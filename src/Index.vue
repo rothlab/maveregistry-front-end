@@ -30,7 +30,7 @@
           <p class="is-inline-flex has-vcentered">
             <b-icon
               size="is-medium"
-              icon="chevron-double-down"
+              icon="mdil-chevron-double-down"
             />
             <span>How does it work?</span>
           </p>
@@ -52,7 +52,7 @@
             <div class="step-line" />
             <div class="columns">
               <div class="column">
-                <div class="step-number is-inline-flex has-vcentered has-text-centered">
+                <div class="step-number is-inline-flex has-vcentered has-text-centered has-background-white">
                   <p class="has-fullwidth has-text-primary">
                     1
                   </p>
@@ -63,7 +63,7 @@
                 <p>See which targets have been registered with activities.</p>
               </div>
               <div class="column">
-                <div class="step-number is-inline-flex has-vcentered has-text-centered">
+                <div class="step-number is-inline-flex has-vcentered has-text-centered has-background-white">
                   <p class="has-fullwidth has-text-primary">
                     2
                   </p>
@@ -74,7 +74,7 @@
                 <p>Reguster activity on a target and see who is working on the same target.</p>
               </div>
               <div class="column">
-                <div class="step-number is-inline-flex has-vcentered has-text-centered">
+                <div class="step-number is-inline-flex has-vcentered has-text-centered has-background-white">
                   <p class="has-fullwidth has-text-primary">
                     3
                   </p>
@@ -94,9 +94,9 @@
           <p class="is-inline-flex has-vcentered">
             <b-icon
               size="is-medium"
-              icon="chevron-double-down"
+              icon="mdil-chevron-double-down"
             />
-            <span>Why register your MAVE activity</span>
+            <span>Why register your MAVE activity?</span>
           </p>
         </div>
       </div>

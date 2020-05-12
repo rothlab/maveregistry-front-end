@@ -8,11 +8,13 @@ import Buefy from 'buefy'
 
 // Import stylesheets
 import 'buefy/dist/buefy.css'
-import '@mdi/font/css/materialdesignicons.css'
+import '@mdi/light-font/css/materialdesignicons-light.css'
 import '@/assets/styles.sass'
 
 // Initialize frameworks
-Vue.use(Buefy)
+Vue.use(Buefy, {
+  defaultIconPack: 'mdil',
+})
 
 // Initialize plugins
 
