@@ -29,7 +29,7 @@
         <div class="tip has-text-centered">
           <p class="is-inline-flex has-vcentered">
             <b-icon
-              size="is-medium"
+              custom-size="mdil-24px"
               icon="mdil-chevron-double-down"
             />
             <span>How does it work?</span>
@@ -93,7 +93,7 @@
         <div class="tip has-text-centered">
           <p class="is-inline-flex has-vcentered">
             <b-icon
-              size="is-medium"
+              custom-size="mdil-24px"
               icon="mdil-chevron-double-down"
             />
             <span>Why register your MAVE activity?</span>
