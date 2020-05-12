@@ -8,6 +8,7 @@ import Buefy from 'buefy'
 
 // Import stylesheets
 import 'buefy/dist/buefy.css'
+import '@mdi/font/css/materialdesignicons.css'
 
 // Initialize frameworks
 Vue.use(Buefy)
