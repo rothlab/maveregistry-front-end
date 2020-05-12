@@ -21,11 +21,18 @@
               <b-button>Team Progress</b-button>
             </div>
           </section>
-
-          <!-- Guider to the next section -->
-          <div class="guider has-text-centered">
-            <p class="guider-text">How does it work??</p>
-          </div>
+        </div>
+      </div>
+      <div class="hero-footer">
+        <!-- Tip to the next section -->
+        <div class="tip has-text-centered">
+          <p class="is-inline-flex has-vcentered">
+            <b-icon
+              size="is-medium"
+              icon="chevron-double-down"
+            />
+            <span>How does it work?</span>
+          </p>
         </div>
       </div>
     </section>
@@ -33,11 +40,8 @@
 </template>
 
 <style lang="sass" scoped>
-.guider
-  position: relative
-  height: 100%
-.guider-text
-  position: absolute
-  width: 100%
-  bottom: 0
+.tip
+  margin: 1rem 0
+.tip span
+  margin-left: 0.5rem
 </style>
