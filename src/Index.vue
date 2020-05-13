@@ -3,7 +3,7 @@
     <!-- Landing section-->
     <section class="hero is-light is-bold">
       <div class="hero-body landing">
-        <div class="container is-fluid">
+        <div class="container is-fluid has-text-centered">
           <div class="columns is-vcentered">
             <div class="column">
               <div class="landing-left">
@@ -39,7 +39,7 @@
               </div>
             </div>
 
-            <div class="column">
+            <div class="column is-hidden-mobile">
               <div class="demo-display" />
             </div>
           </div>
@@ -70,7 +70,7 @@
 
           <div class="section">
             <!-- Steps -->
-            <div class="step-line" />
+            <div class="step-line is-hidden-touch" />
             <div class="columns">
               <div class="column">
                 <div class="step-number is-inline-flex has-vcentered has-text-centered has-background-white">
@@ -136,7 +136,6 @@
               v-model="activeTab"
               size="is-small"
               position="is-centered"
-              class="block"
             >
               <b-tab-item
                 v-for="(tab, index) in tabs"
@@ -160,7 +159,7 @@
                     </div>
                     <p
                       v-if="tab.title"
-                      class="tab-title is-size-5 has-text-primary"
+                      class="tab-title is-size-5 has-text-primary is-hidden-touch"
                     >
                       {{ tab.title }}
                     </p>
@@ -169,7 +168,7 @@
 
                 <!-- Tab content -->
                 <div class="container has-text-left is-flex has-vcentered">
-                  <div>
+                  <div class="is-hidden-mobile">
                     <img
                       :src="tab.image"
                       :alt="tab.image_alt_text"
@@ -184,7 +183,7 @@
                           </h2>
                         </div>
                         <div class="columns">
-                          <div class="column is-narrow">
+                          <div class="column is-narrow is-hidden-mobile">
                             <b-icon
                               icon="mdil-check"
                               custom-size="mdil-36px"
@@ -268,13 +267,14 @@ export default {
 <style lang="sass" scoped>
 @import "@/assets/variables.sass"
 
-.landing
-  padding-right: 0
-  margin-right: 0
-.landing-left
-  position: relative
-  float: right
-  max-width: 30rem
+@media screen and (min-width: $break-desktop)
+  .landing
+    padding-right: 0
+    margin-right: 0
+  .landing-left
+    position: relative
+    float: right
+    max-width: 30rem
 .landing-action-buttons
   margin-top: 2rem
   .button
@@ -302,13 +302,18 @@ export default {
   height: 5rem
   width: 5rem
   font-size: 40px
+  @media screen and (max-width: $break-desktop)
+    height: 3rem
+    width: 3rem
+    font-size: 30px
   font-weight: lighter
   border-radius: 50%
   border: 1px solid $primary
 .tab-title
   padding: 1rem
-.tab-description
-  width: 50%
-  position: absolute
-  right: 0px
+@media screen and (min-width: $break-mobile)
+  .tab-description
+    width: 50%
+    position: absolute
+    right: 0px
 </style>
