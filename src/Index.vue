@@ -3,7 +3,7 @@
     <!-- Landing section-->
     <section class="hero is-light is-bold">
       <div class="hero-body landing">
-        <div class="container is-fluid has-text-centered">
+        <div class="container is-fluid">
           <div class="columns is-vcentered">
             <div class="column">
               <div class="landing-left">
@@ -70,7 +70,7 @@
 
           <div class="section">
             <!-- Steps -->
-            <div class="step-line is-hidden-touch" />
+            <div class="step-line is-hidden-mobile" />
             <div class="columns">
               <div class="column">
                 <div class="step-number is-inline-flex has-vcentered has-text-centered has-background-white">
@@ -275,6 +275,10 @@ export default {
     position: relative
     float: right
     max-width: 30rem
+@media screen and (max-width: $break-mobile)
+  .landing
+    text-align: center
+
 .landing-action-buttons
   margin-top: 2rem
   .button
@@ -294,6 +298,8 @@ export default {
 .step-line
   position: relative
   top: 2.5rem
+  @media screen and (max-width: $break-desktop)
+    top: 1.6rem
   left: 15%
   width: 70%
   border: 0.5px solid $primary
