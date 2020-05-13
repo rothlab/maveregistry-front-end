@@ -10,6 +10,7 @@ import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 import '@mdi/light-font/css/materialdesignicons-light.css'
 import '@/assets/styles.sass'
+import router from './router'
 
 // Initialize frameworks
 Vue.use(Buefy, {
@@ -21,5 +22,6 @@ Vue.use(Buefy, {
 Vue.config.productionTip = false
 
 new Vue({
-  render: h => h(App),
+  router,
+  render: h => h(App)
 }).$mount('#app')

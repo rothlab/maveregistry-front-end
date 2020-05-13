@@ -288,7 +288,7 @@ export default {
   right: -2rem
   min-height: 20rem
   height: 70vh
-  background-image: url("./assets/laptop-wire.svg")
+  background-image: url("../assets/laptop-wire.svg")
   background-size: cover
   overflow-x: show
 .tip
