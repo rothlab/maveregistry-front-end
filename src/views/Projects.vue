@@ -31,7 +31,7 @@
     </div>
 
     <!-- Project table -->
-    <div class="container">
+    <div class="container has-fullheight">
       <div class="project-table">
         <b-table :data="projects">
           <template slot-scope="props">
@@ -252,6 +252,8 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.project-table
+  padding-top: 1rem
 .progress-card
   box-shadow: none
   border-radius: 0.4rem

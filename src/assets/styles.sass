@@ -1,6 +1,13 @@
+@import "variables"
+
 .has-vcentered
   align-items: center
 .has-fullwidth
   width: 100%
+.has-fullheight
+  @media screen and (min-width: $break-desktop)
+    min-height: calc( 100vh - 10.75rem - 7.25rem)
+  @media screen and (max-width: $break-desktop)
+    min-height: calc( 100vh - 8.75rem - 7.25rem)
 .circle-icon
   border-radius: 50%
