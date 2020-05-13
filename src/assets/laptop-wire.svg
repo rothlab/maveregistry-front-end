@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1250.505" height="773.5" viewBox="0 0 1250.505 773.5">
+  <g id="macbook-pro-wire" transform="translate(-577.25 -226)">
+    <path id="Path_2" data-name="Path 2" d="M1676.52,935.368H643.957V337.574a69.356,69.356,0,0,1,69.355-69.357h893.852a69.356,69.356,0,0,1,69.355,69.357Z" transform="translate(42.264 26.748)" fill="#186aa5"/>
+    <path id="Path_3" data-name="Path 3" d="M1650.438,924.127H655.461V330.652a47.568,47.568,0,0,1,47.568-47.568H1602.87a47.568,47.568,0,0,1,47.568,47.568Z" transform="translate(49.553 36.167)" fill="#fff"/>
+    <path id="Path_4" data-name="Path 4" d="M963,228.45v0Z" transform="translate(244.403 0)"/>
+    <circle id="Ellipse_1" data-name="Ellipse 1" cx="4.084" cy="4.084" r="4.084" transform="translate(1198.419 303.062)" fill="#fff"/>
+    <g id="Group_3" data-name="Group 3" transform="translate(704.591 331.843)">
+      <rect id="Rectangle_6" data-name="Rectangle 6" width="1164.135" height="1.633" transform="matrix(0.842, -0.539, 0.539, 0.842, 0, 627.79)" fill="#d1e4f3"/>
+    </g>
+    <g id="Group_4" data-name="Group 4" transform="translate(719.164 331.869)">
+      <rect id="Rectangle_7" data-name="Rectangle 7" width="1.633" height="1164.136" transform="translate(0 1.375) rotate(-57.369)" fill="#d1e4f3"/>
+    </g>
+    <path id="Path_5" data-name="Path 5" d="M577.25,695.1V681.209a5.71,5.71,0,0,1,5.709-5.709H1822.046a5.71,5.71,0,0,1,5.709,5.709V695.1Z" transform="translate(0 284.794)" fill="#fff"/>
+    <path id="Path_6" data-name="Path 6" d="M596.618,703.643,577.25,687.5H1827.755l-22.47,18.729a3.77,3.77,0,0,1-2.414.874H606.171A14.917,14.917,0,0,1,596.618,703.643Z" transform="translate(0 292.397)" fill="#d1e4f3"/>
+    <path id="Path_7" data-name="Path 7" d="M1058.213,680.721H919.6a5.22,5.22,0,0,1-5.219-5.221h149.054A5.22,5.22,0,0,1,1058.213,680.721Z" transform="translate(213.597 284.794)" fill="#186aa5"/>
+  </g>
+</svg>

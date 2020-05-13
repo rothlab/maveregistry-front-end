@@ -1,27 +1,48 @@
 <template>
   <section>
     <!-- Landing section-->
-    <section class="hero is-large is-primary is-bold">
-      <div class="hero-body">
-        <div class="container">
-          <!-- Intro -->
-          <h2 class="subtitle">
-            Amazing MAVE projects
-          </h2>
-          <h1 class="title is-uppercase">
-            Registered Here
-          </h1>
-          <p>
-            MAVE Registry is a database for activities on studying targets with Multiplexed Assays of Variant Effect (MAVE).
-          </p>
+    <section class="hero is-light is-bold">
+      <div class="hero-body landing">
+        <div class="container is-fluid">
+          <div class="columns is-vcentered">
+            <div class="column">
+              <div class="landing-left">
+                <!-- Intro -->
+                <h2 class="subtitle is-size-4">
+                  Amazing MAVE projects
+                </h2>
+                <h1 class="title is-uppercase is-size-2">
+                  Registered Here
+                </h1>
+                <p class="is-size-5">
+                  MAVE Registry is a database for activities on studying targets with Multiplexed Assays of Variant Effect (MAVE).
+                </p>
 
-          <!-- Action buttons -->
-          <section>
-            <div class="buttons">
-              <b-button>Register Activity</b-button>
-              <b-button>Team Progress</b-button>
+                <!-- Action buttons -->
+                <div class="landing-action-buttons">
+                  <div class="level">
+                    <div class="level-left">
+                      <b-button
+                        size="is-medium"
+                        type="is-primary"
+                      >
+                        Register Activity
+                      </b-button>
+                    </div>
+                    <div class="level-right">
+                      <b-button size="is-medium">
+                        Team Progress
+                      </b-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </section>
+
+            <div class="column">
+              <div class="demo-display" />
+            </div>
+          </div>
         </div>
       </div>
       <div class="hero-footer">
@@ -247,6 +268,25 @@ export default {
 <style lang="sass" scoped>
 @import "@/assets/variables.sass"
 
+.landing
+  padding-right: 0
+  margin-right: 0
+.landing-left
+  position: relative
+  float: right
+  max-width: 30rem
+.landing-action-buttons
+  margin-top: 2rem
+  .button
+    padding: 0rem 1.5rem
+.demo-display
+  position: relative
+  right: -2rem
+  min-height: 20rem
+  height: 70vh
+  background-image: url("./assets/laptop-wire.svg")
+  background-size: cover
+  overflow-x: show
 .tip
   margin: 1rem 0
 .tip span
