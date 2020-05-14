@@ -29,11 +29,28 @@
         </div>
       </div>
     </div>
-
-    <!-- Project table -->
-    <div class="container has-fullheight">
-      <div class="project-table">
-        <b-table :data="projects">
+    
+    <div class="container has-fullheight has-top-padding">
+      <!-- New project register -->
+      <b-button
+        expanded
+        icon-left="mdil-plus"
+        type="is-primary"
+        size="is-medium"
+        class="register-activity"
+        outlined
+      >
+        Register Activity for a New Target
+      </b-button>
+      
+      <!-- Project table -->
+      <div>
+        <b-table
+          :data="projects"
+          hoverable
+          paginated
+          :per-page="20"
+        >
           <template slot-scope="props">
             <!-- Project ID -->
             <b-table-column
@@ -155,11 +172,30 @@
                         icon="mdil-currency-usd"
                       />
                     </b-tag>
+                    <!-- Followed status -->
                     <b-tag
+                      v-if="team.has_followed"
                       size="is-medium"
-                      type="is-primary"
+                      class="is-clickable has-background-primary"
+                      @click.native="isFollowModelActive = true"
                     >
-                      <b-icon icon="mdil-bell" />
+                      <b-icon
+                        type="is-white"
+                        custom-size="mdi-16px"
+                        pack="mdi"
+                        icon="bell"
+                      />
+                    </b-tag>
+                    <!-- Unfollowed status -->
+                    <b-tag
+                      v-else
+                      size="is-medium"
+                      class="is-clickable has-background-grey-lighter"
+                      @click.native="isUnfollowModelActive = true"
+                    >
+                      <b-icon
+                        icon="mdil-bell"
+                      />
                     </b-tag>
                   </b-taglist>
                 </div>
@@ -232,15 +268,19 @@ export default {
             {
               id: "team_1",
               name: "Roth FP",
+              has_followed: false,
             },
             {
               id: "team_2",
               name: "Smith J",
-              open_for_funding: true
+              open_for_funding: true,
+              has_followed: true,
             }
           ]
         }
-      ]
+      ],
+      isFollowModelActive: false,
+      isUnfollowModelActive: false,
     }
   },
   methods: {
