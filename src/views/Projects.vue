@@ -135,6 +135,7 @@
               <b-field
                 grouped
                 group-multiline
+                class="team-control"
               >
                 <div
                   class="control"
@@ -143,7 +144,10 @@
                 >
                   <b-taglist attached>
                     <b-tag size="is-medium">
-                      <b-icon icon="mdil-account" />
+                      <b-icon
+                        icon="mdil-account"
+                        class="team-icon"
+                      />
                       {{ team.name }}
                       <b-icon
                         v-if="team.open_for_funding"
@@ -252,6 +256,8 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+@import "@/assets/variables.sass"
+
 .project-table
   padding-top: 1rem
 .progress-card
@@ -272,4 +278,14 @@ export default {
     padding-right: 0.625rem
     padding-top: calc( 0.3125rem - 1px )
     padding-bottom: calc( 0.3125rem - 1px )
+@media screen and (max-width: $break-mobile)
+  .team-control
+    justify-content: flex-end
+    .control:first-child
+      margin-right: 0 !important
+    .control:not(:first-child)
+      margin-left: 0.75rem
+.team-icon
+  margin-left: -0.375rem !important
+  margin-right: -0.2rem !important
 </style>
