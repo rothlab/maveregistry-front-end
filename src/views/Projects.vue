@@ -258,8 +258,8 @@ export default {
 <style lang="sass" scoped>
 @import "@/assets/variables.sass"
 
-.project-table
-  padding-top: 1rem
+.register-activity
+  margin: 1rem 0rem
 .progress-card
   box-shadow: none
   border-radius: 0.4rem
