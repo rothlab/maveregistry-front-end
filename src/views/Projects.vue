@@ -177,7 +177,7 @@
                       v-if="team.has_followed"
                       size="is-medium"
                       class="is-clickable has-background-primary"
-                      @click.native="isFollowModelActive = true"
+                      @click.native="confirmUnfollowTeam(team, props.row.target)"
                     >
                       <b-icon
                         type="is-white"
@@ -191,7 +191,7 @@
                       v-else
                       size="is-medium"
                       class="is-clickable has-background-grey-lighter"
-                      @click.native="isUnfollowModelActive = true"
+                      @click.native="confirmFollowTeam(team, props.row.target)"
                     >
                       <b-icon
                         icon="mdil-bell"
@@ -227,14 +227,79 @@
           </template>
         </b-table>
       </div>
+
+      <!-- Follow up modal -->
+      <b-modal
+        :active.sync="isFollowModelActive"
+        has-modal-card
+        :can-cancel="['escape', 'outside']"
+        @close="cleanupFollow()"
+      >
+        <div
+          class="modal-card"
+          v-if="followProp"
+        >
+          <header class="modal-card-head">
+            <p class="modal-card-title">
+              <b-icon
+                class="follow-modal-title-icon"
+                icon="mdil-rss"
+              />
+              <span>Follow {{ followProp.team.name }}</span>
+            </p>
+            <button
+              class="delete"
+              aria-label="close"
+              @click="isFollowModelActive = false"
+            />
+          </header>
+          <section class="modal-card-body">
+            <div class="content">
+              <p>
+                <strong>Target: </strong>
+                <span>{{ followProp.target.name }}</span>
+              </p>
+              <b-field :label="'Please briefly summarize your interest in following this target and team.'">
+                <b-input
+                  v-model="followRequest"
+                  maxlength="300"
+                  type="textarea"
+                  placeholder="Maximum 300 characters."
+                  required
+                />
+              </b-field>
+            </div>
+          </section>
+          <footer class="modal-card-foot">
+            <b-button
+              expanded
+              :disabled="followRequest.length <= 0"
+              :loading="isActionButtonLoading"
+              type="is-primary"
+              outlined
+              @click="followTeam(followProp.team, followProp.target, followRequest)"
+            >
+              Submit Request
+            </b-button>
+          </footer>
+        </div>
+      </b-modal>
     </div>
   </div>
 </template>
 
 <script>
+//TODO: remove debug functions
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 export default {
   data () {
     return {
+      user: {
+        id: "user_1",
+        name: "Kevin Kuang",
+        auth_token: "arandomtoken",
+      },
       projects: 
       [
         {
@@ -262,7 +327,7 @@ export default {
                 url: "https://www.mavedb.org/search/?search=brca1",
                 text: "MaveDB"
               },
-            ]
+            ],
           }],
           teams: [
             {
@@ -275,12 +340,14 @@ export default {
               name: "Smith J",
               open_for_funding: true,
               has_followed: true,
-            }
+            },
           ]
         }
       ],
       isFollowModelActive: false,
-      isUnfollowModelActive: false,
+      followProp: null,
+      followRequest: "",
+      isActionButtonLoading: false,
     }
   },
   methods: {
@@ -290,6 +357,65 @@ export default {
       }
 
       return icons[type]
+    },
+    confirmFollowTeam(team, target) {
+      this.isFollowModelActive = true
+      this.followProp = {
+        team: team,
+        target: target, 
+      }
+    },
+    async followTeam(team, target, request) {
+      // Loading
+      this.isActionButtonLoading = true
+
+      //TODO: remove debug delay
+      await delay(2000);
+
+      //TODO: implement API to accept follow request
+
+      // Handle UI changes
+      this.isActionButtonLoading = false
+      this.isFollowModelActive = false
+      this.cleanupFollow()
+      this.$buefy.toast.open({
+        message: `Followed ${team.name} on ${target.name} successfully`,
+        type: "is-success",
+        duration: 5000
+      })
+
+      request
+    },
+    confirmUnfollowTeam(team, target) {
+      this.$buefy.dialog.confirm({
+        title: `Unfollow ${team.name} on ${target.name}`,
+        message: `Once unfollowed, you will need ${team.name}'s permission to follow again.`,
+        type: "is-warning",
+        hasIcon: true,
+        iconPack: "mdi",
+        icon: "alert-circle",
+        confirmText: "Unfollow",
+        cancelText: "Cancel",
+        onConfirm: () => this.unfollowTeam(team, target)
+      })
+    },
+    unfollowTeam(team, target) {
+      // Loading
+      this.$buefy.loading.open({
+        container: this.$refs["follow-submit-buttom"].$el
+      })
+
+      // TODO: Implement API to accept unfollow request
+
+      // Handle UI changes
+      this.$buefy.toast.open({
+        message: `Unfollowed ${team.name} on ${target.name} successfully`,
+        type: "is-success"
+      })
+    },
+    cleanupFollow() {
+      this.followProp = null
+      this.followRequest = ""
     }
   }
 }
@@ -328,4 +454,6 @@ export default {
 .team-icon
   margin-left: -0.375rem !important
   margin-right: -0.2rem !important
+.follow-modal-title-icon
+  margin-right: 0.5rem
 </style>
