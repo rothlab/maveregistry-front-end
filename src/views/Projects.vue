@@ -96,75 +96,76 @@
               label="Progress"
               width="25vw"
             >
-              <b-collapse
-                class="card progress-card has-background-light"
-                animation="slide"
-                v-for="(progress, index) in props.row.progress"
-                :key="index"
-                :open="false"
-              >
-                <div
-                  slot="trigger"
-                  slot-scope="innerProps"
-                  class="card-header"
-                  role="button"
+              <div class="has-text-left">
+                <b-collapse
+                  class="card progress-card has-background-light"
+                  animation="slide"
+                  v-for="(progress, index) in props.row.progress"
+                  :key="index"
+                  :open="false"
                 >
-                  <p class="card-header-title is-capitalized">
-                    <b-icon :icon="selectProgressIcon(progress.type)" />
-                    {{ progress.description }}
-                  </p>
-                  <a class="card-header-icon">
-                    <b-icon
-                      :icon="innerProps.open ? 'mdil-chevron-up' : 'mdil-chevron-down'"
-                    />
-                  </a>
-                </div>
-                <div class="card-content has-background-white">
-                  <div class="content">
-                    <!-- Show links when available -->
-                    <div
-                      v-if="progress.links"
-                    >
-                      <span
-                        v-for="(link, i) in progress.links"
-                        :key="i"
+                  <div
+                    slot="trigger"
+                    slot-scope="innerProps"
+                    class="card-header"
+                    role="button"
+                  >
+                    <p class="card-header-title is-capitalized">
+                      <b-icon :icon="selectProgressIcon(progress.type)" />
+                      {{ progress.description }}
+                    </p>
+                    <a class="card-header-icon">
+                      <b-icon
+                        :icon="innerProps.open ? 'mdil-chevron-up' : 'mdil-chevron-down'"
+                      />
+                    </a>
+                  </div>
+                  <div class="card-content">
+                    <div class="content">
+                      <!-- Show links when available -->
+                      <div
+                        v-if="progress.links"
                       >
-                        <a
-                          :href="link.url"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >{{ link.text }}</a>
-                        <span v-if="i < progress.links.length - 1">, </span>
-                      </span>
-                    </div>
-
-                    <!-- Show assay detail when available -->
-                    <div
-                      v-if="progress.phenotype"
-                      class="is-capitalized"
-                    >
-                      <div class="level is-paddingless">
-                        <div class="level-left">
-                          <p>
-                            Phenotype: {{ progress.phenotype }} <br>
-                            Submitter: {{ progress.team }}
-                          </p>
-                        </div>
-                        <div class="level-right">
+                        <span
+                          v-for="(link, i) in progress.links"
+                          :key="i"
+                        >
                           <a
-                            :href="'/progress/' + progress.id"
+                            :href="link.url"
                             target="_blank"
                             rel="noopener noreferrer"
-                          >
-                            <b-icon icon="mdil-link-variant" />
-                            <span>Detail</span>
-                          </a>
+                          >{{ link.text }}</a>
+                          <span v-if="i < progress.links.length - 1">, </span>
+                        </span>
+                      </div>
+
+                      <!-- Show assay detail when available -->
+                      <div
+                        v-if="progress.phenotype"
+                        class="is-capitalized"
+                      >
+                        <div class="level is-paddingless is-mobile">
+                          <div class="level-left">
+                            <p>
+                              Phenotype: {{ progress.phenotype }} <br>
+                              Submitter: {{ progress.team }}
+                            </p>
+                          </div>
+                          <div class="level-right">
+                            <a
+                              :href="'/progress/' + progress.id"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <b-icon icon="mdil-link-variant" />
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </b-collapse>
+                </b-collapse>
+              </div>
             </b-table-column>
 
             <!-- Active teams -->
@@ -617,7 +618,7 @@ export default {
 .register-activity
   margin: 1rem 0rem
 .progress-card
-  box-shadow: none
+  box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 0 1px 0px rgba(10, 10, 10, 0.3) inset
   &:first-child
     border-radius: 0.4rem 0.4rem 0 0
   &:last-child
@@ -630,9 +631,7 @@ export default {
     font-weight: normal
     padding: 0.25rem 0.5rem
   .card-content
-    padding: 0.25rem 2rem 0.25rem 2rem
-    &:last-child
-    border-radius: 0rem 0rem 0.4rem 0.4rem
+    padding: 0.25rem 0.5rem 0.25rem 0.9rem
 .action-button
   justify-content: space-between
   button, a
