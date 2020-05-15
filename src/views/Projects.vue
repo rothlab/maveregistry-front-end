@@ -177,7 +177,7 @@
                       v-if="team.has_followed"
                       size="is-medium"
                       class="is-clickable has-background-primary"
-                      @click.native="confirmUnfollowTeam(team, props.row.target)"
+                      @click.native="confirmUnfollowTeam(team, props.row.target, props.index)"
                     >
                       <b-icon
                         type="is-white"
@@ -191,7 +191,7 @@
                       v-else
                       size="is-medium"
                       class="is-clickable has-background-grey-lighter"
-                      @click.native="confirmFollowTeam(team, props.row.target)"
+                      @click.native="confirmFollowTeam(team, props.row.target, props.index)"
                     >
                       <b-icon
                         icon="mdil-bell"
@@ -241,10 +241,6 @@
         >
           <header class="modal-card-head">
             <p class="modal-card-title">
-              <b-icon
-                class="follow-modal-title-icon"
-                icon="mdil-rss"
-              />
               <span>Follow {{ followProp.team.name }}</span>
             </p>
             <button
@@ -277,10 +273,73 @@
               :loading="isActionButtonLoading"
               type="is-primary"
               outlined
-              @click="followTeam(followProp.team, followProp.target, followRequest)"
+              @click="followTeam(followProp.team, followProp.target, followProp.project_index, followRequest)"
             >
               Submit Request
             </b-button>
+          </footer>
+        </div>
+      </b-modal>
+
+      <!-- Unfollow modal -->
+      <b-modal
+        :active.sync="isUnfollowModelActive"
+        has-modal-card
+        :can-cancel="['escape', 'outside']"
+        @close="cleanupUnfollow()"
+      >
+        <div
+          class="modal-card"
+          v-if="followProp"
+        >
+          <header class="modal-card-head">
+            <p class="modal-card-title">
+              <span>Unfollow target?</span>
+            </p>
+            <button
+              class="delete"
+              aria-label="close"
+              @click="isUnfollowModelActive = false"
+            />
+          </header>
+          <section class="modal-card-body">
+            <div class="container">
+              <div class="media">
+                <div class="media-left">
+                  <b-icon
+                    pack="mdi"
+                    icon="alert-circle"
+                    size="is-large"
+                    type="is-warning"
+                  />
+                </div>
+                <div class="media-content">
+                  <div class="content">
+                    <p>
+                      Are you sure you want to unfollow {{ followProp.team.name }} on {{ followProp.target.name }}? <br>
+                      Once unfollowed, you will need their permission to follow again.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <footer class="modal-card-foot has-hright">
+            <div class="buttons">
+              <b-button
+                @click="isUnfollowModelActive = false"
+              >
+                Cancel
+              </b-button>
+              <b-button
+                :loading="isActionButtonLoading"
+                type="is-primary"
+                outlined
+                @click="unfollowTeam(followProp.team, followProp.target, followProp.project_index)"
+              >
+                Unfollow
+              </b-button>
+            </div>
           </footer>
         </div>
       </b-modal>
@@ -347,6 +406,7 @@ export default {
       isFollowModelActive: false,
       followProp: null,
       followRequest: "",
+      isUnfollowModelActive: false,
       isActionButtonLoading: false,
     }
   },
@@ -358,19 +418,38 @@ export default {
 
       return icons[type]
     },
-    confirmFollowTeam(team, target) {
+    confirmFollowTeam(team, target, index) {
       this.isFollowModelActive = true
       this.followProp = {
         team: team,
-        target: target, 
+        target: target,
+        project_index: index
       }
     },
-    async followTeam(team, target, request) {
+    async followTeam(team, target, index, request) {
       // Loading
       this.isActionButtonLoading = true
 
       //TODO: remove debug delay
       await delay(2000);
+
+      //TODO: remove debug response
+      const response = {
+        status: "success",
+        teams: [
+          {
+            id: "team_1",
+            name: "Roth FP",
+            has_followed: true,
+          },
+          {
+            id: "team_2",
+            name: "Smith J",
+            open_for_funding: true,
+            has_followed: true,
+          },
+        ]
+      }
 
       //TODO: implement API to accept follow request
 
@@ -378,38 +457,65 @@ export default {
       this.isActionButtonLoading = false
       this.isFollowModelActive = false
       this.cleanupFollow()
+
+      // Update team
+      this.projects[index].teams = response.teams
+
+      // Show status update
       this.$buefy.toast.open({
-        message: `Followed ${team.name} on ${target.name} successfully`,
+        message: `Followed ${team.name} on ${target.name}`,
         type: "is-success",
         duration: 5000
       })
 
       request
     },
-    confirmUnfollowTeam(team, target) {
-      this.$buefy.dialog.confirm({
-        title: `Unfollow ${team.name} on ${target.name}`,
-        message: `Once unfollowed, you will need ${team.name}'s permission to follow again.`,
-        type: "is-warning",
-        hasIcon: true,
-        iconPack: "mdi",
-        icon: "alert-circle",
-        confirmText: "Unfollow",
-        cancelText: "Cancel",
-        onConfirm: () => this.unfollowTeam(team, target)
-      })
+    confirmUnfollowTeam(team, target, index) {
+      this.isUnfollowModelActive = true
+      this.followProp = {
+        team: team,
+        target: target, 
+        project_index: index
+      }
     },
-    unfollowTeam(team, target) {
+    async unfollowTeam(team, target, index) {
       // Loading
-      this.$buefy.loading.open({
-        container: this.$refs["follow-submit-buttom"].$el
-      })
+      this.isActionButtonLoading = true
+
+      //TODO: remove debug delay
+      await delay(2000);
 
       // TODO: Implement API to accept unfollow request
 
+      //TODO: remove debug response
+      const response = {
+        status: "success",
+        teams: [
+          {
+            id: "team_1",
+            name: "Roth FP",
+            has_followed: false,
+          },
+          {
+            id: "team_2",
+            name: "Smith J",
+            open_for_funding: true,
+            has_followed: false,
+          },
+        ]
+      }
+
       // Handle UI changes
+      this.isActionButtonLoading = false
+      this.isUnfollowModelActive = false
+      this.cleanupFollow()
+
+      // Update team
+      this.projects[index].teams = response.teams
+
+      // Show status update
       this.$buefy.toast.open({
-        message: `Unfollowed ${team.name} on ${target.name} successfully`,
+        message: `Unfollowed ${team.name} on ${target.name}`,
         type: "is-success"
       })
     },
@@ -454,6 +560,4 @@ export default {
 .team-icon
   margin-left: -0.375rem !important
   margin-right: -0.2rem !important
-.follow-modal-title-icon
-  margin-right: 0.5rem
 </style>
