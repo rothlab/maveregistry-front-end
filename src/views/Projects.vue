@@ -101,8 +101,7 @@
                 animation="slide"
                 v-for="(progress, index) in props.row.progress"
                 :key="index"
-                :open="props.row.isOpen == index"
-                @open="props.row.isOpen = index"
+                :open="false"
               >
                 <div
                   slot="trigger"
@@ -120,12 +119,11 @@
                     />
                   </a>
                 </div>
-                <div class="card-content">
+                <div class="card-content has-background-white">
                   <div class="content">
                     <!-- Show links when available -->
                     <div
                       v-if="progress.links"
-                      class="progress-link"
                     >
                       <span
                         v-for="(link, i) in progress.links"
@@ -138,6 +136,27 @@
                         >{{ link.text }}</a>
                         <span v-if="i < progress.links.length - 1">, </span>
                       </span>
+                    </div>
+
+                    <!-- Show assay detail when available -->
+                    <div
+                      v-if="progress.phenotype"
+                      class="is-capitalized"
+                    >
+                      <div class="level is-paddingless">
+                        <div class="level-left">
+                          <p>
+                            Phenotype: {{ progress.phenotype }} <br>
+                            Submitter: {{ progress.team }}
+                          </p>
+                        </div>
+                        <div class="level-right">
+                          <a :href="'/progress/' + progress.id" target="_blank" rel="noopener noreferrer">
+                            <b-icon icon="mdil-link-variant" />
+                            <span>Detail</span>
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -401,7 +420,45 @@ export default {
               has_followed: true,
             },
           ]
-        }
+        },
+{
+          id: "project_2",
+          target: {
+            id: "target_2",
+            name: "CHEK2",
+            type: "gene",
+            organism: "H. sapiens",
+          },
+          progress: [
+            {
+              id: "progress_3",
+              type: "assay",
+              description: "yeast complementation",
+              phenotype: "growth defect",
+              team: "Roth FP",
+            },
+            {
+              id: "progress_4",
+              type: "assay",
+              description: "yeast two-hybrid",
+              phenotype: "growth defect",
+              team: "Smith J",
+            }
+          ],
+          teams: [
+            {
+              id: "team_1",
+              name: "Roth FP",
+              has_followed: true,
+            },
+            {
+              id: "team_2",
+              name: "Smith J",
+              open_for_funding: true,
+              has_followed: true,
+            },
+          ]
+        },
       ],
       isFollowModelActive: false,
       followProp: null,
@@ -413,7 +470,8 @@ export default {
   methods: {
     selectProgressIcon(type) {
       const icons = {
-        publication: "mdil-file-multiple"
+        publication: "mdil-file-multiple",
+        assay: "mdil-flask"
       }
 
       return icons[type]
@@ -534,14 +592,19 @@ export default {
   margin: 1rem 0rem
 .progress-card
   box-shadow: none
-  border-radius: 0.4rem
+  &:first-child
+    border-radius: 0.4rem 0.4rem 0 0
+  &:last-child
+    border-radius: 0rem 0rem 0.4rem 0.4rem
+  &:only-child
+    border-radius: 0.4rem
   .card-header
     box-shadow: none
   .card-header-title, .card-header-icon
     font-weight: normal
     padding: 0.25rem 0.5rem
   .card-content
-    padding: 0rem 2rem 0.25rem 2rem
+    padding: 0.25rem 2rem 0.25rem 2rem
 .action-button
   justify-content: space-between
   button
