@@ -151,7 +151,11 @@
                           </p>
                         </div>
                         <div class="level-right">
-                          <a :href="'/progress/' + progress.id" target="_blank" rel="noopener noreferrer">
+                          <a
+                            :href="'/progress/' + progress.id"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             <b-icon icon="mdil-link-variant" />
                             <span>Detail</span>
                           </a>
@@ -234,12 +238,34 @@
                 >
                   <b-button icon-right="mdil-plus" />
                 </b-tooltip>
+                <!-- Show MaveQuest for human genes -->
                 <b-tooltip
-                  label="Plan MAVE study"
+                  v-if="props.row.target.type == 'gene' && props.row.target.organism == 'H. sapiens'"
+                  label="Plan with MaveQuest"
                   position="is-left"
                   type="is-dark"
                 >
-                  <b-button icon-right="mdil-magnify" />
+                  <b-button
+                    tag="a"
+                    :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.target.name"
+                    target="_blank"
+                    icon-right="mdil-magnify"
+                  />
+                </b-tooltip>
+                <!-- Show Google search for others -->
+                <b-tooltip
+                  v-else
+                  label="Look up"
+                  position="is-left"
+                  type="is-dark"
+                >
+                  <b-button
+                    tag="a"
+                    :href="'https://www.google.com/search?q=' + props.row.target.name"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    icon-right="mdil-magnify"
+                  />
                 </b-tooltip>
               </div>
             </b-table-column>
@@ -605,9 +631,11 @@ export default {
     padding: 0.25rem 0.5rem
   .card-content
     padding: 0.25rem 2rem 0.25rem 2rem
+    &:last-child
+    border-radius: 0rem 0rem 0.4rem 0.4rem
 .action-button
   justify-content: space-between
-  button
+  button, a
     height: 2rem
     padding-left: 0.625rem
     padding-right: 0.625rem
