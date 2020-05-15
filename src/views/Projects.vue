@@ -39,6 +39,7 @@
         size="is-medium"
         class="register-activity"
         outlined
+        @click="isNewActivityModalActive = true"
       >
         Register Activity for a New Target
       </b-button>
@@ -292,7 +293,7 @@
             <button
               class="delete"
               aria-label="close"
-              @click="isFollowModelActive = false"
+              @click="isFollowModelActive = false; cleanupFollow();"
             />
           </header>
           <section class="modal-card-body">
@@ -301,7 +302,7 @@
                 <strong>Target: </strong>
                 <span>{{ followProp.target.name }}</span>
               </p>
-              <b-field :label="'Please briefly summarize your interest in following this target and team.'">
+              <b-field label="Please briefly summarize your interest in following this target and team.">
                 <b-input
                   v-model="followRequest"
                   maxlength="300"
@@ -332,7 +333,7 @@
         :active.sync="isUnfollowModelActive"
         has-modal-card
         :can-cancel="['escape', 'outside']"
-        @close="cleanupUnfollow()"
+        @close="cleanupFollow()"
       >
         <div
           class="modal-card"
@@ -345,7 +346,7 @@
             <button
               class="delete"
               aria-label="close"
-              @click="isUnfollowModelActive = false"
+              @click="isUnfollowModelActive = false; cleanupFollow();"
             />
           </header>
           <section class="modal-card-body">
@@ -373,7 +374,7 @@
           <footer class="modal-card-foot has-hright">
             <div class="buttons">
               <b-button
-                @click="isUnfollowModelActive = false"
+                @click="isUnfollowModelActive = false; cleanupFollow();"
               >
                 Cancel
               </b-button>
@@ -386,6 +387,57 @@
                 Unfollow
               </b-button>
             </div>
+          </footer>
+        </div>
+      </b-modal>
+
+      <!-- New activity modal -->
+      <b-modal
+        :active.sync="isNewActivityModalActive"
+        has-modal-card
+        :can-cancel="['escape', 'outside']"
+        @close="cleanupNewActivity()"
+      >
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title">
+              <span>Register activity</span>
+            </p>
+            <button
+              class="delete"
+              aria-label="close"
+              @click="isNewActivityModalActive = false; cleanupNewActivity();"
+            />
+          </header>
+          <section class="modal-card-body">
+            <div class="content">
+              <b-field label="Type of target">
+                <b-select
+                  v-model="newActivityProp.type"
+                  placeholder="Select a target type"
+                  required
+                  expanded
+                >
+                  <option value="gene">
+                    Gene
+                  </option>
+                  <option value="regulatory">
+                    Regulatory
+                  </option>
+                </b-select>
+              </b-field>
+            </div>
+          </section>
+          <footer class="modal-card-foot">
+            <b-button
+              expanded
+              :loading="isActionButtonLoading"
+              type="is-primary"
+              outlined
+              @click="followTeam(followProp.team, followProp.target, followProp.project_index, followRequest)"
+            >
+              Submit Request
+            </b-button>
           </footer>
         </div>
       </b-modal>
@@ -448,7 +500,7 @@ export default {
             },
           ]
         },
-{
+        {
           id: "project_2",
           target: {
             id: "target_2",
@@ -487,11 +539,19 @@ export default {
           ]
         },
       ],
+      // Follow/unfollow target related parameters
       isFollowModelActive: false,
       followProp: null,
       followRequest: "",
       isUnfollowModelActive: false,
+      // Register new activity related parameters
       isActionButtonLoading: false,
+      isNewActivityModalActive: false,
+      newActivityProp: {
+        type: "",
+        name: "",
+        features: []
+      }
     }
   },
   methods: {
@@ -607,6 +667,13 @@ export default {
     cleanupFollow() {
       this.followProp = null
       this.followRequest = ""
+    },
+    cleanupNewActivity() {
+      this.newActivityProp = {
+        type: "",
+        name: "",
+        features: []
+      }
     }
   }
 }
