@@ -1,0 +1,72 @@
+{
+  "target_types": [
+    {
+      "id": "gene",
+      "name": "Gene"
+    },
+    {
+      "id": "regulatory",
+      "name": "Regulatory Region"
+    }
+  ],
+  "target_organisms": [
+    {
+      "id": "taxon_9606",
+      "name": "H. sapiens"
+    },
+    {
+      "id": "taxon_562",
+      "name": "E. coli"
+    },
+    {
+      "id": "taxon_4932",
+      "name": "S. cerevisiae"
+    }
+  ],
+  "genomic_features": [
+    "-10_signal",
+    "-35_signal",
+    "5’UTR",
+    "attenuator",
+    "CDS",
+    "conflict",
+    "enhancer",
+    "exon",
+    "gene",
+    "intron",
+    "LTR",
+    "mat_peptide",
+    "misc_binding",
+    "misc_difference",
+    "misc_feature",
+    "misc_recomb",
+    "misc_RNA",
+    "misc_signal",
+    "misc_structure",
+    "mRNA",
+    "ncRNA",
+    "old_sequence",
+    "prim_transcript",
+    "primer_bind",
+    "promoter",
+    "protein_bind",
+    "pseudogene",
+    "pseudogenic_region",
+    "RBS",
+    "region",
+    "rep_origin",
+    "repeat_region",
+    "repeat_unit",
+    "ribosome_entry_site",
+    "rRNA",
+    "sig_peptide",
+    "source",
+    "stem_loop",
+    "terminator",
+    "tmRNA",
+    "transcript",
+    "tRNA",
+    "unsure",
+    "variation"
+  ]
+}

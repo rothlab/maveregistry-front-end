@@ -237,6 +237,7 @@
                   label="Add new activity"
                   position="is-left"
                   type="is-dark"
+                  @click="isNewActivityModalActive = true; prepareNewActivity(props.row.target)"
                 >
                   <b-button icon-right="mdil-plus" />
                 </b-tooltip>
@@ -401,7 +402,7 @@
         <div class="modal-card">
           <header class="modal-card-head">
             <p class="modal-card-title">
-              <span>Register activity</span>
+              <span>Add Project</span>
             </p>
             <button
               class="delete"
@@ -411,6 +412,16 @@
           </header>
           <section class="modal-card-body">
             <div class="content">
+              <!-- Target name -->
+              <b-field label="Target name">
+                <b-input
+                  v-model="newActivityProp.name"
+                  placeholder="e.g. Gene Symbol, Domain Name"
+                  required
+                  expanded
+                />
+              </b-field>
+              <!-- Target type -->
               <b-field label="Type of target">
                 <b-select
                   v-model="newActivityProp.type"
@@ -418,13 +429,43 @@
                   required
                   expanded
                 >
-                  <option value="gene">
-                    Gene
-                  </option>
-                  <option value="regulatory">
-                    Regulatory
+                  <option
+                    v-for="(type, index) in types"
+                    :key="index"
+                    :value="type.id"
+                  >
+                    {{ type.name }}
                   </option>
                 </b-select>
+              </b-field>
+              <!-- Target organism -->
+              <b-field label="Target organism">
+                <b-select
+                  v-model="newActivityProp.organism"
+                  placeholder="Select a target organism"
+                  required
+                  expanded
+                >
+                  <option
+                    v-for="(organism, index) in organisms"
+                    :key="index"
+                    :value="organism.id"
+                  >
+                    {{ organism.name }}
+                  </option>
+                </b-select>
+              </b-field>
+              <!-- Target features -->
+              <b-field label="Target features">
+                <b-taginput
+                  v-model="newActivityProp.features"
+                  :data="features"
+                  autocomplete
+                  append-to-body
+                  icon="mdil-magnify"
+                  placeholder="Search for a genomic feature"
+                  @typing="getFilteredFeatures"
+                />
               </b-field>
             </div>
           </section>
@@ -434,9 +475,9 @@
               :loading="isActionButtonLoading"
               type="is-primary"
               outlined
-              @click="followTeam(followProp.team, followProp.target, followProp.project_index, followRequest)"
+              @click="addProject(newActivityProp)"
             >
-              Submit Request
+              Add Project
             </b-button>
           </footer>
         </div>
@@ -448,6 +489,10 @@
 <script>
 //TODO: remove debug functions
 const delay = ms => new Promise(res => setTimeout(res, ms));
+
+// Feature list
+// Source: https://docs.patricbrc.org/user_guides/organisms_taxon/genome_annotations.html
+const variables = require("@/assets/variables.json")
 
 export default {
   data () {
@@ -539,6 +584,9 @@ export default {
           ]
         },
       ],
+      features: variables.genomic_features,
+      types: variables.target_types,
+      organisms: variables.target_organisms,
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
       followProp: null,
@@ -550,6 +598,7 @@ export default {
       newActivityProp: {
         type: "",
         name: "",
+        organism: "",
         features: []
       }
     }
@@ -668,12 +717,37 @@ export default {
       this.followProp = null
       this.followRequest = ""
     },
+    prepareNewActivity(target) {
+      this.newActivityProp.type = target.type
+      this.newActivityProp.name = target.name
+      this.newActivityProp.organism = target.organism
+    },
     cleanupNewActivity() {
       this.newActivityProp = {
         type: "",
         name: "",
+        organism: "",
         features: []
       }
+    },
+    getFilteredFeatures(text) {
+      this.features = variables.genomic_features.filter(feature => {
+        return feature.toLowerCase().indexOf(text.toLowerCase()) >= 0
+      })
+    },
+    async addProject() {
+      // Loading
+      this.isActionButtonLoading = true
+
+      //TODO: remove debug delay
+      await delay(2000);
+
+      // TODO: Implement API to accept unfollow request
+
+      // Handle UI changes
+      this.isActionButtonLoading = false
+      this.isNewActivityModalActive = false
+      this.cleanupNewActivity()
     }
   }
 }
@@ -685,7 +759,7 @@ export default {
 .register-activity
   margin: 1rem 0rem
 .progress-card
-  box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 0 1px 0px rgba(10, 10, 10, 0.3) inset
+  box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
   &:first-child
     border-radius: 0.4rem 0.4rem 0 0
   &:last-child
