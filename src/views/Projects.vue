@@ -145,6 +145,7 @@
                         <div class="level is-paddingless is-mobile">
                           <div class="level-left">
                             <p>
+                              Organism: {{ progress.organism }} <br>
                               Phenotype: {{ progress.phenotype }} <br>
                               Submitter: {{ progress.team }}
                             </p>
