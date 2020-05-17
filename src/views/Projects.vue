@@ -1,29 +1,27 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="hero is-small is-primary is-bold">
-      <div class="hero-body">
+    <div class="hero is-light is-bold">
+      <div class="hero-body has-page-header-padding">
         <div class="container">
-          <div class="columns">
-            <div class="column">
+          <div class="level">
+            <div class="level-left">
               <div class="content">
-                <p class="is-size-4 has-text-weight-medium">
+                <p class="is-size-3 has-text-weight-medium">
                   MAVE Projects
                 </p>
               </div>
             </div>
-            <div class="column">
-              <b-field>
-                <b-autocomplete
-                  icon="mdil-magnify"
-                  expanded
-                  placeholder="Target Name"
-                >
-                  <template slot="empty">
-                    No results found
-                  </template>
-                </b-autocomplete>
-              </b-field>
+            <div class="level-right">
+              <!-- New project register -->
+              <b-button
+                icon-left="mdil-plus"
+                type="is-primary"
+                size="is-medium"
+                @click="isNewActivityModalActive = true"
+              >
+                New Project
+              </b-button>
             </div>
           </div>
         </div>
@@ -31,19 +29,6 @@
     </div>
     
     <div class="container has-fullheight has-top-padding">
-      <!-- New project register -->
-      <b-button
-        expanded
-        icon-left="mdil-plus"
-        type="is-primary"
-        size="is-medium"
-        class="register-activity"
-        outlined
-        @click="isNewActivityModalActive = true"
-      >
-        Register Activity for a New Target
-      </b-button>
-      
       <!-- Project table -->
       <div>
         <b-table
@@ -402,7 +387,7 @@
         <div class="modal-card">
           <header class="modal-card-head">
             <p class="modal-card-title">
-              <span>Add Project</span>
+              <span>Add a New Project</span>
             </p>
             <button
               class="delete"
@@ -756,8 +741,6 @@ export default {
 <style lang="sass" scoped>
 @import "@/assets/variables.sass"
 
-.register-activity
-  margin: 1rem 0rem
 .progress-card
   box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
   &:first-child
