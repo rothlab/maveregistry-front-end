@@ -789,4 +789,6 @@ export default {
 .team-icon
   margin-left: -0.375rem !important
   margin-right: -0.2rem !important
+.team-control .tag
+  box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
 </style>
