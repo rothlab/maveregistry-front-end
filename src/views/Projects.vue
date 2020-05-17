@@ -4,7 +4,7 @@
     <div class="hero is-light is-bold">
       <div class="hero-body has-page-header-padding">
         <div class="container">
-          <div class="level">
+          <div class="level is-mobile">
             <div class="level-left">
               <div class="content">
                 <p class="is-size-3 has-text-weight-medium">
@@ -14,13 +14,25 @@
             </div>
             <div class="level-right">
               <!-- New project register -->
+              <!-- Non-mobile style -->
               <b-button
                 icon-left="mdil-plus"
                 type="is-primary"
                 size="is-medium"
+                class="is-hidden-mobile"
                 @click="isNewActivityModalActive = true"
               >
                 New Project
+              </b-button>
+              <!-- Mobile style -->
+              <b-button
+                icon-left="mdil-plus"
+                type="is-primary"
+                size="is-medium"
+                class="is-hidden-tablet"
+                @click="isNewActivityModalActive = true"
+              >
+                New
               </b-button>
             </div>
           </div>
@@ -28,7 +40,7 @@
       </div>
     </div>
     
-    <div class="container has-fullheight has-top-padding">
+    <div class="container has-fullheight has-top-padding has-touch-container-padding">
       <!-- Project table -->
       <div>
         <b-table
@@ -500,7 +512,7 @@ export default {
           progress: [{
             id: "progress_1",
             type: "publication",
-            description: "publications available",
+            description: "publication",
             links: [
               {
                 url: "https://www.ncbi.nlm.nih.gov/pubmed/30219179",
@@ -542,14 +554,16 @@ export default {
             {
               id: "progress_3",
               type: "assay",
-              description: "yeast complementation",
+              description: "complementation",
+              organism: "S. Cerevisiae",
               phenotype: "growth defect",
               team: "Roth FP",
             },
             {
               id: "progress_4",
               type: "assay",
-              description: "yeast two-hybrid",
+              description: "two-hybrid",
+              organism: "S. Cerevisiae",
               phenotype: "growth defect",
               team: "Smith J",
             }

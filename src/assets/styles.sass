@@ -10,11 +10,17 @@
   @media screen and (max-width: $break-desktop)
     min-height: calc( 100vh - 8.75rem - 7.25rem)
 .has-top-padding
-  padding-top: 1rem
+  padding-top: 1.5rem
 .has-hright
   justify-content: flex-end
 .has-page-header-padding
   padding: 2.5rem 1.5rem
+  @media screen and (max-width: $break-desktop)
+    padding: 1.5rem 1.5rem
+.has-touch-container-padding
+  @media screen and (max-width: $break-desktop - 1) // -1 to handle egde case (1024px)
+    padding-left: 1.5rem
+    padding-right: 1.5rem
 .is-clickable
   cursor: pointer
 .circle-icon
