@@ -10,7 +10,6 @@
         <div class="field-margin">
           <b-field
             :type="{ 'is-danger': errors[0], '': valid }"
-            :value="value"
             :input="$emit('input', password)"
             class="is-marginless"
           >
@@ -53,15 +52,13 @@
           <b-field
             class="is-marginless"
             :type="{ 'is-danger': errors[0], '': valid }"
-            :value="value"
-            :input="$emit('input', password)"
           >
             <b-input
               icon="mdil-lock"
               :key="revealPass ? 'reveal_pass' : 'hidden_pass'"
               :type="revealPass ? 'text' : 'password'"
               placeholder="Password (min. 7 characters)"
-              v-model="password"
+              v-model="passwordInit"
               expanded
             />
             <p class="control">
@@ -86,7 +83,7 @@
             </div>
             <div class="column">
               <password
-                v-model="password"
+                v-model="passwordInit"
                 :strength-meter-only="true"
                 @score="storePassStrength"
                 @feedback="storePassFeedback"
@@ -104,13 +101,14 @@
           <b-field
             class="is-marginless"
             :type="{ 'is-danger': errors[0], '': valid }"
+            :input="$emit('input', passwordConfirm)"
           >
             <b-input
               icon="mdil-lock"
               :key="revealPassConfirm ? 'reveal_pass' : 'hidden_pass'"
               :type="revealPassConfirm ? 'text' : 'password'"
               placeholder="Confirm password"
-              v-model="confirmPass"
+              v-model="passwordConfirm"
               expanded
             />
             <p class="control">
@@ -158,7 +156,8 @@ export default {
       revealPass: false,
       revealPassConfirm: false,
       password: "",
-      confirmPass: "",
+      passwordInit: "",
+      passwordConfirm: "",
       passStrength: 0,
       passFeedback: ""
     }

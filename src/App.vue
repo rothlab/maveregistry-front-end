@@ -293,11 +293,8 @@ export default {
       loginSignupProp: {
         email: "",
         password: "",
-        password_confirm: "",
         method: ""
-      },
-      passStrength: 0,
-      passFeedback: "",
+      }
     }
   },
   methods: {
