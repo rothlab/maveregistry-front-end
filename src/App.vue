@@ -83,8 +83,9 @@
             <!-- Log in/Sign up tab -->
             <b-tabs
               position="is-centered"
-              type="is-boxed"
+              type="is-toggle"
               expanded
+              class="login-tab"
               :animated="false"
             >
               <!-- Log in tab -->
@@ -148,28 +149,77 @@
                 icon="mdil-file-plus"
                 label="Sign up"
               >
-                <b-field>
-                  <b-input
-                    type="email"
-                    icon="mdil-email"
-                    placeholder="Email"
-                  />
-                </b-field>
-                <b-field>
-                  <b-input
-                    type="password"
-                    icon="mdil-lock"
-                    placeholder="Password"
-                  />
-                </b-field>
-                <p class="control">
-                  <b-button
-                    expanded
-                    class="is-primary"
+                <ValidationObserver
+                  ref="observer"
+                  v-slot="{ passed }"
+                >
+                  <ValidationProvider
+                    rules="required|email"
+                    name="Email"
+                    v-slot="{ errors, valid }"
+                  > 
+                    <!-- Need to add class here because validation provider screws it up -->
+                    <b-field
+                      :message="errors"
+                      class="field-margin"
+                      :type="{ 'is-danger': errors[0], 'is-success': valid }"
+                    >
+                      <b-input
+                        icon="mdil-email"
+                        type="email"
+                        placeholder="Email"
+                        v-model="loginSignupProp.email"
+                      />
+                    </b-field>
+                  </ValidationProvider>
+                  <ValidationProvider
+                    v-slot="{ errors, valid }" 
+                    rules="required|password:@confirm"
                   >
-                    Sign up
-                  </b-button>
-                </p>
+                    <b-field
+                      :message="errors"
+                      class="field-margin"
+                      :type="{ 'is-danger': errors[0], 'is-success': valid }"
+                    >
+                      <b-input
+                        type="password"
+                        icon="mdil-lock"
+                        placeholder="Password"
+                        v-model="loginSignupProp.password"
+                      />
+                    </b-field>
+                  </ValidationProvider>
+                  <ValidationProvider
+                    name="confirm"
+                    v-slot="{ errors, valid }" 
+                    rules="required"
+                  >
+                    <b-field
+                      :message="errors[0]"
+                      class="field-margin"
+                      :type="{ 'is-danger': errors[0], 'is-success': valid }"
+                    >
+                      <b-input
+                        type="password"
+                        icon="mdil-lock"
+                        placeholder="Confirm password"
+                        :validation-message="errors[0]"
+                        v-model="loginSignupProp.password_confirm"
+                      />
+                    </b-field>
+                  </ValidationProvider>
+                  <p class="control">
+                    <b-button
+                      expanded
+                      class="is-primary"
+                      :disabled="!passed"
+                    >
+                      Sign up
+                    </b-button>
+                  </p>
+                </ValidationObserver>
+                
+                <!-- Third party -->
                 <div class="level oauth signup">
                   <div class="level-left">
                     <p class="has-text-weight-medium has-text-centered">
@@ -219,9 +269,16 @@
   </div>
 </template>
 
+<style lang="sass">
+.login-tab .tab-content
+  padding: 1rem 0 !important
+</style>
+
 <style lang="sass" scoped>
 @import "@/assets/variables.sass"
 
+.field-margin
+  margin-bottom: 0.75rem
 .oauth
   @media screen and (max-width: $break-mobile)
     margin-top: 1rem !important
@@ -236,13 +293,20 @@
 </style>
 
 <script>
+import { ValidationProvider, ValidationObserver } from 'vee-validate';
+
 export default {
+  components: {
+    ValidationProvider,
+    ValidationObserver
+  },
   data () {
     return {
       isLoginSignupModalActive: false,
       loginSignupProp: {
         email: "",
         password: "",
+        password_confirm: "",
         method: ""
       }
     }
@@ -252,6 +316,7 @@ export default {
       this.loginSignupProp = {
         email: "",
         password: "",
+        password_confirm: "",
         method: ""
       }
     }

@@ -5,6 +5,8 @@ import App from './App.vue'
 import Buefy from 'buefy'
 
 // Import plugins
+import { extend } from 'vee-validate';
+import { required, email, password } from 'vee-validate/dist/rules';
 
 // Import stylesheets
 import 'buefy/dist/buefy.css'
@@ -18,6 +20,23 @@ import '@fortawesome/fontawesome-free/css/fontawesome.css'
 import router from './router'
 
 // Initialize plugins
+// Vee-validate
+extend('required', {
+  ...required,
+  message: 'This field is required'
+});
+extend('email', {
+  ...email,
+  message: 'Please provide a valid email'
+});
+extend('password', {
+  params: ['target'],
+  ...password,
+  validate(value, { target }) {
+    return value === target;
+  },
+  message: 'Password confirmation does not match'
+});
 
 // Initialize frameworks
 Vue.use(Buefy, {
