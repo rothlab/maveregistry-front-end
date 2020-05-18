@@ -175,17 +175,17 @@
                   <ValidationProvider
                     name="initial"
                     v-slot="{ errors, valid }" 
-                    rules="required|password_strength:3"
+                    :rules="'required|password_strength:3,' + passStrength"
                   >
                     <b-field
-                      :message="errors + passFeedback ? passFeedback : ''"
+                      :message="errors + (passFeedback ? passFeedback : '')"
                       class="field-margin"
                       :type="{ 'is-danger': errors[0], 'is-success': valid }"
                     >
                       <b-input
                         type="password"
                         icon="mdil-lock"
-                        placeholder="Password"
+                        placeholder="Password (min. 7 characters)"
                         v-model="loginSignupProp.password"
                       />
                     </b-field>
