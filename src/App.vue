@@ -52,11 +52,39 @@
         </b-navbar-dropdown>
       </template>
 
-      <!-- Right side: user functions -->
-      <template slot="end">
+      <!-- Right side: user functions when logged in -->
+      <template
+        slot="end"
+        v-if="hasLoggedIn"
+      >
+        <b-navbar-item tag="p">
+          Hello, {{ user.first_name }}!
+        </b-navbar-item>
+        <b-navbar-item
+          tag="router-link"
+          :to="{ path: '/profile/' + user.id }"
+        >
+          Profile
+        </b-navbar-item>
         <b-navbar-item tag="div">
-          <b-button 
-            type="is-primary" 
+          <b-button
+            @click="logout"
+          >
+            Log out
+          </b-button>
+        </b-navbar-item>
+      </template>
+
+      <!-- Log in or sign up -->
+      <template
+        slot="end"
+        v-else
+      >
+        <b-navbar-item
+          tag="div"
+        >
+          <b-button
+            type="is-primary"
             @click="isLoginSignupModalActive = true"
           >
             Log in
@@ -124,6 +152,7 @@
                       expanded
                       :disabled="!passed"
                       class="is-primary"
+                      @click="loginSignupProp.method = 'password'; login()"
                     >
                       Log in
                     </b-button>
@@ -195,6 +224,7 @@
                       expanded
                       class="is-primary"
                       :disabled="!passed"
+                      @click="loginSignupProp.method = 'password'; signup()"
                     >
                       Sign up
                     </b-button>
@@ -294,7 +324,16 @@ export default {
         email: "",
         password: "",
         method: ""
-      }
+      },
+      isActionButtonLoading: false,
+    }
+  },
+  computed: {
+    hasLoggedIn() {
+      return this.$store.state.hasLoggedIn
+    },
+    user() {
+      return this.$store.state.user
     }
   },
   methods: {
@@ -304,6 +343,34 @@ export default {
         password: "",
         method: ""
       }
+    },
+    signup() {
+      // Loading
+      this.isActionButtonLoading = true
+
+      switch (this.loginSignupProp.method) {
+        case "password":
+          // Password sign up
+          break;
+      
+        default:
+          break;
+      }
+
+    },
+    login() {
+      // Loading
+      this.isActionButtonLoading = true
+
+      // Authenticate user
+      this.$store.dispatch('loginUser')
+
+      this.isActionButtonLoading = false
+      this.isLoginSignupModalActive = false
+      this.cleanupLoginSignup()
+    },
+    logout() {
+      this.$store.dispatch('logoutUser')
     }
   }
 }

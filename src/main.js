@@ -17,7 +17,7 @@ import '@fortawesome/fontawesome-free/css/fontawesome.css'
 
 // Import custom scripts
 import router from './router'
-
+import store from './store'
 
 // Initialize frameworks
 Vue.use(Buefy, {
@@ -29,5 +29,6 @@ Vue.config.productionTip = false
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')
