@@ -13,6 +13,7 @@
     "@mdi/light-font": "^0.2.63",
     "buefy": "^0.8.19",
     "core-js": "^3.6.5",
+    "parse": "^2.13.0",
     "vee-validate": "^3.3.0",
     "vue": "^2.6.11",
     "vue-password-strength-meter": "^1.7.2",
