@@ -62,7 +62,7 @@
         </b-navbar-item>
         <b-navbar-item
           tag="router-link"
-          :to="{ path: '/profile/' + user.id }"
+          :to="{ path: '/profile/' + user.username }"
         >
           Profile
         </b-navbar-item>
@@ -126,8 +126,8 @@
                   v-slot="{ passed }"
                 >
                   <ValidationProvider
-                    rules="required|email"
-                    name="Email"
+                    rules="required"
+                    name="Username/Email"
                     v-slot="{ errors, valid }"
                   > 
                     <!-- Need to add class here because validation provider screws it up -->
@@ -137,9 +137,8 @@
                       :type="{ 'is-danger': errors[0], '': valid }"
                     >
                       <b-input
-                        icon="mdil-email"
-                        type="email"
-                        placeholder="Email"
+                        icon="mdil-account"
+                        placeholder="Username/Email"
                         v-model="loginSignupProp.email"
                       />
                     </b-field>
@@ -358,16 +357,27 @@ export default {
       }
 
     },
-    login() {
+    async login() {
       // Loading
       this.isActionButtonLoading = true
 
       // Authenticate user
-      this.$store.dispatch('loginUser')
+      try {
+        await this.$store.dispatch('loginUser', this.loginSignupProp)
 
-      this.isActionButtonLoading = false
-      this.isLoginSignupModalActive = false
-      this.cleanupLoginSignup()
+        this.isLoginSignupModalActive = false
+        this.cleanupLoginSignup()
+      } catch (e) {
+        // Handle error
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: e.message,
+          type: 'is-danger',
+          queue: false
+        })
+      } finally {
+        this.isActionButtonLoading = false
+      }
     },
     logout() {
       this.$store.dispatch('logoutUser')

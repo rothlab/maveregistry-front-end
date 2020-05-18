@@ -3,6 +3,9 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+// Import Backend API
+import * as UserManage from "../api/userManage"
+
 export default new Vuex.Store({
   state: {
     user: undefined,
@@ -22,17 +25,23 @@ export default new Vuex.Store({
     logoutUser ({ commit }) {
       commit('logoutUser')
     },
-    loginUser ({ commit }, credential) {
+    async loginUser ({ commit }, credential) {
       // TODO: retrieve user info based on credential
-      credential
-      let user = {
-        id: "user_1",
-        first_name: "Kevin",
-        last_name: "Kuang",
-        auth_token: "anothertoken",
+      let res = Object;
+      switch (credential.method) {
+        case "password":
+          res = await UserManage.loginUserPassword(credential.email, credential.password)
+          break;
+        default:
+          break;
       }
-      
-      commit('loginUser', user)
+
+      if (!res.error) {
+        // Update user info if loggined in successfully
+        commit('loginUser', res.user)
+      } else {
+        throw res.error
+      }
     }
   },
   modules: {
