@@ -93,28 +93,42 @@
                 icon="mdil-login"
                 label="Log in"
               >
-                <b-field>
-                  <b-input
-                    type="email"
-                    icon="mdil-email"
-                    placeholder="Email"
+                <ValidationObserver
+                  ref="observer"
+                  v-slot="{ passed }"
+                >
+                  <ValidationProvider
+                    rules="required|email"
+                    name="Email"
+                    v-slot="{ errors, valid }"
+                  > 
+                    <!-- Need to add class here because validation provider screws it up -->
+                    <b-field
+                      :message="errors"
+                      class="field-margin"
+                      :type="{ 'is-danger': errors[0], '': valid }"
+                    >
+                      <b-input
+                        icon="mdil-email"
+                        type="email"
+                        placeholder="Email"
+                        v-model="loginSignupProp.email"
+                      />
+                    </b-field>
+                  </ValidationProvider>
+                  <PasswordWithRevealAndValidation
+                    v-model="loginSignupProp.password"
                   />
-                </b-field>
-                <b-field>
-                  <b-input
-                    type="password"
-                    icon="mdil-lock"
-                    placeholder="Password"
-                  />
-                </b-field>
-                <p class="control">
-                  <b-button
-                    expanded
-                    class="is-primary"
-                  >
-                    Log in
-                  </b-button>
-                </p>
+                  <p class="control">
+                    <b-button
+                      expanded
+                      :disabled="!passed"
+                      class="is-primary"
+                    >
+                      Log in
+                    </b-button>
+                  </p>
+                </ValidationObserver>
                 <p class="forget-password has-text-right">
                   Forget Password?
                 </p>
@@ -162,7 +176,7 @@
                     <b-field
                       :message="errors"
                       class="field-margin"
-                      :type="{ 'is-danger': errors[0], 'is-success': valid }"
+                      :type="{ 'is-danger': errors[0], '': valid }"
                     >
                       <b-input
                         icon="mdil-email"
@@ -172,57 +186,10 @@
                       />
                     </b-field>
                   </ValidationProvider>
-                  <ValidationProvider
-                    name="initial"
-                    v-slot="{ errors, valid }" 
-                    :rules="'required|password_strength:3,' + passStrength"
-                  >
-                    <b-field
-                      :message="errors + (passFeedback ? passFeedback : '')"
-                      class="field-margin"
-                      :type="{ 'is-danger': errors[0], 'is-success': valid }"
-                    >
-                      <b-input
-                        type="password"
-                        icon="mdil-lock"
-                        placeholder="Password (min. 7 characters)"
-                        v-model="loginSignupProp.password"
-                      />
-                    </b-field>
-                    <!-- Password strength indicator -->
-                    <div class="columns is-mobile is-vcentered password-strength">
-                      <div class="column is-narrow">
-                        <span class="is-size-7">Strength</span>
-                      </div>
-                      <div class="column">
-                        <password
-                          v-model="loginSignupProp.password"
-                          :strength-meter-only="true"
-                          @score="storePassStrength"
-                          @feedback="storePassFeedback"
-                          strength-meter-class="Password__strength-meter strength-meter"
-                        />
-                      </div>
-                    </div>
-                  </ValidationProvider>
-                  <ValidationProvider
-                    v-slot="{ errors, valid }" 
-                    rules="required|password:@initial"
-                  >
-                    <b-field
-                      :message="errors[0]"
-                      class="field-margin"
-                      :type="{ 'is-danger': errors[0], 'is-success': valid }"
-                    >
-                      <b-input
-                        type="password"
-                        icon="mdil-lock"
-                        placeholder="Confirm password"
-                        :validation-message="errors[0]"
-                        v-model="loginSignupProp.password_confirm"
-                      />
-                    </b-field>
-                  </ValidationProvider>
+                  <PasswordWithRevealAndValidation
+                    has-confirm
+                    v-model="loginSignupProp.password"
+                  />
                   <p class="control">
                     <b-button
                       expanded
@@ -287,8 +254,6 @@
 <style lang="sass">
 .login-tab .tab-content
   padding: 1rem 0 !important
-.strength-meter
-  margin: 0.25rem 0 0 0 !important
 </style>
 
 <style lang="sass" scoped>
@@ -313,14 +278,14 @@
 </style>
 
 <script>
-import { ValidationProvider, ValidationObserver } from 'vee-validate';
-import Password from 'vue-password-strength-meter'
+import { ValidationProvider, ValidationObserver } from 'vee-validate'
+import PasswordWithRevealAndValidation from './components/PasswordWithRevealAndValidation'
 
 export default {
   components: {
     ValidationProvider,
     ValidationObserver,
-    Password
+    PasswordWithRevealAndValidation
   },
   data () {
     return {
@@ -340,15 +305,8 @@ export default {
       this.loginSignupProp = {
         email: "",
         password: "",
-        password_confirm: "",
         method: ""
       }
-    },
-    storePassStrength(score) {
-      this.passStrength = score
-    },
-    storePassFeedback({suggestions}) {
-      this.passFeedback = suggestions[0]
     }
   }
 }
