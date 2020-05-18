@@ -23,11 +23,11 @@ import router from './router'
 // Vee-validate
 extend('required', {
   ...required,
-  message: 'This field is required'
+  message: 'This field is required. '
 });
 extend('email', {
   ...email,
-  message: 'Please provide a valid email'
+  message: 'Please provide a valid email. '
 });
 extend('password', {
   params: ['target'],
@@ -35,7 +35,19 @@ extend('password', {
   validate(value, { target }) {
     return value === target;
   },
-  message: 'Password confirmation does not match'
+  message: 'Password confirmation does not match. '
+});
+extend('password_strength', {
+  params: ['target'],
+  ...password,
+  validate(value, { target }) {
+    const zxcvbn = require('zxcvbn')
+
+    const result = zxcvbn(value)
+
+    return result.score >= target
+  },
+  message: "Weak password. "
 });
 
 // Initialize frameworks

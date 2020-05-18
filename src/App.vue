@@ -83,7 +83,7 @@
             <!-- Log in/Sign up tab -->
             <b-tabs
               position="is-centered"
-              type="is-toggle"
+              type="is-boxed"
               expanded
               class="login-tab"
               :animated="false"
@@ -173,11 +173,12 @@
                     </b-field>
                   </ValidationProvider>
                   <ValidationProvider
+                    name="initial"
                     v-slot="{ errors, valid }" 
-                    rules="required|password:@confirm"
+                    rules="required|password_strength:3"
                   >
                     <b-field
-                      :message="errors"
+                      :message="errors + passFeedback ? passFeedback : ''"
                       class="field-margin"
                       :type="{ 'is-danger': errors[0], 'is-success': valid }"
                     >
@@ -188,11 +189,25 @@
                         v-model="loginSignupProp.password"
                       />
                     </b-field>
+                    <!-- Password strength indicator -->
+                    <div class="columns is-mobile is-vcentered password-strength">
+                      <div class="column is-narrow">
+                        <span class="is-size-7">Strength</span>
+                      </div>
+                      <div class="column">
+                        <password
+                          v-model="loginSignupProp.password"
+                          :strength-meter-only="true"
+                          @score="storePassStrength"
+                          @feedback="storePassFeedback"
+                          strength-meter-class="Password__strength-meter strength-meter"
+                        />
+                      </div>
+                    </div>
                   </ValidationProvider>
                   <ValidationProvider
-                    name="confirm"
                     v-slot="{ errors, valid }" 
-                    rules="required"
+                    rules="required|password:@initial"
                   >
                     <b-field
                       :message="errors[0]"
@@ -272,6 +287,8 @@
 <style lang="sass">
 .login-tab .tab-content
   padding: 1rem 0 !important
+.strength-meter
+  margin: 0.25rem 0 0 0 !important
 </style>
 
 <style lang="sass" scoped>
@@ -279,6 +296,9 @@
 
 .field-margin
   margin-bottom: 0.75rem
+.password-strength
+  margin-top: -1.5rem
+  margin-bottom: -0.25rem !important
 .oauth
   @media screen and (max-width: $break-mobile)
     margin-top: 1rem !important
@@ -294,11 +314,13 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate';
+import Password from 'vue-password-strength-meter'
 
 export default {
   components: {
     ValidationProvider,
-    ValidationObserver
+    ValidationObserver,
+    Password
   },
   data () {
     return {
@@ -308,7 +330,9 @@ export default {
         password: "",
         password_confirm: "",
         method: ""
-      }
+      },
+      passStrength: 0,
+      passFeedback: "",
     }
   },
   methods: {
@@ -319,6 +343,12 @@ export default {
         password_confirm: "",
         method: ""
       }
+    },
+    storePassStrength(score) {
+      this.passStrength = score
+    },
+    storePassFeedback({suggestions}) {
+      this.passFeedback = suggestions[0]
     }
   }
 }
