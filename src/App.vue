@@ -139,7 +139,7 @@
                       <b-input
                         icon="mdil-account"
                         placeholder="Username/Email"
-                        v-model="loginSignupProp.email"
+                        v-model="loginSignupProp.username"
                       />
                     </b-field>
                   </ValidationProvider>
@@ -195,12 +195,69 @@
                   ref="observer"
                   v-slot="{ passed }"
                 >
+                  <!-- Need to add class here because validation provider screws it up -->
+                  <b-field
+                    grouped
+                    class="field-margin is-space-between"
+                  >
+                    <ValidationProvider
+                      rules="required|alpha_dash"
+                      name="FirstName"
+                      v-slot="{ errors, valid }"
+                      class="name"
+                    >
+                      <b-field
+                        :message="errors"
+                        :type="{ 'is-danger': errors[0], '': valid }"
+                      >
+                        <b-input
+                          type="text"
+                          placeholder="First Name"
+                          v-model="loginSignupProp.first_name"
+                        />
+                      </b-field>
+                    </ValidationProvider>
+                    <ValidationProvider
+                      rules="required|alpha_dash"
+                      name="LastName"
+                      v-slot="{ errors, valid }"
+                      class="name"
+                    >
+                      <b-field
+                        :message="errors"
+                        :type="{ 'is-danger': errors[0], '': valid }"
+                      >
+                        <b-input
+                          type="text"
+                          placeholder="Last Name"
+                          v-model="loginSignupProp.last_name"
+                        />
+                      </b-field>
+                    </ValidationProvider>
+                  </b-field>
+                  <ValidationProvider
+                    rules="required|alpha_dash"
+                    name="Username"
+                    v-slot="{ errors, valid }"
+                  > 
+                    <b-field
+                      :message="errors"
+                      class="field-margin"
+                      :type="{ 'is-danger': errors[0], '': valid }"
+                    >
+                      <b-input
+                        icon="mdil-account"
+                        type="text"
+                        placeholder="Username"
+                        v-model="loginSignupProp.username"
+                      />
+                    </b-field>
+                  </ValidationProvider>
                   <ValidationProvider
                     rules="required|email"
                     name="Email"
                     v-slot="{ errors, valid }"
                   > 
-                    <!-- Need to add class here because validation provider screws it up -->
                     <b-field
                       :message="errors"
                       class="field-margin"
@@ -283,6 +340,8 @@
 <style lang="sass">
 .login-tab .tab-content
   padding: 1rem 0 !important
+.help
+  margin-top: 0
 </style>
 
 <style lang="sass" scoped>
@@ -290,6 +349,9 @@
 
 .field-margin
   margin-bottom: 0.75rem
+  .name
+    width: 47.5%
+    // height: 2.25rem
 .password-strength
   margin-top: -1.5rem
   margin-bottom: -0.25rem !important
@@ -322,6 +384,9 @@ export default {
     return {
       isLoginSignupModalActive: false,
       loginSignupProp: {
+        first_name: "",
+        last_name: "",
+        username: "",
         email: "",
         password: "",
         method: ""
@@ -340,22 +405,34 @@ export default {
   methods: {
     cleanupLoginSignup() {
       this.loginSignupProp = {
+        first_name: "",
+        last_name: "",
+        username: "",
         email: "",
         password: "",
         method: ""
       }
     },
-    signup() {
+    async signup() {
       // Loading
       this.isActionButtonLoading = true
 
-      switch (this.loginSignupProp.method) {
-        case "password":
-          // Password sign up
-          break;
-      
-        default:
-          break;
+      // Sign up user
+      try {
+        await this.$store.dispatch('signupUser', this.loginSignupProp)
+
+        this.isLoginSignupModalActive = false
+        this.cleanupLoginSignup()
+      } catch (e) {
+        // Handle error
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: e.message,
+          type: 'is-danger',
+          queue: false
+        })
+      } finally {
+        this.isActionButtonLoading = false
       }
 
     },

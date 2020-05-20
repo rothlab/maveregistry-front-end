@@ -19,18 +19,35 @@ export default new Vuex.Store({
     loginUser(state, user) {
       state.hasLoggedIn = true
       state.user = user
-    }
+    },
   },
   actions: {
     logoutUser ({ commit }) {
       commit('logoutUser')
     },
     async loginUser ({ commit }, credential) {
-      // TODO: retrieve user info based on credential
-      let res = Object;
+      let res = new Object;
       switch (credential.method) {
         case "password":
-          res = await UserManage.loginUserPassword(credential.email, credential.password)
+          res = await UserManage.loginUserPassword(credential.username, credential.password)
+          break;
+        default:
+          break;
+      }
+
+      if (!res.error) {
+        // Update user info if loggined in successfully
+        commit('loginUser', res.user)
+      } else {
+        throw res.error
+      }
+    },
+    async signupUser ({ commit }, userInfo) {
+      let res = new Object;
+      switch (userInfo.method) {
+        case "password":
+          res = await UserManage.signupUserPassword(userInfo.username, userInfo.email, userInfo.password, 
+            userInfo.first_name, userInfo.last_name)
           break;
         default:
           break;
