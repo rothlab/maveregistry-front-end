@@ -308,7 +308,9 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import PasswordWithRevealAndValidation from './components/PasswordWithRevealAndValidation'
+
+// Lazy loading
+const PasswordWithRevealAndValidation = () => import('./components/PasswordWithRevealAndValidation.vue')
 
 export default {
   components: {
