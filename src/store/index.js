@@ -22,7 +22,14 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    logoutUser ({ commit }) {
+    async logoutUser ({ commit }) {
+      const res = await UserManage.logoutUser()
+
+      if (res.error) {
+        throw res.error
+      }
+
+      // Logout user no matter what
       commit('logoutUser')
     },
     async loginUserPassword ({ commit }, credential) {
@@ -34,6 +41,14 @@ export default new Vuex.Store({
         commit('loginUser', res.user)
       } else {
         throw res.error
+      }
+    },
+    async loginUserCache ({ commit }) {
+      const res = await UserManage.loginUserCache()
+
+      if (res.user) {
+        // Update user info if loggined in successfully
+        commit('loginUser', res.user)
       }
     },
     async signupUserPassword ({ commit }, userInfo) {

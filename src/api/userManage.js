@@ -27,9 +27,16 @@ export async function loginUserPassword (username, password) {
   return res
 }
 
-// Log in user with Google
-export async function loginUserGoogle (authCode) {
-  return authCode
+// Log in user from cache
+export async function loginUserCache () {
+  let res = new Object
+
+  const currentUser = Parse.User.current()
+  if (currentUser) {
+    res.user = parseUserMetadata(currentUser)
+  }
+
+  return res
 }
 
 // Sign up user with username, email and password
@@ -74,6 +81,18 @@ export async function signupLoginUserGoogle (userInfo) {
 
     // Set user info
     res.user = parseUserMetadata(Parse.User.current())
+  } catch (e) {
+    res.error = e
+  }
+
+  return res
+}
+
+export async function logoutUser () {
+  let res = new Object
+
+  try {
+    res.user = await Parse.User.logOut()
   } catch (e) {
     res.error = e
   }

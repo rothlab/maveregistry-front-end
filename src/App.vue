@@ -382,6 +382,10 @@ export default {
     ValidationObserver,
     PasswordWithRevealAndValidation
   },
+  mounted () {
+    // Check if an user has logged in, if so, use it
+    this.login("cache")
+  },
   data () {
     return {
       isLoginSignupModalActive: false,
@@ -550,6 +554,9 @@ export default {
               queue: false
             })
           }
+          break;
+        case "cache":
+          await this.$store.dispatch('loginUserCache')
           break;
         default:
           break;
