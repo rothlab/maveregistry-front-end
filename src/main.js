@@ -6,6 +6,7 @@ import Buefy from 'buefy'
 
 // Import plugins
 import "@/assets/field_validation_rules.js"
+import GAuth from 'vue-google-oauth2'
 
 // Import stylesheets
 import 'buefy/dist/buefy.css'
@@ -25,7 +26,15 @@ Vue.use(Buefy, {
 })
 
 // Initialize parameters
+const gauthOption = { // Google O-Auth
+  clientId: '858736137272-vq823b82c3smcg86glnm7a5thhbp41an.apps.googleusercontent.com',
+  scope: 'profile email',
+  prompt: 'select_account'
+}
 Vue.config.productionTip = false
+
+// Inject plugins
+Vue.use(GAuth, gauthOption)
 
 new Vue({
   router,

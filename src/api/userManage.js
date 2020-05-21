@@ -27,6 +27,11 @@ export async function loginUserPassword (username, password) {
   return res
 }
 
+// Log in user with Google
+export async function loginUserGoogle (authCode) {
+  return authCode
+}
+
 // Sign up user with username, email and password
 export async function signupUserPassword (username, email, password, firstName, lastName) {
   let res = new Object
@@ -45,6 +50,24 @@ export async function signupUserPassword (username, email, password, firstName, 
 
     // Parse user
     res.user = parseUserMetadata(retUser)
+  } catch (e) {
+    res.error = e
+  }
+
+  return res
+}
+
+// Sign up user with Google auth code
+export async function signupUserGoogle (authCode) {
+  let res = new Object
+
+  // Sign up
+  try {
+    const response = await Parse.Cloud.run("googleSignUp", {
+      auth_code: authCode
+    })
+    res.user = response
+    
   } catch (e) {
     res.error = e
   }

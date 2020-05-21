@@ -25,15 +25,9 @@ export default new Vuex.Store({
     logoutUser ({ commit }) {
       commit('logoutUser')
     },
-    async loginUser ({ commit }, credential) {
+    async loginUserPassword ({ commit }, credential) {
       let res = new Object;
-      switch (credential.method) {
-        case "password":
-          res = await UserManage.loginUserPassword(credential.username, credential.password)
-          break;
-        default:
-          break;
-      }
+      res = await UserManage.loginUserPassword(credential.username, credential.password)
 
       if (!res.error) {
         // Update user info if loggined in successfully
@@ -42,16 +36,9 @@ export default new Vuex.Store({
         throw res.error
       }
     },
-    async signupUser ({ commit }, userInfo) {
+    async loginUserGoogle ({ commit }, authCode) {
       let res = new Object;
-      switch (userInfo.method) {
-        case "password":
-          res = await UserManage.signupUserPassword(userInfo.username, userInfo.email, userInfo.password, 
-            userInfo.first_name, userInfo.last_name)
-          break;
-        default:
-          break;
-      }
+      res = await UserManage.loginUserGoogle(authCode)
 
       if (!res.error) {
         // Update user info if loggined in successfully
@@ -59,7 +46,32 @@ export default new Vuex.Store({
       } else {
         throw res.error
       }
-    }
+    },
+    async signupUserPassword ({ commit }, userInfo) {
+      let res = new Object;
+      res = await UserManage.signupUserPassword(userInfo.username, userInfo.email, userInfo.password, 
+        userInfo.first_name, userInfo.last_name)
+
+      if (!res.error) {
+        // Update user info if loggined in successfully
+        commit('loginUser', res.user)
+      } else {
+        throw res.error
+      }
+    },
+    async signupUserGoogle ({ commit }, authCode) {
+      let res = new Object;
+      res = await UserManage.signupUserGoogle(authCode)
+
+      console.log(res)
+      
+      if (!res.error) {
+        // Update user info if loggined in successfully
+        commit('loginUser', res.user)
+      } else {
+        throw res.error
+      }
+    },
   },
   modules: {
   }

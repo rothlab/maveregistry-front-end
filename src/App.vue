@@ -151,7 +151,7 @@
                       expanded
                       :disabled="!passed"
                       class="is-primary"
-                      @click="loginSignupProp.method = 'password'; login()"
+                      @click="login('password')"
                     >
                       Log in
                     </b-button>
@@ -172,6 +172,7 @@
                         icon-pack="mdi"
                         icon-left="google"
                         type="is-light"
+                        @click="login('google')"
                       >
                         Google
                       </b-button>
@@ -280,7 +281,7 @@
                       expanded
                       class="is-primary"
                       :disabled="!passed"
-                      @click="loginSignupProp.method = 'password'; signup()"
+                      @click="signup('password')"
                     >
                       Sign up
                     </b-button>
@@ -300,6 +301,7 @@
                         icon-pack="mdi"
                         icon-left="google"
                         type="is-light"
+                        @click="signup('google')"
                       >
                         Google
                       </b-button>
@@ -389,7 +391,6 @@ export default {
         username: "",
         email: "",
         password: "",
-        method: ""
       },
       isActionButtonLoading: false,
     }
@@ -410,53 +411,136 @@ export default {
         username: "",
         email: "",
         password: "",
-        method: ""
       }
     },
-    async signup() {
+    parseGoogleSigninError(e, authCode) {
+      let message = ""
+
+      if (e) return
+
+      if (!e) {
+        message = 'Something went wrong with Google Sign-in.'
+      } else if (authCode == "") {
+        message = 'Authentication failed.'
+      } 
+
+      this.$buefy.toast.open({
+        duration: 5000,
+        message: message,
+        type: 'is-danger',
+        queue: false
+      })
+    },
+    async signup(method) {
       // Loading
       this.isActionButtonLoading = true
 
       // Sign up user
-      try {
-        await this.$store.dispatch('signupUser', this.loginSignupProp)
+      let authCode = ""
+      switch (method) {
+        // With password
+        case "password":
+          try {
+            await this.$store.dispatch('signupUserPassword', this.loginSignupProp)
 
-        this.isLoginSignupModalActive = false
-        this.cleanupLoginSignup()
-      } catch (e) {
-        // Handle error
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: e.message,
-          type: 'is-danger',
-          queue: false
-        })
-      } finally {
-        this.isActionButtonLoading = false
+            this.isLoginSignupModalActive = false
+            this.cleanupLoginSignup()
+          } catch (e) {
+            // Handle error
+            this.$buefy.toast.open({
+              duration: 5000,
+              message: e.message,
+              type: 'is-danger',
+              queue: false
+            })
+          } finally {
+            this.isActionButtonLoading = false
+          }
+
+          break;
+        case "google":
+          // With Google
+          try {
+            // Bring up Google Sign-in
+            authCode = await this.$gAuth.getAuthCode()
+          } catch (e) {
+            this.parseGoogleSigninError(e, authCode)
+            return
+          }
+
+          // Handle Sign up in the backend
+          try {
+            await this.$store.dispatch('signupUserGoogle', authCode)
+
+            this.isLoginSignupModalActive = false
+            this.cleanupLoginSignup(authCode)
+          } catch (e) {
+            this.$buefy.toast.open({
+              duration: 5000,
+              message: e.message,
+              type: 'is-danger',
+              queue: false
+            })
+          }
+          break;
+        default:
+          break;
       }
-
     },
-    async login() {
+    async login(method) {
       // Loading
       this.isActionButtonLoading = true
 
       // Authenticate user
-      try {
-        await this.$store.dispatch('loginUser', this.loginSignupProp)
+      let authCode = ""
+      switch (method) {
+        case "password":
+          // With password
+          try {
+            await this.$store.dispatch('loginUserPassword', this.loginSignupProp)
 
-        this.isLoginSignupModalActive = false
-        this.cleanupLoginSignup()
-      } catch (e) {
-        // Handle error
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: e.message,
-          type: 'is-danger',
-          queue: false
-        })
-      } finally {
-        this.isActionButtonLoading = false
+            this.isLoginSignupModalActive = false
+            this.cleanupLoginSignup()
+          } catch (e) {
+            // Handle error
+            this.$buefy.toast.open({
+              duration: 5000,
+              message: e.message,
+              type: 'is-danger',
+              queue: false
+            })
+          }
+          break;
+        case "google":
+          // With Google
+          try {
+            // Bring up Google Sign-in
+            authCode = await this.$gAuth.getAuthCode()
+          } catch (e) {
+            this.parseGoogleSigninError(e, authCode)
+            return
+          }
+
+          // Handle verification in the backend
+          try {
+            await this.$store.dispatch('loginUserGoogle', authCode)
+
+            this.isLoginSignupModalActive = false
+            this.cleanupLoginSignup(authCode)
+          } catch (e) {
+            this.$buefy.toast.open({
+              duration: 5000,
+              message: e.message,
+              type: 'is-danger',
+              queue: false
+            })
+          }
+          break;
+        default:
+          break;
       }
+
+      this.isActionButtonLoading = false
     },
     logout() {
       this.$store.dispatch('logoutUser')
