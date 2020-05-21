@@ -36,17 +36,6 @@ export default new Vuex.Store({
         throw res.error
       }
     },
-    async loginUserGoogle ({ commit }, authCode) {
-      let res = new Object;
-      res = await UserManage.loginUserGoogle(authCode)
-
-      if (!res.error) {
-        // Update user info if loggined in successfully
-        commit('loginUser', res.user)
-      } else {
-        throw res.error
-      }
-    },
     async signupUserPassword ({ commit }, userInfo) {
       let res = new Object;
       res = await UserManage.signupUserPassword(userInfo.username, userInfo.email, userInfo.password, 
@@ -59,11 +48,9 @@ export default new Vuex.Store({
         throw res.error
       }
     },
-    async signupUserGoogle ({ commit }, authCode) {
+    async signupLoginUserGoogle ({ commit }, userInfo) {
       let res = new Object;
-      res = await UserManage.signupUserGoogle(authCode)
-
-      console.log(res)
+      res = await UserManage.signupLoginUserGoogle(userInfo)
       
       if (!res.error) {
         // Update user info if loggined in successfully

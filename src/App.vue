@@ -420,7 +420,7 @@ export default {
 
       if (!e) {
         message = 'Something went wrong with Google Sign-in.'
-      } else if (authCode == "") {
+      } else if (!authCode) {
         message = 'Authentication failed.'
       } 
 
@@ -431,12 +431,25 @@ export default {
         queue: false
       })
     },
+    parseGoogleSigninRes(googleUser) {
+      const basicProfile = googleUser.getBasicProfile()
+
+      return {
+        email: basicProfile.getEmail(),
+        first_name: basicProfile.getGivenName(),
+        last_name: basicProfile.getFamilyName(),
+        auth: {
+          id: googleUser.getId(),
+          access_token: googleUser.getAuthResponse().access_token
+        }
+      }
+    },
     async signup(method) {
       // Loading
       this.isActionButtonLoading = true
 
       // Sign up user
-      let authCode = ""
+      let user = undefined
       switch (method) {
         // With password
         case "password":
@@ -462,18 +475,19 @@ export default {
           // With Google
           try {
             // Bring up Google Sign-in
-            authCode = await this.$gAuth.getAuthCode()
+            const googleUser = await this.$gAuth.signIn()
+            user = this.parseGoogleSigninRes(googleUser)
           } catch (e) {
-            this.parseGoogleSigninError(e, authCode)
+            this.parseGoogleSigninError(e, user)
             return
           }
 
           // Handle Sign up in the backend
           try {
-            await this.$store.dispatch('signupUserGoogle', authCode)
+            await this.$store.dispatch('signupLoginUserGoogle', user)
 
             this.isLoginSignupModalActive = false
-            this.cleanupLoginSignup(authCode)
+            this.cleanupLoginSignup()
           } catch (e) {
             this.$buefy.toast.open({
               duration: 5000,
@@ -492,7 +506,7 @@ export default {
       this.isActionButtonLoading = true
 
       // Authenticate user
-      let authCode = ""
+      let user = undefined
       switch (method) {
         case "password":
           // With password
@@ -515,18 +529,19 @@ export default {
           // With Google
           try {
             // Bring up Google Sign-in
-            authCode = await this.$gAuth.getAuthCode()
+            const googleUser = await this.$gAuth.signIn()
+            user = this.parseGoogleSigninRes(googleUser)
           } catch (e) {
-            this.parseGoogleSigninError(e, authCode)
+            this.parseGoogleSigninError(e, user)
             return
           }
 
           // Handle verification in the backend
           try {
-            await this.$store.dispatch('loginUserGoogle', authCode)
+            await this.$store.dispatch('signupLoginUserGoogle', user)
 
             this.isLoginSignupModalActive = false
-            this.cleanupLoginSignup(authCode)
+            this.cleanupLoginSignup()
           } catch (e) {
             this.$buefy.toast.open({
               duration: 5000,

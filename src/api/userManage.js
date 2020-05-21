@@ -58,16 +58,22 @@ export async function signupUserPassword (username, email, password, firstName, 
 }
 
 // Sign up user with Google auth code
-export async function signupUserGoogle (authCode) {
+export async function signupLoginUserGoogle (userInfo) {
   let res = new Object
 
   // Sign up
   try {
-    const response = await Parse.Cloud.run("googleSignUp", {
-      auth_code: authCode
+    // Link account
+    let user = new Parse.User()
+    user.set("email", userInfo.email)
+    user.set("first_name", userInfo.first_name)
+    user.set("last_name", userInfo.last_name)
+    await user.linkWith("google", {
+      authData: userInfo.auth
     })
-    res.user = response
-    
+
+    // Set user info
+    res.user = parseUserMetadata(Parse.User.current())
   } catch (e) {
     res.error = e
   }
