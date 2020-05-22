@@ -126,7 +126,6 @@ export async function signupLoginUserOrcid (userInfo) {
     res.error = e
   }
 
-  console.log(res)
   return res
 }
 
