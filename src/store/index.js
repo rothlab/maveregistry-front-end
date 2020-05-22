@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createMutationsSharer from "vuex-shared-mutations";
 
 Vue.use(Vuex)
 
@@ -74,7 +75,21 @@ export default new Vuex.Store({
         throw res.error
       }
     },
+    async signupLoginUserOrcid ({ commit }, userInfo) {
+      let res = new Object;
+      res = await UserManage.signupLoginUserOrcid(userInfo)
+
+      if (!res.error) {
+        // Update user info if loggined in successfully
+        commit('loginUser', res.user)
+      } else {
+        throw res.error
+      }
+    }
   },
   modules: {
-  }
+  },
+  plugins: [createMutationsSharer({
+    predicate: ['loginUser', 'logoutUser']
+  })]
 })

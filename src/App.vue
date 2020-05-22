@@ -5,6 +5,7 @@
       spaced
       shadow
       type="is-white"
+      v-if="!$route.meta.hideNav"
     >
       <!-- Logo -->
       <template slot="brand">
@@ -180,6 +181,7 @@
                         icon-pack="fab"
                         icon-left="orcid"
                         type="is-light"
+                        @click="login('orcid')"
                       >
                         ORCID
                       </b-button>
@@ -281,6 +283,7 @@
                       expanded
                       class="is-primary"
                       :disabled="!passed"
+                      :loading="isActionButtonLoading"
                       @click="signup('password')"
                     >
                       Sign up
@@ -309,6 +312,7 @@
                         icon-pack="fab"
                         icon-left="orcid"
                         type="is-light"
+                        @click="signup('orcid')"
                       >
                         ORCID
                       </b-button>
@@ -324,7 +328,10 @@
     <!-- Component injection -->
     <router-view />
 
-    <footer class="footer has-background-dark has-text-light">
+    <footer
+      class="footer has-background-dark has-text-light"
+      v-if="!$route.meta.hideFooter"
+    >
       <div class="container">
         <div class="level">
           <div class="level-left">
@@ -349,11 +356,6 @@
 <style lang="sass" scoped>
 @import "@/assets/variables.sass"
 
-.field-margin
-  margin-bottom: 0.75rem
-  .name
-    width: 47.5%
-    // height: 2.25rem
 .password-strength
   margin-top: -1.5rem
   margin-bottom: -0.25rem !important
@@ -416,6 +418,7 @@ export default {
         email: "",
         password: "",
       }
+      this.isActionButtonLoading = false
     },
     parseGoogleSigninError(e, authCode) {
       let message = ""
@@ -449,14 +452,15 @@ export default {
       }
     },
     async signup(method) {
-      // Loading
-      this.isActionButtonLoading = true
-
       // Sign up user
       let user = undefined
+      let authWindow, timer;
       switch (method) {
         // With password
         case "password":
+          // Loading
+          this.isActionButtonLoading = true
+
           try {
             await this.$store.dispatch('signupUserPassword', this.loginSignupProp)
 
@@ -501,6 +505,33 @@ export default {
             })
           }
           break;
+        case "orcid":
+          // Bring up ORCID window
+          authWindow = window.open(
+            'https://orcid.org/oauth/authorize?client_id=APP-TNM3Y1CPZI5HS7WJ&response_type=token&scope=openid&redirect_uri=http://localhost:8080/callback/ORCID/signup',
+            'targetWindow',
+            `toolbar=no,
+             location=no,
+             status=no,
+             menubar=no,
+             scrollbars=yes,
+             resizable=yes,
+             width=500px,
+             height=600px`
+          )
+
+          // Handle results
+          timer = setInterval(() => { 
+            if(authWindow.closed) {
+              clearInterval(timer);
+
+              if (this.hasLoggedIn) {
+                this.isLoginSignupModalActive = false
+                this.cleanupLoginSignup()
+              }
+            }
+          }, 1000);
+          break;
         default:
           break;
       }
@@ -511,6 +542,7 @@ export default {
 
       // Authenticate user
       let user = undefined
+      let authWindow, timer;
       switch (method) {
         case "password":
           // With password
@@ -554,6 +586,33 @@ export default {
               queue: false
             })
           }
+          break;
+        case "orcid":
+          // Bring up ORCID window
+          authWindow = window.open(
+            'https://orcid.org/oauth/authorize?client_id=APP-TNM3Y1CPZI5HS7WJ&response_type=token&scope=openid&redirect_uri=http://localhost:8080/callback/ORCID/login',
+            'targetWindow',
+            `toolbar=no,
+             location=no,
+             status=no,
+             menubar=no,
+             scrollbars=yes,
+             resizable=yes,
+             width=500px,
+             height=600px`
+          )
+
+          // Handle results
+          timer = setInterval(() => { 
+            if(authWindow.closed) {
+              clearInterval(timer);
+
+              if (this.hasLoggedIn) {
+                this.isLoginSignupModalActive = false
+                this.cleanupLoginSignup()
+              }
+            }
+          }, 1000);
           break;
         case "cache":
           await this.$store.dispatch('loginUserCache')

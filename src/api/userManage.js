@@ -88,6 +88,48 @@ export async function signupLoginUserGoogle (userInfo) {
   return res
 }
 
+// Sign up user with ORCID OAuth2
+export async function signupLoginUserOrcid (userInfo) {
+  // Register provider
+  const provider = {
+    authenticate: () => Promise.resolve(),
+    restoreAuthentication() {
+      return true;
+    },
+  
+    getAuthType() {
+      return 'orcid';
+    },
+
+    getAuthData() {
+      return {
+        authData: userInfo.auth
+      }
+    }
+  };
+  Parse.User._registerAuthenticationProvider(provider);
+
+  let res = new Object
+
+  // Sign up
+  try {
+    // Link account
+    let user = new Parse.User()
+    user.set("email", userInfo.email)
+    user.set("first_name", userInfo.first_name)
+    user.set("last_name", userInfo.last_name)
+    await user.linkWith(provider.getAuthType(), provider.getAuthData())
+
+    // Set user info
+    res.user = parseUserMetadata(Parse.User.current())
+  } catch (e) {
+    res.error = e
+  }
+
+  console.log(res)
+  return res
+}
+
 export async function logoutUser () {
   let res = new Object
 

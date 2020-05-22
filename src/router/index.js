@@ -14,9 +14,15 @@ Vue.use(VueRouter)
     path: '/projects',
     name: 'Projects',
     // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
+    // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Projects.vue')
+    component: () => import(/* webpackChunkName: "projects" */ '../views/Projects.vue')
+  },
+  {
+    path: '/callback/:method/:action',
+    name: 'Callback',
+    meta: { hideNav: true, hideFooter: true },
+    component: () => import(/* webpackChunkName: "callback" */ '../views/Callback.vue')
   }
 ]
 
