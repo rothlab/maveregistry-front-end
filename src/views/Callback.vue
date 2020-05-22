@@ -8,7 +8,7 @@
       
       <div
         class="section"
-        v-if="requireEmail && isSignup"
+        v-if="isSignup"
       >
         <div class="content">
           <p class="is-size-5">
@@ -93,7 +93,6 @@ export default {
         email: "",
         auth: {}
       },
-      requireEmail: true,
       isLoading: false
     }
   },
@@ -122,9 +121,8 @@ export default {
         id_token: payload.id_token
       }
       
-      // If no email was returned, prompt the user to provide an email
-      if (!info.email && !email && this.isSignup) {
-        this.requireEmail = true
+      // If signing up, prompt the user to provide an email
+      if (!email && this.isSignup) {
         this.isLoading = false
         return undefined
       }
