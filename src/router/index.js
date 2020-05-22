@@ -18,6 +18,15 @@ Vue.use(VueRouter)
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "projects" */ '../views/Projects.vue')
   },
+  // User management related
+  {
+    path: '/profile/:username',
+    name: 'Profile',
+    // route level code-splitting
+    // this generates a separate chunk for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "profile" */ '../views/Profile.vue')
+  },
   {
     path: '/callback/:method/:action',
     name: 'Callback',

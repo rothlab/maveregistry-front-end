@@ -129,11 +129,30 @@ export async function signupLoginUserOrcid (userInfo) {
   return res
 }
 
+// Log out user
 export async function logoutUser () {
   let res = new Object
 
   try {
     res.user = await Parse.User.logOut()
+  } catch (e) {
+    res.error = e
+  }
+
+  return res
+}
+
+// Fetch user info with username
+export async function fetchUserInfo (username) {
+  let res = new Object
+
+  try {
+    // Query user info
+    const query = new Parse.Query(Parse.User)
+    query.equalTo("username", username)
+    const user = await query.find()
+
+    res.user = parseUserMetadata(user[0])
   } catch (e) {
     res.error = e
   }
