@@ -159,3 +159,28 @@ export async function fetchUserInfo (username) {
 
   return res
 }
+
+// Update user profile
+export async function updateUserProfile (userInfo) {
+  // We can only change profile for the current logged in user
+  let user = Parse.User.current();
+  if (!user) return
+
+  // Update user info
+  if (userInfo.username) user.set("username", userInfo.username)
+  if (userInfo.first_name) user.set("first_name", userInfo.first_name)
+  if (userInfo.last_name) user.set("last_name", userInfo.last_name)
+  if (userInfo.email) user.set("email", userInfo.email)
+  if (userInfo.website) user.set("email", userInfo.website)
+
+  // Save user info changes
+  let res = new Object
+  try {
+    const retUser = await user.save()
+    res.user = parseUserMetadata(retUser)
+  } catch (e) {
+    res.error = e
+  }
+
+  return res
+}

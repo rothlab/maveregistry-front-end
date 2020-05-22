@@ -53,8 +53,7 @@ export default new Vuex.Store({
       }
     },
     async signupUserPassword ({ commit }, userInfo) {
-      let res = new Object;
-      res = await UserManage.signupUserPassword(userInfo.username, userInfo.email, userInfo.password, 
+      let res = await UserManage.signupUserPassword(userInfo.username, userInfo.email, userInfo.password, 
         userInfo.first_name, userInfo.last_name)
 
       if (!res.error) {
@@ -65,8 +64,7 @@ export default new Vuex.Store({
       }
     },
     async signupLoginUserGoogle ({ commit }, userInfo) {
-      let res = new Object;
-      res = await UserManage.signupLoginUserGoogle(userInfo)
+      let res = await UserManage.signupLoginUserGoogle(userInfo)
       
       if (!res.error) {
         // Update user info if loggined in successfully
@@ -76,8 +74,17 @@ export default new Vuex.Store({
       }
     },
     async signupLoginUserOrcid ({ commit }, userInfo) {
-      let res = new Object;
-      res = await UserManage.signupLoginUserOrcid(userInfo)
+      let res = await UserManage.signupLoginUserOrcid(userInfo)
+
+      if (!res.error) {
+        // Update user info if loggined in successfully
+        commit('loginUser', res.user)
+      } else {
+        throw res.error
+      }
+    },
+    async updateUserProfile ({ commit }, userInfo) {
+      let res = await UserManage.updateUserProfile(userInfo)
 
       if (!res.error) {
         // Update user info if loggined in successfully
