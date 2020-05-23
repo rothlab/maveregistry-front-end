@@ -6,7 +6,8 @@ function parseUserMetadata (user) {
     username: user.get("username"),
     email: user.get("email"),
     first_name: user.get("first_name"),
-    last_name: user.get("last_name")
+    last_name: user.get("last_name"),
+    website: user.get("website")
   }
 }
 
@@ -171,7 +172,7 @@ export async function updateUserProfile (userInfo) {
   if (userInfo.first_name) user.set("first_name", userInfo.first_name)
   if (userInfo.last_name) user.set("last_name", userInfo.last_name)
   if (userInfo.email) user.set("email", userInfo.email)
-  if (userInfo.website) user.set("email", userInfo.website)
+  if (userInfo.website) user.set("website", userInfo.website)
 
   // Save user info changes
   let res = new Object

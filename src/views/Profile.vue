@@ -61,15 +61,24 @@
                 class="column"
                 v-if="!isEditing"
               >
-                <p class="is-size-5">
+                <p
+                  class="is-size-5"
+                  v-if="userInfo.username"
+                >
                   <b>Username</b> <br>
                   {{ userInfo.username }}
                 </p>
-                <p class="is-size-5">
+                <p
+                  class="is-size-5"
+                  v-if="userInfo.first_name && userInfo.last_name"
+                >
                   <b>Name</b> <br>
                   {{ userInfo.first_name }} {{ userInfo.last_name }}
                 </p>
-                <p class="is-size-5">
+                <p
+                  class="is-size-5"
+                  v-if="userInfo.email"
+                >
                   <b>Email</b> <br>
                   {{ userInfo.email }}
                 </p>
@@ -78,11 +87,15 @@
                   v-if="userInfo.website"
                 >
                   <b>Website</b> <br>
-                  {{ userInfo.website }}
+                  <a
+                    :href="userInfo.website"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >{{ userInfo.website }}</a>
                 </p>
                 <div
                   class="is-size-5"
-                  v-if="userInfo.social"
+                  v-if="userInfo.social && Object.keys(userInfo.social).length"
                 >
                   <span><b>Social Media</b></span>
                   <br>
@@ -242,7 +255,10 @@
                 <div class="profile-image">
                   <figure class="image is-square is-marginless">
                     <img src="https://bulma.io/images/placeholders/256x256.png">
-                    <div class="upload">
+                    <div
+                      class="upload"
+                      v-if="isEditing"
+                    >
                       <b-button
                         icon-left="mdil-upload"
                         rounded
@@ -299,19 +315,32 @@ export default {
     ValidationProvider,
     ValidationObserver
   },
+  watch: {
+    async $route(to, from) {
+      if (to !== from) {
+        const username = this.$route.params.username
+        this.userInfo = await this.fetchUserInfo(username)
+
+        if (this.userInfo) {
+          this.userInfo.social = {}
+        }
+      }
+    }
+  },
   data () {
     return {
       userInfo: {},
       showProfile: false,
       isOwner: true,
       isEditing: false,
-      isActionLoading: false
+      isActionLoading: false,
+      errorMessage: ""
     }
   },
   async mounted () {
     const username = this.$route.params.username
     this.userInfo = await this.fetchUserInfo(username)
-    
+
     if (this.userInfo) {
       this.userInfo.social = {}
     }
@@ -321,26 +350,46 @@ export default {
       // Get user info using username
       const res = await UserManage.fetchUserInfo(username)
 
-      if (!res.error) {
-        this.showProfile = true
-
-        return res.user
+      // Handle error
+      if (res.error) {
+        this.errorMessage = res.error.message
+        return undefined
       }
 
-      return undefined
+      // Check if owning the account.
+      // Only the owner can make changes
+      this.showProfile = true
+      this.isOwner = this.$store.state.hasLoggedIn && (res.user.username === this.$store.state.user.username)
+      return res.user
     },
     async saveProfile() {
       this.isActionLoading = true
 
       // Update user
-      await this.$store.dispatch('updateUserProfile', this.userInfo)
+      try {
+        await this.$store.dispatch('updateUserProfile', this.userInfo)
+      } catch (e) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: e.message,
+          type: 'is-danger',
+          queue: false
+        })
+
+        this.isActionLoading = false
+        return
+      }
 
       // Handle UI changes
       this.isActionLoading = false
       this.isEditing = false
 
       // Refresh user info
-      this.$router.replace('/profile/' + this.userInfo.username)
+      if (this.userInfo.username === this.$route.params.username) {
+        this.userInfo = await this.fetchUserInfo(this.userInfo.username)
+      } else {
+        this.$router.replace('/profile/' + this.userInfo.username)
+      }
     }
   }
 }

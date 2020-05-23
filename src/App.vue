@@ -64,6 +64,7 @@
         <b-navbar-item
           tag="router-link"
           :to="{ path: '/profile/' + user.username }"
+          :key="$route.path"
         >
           Profile
         </b-navbar-item>
