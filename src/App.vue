@@ -58,19 +58,26 @@
         slot="end"
         v-if="hasLoggedIn"
       >
-        <b-navbar-item tag="p">
-          Hello, {{ user.first_name }}!
-        </b-navbar-item>
         <b-navbar-item
           tag="router-link"
           :to="{ path: '/profile/' + user.username }"
           :key="$route.path"
         >
-          Profile
+          <span class="profile-tag">Profile</span>
+          <figure
+            class="image is-24x24"
+          >
+            <img
+              class="is-rounded"
+              :src="profileImageUrl"
+              alt="Profile Image"
+            >
+          </figure>
         </b-navbar-item>
         <b-navbar-item tag="div">
           <b-button
             @click="logout"
+            icon-right="mdil-logout"
           >
             Log out
           </b-button>
@@ -372,6 +379,8 @@
 <style lang="sass" scoped>
 @import "@/assets/variables.sass"
 
+.profile-tag
+  padding-right: 0.5rem
 .password-strength
   margin-top: -1.5rem
   margin-bottom: -0.25rem !important
@@ -423,6 +432,14 @@ export default {
     },
     user() {
       return this.$store.state.user
+    },
+    profileImageUrl() {
+      // Set url as placeholder
+      let url = require("./assets/blank-profile.png")
+
+      if (this.user && this.user.profile_image) url = this.user.profile_image
+
+      return url
     }
   },
   methods: {
@@ -456,11 +473,18 @@ export default {
     },
     parseGoogleSigninRes(googleUser) {
       const basicProfile = googleUser.getBasicProfile()
+  
+      if (!googleUser) return
+
+      // TODO: move profile image resizing to the backend
+      let imgUrl = basicProfile.getImageUrl()
+      if (imgUrl) imgUrl = imgUrl.substring(0, imgUrl.lastIndexOf("=")) // Get original size image
 
       return {
         email: basicProfile.getEmail(),
         first_name: basicProfile.getGivenName(),
         last_name: basicProfile.getFamilyName(),
+        profile_image: imgUrl,
         auth: {
           id: googleUser.getId(),
           access_token: googleUser.getAuthResponse().access_token

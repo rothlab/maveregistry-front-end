@@ -254,17 +254,23 @@
                 <!-- Profile image -->
                 <div class="profile-image">
                   <figure class="image is-square is-marginless">
-                    <img src="https://bulma.io/images/placeholders/256x256.png">
+                    <img :src="profileImageUrl">
                     <div
                       class="upload"
                       v-if="isEditing"
                     >
-                      <b-button
-                        icon-left="mdil-upload"
-                        rounded
-                        type="is-white"
+                      <b-upload
                         v-if="isOwner"
-                      />
+                        accept="image/png, image/jpeg"
+                        @input="uploadProfileImg"
+                      >
+                        <a class="button is-white">
+                          <b-icon
+                            icon="mdil-upload"
+                            type="is-primary"
+                          />
+                        </a>
+                      </b-upload>
                     </div>
                   </figure>
                 </div>
@@ -308,12 +314,23 @@
 
 <script>
 import * as UserManage from "../api/userManage"
+import * as FileManage from "../api/fileManage"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 
 export default {
   components: {
     ValidationProvider,
     ValidationObserver
+  },
+  computed: {
+    profileImageUrl() {
+      // Set url as placeholder
+      let url = require("../assets/blank-profile.png")
+
+      if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
+
+      return url
+    }
   },
   watch: {
     async $route(to, from) {
@@ -334,7 +351,7 @@ export default {
       isOwner: true,
       isEditing: false,
       isActionLoading: false,
-      errorMessage: ""
+      errorMessage: "",
     }
   },
   async mounted () {
@@ -343,6 +360,7 @@ export default {
 
     if (this.userInfo) {
       this.userInfo.social = {}
+      // this.$set(this.userInfo, 'profile_image', "") // Dynamically set profile_image attribute so it is reactive 
     }
   },
   methods: {
@@ -390,6 +408,27 @@ export default {
       } else {
         this.$router.replace('/profile/' + this.userInfo.username)
       }
+    },
+    async uploadProfileImg(file) {
+      if (!file || file.length < 1) return
+
+      this.isActionLoading = true
+      const res = await FileManage.uploadFile(file)
+
+      if (res.error) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: res.error.message,
+          type: 'is-danger',
+          queue: false
+        })
+
+        this.isActionLoading = false
+        return
+      }
+
+      this.userInfo.profile_image = res.file.url()
+      this.isActionLoading = false
     }
   }
 }

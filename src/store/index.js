@@ -20,18 +20,18 @@ export default new Vuex.Store({
     loginUser(state, user) {
       state.hasLoggedIn = true
       state.user = user
-    },
+    }
   },
   actions: {
     async logoutUser ({ commit }) {
+      // Logout user no matter what
+      commit('logoutUser')
+
       const res = await UserManage.logoutUser()
 
       if (res.error) {
         throw res.error
       }
-
-      // Logout user no matter what
-      commit('logoutUser')
     },
     async loginUserPassword ({ commit }, credential) {
       let res = new Object;

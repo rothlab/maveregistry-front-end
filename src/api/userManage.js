@@ -7,7 +7,8 @@ function parseUserMetadata (user) {
     email: user.get("email"),
     first_name: user.get("first_name"),
     last_name: user.get("last_name"),
-    website: user.get("website")
+    website: user.get("website"),
+    profile_image: user.get("profile_image"),
   }
 }
 
@@ -76,6 +77,7 @@ export async function signupLoginUserGoogle (userInfo) {
     user.set("email", userInfo.email)
     user.set("first_name", userInfo.first_name)
     user.set("last_name", userInfo.last_name)
+    user.set("profile_image", userInfo.profile_image)
     await user.linkWith("google", {
       authData: userInfo.auth
     })
@@ -173,6 +175,7 @@ export async function updateUserProfile (userInfo) {
   if (userInfo.last_name) user.set("last_name", userInfo.last_name)
   if (userInfo.email) user.set("email", userInfo.email)
   if (userInfo.website) user.set("website", userInfo.website)
+  if (userInfo.profile_image) user.set("profile_image", userInfo.profile_image)
 
   // Save user info changes
   let res = new Object
