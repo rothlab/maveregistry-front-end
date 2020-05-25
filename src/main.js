@@ -27,7 +27,7 @@ Vue.use(Buefy, {
 
 // Initialize parameters
 const gauthOption = { // Google O-Auth
-  clientId: '858736137272-vq823b82c3smcg86glnm7a5thhbp41an.apps.googleusercontent.com',
+  clientId: '637030175210-gdtjb7kd3kalhovg25sm3d2ns8mu67o5.apps.googleusercontent.com',
   scope: 'profile email',
   prompt: 'select_account'
 }
