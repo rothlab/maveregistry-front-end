@@ -115,7 +115,7 @@
               position="is-centered"
               type="is-boxed"
               expanded
-              class="login-tab"
+              class="login-tab is-marginless"
               :animated="false"
             >
               <!-- Log in tab -->
@@ -322,6 +322,21 @@
                 </div>
               </b-tab-item>
             </b-tabs>
+            <div class="recaptcha-display">
+              <p class="is-size-7 has-text-grey-light">
+                This site is protected by reCAPTCHA and the Google
+                <a
+                  href="https://policies.google.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >Privacy Policy</a> and
+                <a
+                  href="https://policies.google.com/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >Terms of Service</a> apply.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -385,7 +400,7 @@ export default {
     ValidationObserver,
     PasswordWithRevealAndValidation
   },
-  mounted () {
+  async mounted () {
     // Check if an user has logged in, if so, use it
     this.login("cache")
   },

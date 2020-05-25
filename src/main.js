@@ -7,6 +7,7 @@ import Buefy from 'buefy'
 // Import plugins
 import "@/assets/field_validation_rules.js"
 import GAuth from 'vue-google-oauth2'
+import { VueReCaptcha } from 'vue-recaptcha-v3'
 
 // Import stylesheets
 import 'buefy/dist/buefy.css'
@@ -35,6 +36,13 @@ Vue.config.productionTip = false
 
 // Inject plugins
 Vue.use(GAuth, gauthOption)
+Vue.use(VueReCaptcha, {
+  siteKey: '6LeEHPwUAAAAABdzBkPKUmfsxsGPxBtddID97XWh',
+  loaderOptions: {
+    useRecaptchaNet: true,
+    autoHideBadge: true
+  }
+})
 
 new Vue({
   router,
