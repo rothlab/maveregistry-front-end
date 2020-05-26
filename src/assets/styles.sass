@@ -2,13 +2,23 @@
 
 .has-vcentered
   align-items: center
+.has-vcentered-page
+  position: absolute
+  width: 100%
+  top: 50%
+  transform: translateY(-50%)
 .has-fullwidth
   width: 100%
 .has-fullheight
   @media screen and (min-width: $break-desktop)
-    min-height: calc( 100vh - 13.5rem - 7.25rem)
+    min-height: calc( 100vh - 13.5rem - 7.25rem )
   @media screen and (max-width: $break-desktop)
-    min-height: calc( 100vh - 9.5rem - 7.25rem)
+    min-height: calc( 100vh - 9.5rem - 7.25rem )
+.has-fullheight-no-header
+  @media screen and (min-width: $break-desktop)
+    min-height: calc( 100vh - 12.75rem )
+  @media screen and (max-width: $break-desktop)
+    min-height: calc( 100vh - 11rem )
 .has-top-padding
   padding-top: 1.5rem
 .has-hright

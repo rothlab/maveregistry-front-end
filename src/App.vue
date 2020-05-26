@@ -167,7 +167,12 @@
                   </p>
                 </ValidationObserver>
                 <p class="forget-password has-text-right">
-                  Forget Password?
+                  <router-link
+                    :to="{ name: 'Reset Password'}"
+                    target="_blank"
+                  >
+                    Forgot Password?
+                  </router-link>
                 </p>
                 <div class="level">
                   <div class="level-left">

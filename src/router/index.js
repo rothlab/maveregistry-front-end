@@ -28,6 +28,14 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "profile" */ '../views/Profile.vue')
   },
   {
+    path: '/reset_password',
+    name: 'Reset Password',
+    // route level code-splitting
+    // this generates a separate chunk for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "profile" */ '../views/ResetPassword.vue')
+  },
+  {
     path: '/callback/:method/:action',
     name: 'Callback',
     meta: { hideNav: true, hideFooter: true },
