@@ -310,7 +310,10 @@
       </div>
 
       <!-- Error message display -->
-      <Error :message="errorMessage" />
+      <Error
+        v-else-if="errorMessage !== ''"
+        :message="errorMessage"
+      />
 
       <!-- Loading -->
       <b-loading
