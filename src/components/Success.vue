@@ -3,7 +3,7 @@
     <div class="error-icon">
       <span class="mdil mdil-alert-circle" />
     </div>
-    <h1>{{ isError ? 'Error' : 'Warning' }}</h1>
+    <h1>{{ isSuccess ? 'Success' : 'Info' }}</h1>
     <h2>{{ message }}</h2>
     <p>
       <b-button
@@ -24,7 +24,7 @@ export default {
       type: String,
       required: true
     },
-    isError: {
+    isSuccess: {
       type: Boolean,
       default: true
     }

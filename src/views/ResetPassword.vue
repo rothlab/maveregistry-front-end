@@ -3,7 +3,10 @@
     <div class="container has-fullheight-no-header has-top-padding has-touch-container-padding">
       <div class="columns is-centered has-vcentered-page">
         <div class="column is-5">
-          <div class="card">
+          <div
+            v-if="!showSuccess"
+            class="card"
+          >
             <div class="card-content content">
               <h2 class="title">
                 Reset Password
@@ -79,6 +82,10 @@
               </transition>
             </div>
           </div>
+
+          <div v-else>
+            <Success message="Your password has been reset." />
+          </div>
         </div>
       </div>
     </div>
@@ -88,11 +95,18 @@
 <script>
 import * as UserManage from "../api/userManage"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
+import Success from "../components/Success"
 
 export default {
   components: {
     ValidationProvider,
-    ValidationObserver
+    ValidationObserver,
+    Success
+  },
+  computed: {
+    showSuccess () {
+      return this.$route.hash === "#success"
+    }
   },
   data () {
     return {
