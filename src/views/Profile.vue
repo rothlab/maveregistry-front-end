@@ -294,15 +294,18 @@
                 icon-left="mdil-lock"
                 type="is-light"
                 expanded
+                @click="resetPassword"
+                :loading="isActionLoading"
               >
-                Change Password
+                Reset Password
               </b-button>
               <b-button
                 icon-left="mdil-delete"
                 type="is-light"
                 expanded
+                disabled
               >
-                Delete Account
+                Delete Account (Under Dev.)
               </b-button>
             </div>
           </div>
@@ -449,6 +452,34 @@ export default {
       }
 
       this.userInfo.profile_image = res.file.url()
+      this.isActionLoading = false
+    },
+    async resetPassword() {
+      if (!this.userInfo.email) {
+        throw new Error("Missing email")
+      }
+      
+      try {
+        this.isActionLoading = true
+
+        await UserManage.resetPassword(this.userInfo.email)
+
+        // Confirmation
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: "A password reset email is sent. Please check your mailbox.",
+          type: 'is-success',
+          queue: false
+        })
+      } catch (error) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: error.message,
+          type: 'is-danger',
+          queue: false
+        })
+      }
+
       this.isActionLoading = false
     }
   }

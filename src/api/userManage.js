@@ -201,3 +201,8 @@ export async function updateUserProfile (userInfo) {
 
   return res
 }
+
+// Reset password
+export async function resetPassword (email) {
+  return await Parse.User.requestPasswordReset(email)
+}
