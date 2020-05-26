@@ -154,6 +154,9 @@ export async function logoutUser () {
 
 // Fetch user info with username
 export async function fetchUserInfo (username) {
+  // Clear cache
+  Parse.User._clearCache()
+  
   let res = new Object
 
   try {
