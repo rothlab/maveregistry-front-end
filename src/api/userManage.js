@@ -156,7 +156,7 @@ export async function logoutUser () {
 export async function fetchUserInfo (username) {
   // Clear cache
   Parse.User._clearCache()
-  
+
   let res = new Object
 
   try {
@@ -164,7 +164,11 @@ export async function fetchUserInfo (username) {
     const query = new Parse.Query(Parse.User)
     query.equalTo("username", username)
     const user = await query.find()
-    res.user = parseUserMetadata(user[0])
+    if (user.length > 0) {
+      res.user = parseUserMetadata(user[0])
+    } else {
+      throw new Error(`User ${username} does not exist.`)
+    }
   } catch (e) {
     res.error = e
   }

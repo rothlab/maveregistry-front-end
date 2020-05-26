@@ -308,6 +308,15 @@
           </div>
         </div>
       </div>
+
+      <!-- Error message display -->
+      <Error :message="errorMessage" />
+
+      <!-- Loading -->
+      <b-loading
+        :active="isPageLoading"
+        :is-full-page="false"
+      />
     </div>
   </div>
 </template>
@@ -316,11 +325,25 @@
 import * as UserManage from "../api/userManage"
 import * as FileManage from "../api/fileManage"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
+import Error from "../components/Error"
+
+function initialState (){
+  return {
+    userInfo: {},
+    showProfile: false,
+    isOwner: false,
+    isEditing: false,
+    isActionLoading: false,
+    isPageLoading: true,
+    errorMessage: "",
+  }
+}
 
 export default {
   components: {
     ValidationProvider,
-    ValidationObserver
+    ValidationObserver,
+    Error
   },
   computed: {
     profileImageUrl() {
@@ -334,23 +357,17 @@ export default {
   },
   watch: {
     async $route() {
+      // Reset parameters
+      Object.assign(this.$data, initialState())
+
+      // Fetch and store user information
       const username = this.$route.params.username
       this.userInfo = await this.fetchUserInfo(username)
-
-      if (this.userInfo) {
-        this.userInfo.social = {}
-      }
+      if (this.userInfo) this.userInfo.social = {}
     }
   },
   data () {
-    return {
-      userInfo: {},
-      showProfile: false,
-      isOwner: true,
-      isEditing: false,
-      isActionLoading: false,
-      errorMessage: "",
-    }
+    return initialState()
   },
   async mounted () {
     const username = this.$route.params.username
@@ -362,12 +379,15 @@ export default {
   },
   methods: {
     async fetchUserInfo(username) {
+      this.isPageLoading = true
+      
       // Get user info using username
       const res = await UserManage.fetchUserInfo(username)
 
       // Handle error
       if (res.error) {
         this.errorMessage = res.error.message
+        this.isPageLoading = false
         return undefined
       }
 
@@ -375,6 +395,7 @@ export default {
       // Only the owner can make changes
       this.showProfile = true
       this.isOwner = this.$store.state.hasLoggedIn && (res.user.username === this.$store.state.user.username)
+      this.isPageLoading = false
       return res.user
     },
     async saveProfile() {
