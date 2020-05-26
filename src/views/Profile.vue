@@ -333,14 +333,12 @@ export default {
     }
   },
   watch: {
-    async $route(to, from) {
-      if (to !== from) {
-        const username = this.$route.params.username
-        this.userInfo = await this.fetchUserInfo(username)
+    async $route() {
+      const username = this.$route.params.username
+      this.userInfo = await this.fetchUserInfo(username)
 
-        if (this.userInfo) {
-          this.userInfo.social = {}
-        }
+      if (this.userInfo) {
+        this.userInfo.social = {}
       }
     }
   },
@@ -360,7 +358,6 @@ export default {
 
     if (this.userInfo) {
       this.userInfo.social = {}
-      // this.$set(this.userInfo, 'profile_image', "") // Dynamically set profile_image attribute so it is reactive 
     }
   },
   methods: {
@@ -370,6 +367,7 @@ export default {
 
       // Handle error
       if (res.error) {
+        console.log("fetch", res.error)
         this.errorMessage = res.error.message
         return undefined
       }
@@ -416,6 +414,7 @@ export default {
       const res = await FileManage.uploadFile(file)
 
       if (res.error) {
+        console.log("upload", res.error)
         this.$buefy.toast.open({
           duration: 5000,
           message: res.error.message,

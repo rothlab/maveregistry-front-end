@@ -8,7 +8,7 @@
       
       <div
         class="section"
-        v-if="isSignup"
+        v-if="isSignup || !hasEmail"
       >
         <div class="content">
           <p class="is-size-5">
@@ -93,7 +93,9 @@ export default {
         email: "",
         auth: {}
       },
-      isLoading: false
+      isLoading: false,
+      hasEmail: true,
+      firstTry: true
     }
   },
   methods: {
@@ -124,13 +126,14 @@ export default {
       // If signing up, prompt the user to provide an email
       if (!email && this.isSignup) {
         this.isLoading = false
-        return undefined
+        return
       }
 
       // Otherwise, either response has email or email has been filled
       // Now, sign up user
+      let ret
       try {
-        await this.$store.dispatch('signupLoginUserOrcid', this.userInfo)
+        ret = await this.$store.dispatch('signupLoginUserOrcid', this.userInfo)
       } catch (e) {
         this.$buefy.toast.open({
           duration: 5000,
@@ -144,7 +147,32 @@ export default {
         this.isLoading = false
       }
 
-      window.close()
+      // If email is missing from the returned user,
+      // it means we were registering and if the router is /login
+      // we still need to collect user email
+      this.hasEmail = ret.hasEmail
+      if (!this.hasEmail && this.firstTry) {
+        this.firstTry = false
+        return
+      } else if (!this.hasEmail) {
+        let userUpdate = this.userInfo
+        delete userUpdate.auth
+
+        try {
+          await this.$store.dispatch('updateUserProfile', userUpdate)
+
+          window.close()
+        } catch (e) {
+          this.$buefy.toast.open({
+          duration: 5000,
+          message: e.message,
+          type: 'is-danger',
+          queue: false
+          })
+
+          return
+        }
+      }
     }
   },
   async mounted() {

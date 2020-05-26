@@ -121,7 +121,14 @@ export async function signupLoginUserOrcid (userInfo) {
     user.set("email", userInfo.email)
     user.set("first_name", userInfo.first_name)
     user.set("last_name", userInfo.last_name)
-    await user.linkWith(provider.getAuthType(), provider.getAuthData())
+    user.set("profile_image", userInfo.profile_image)
+
+    // Check if current user has email
+    // Because user might use the log in function to sign up
+    // We need to handle that case
+    res.response = await user.linkWith(provider.getAuthType(), provider.getAuthData())
+    res.hasEmail = res.response.getEmail() !== ""
+    delete res.response
 
     // Set user info
     res.user = parseUserMetadata(Parse.User.current())
