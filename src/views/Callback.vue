@@ -173,6 +173,8 @@ export default {
           return
         }
       }
+
+      window.close()
     }
   },
   async mounted() {

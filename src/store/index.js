@@ -75,7 +75,6 @@ export default new Vuex.Store({
     },
     async signupLoginUserOrcid ({ commit }, userInfo) {
       let res = await UserManage.signupLoginUserOrcid(userInfo)
-      console.log(res)
 
       if (!res.error && !!res.hasEmail) {
         // Update user info if loggined in successfully
@@ -88,7 +87,6 @@ export default new Vuex.Store({
     },
     async updateUserProfile ({ commit }, userInfo) {
       let res = await UserManage.updateUserProfile(userInfo)
-      console.log(res.error)
       if (!res.error) {
         // Update user info if loggined in successfully
         commit('loginUser', res.user)

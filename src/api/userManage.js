@@ -161,7 +161,6 @@ export async function fetchUserInfo (username) {
     const query = new Parse.Query(Parse.User)
     query.equalTo("username", username)
     const user = await query.find()
-
     res.user = parseUserMetadata(user[0])
   } catch (e) {
     res.error = e
