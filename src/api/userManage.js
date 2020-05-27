@@ -167,7 +167,7 @@ export async function fetchUserInfo (username) {
     if (user.length > 0) {
       res.user = parseUserMetadata(user[0])
     } else {
-      throw new Error(`User ${username} does not exist.`)
+      throw new Error(`User '${username}' does not exist`)
     }
   } catch (e) {
     res.error = e

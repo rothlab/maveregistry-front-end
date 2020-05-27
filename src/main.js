@@ -8,6 +8,8 @@ import Buefy from 'buefy'
 import "@/assets/field_validation_rules.js"
 import GAuth from 'vue-google-oauth2'
 import { VueReCaptcha } from 'vue-recaptcha-v3'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 
 // Import stylesheets
 import 'buefy/dist/buefy.css'
@@ -43,6 +45,7 @@ Vue.use(VueReCaptcha, {
     autoHideBadge: true
   }
 })
+Vue.use(VueAxios, axios)
 
 new Vue({
   router,

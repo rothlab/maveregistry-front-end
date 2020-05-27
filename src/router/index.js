@@ -33,7 +33,24 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "profile" */ '../views/ResetPassword.vue')
+    component: () => import(/* webpackChunkName: "resetPass" */ '../views/ResetPassword.vue')
+  },
+  {
+    path: '/change_password',
+    name: 'Change Password',
+    // route level code-splitting
+    // this generates a separate chunk for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "changePass" */ '../views/ChangePassword.vue')
+  },
+  {
+    path: '/reset_password_success',
+    name: 'Reset Password Successful',
+    // route level code-splitting
+    // this generates a separate chunk for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "resetPass" */ '../views/ResetPassword.vue'),
+    props: { showSuccess: true }
   },
   {
     path: '/callback/:method/:action',

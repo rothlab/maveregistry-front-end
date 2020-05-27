@@ -52,7 +52,7 @@
                         expanded
                         :disabled="!passed"
                         class="is-primary"
-                        @click="hasReset = true"
+                        @click="resetPass"
                         :loading="isActionLoading"
                       >
                         Email me a recovery link
@@ -84,7 +84,7 @@
           </div>
 
           <div v-else>
-            <Success message="Your password has been reset." />
+            <Success message="Your password has been reset" />
           </div>
         </div>
       </div>
@@ -98,15 +98,16 @@ import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Success from "../components/Success"
 
 export default {
+  props: {
+    showSuccess: {
+      type: Boolean,
+      default: false
+    }
+  },
   components: {
     ValidationProvider,
     ValidationObserver,
     Success
-  },
-  computed: {
-    showSuccess () {
-      return this.$route.hash === "#success"
-    }
   },
   data () {
     return {
