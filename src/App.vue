@@ -553,7 +553,7 @@ export default {
         case "orcid":
           // Bring up ORCID window
           authWindow = window.open(
-            'https://orcid.org/oauth/authorize?client_id=APP-TNM3Y1CPZI5HS7WJ&response_type=token&scope=openid&redirect_uri=http://localhost:8080/callback/ORCID/signup',
+            `https://orcid.org/oauth/authorize?client_id=APP-TNM3Y1CPZI5HS7WJ&response_type=token&scope=openid&redirect_uri=${window.location.origin}/callback/ORCID/signup`,
             'targetWindow',
             `toolbar=no,
              location=no,
@@ -635,7 +635,7 @@ export default {
         case "orcid":
           // Bring up ORCID window
           authWindow = window.open(
-            'https://orcid.org/oauth/authorize?client_id=APP-TNM3Y1CPZI5HS7WJ&response_type=token&scope=openid&redirect_uri=http://localhost:8080/callback/ORCID/login',
+            `https://orcid.org/oauth/authorize?client_id=APP-TNM3Y1CPZI5HS7WJ&response_type=token&scope=openid&redirect_uri=${window.location.origin}/callback/ORCID/login`,
             'targetWindow',
             `toolbar=no,
              location=no,
