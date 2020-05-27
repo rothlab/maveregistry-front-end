@@ -32,7 +32,7 @@
                 icon-left="mdil-content-save"
                 type="is-primary"
                 size="is-medium"
-                :loading="isActionLoading"
+                :loading="isLoading.save_edit"
                 @click="saveProfile"
               >
                 Save
@@ -295,7 +295,7 @@
                 type="is-light"
                 expanded
                 @click="resetPassword"
-                :loading="isActionLoading"
+                :loading="isLoading.reset_pass"
               >
                 Reset Password
               </b-button>
@@ -320,7 +320,7 @@
 
       <!-- Loading -->
       <b-loading
-        :active="isPageLoading"
+        :active="isLoading.page"
         :is-full-page="false"
       />
     </div>
@@ -339,8 +339,12 @@ function initialState (){
     showProfile: false,
     isOwner: false,
     isEditing: false,
-    isActionLoading: false,
-    isPageLoading: true,
+    isLoading: {
+      page: true,
+      reset_pass: false,
+      save_edit: false,
+      save_profile_pic: false
+    },
     errorMessage: "",
   }
 }
@@ -385,7 +389,7 @@ export default {
   },
   methods: {
     async fetchUserInfo(username) {
-      this.isPageLoading = true
+      this.isLoading.page = true
       
       // Get user info using username
       const res = await UserManage.fetchUserInfo(username)
@@ -393,7 +397,7 @@ export default {
       // Handle error
       if (res.error) {
         this.errorMessage = res.error.message
-        this.isPageLoading = false
+        this.isLoading.page = false
         return undefined
       }
 
@@ -401,11 +405,11 @@ export default {
       // Only the owner can make changes
       this.showProfile = true
       this.isOwner = this.$store.state.hasLoggedIn && (res.user.username === this.$store.state.user.username)
-      this.isPageLoading = false
+      this.isLoading.page = false
       return res.user
     },
     async saveProfile() {
-      this.isActionLoading = true
+      this.isLoading.save_edit = true
 
       // Update user
       try {
@@ -418,12 +422,12 @@ export default {
           queue: false
         })
 
-        this.isActionLoading = false
+        this.isLoading.save_edit = false
         return
       }
 
       // Handle UI changes
-      this.isActionLoading = false
+      this.isLoading.save_edit = false
       this.isEditing = false
 
       // Refresh user info
@@ -436,7 +440,7 @@ export default {
     async uploadProfileImg(file) {
       if (!file || file.length < 1) return
 
-      this.isActionLoading = true
+      this.isLoading.save_profile_pic = true
       const res = await FileManage.uploadFile(file)
 
       if (res.error) {
@@ -447,12 +451,12 @@ export default {
           queue: false
         })
 
-        this.isActionLoading = false
+        this.isLoading.save_profile_pic = false
         return
       }
 
       this.userInfo.profile_image = res.file.url()
-      this.isActionLoading = false
+      this.isLoading.save_profile_pic = false
     },
     async resetPassword() {
       if (!this.userInfo.email) {
@@ -460,7 +464,7 @@ export default {
       }
       
       try {
-        this.isActionLoading = true
+        this.isLoading.reset_pass = true
 
         await UserManage.resetPassword(this.userInfo.email)
 
@@ -480,7 +484,7 @@ export default {
         })
       }
 
-      this.isActionLoading = false
+      this.isLoading.reset_pass = false
     }
   }
 }
