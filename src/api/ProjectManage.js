@@ -1,6 +1,7 @@
 import { Parse } from "./parseConnect"
 
 // Define Project object
+const variables = require("@/assets/variables.json")
 const Project = Parse.Object.extend("Project", {
   initialize: function (attrs) {
     // Validate
@@ -15,7 +16,8 @@ const Project = Parse.Object.extend("Project", {
     if (attrs.organism === "") throw new Error("Target organism is empty")
     this.organism = attrs.organism
 
-    if (attrs.type !== "gene" && attrs.features.length < 1) throw new Error("Target features is empty for non-genic region")
+    if (attrs.features && attrs.features.length > 0 && 
+      attrs.features.some(val => variables.genomic_features.indexOf(val) === -1)) throw new Error("Some target features are invalid")
     this.features = attrs.features
   }
 })
