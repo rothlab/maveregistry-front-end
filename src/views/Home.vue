@@ -25,12 +25,18 @@
                       <b-button
                         size="is-medium"
                         type="is-primary"
+                        tag="router-link"
+                        to="/projects"
                       >
                         Register Activity
                       </b-button>
                     </div>
                     <div class="level-right">
-                      <b-button size="is-medium">
+                      <b-button
+                        size="is-medium"
+                        tag="router-link"
+                        to="/teams"
+                      >
                         Team Progress
                       </b-button>
                     </div>
@@ -232,7 +238,7 @@ export default {
           image: "https://bulma.io/images/placeholders/640x360.png",
           image_alt_text: "Placeholder image",
           action_text: "Register activity",
-          action_link: "#"
+          action_link: "/projects"
         },
         {
           icon: "mdil-vector-union",
@@ -240,7 +246,7 @@ export default {
           description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vehicula quam ipsum, ut iaculis mi molestie elementum.",
           image: "https://bulma.io/images/placeholders/640x360.png",
           action_text: "Register activity",
-          action_link: "#"
+          action_link: "/projects"
         },
         {
           icon: "mdil-shuffle",
@@ -248,7 +254,7 @@ export default {
           description: "Morbi ut rhoncus augue. Sed nec dui a enim feugiat lacinia id et turpis. Mauris faucibus semper molestie.",
           image: "https://bulma.io/images/placeholders/640x360.png",
           action_text: "Register activity",
-          action_link: "#"
+          action_link: "/projects"
         },
         {
           icon: "mdil-currency-usd",
@@ -256,7 +262,7 @@ export default {
           description: "In lobortis laoreet magna et sodales. Cras mi tellus, egestas ut pretium commodo,",
           image: "https://bulma.io/images/placeholders/640x360.png",
           action_text: "Register activity",
-          action_link: "#"
+          action_link: "/projects"
         }
       ]
     }

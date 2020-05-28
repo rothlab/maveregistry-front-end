@@ -85,7 +85,7 @@
               field="target_organism"
               label="Organism"
             >
-              {{ props.row.target.organism }}
+              <i>{{ props.row.target.organism }}</i>
             </b-table-column>
 
             <!-- Progress -->
@@ -235,9 +235,11 @@
                   label="Add new activity"
                   position="is-left"
                   type="is-dark"
-                  @click="isNewActivityModalActive = true; prepareNewActivity(props.row.target)"
                 >
-                  <b-button icon-right="mdil-plus" />
+                  <b-button
+                    icon-right="mdil-plus"
+                    @click="prepareNewActivity(props.row.target); isNewActivityModalActive = true"
+                  />
                 </b-tooltip>
                 <!-- Show MaveQuest for human genes -->
                 <b-tooltip
@@ -390,7 +392,7 @@
         </div>
       </b-modal>
 
-      <!-- New activity modal -->
+      <!-- New project modal -->
       <b-modal
         :active.sync="isNewActivityModalActive"
         has-modal-card
@@ -408,76 +410,129 @@
               @click="isNewActivityModalActive = false; cleanupNewActivity();"
             />
           </header>
-          <section class="modal-card-body">
-            <div class="content">
-              <!-- Target name -->
-              <b-field label="Target name">
-                <b-input
-                  v-model="newActivityProp.name"
-                  placeholder="e.g. Gene Symbol, Domain Name"
-                  required
-                  expanded
-                />
-              </b-field>
-              <!-- Target type -->
-              <b-field label="Type of target">
-                <b-select
-                  v-model="newActivityProp.type"
-                  placeholder="Select a target type"
-                  required
-                  expanded
-                >
-                  <option
-                    v-for="(type, index) in types"
-                    :key="index"
-                    :value="type.id"
+          <ValidationObserver
+            ref="observer"
+            v-slot="{ passed }"
+          >
+            <section class="modal-card-body">
+              <div class="content">
+                <!-- Target name -->
+                <ValidationProvider
+                  rules="required|alpha_dash"
+                  name="Name"
+                  v-slot="{ errors, valid }"
+                > 
+                  <b-field
+                    :message="errors"
+                    class="field-margin"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                    label="Target name"
                   >
-                    {{ type.name }}
-                  </option>
-                </b-select>
-              </b-field>
-              <!-- Target organism -->
-              <b-field label="Target organism">
-                <b-select
-                  v-model="newActivityProp.organism"
-                  placeholder="Select a target organism"
-                  required
-                  expanded
-                >
-                  <option
-                    v-for="(organism, index) in organisms"
-                    :key="index"
-                    :value="organism.id"
+                    <b-input
+                      v-model="newActivityProp.name"
+                      placeholder="e.g. Gene Symbol, Domain Name"
+                      required
+                      expanded
+                    />
+                  </b-field>
+                </ValidationProvider>
+
+                <ValidationProvider
+                  rules="required|alpha"
+                  name="Type"
+                  v-slot="{ errors, valid }"
+                > 
+                  <!-- Target type -->
+                  <b-field
+                    :message="errors"
+                    class="field-margin"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                    label="Type of target"
                   >
-                    {{ organism.name }}
-                  </option>
-                </b-select>
-              </b-field>
-              <!-- Target features -->
-              <b-field label="Target features">
-                <b-taginput
-                  v-model="newActivityProp.features"
-                  :data="features"
-                  autocomplete
-                  append-to-body
-                  icon="mdil-magnify"
-                  placeholder="Search for a genomic feature"
-                  @typing="getFilteredFeatures"
-                />
-              </b-field>
-            </div>
-          </section>
-          <footer class="modal-card-foot">
-            <b-button
-              expanded
-              :loading="isActionButtonLoading"
-              type="is-primary"
-              outlined
-              @click="addProject(newActivityProp)"
-            >
-              Add Project
-            </b-button>
-          </footer>
+                    <b-select
+                      v-model="newActivityProp.type"
+                      placeholder="Select a target type"
+                      required
+                      expanded
+                    >
+                      <option
+                        v-for="(type, index) in types"
+                        :key="index"
+                        :value="type.id"
+                      >
+                        {{ type.name }}
+                      </option>
+                    </b-select>
+                  </b-field>
+                </ValidationProvider>
+
+                <!-- Target organism -->
+                <ValidationProvider
+                  rules="required"
+                  name="Organism"
+                  v-slot="{ errors, valid }"
+                > 
+                  <b-field
+                    :message="errors"
+                    class="field-margin"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                    label="Target organism"
+                  >
+                    <b-select
+                      v-model="newActivityProp.organism"
+                      placeholder="Select a target organism"
+                      required
+                      expanded
+                    >
+                      <option
+                        v-for="(organism, index) in organisms"
+                        :key="index"
+                        :value="organism"
+                      >
+                        {{ organism }}
+                      </option>
+                    </b-select>
+                  </b-field>
+                </ValidationProvider>
+                
+                <ValidationProvider
+                  rules="required"
+                  name="Features"
+                  v-slot="{ errors, valid }"
+                > 
+                  <!-- Target features -->
+                  <b-field
+                    :message="errors"
+                    class="field-margin"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                    label="Target features"
+                  >
+                    <b-taginput
+                      v-model="newActivityProp.features"
+                      :data="features"
+                      autocomplete
+                      append-to-body
+                      open-on-focus
+                      icon="mdil-magnify"
+                      placeholder="Search for a genomic feature"
+                      @typing="getFilteredFeatures"
+                    />
+                  </b-field>
+                </ValidationProvider>
+              </div>
+            </section>
+            <footer class="modal-card-foot">
+              <b-button
+                expanded
+                :loading="isActionButtonLoading"
+                :disabled="!passed"
+                type="is-primary"
+                @click="addProject(newActivityProp)"
+              >
+                Add Project
+              </b-button>
+            </footer>
+          </ValidationObserver>
         </div>
       </b-modal>
     </div>
@@ -485,6 +540,8 @@
 </template>
 
 <script>
+import { ValidationProvider, ValidationObserver } from 'vee-validate'
+
 //TODO: remove debug functions
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -493,6 +550,10 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 const variables = require("@/assets/variables.json")
 
 export default {
+  components: {
+    ValidationProvider,
+    ValidationObserver
+  },
   data () {
     return {
       user: {
@@ -739,10 +800,8 @@ export default {
       // Loading
       this.isActionButtonLoading = true
 
-      //TODO: remove debug delay
-      await delay(2000);
+      // TODO: Implement API to add project
 
-      // TODO: Implement API to accept unfollow request
 
       // Handle UI changes
       this.isActionButtonLoading = false

@@ -1,10 +1,14 @@
 import { extend } from 'vee-validate';
-import { required, email, alpha_dash, regex, alpha_num } from 'vee-validate/dist/rules';
+import { required, email, alpha, alpha_dash, regex, alpha_num } from 'vee-validate/dist/rules';
 
 // Vee-validate
 extend('required', {
   ...required,
   message: 'This field is required. '
+});
+extend('alpha', {
+  ...alpha,
+  message: 'Only use alphabetic characters. '
 });
 extend('alpha_num', {
   ...alpha_num,
