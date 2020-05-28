@@ -421,6 +421,7 @@
                   rules="required|alpha_dash"
                   name="Name"
                   v-slot="{ errors, valid }"
+                  :immediate="newProjectProp.organism !== ''"
                 > 
                   <b-field
                     :message="errors"
@@ -429,7 +430,7 @@
                     label="Target name"
                   >
                     <b-input
-                      v-model="newActivityProp.name"
+                      v-model="newProjectProp.name"
                       placeholder="e.g. Gene Symbol, Domain Name"
                       required
                       expanded
@@ -441,6 +442,7 @@
                   rules="required|alpha"
                   name="Type"
                   v-slot="{ errors, valid }"
+                  :immediate="newProjectProp.organism !== ''"
                 > 
                   <!-- Target type -->
                   <b-field
@@ -450,7 +452,7 @@
                     label="Type of target"
                   >
                     <b-select
-                      v-model="newActivityProp.type"
+                      v-model="newProjectProp.type"
                       placeholder="Select a target type"
                       required
                       expanded
@@ -471,6 +473,7 @@
                   rules="required"
                   name="Organism"
                   v-slot="{ errors, valid }"
+                  :immediate="newProjectProp.organism !== ''"
                 > 
                   <b-field
                     :message="errors"
@@ -479,7 +482,7 @@
                     label="Target organism"
                   >
                     <b-select
-                      v-model="newActivityProp.organism"
+                      v-model="newProjectProp.organism"
                       placeholder="Select a target organism"
                       required
                       expanded
@@ -496,9 +499,10 @@
                 </ValidationProvider>
                 
                 <ValidationProvider
-                  rules="required"
+                  :rules="'oneOf:' + features.join(',')"
                   name="Features"
                   v-slot="{ errors, valid }"
+                  immediate
                 > 
                   <!-- Target features -->
                   <b-field
@@ -508,11 +512,12 @@
                     label="Target features"
                   >
                     <b-taginput
-                      v-model="newActivityProp.features"
+                      v-model="newProjectProp.features"
                       :data="features"
                       autocomplete
                       append-to-body
                       open-on-focus
+                      readonly
                       icon="mdil-magnify"
                       placeholder="Search for a genomic feature"
                       @typing="getFilteredFeatures"
@@ -527,7 +532,7 @@
                 :loading="isActionButtonLoading"
                 :disabled="!passed"
                 type="is-primary"
-                @click="addProject(newActivityProp)"
+                @click="addProject(newProjectProp)"
               >
                 Add Project
               </b-button>
@@ -541,6 +546,7 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
+import * as ProjectManage from "../api/projectManage"
 
 //TODO: remove debug functions
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -656,7 +662,7 @@ export default {
       // Register new activity related parameters
       isActionButtonLoading: false,
       isNewActivityModalActive: false,
-      newActivityProp: {
+      newProjectProp: {
         type: "",
         name: "",
         organism: "",
@@ -779,12 +785,12 @@ export default {
       this.followRequest = ""
     },
     prepareNewActivity(target) {
-      this.newActivityProp.type = target.type
-      this.newActivityProp.name = target.name
-      this.newActivityProp.organism = target.organism
+      this.newProjectProp.type = target.type
+      this.newProjectProp.name = target.name
+      this.newProjectProp.organism = target.organism
     },
     cleanupNewActivity() {
-      this.newActivityProp = {
+      this.newProjectProp = {
         type: "",
         name: "",
         organism: "",
@@ -801,11 +807,11 @@ export default {
       this.isActionButtonLoading = true
 
       // TODO: Implement API to add project
-
+      await ProjectManage.addProject(this.newProjectProp)
 
       // Handle UI changes
       this.isActionButtonLoading = false
-      this.isNewActivityModalActive = false
+      // this.isNewActivityModalActive = false
       this.cleanupNewActivity()
     }
   }

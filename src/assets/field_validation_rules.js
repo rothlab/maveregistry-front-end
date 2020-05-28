@@ -1,5 +1,5 @@
 import { extend } from 'vee-validate';
-import { required, email, alpha, alpha_dash, regex, alpha_num } from 'vee-validate/dist/rules';
+import { required, email, alpha, alpha_dash, regex, alpha_num, oneOf } from 'vee-validate/dist/rules';
 
 // Vee-validate
 extend('required', {
@@ -24,6 +24,10 @@ extend('email', {
 });
 extend('regex', {
   ...regex,
+});
+extend('oneOf', {
+  ...oneOf,
+  message: 'Please select one from the list.'
 });
 extend('password', {
   params: ['target'],
