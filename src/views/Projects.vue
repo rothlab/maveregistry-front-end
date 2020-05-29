@@ -109,7 +109,9 @@
                   >
                     <p class="card-header-title is-capitalized">
                       <b-icon :icon="selectProgressIcon(project.type)" />
-                      {{ project.description }}
+                      <!-- TODO: Add a proper progress interface -->
+                      <!-- {{ project.description }} -->
+                      ID: {{ project.id }}
                     </p>
                     <a class="card-header-icon">
                       <b-icon
@@ -119,6 +121,7 @@
                   </div>
                   <div class="card-content">
                     <div class="content">
+                      Features: {{ project.features }}
                       <!-- Show links when available -->
                       <div
                         v-if="project.links"

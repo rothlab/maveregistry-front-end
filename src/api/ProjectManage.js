@@ -26,7 +26,12 @@ const Target = Parse.Object.extend("Target", {
       name: this.get("name"),
       type: this.get("type"),
       organism: this.get("organism"),
-      projects: projects,
+      projects: projects.map(e => {
+        return {
+          id: e.id,
+          features: e.get("features")
+        }
+      }),
       teams: users.map(e => {
         return {
           id: e.get("username"),
