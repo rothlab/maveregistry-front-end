@@ -13,7 +13,7 @@
               </div>
             </div>
             <div class="level-right">
-              <!-- New project register -->
+              <!-- Register new project -->
               <!-- Non-mobile style -->
               <b-button
                 icon-left="mdil-plus"
@@ -44,19 +44,20 @@
       <!-- Project table -->
       <div>
         <b-table
-          :data="projects"
+          :data="targets"
+          :loading="isLoading.fetch_targets"
           hoverable
           paginated
           :per-page="20"
         >
           <template slot-scope="props">
-            <!-- Project ID -->
+            <!-- Target ID -->
             <b-table-column
-              field="id"
-              label="ID"
+              field="target_id"
+              label="Target ID"
               class="is-capitalized"
             >
-              <a :href="'/project/' + props.row.id">
+              <a :href="'/target/' + props.row.id">
                 {{ props.row.id }}
               </a>
             </b-table-column>
@@ -64,11 +65,9 @@
             <!-- Target name-->
             <b-table-column
               field="target_name"
-              label="Target"
+              label="Name"
             >
-              <a :href="'/target/' + props.row.target.id">
-                {{ props.row.target.name }}
-              </a>
+              {{ props.row.name }}
             </b-table-column>
 
             <!-- Target type -->
@@ -77,7 +76,7 @@
               label="Type"
               class="is-capitalized"
             >
-              {{ props.row.target.type }}
+              {{ props.row.type }}
             </b-table-column>
 
             <!-- Target species -->
@@ -85,20 +84,20 @@
               field="target_organism"
               label="Organism"
             >
-              <i>{{ props.row.target.organism }}</i>
+              <i>{{ props.row.organism }}</i>
             </b-table-column>
 
             <!-- Progress -->
             <b-table-column
-              field="progress"
-              label="Progress"
+              field="projects"
+              label="Projects"
               width="25vw"
             >
               <div class="has-text-left">
                 <b-collapse
-                  class="card progress-card has-background-light"
+                  class="card project-card has-background-light"
                   animation="slide"
-                  v-for="(progress, index) in props.row.progress"
+                  v-for="(project, index) in props.row.projects"
                   :key="index"
                   :open="false"
                 >
@@ -109,8 +108,8 @@
                     role="button"
                   >
                     <p class="card-header-title is-capitalized">
-                      <b-icon :icon="selectProgressIcon(progress.type)" />
-                      {{ progress.description }}
+                      <b-icon :icon="selectProgressIcon(project.type)" />
+                      {{ project.description }}
                     </p>
                     <a class="card-header-icon">
                       <b-icon
@@ -122,10 +121,10 @@
                     <div class="content">
                       <!-- Show links when available -->
                       <div
-                        v-if="progress.links"
+                        v-if="project.links"
                       >
                         <span
-                          v-for="(link, i) in progress.links"
+                          v-for="(link, i) in project.links"
                           :key="i"
                         >
                           <a
@@ -133,26 +132,26 @@
                             target="_blank"
                             rel="noopener noreferrer"
                           >{{ link.text }}</a>
-                          <span v-if="i < progress.links.length - 1">, </span>
+                          <span v-if="i < project.links.length - 1">, </span>
                         </span>
                       </div>
 
                       <!-- Show assay detail when available -->
                       <div
-                        v-if="progress.phenotype"
+                        v-if="project.phenotype"
                         class="is-capitalized"
                       >
                         <div class="level is-paddingless is-mobile">
                           <div class="level-left">
                             <p>
-                              Organism: {{ progress.organism }} <br>
-                              Phenotype: {{ progress.phenotype }} <br>
-                              Submitter: {{ progress.team }}
+                              Organism: {{ project.organism }} <br>
+                              Phenotype: {{ project.phenotype }} <br>
+                              Submitter: {{ project.team }}
                             </p>
                           </div>
                           <div class="level-right">
                             <a
-                              :href="'/progress/' + progress.id"
+                              :href="'/project/' + project.id"
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -169,8 +168,8 @@
 
             <!-- Active teams -->
             <b-table-column
-              field="teams"
-              label="Teams"
+              field="team"
+              label="Team"
             >
               <b-field
                 grouped
@@ -183,18 +182,24 @@
                   :key="index"
                 >
                   <b-taglist attached>
-                    <b-tag size="is-medium">
-                      <b-icon
-                        icon="mdil-account"
-                        class="team-icon"
-                      />
-                      {{ team.name }}
-                      <b-icon
-                        v-if="team.open_for_funding"
-                        class="circle-icon has-background-warning"
-                        icon="mdil-currency-usd"
-                      />
-                    </b-tag>
+                    <!-- TODO: implement a proper team interface -->
+                    <router-link
+                      :to="{ path: `/profile/${team.username}`}"
+                      target="_blank"
+                    >
+                      <b-tag size="is-medium">
+                        <b-icon
+                          icon="mdil-account"
+                          class="team-icon"
+                        />
+                        {{ team.first_name.substring(0, 1) }} {{ team.last_name }}
+                        <b-icon
+                          v-if="team.open_for_funding"
+                          class="circle-icon has-background-warning"
+                          icon="mdil-currency-usd"
+                        />
+                      </b-tag>
+                    </router-link>
                     <!-- Followed status -->
                     <b-tag
                       v-if="team.has_followed"
@@ -232,25 +237,25 @@
             >
               <div class="action-button is-flex">
                 <b-tooltip
-                  label="Add new activity"
+                  label="Add new project"
                   position="is-left"
                   type="is-dark"
                 >
                   <b-button
                     icon-right="mdil-plus"
-                    @click="prepareNewActivity(props.row.target); isNewActivityModalActive = true"
+                    @click="prepareNewActivity(props.row); isNewActivityModalActive = true"
                   />
                 </b-tooltip>
                 <!-- Show MaveQuest for human genes -->
                 <b-tooltip
-                  v-if="props.row.target.type == 'gene' && props.row.target.organism == 'H. sapiens'"
+                  v-if="props.row.type == 'gene' && props.row.organism == 'H. sapiens'"
                   label="Plan with MaveQuest"
                   position="is-left"
                   type="is-dark"
                 >
                   <b-button
                     tag="a"
-                    :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.target.name"
+                    :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
                     target="_blank"
                     icon-right="mdil-magnify"
                   />
@@ -264,7 +269,7 @@
                 >
                   <b-button
                     tag="a"
-                    :href="'https://www.google.com/search?q=' + props.row.target.name"
+                    :href="'https://www.google.com/search?q=' + props.row.name"
                     rel="noopener noreferrer"
                     target="_blank"
                     icon-right="mdil-magnify"
@@ -318,7 +323,7 @@
             <b-button
               expanded
               :disabled="followRequest.length <= 0"
-              :loading="isActionButtonLoading"
+              :loading="isLoading.follow_unfollow"
               type="is-primary"
               outlined
               @click="followTeam(followProp.team, followProp.target, followProp.project_index, followRequest)"
@@ -380,7 +385,7 @@
                 Cancel
               </b-button>
               <b-button
-                :loading="isActionButtonLoading"
+                :loading="isLoading.follow_unfollow"
                 type="is-primary"
                 outlined
                 @click="unfollowTeam(followProp.team, followProp.target, followProp.project_index)"
@@ -529,10 +534,10 @@
             <footer class="modal-card-foot">
               <b-button
                 expanded
-                :loading="isActionButtonLoading"
+                :loading="isLoading.new_project"
                 :disabled="!passed"
                 type="is-primary"
-                @click="addProject(newProjectProp)"
+                @click="addProject(newProjectProp); cleanupNewActivity()"
               >
                 Add Project
               </b-button>
@@ -567,18 +572,15 @@ export default {
         name: "Kevin Kuang",
         auth_token: "arandomtoken",
       },
-      projects: 
+      targets: 
       [
         {
-          id: "project_1",
-          target: {
-            id: "target_1",
-            name: "BRCA1",
-            type: "gene",
-            organism: "H. sapiens",
-          },
-          progress: [{
-            id: "progress_1",
+          id: "target_1",
+          name: "BRCA1",
+          type: "gene",
+          organism: "H. sapiens",
+          project: [{
+            id: "project_1",
             type: "publication",
             description: "publication",
             links: [
@@ -598,29 +600,28 @@ export default {
           }],
           teams: [
             {
-              id: "team_1",
-              name: "Roth FP",
+              username: "team_1",
+              first_name: "Fritz",
+              last_name: "Roth",
               has_followed: false,
             },
             {
-              id: "team_2",
-              name: "Smith J",
+              username: "team_2",
+              first_name: "James",
+              last_name: "Smith",
               open_for_funding: true,
               has_followed: true,
             },
           ]
         },
         {
-          id: "project_2",
-          target: {
-            id: "target_2",
-            name: "CHEK2",
-            type: "gene",
-            organism: "H. sapiens",
-          },
-          progress: [
+          id: "target_2",
+          name: "CHEK2",
+          type: "gene",
+          organism: "H. sapiens",
+          project: [
             {
-              id: "progress_3",
+              id: "project_3",
               type: "assay",
               description: "complementation",
               organism: "S. Cerevisiae",
@@ -628,7 +629,7 @@ export default {
               team: "Roth FP",
             },
             {
-              id: "progress_4",
+              id: "project_4",
               type: "assay",
               description: "two-hybrid",
               organism: "S. Cerevisiae",
@@ -660,15 +661,22 @@ export default {
       followRequest: "",
       isUnfollowModelActive: false,
       // Register new activity related parameters
-      isActionButtonLoading: false,
       isNewActivityModalActive: false,
       newProjectProp: {
         type: "",
         name: "",
         organism: "",
         features: []
+      },
+      isLoading: {
+        new_project: false,
+        follow_unfollow: false,
+        fetch_targets: false
       }
     }
+  },
+  async mounted () {
+    await this.fetchTargets()
   },
   methods: {
     selectProgressIcon(type) {
@@ -689,7 +697,7 @@ export default {
     },
     async followTeam(team, target, index, request) {
       // Loading
-      this.isActionButtonLoading = true
+      this.isLoading.follow_unfollow = true
 
       //TODO: remove debug delay
       await delay(2000);
@@ -715,7 +723,7 @@ export default {
       //TODO: implement API to accept follow request
 
       // Handle UI changes
-      this.isActionButtonLoading = false
+      this.isLoading.follow_unfollow = false
       this.isFollowModelActive = false
       this.cleanupFollow()
 
@@ -741,7 +749,7 @@ export default {
     },
     async unfollowTeam(team, target, index) {
       // Loading
-      this.isActionButtonLoading = true
+      this.isLoading.follow_unfollow = true
 
       //TODO: remove debug delay
       await delay(2000);
@@ -767,7 +775,7 @@ export default {
       }
 
       // Handle UI changes
-      this.isActionButtonLoading = false
+      this.isLoading.follow_unfollow = false
       this.isUnfollowModelActive = false
       this.cleanupFollow()
 
@@ -802,17 +810,28 @@ export default {
         return feature.toLowerCase().indexOf(text.toLowerCase()) >= 0
       })
     },
+    async fetchTargets(limit = 10, skip = 0) {
+      // Loading
+      this.isLoading.fetch_targets = true
+
+      // Update targets
+      const targets = await ProjectManage.fetchTargets(limit, skip)
+      this.targets = targets.results
+
+      this.isLoading.fetch_targets = false
+    },
     async addProject() {
       // Loading
-      this.isActionButtonLoading = true
+      this.isLoading.new_project = true
 
-      // TODO: Implement API to add project
       await ProjectManage.addProject(this.newProjectProp)
 
       // Handle UI changes
-      this.isActionButtonLoading = false
-      // this.isNewActivityModalActive = false
-      this.cleanupNewActivity()
+      this.isLoading.new_project = false
+      this.isNewActivityModalActive = false
+
+      // Refresh project list
+      this.fetchTargets()
     }
   }
 }
@@ -821,7 +840,7 @@ export default {
 <style lang="sass" scoped>
 @import "@/assets/variables.sass"
 
-.progress-card
+.project-card
   box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
   &:first-child
     border-radius: 0.4rem 0.4rem 0 0
