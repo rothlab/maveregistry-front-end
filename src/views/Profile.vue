@@ -260,7 +260,6 @@
                       v-if="isEditing"
                     >
                       <b-upload
-                        v-if="isOwner"
                         accept="image/png, image/jpeg"
                         @input="uploadProfileImg"
                       >
@@ -273,6 +272,14 @@
                       </b-upload>
                     </div>
                   </figure>
+                  <div
+                    class="content"
+                    v-if="isEditing"
+                  >
+                    <p class="is-size-7 has-text-grey has-text-right">
+                      Max file size: 2 MB. Format: jpg, png.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -329,6 +336,7 @@
 
 <script>
 import * as UserManage from "../api/userManage"
+// eslint-disable-next-line no-unused-vars
 import * as FileManage from "../api/fileManage"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "../components/Error"
@@ -440,7 +448,20 @@ export default {
     async uploadProfileImg(file) {
       if (!file || file.length < 1) return
 
+      // Check file size
+      if (file.size > 2048 * 1000) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: "File size exceeds limit of 2 MB",
+          type: 'is-danger',
+          queue: false
+        })
+
+        return
+      }
+
       this.isLoading.save_profile_pic = true
+
       const res = await FileManage.uploadFile(file)
 
       if (res.error) {
