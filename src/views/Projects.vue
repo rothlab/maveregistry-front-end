@@ -184,7 +184,7 @@
                   <b-taglist attached>
                     <!-- TODO: implement a proper team interface -->
                     <router-link
-                      :to="{ path: `/profile/${team.username}`}"
+                      :to="{ path: `/team/${team.id}`}"
                       target="_blank"
                     >
                       <b-tag size="is-medium">
@@ -192,7 +192,7 @@
                           icon="mdil-account"
                           class="team-icon"
                         />
-                        {{ team.first_name.substring(0, 1) }} {{ team.last_name }}
+                        {{ team.name }}
                         <b-icon
                           v-if="team.open_for_funding"
                           class="circle-icon has-background-warning"
@@ -205,7 +205,7 @@
                       v-if="team.has_followed"
                       size="is-medium"
                       class="is-clickable has-background-primary"
-                      @click.native="confirmUnfollowTeam(team, props.row.target, props.index)"
+                      @click.native="confirmUnfollowTeam(team, props.row, props.index)"
                     >
                       <b-icon
                         type="is-white"
@@ -219,7 +219,7 @@
                       v-else
                       size="is-medium"
                       class="is-clickable has-background-grey-lighter"
-                      @click.native="confirmFollowTeam(team, props.row.target, props.index)"
+                      @click.native="confirmFollowTeam(team, props.row, props.index)"
                     >
                       <b-icon
                         icon="mdil-bell"
@@ -601,14 +601,12 @@ export default {
           teams: [
             {
               username: "team_1",
-              first_name: "Fritz",
-              last_name: "Roth",
+              name: "F Roth",
               has_followed: false,
             },
             {
               username: "team_2",
-              first_name: "James",
-              last_name: "Smith",
+              nanme: "J Smith",
               open_for_funding: true,
               has_followed: true,
             },

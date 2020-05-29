@@ -29,9 +29,8 @@ const Target = Parse.Object.extend("Target", {
       projects: projects,
       teams: users.map(e => {
         return {
-          username: e.get("username"),
-          first_name: e.get("first_name"),
-          last_name: e.get("last_name")
+          id: e.get("username"),
+          name: e.get("first_name").substring(0, 1) + ' ' + e.get("last_name")
         }
       })
     }
