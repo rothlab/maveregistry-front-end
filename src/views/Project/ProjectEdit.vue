@@ -99,6 +99,29 @@
                 </b-button>
               </div>
             </div>
+
+            <div class="column is-5">
+              <b-notification :closable="false">
+                <div class="content">
+                  <b-icon
+                    class="header-icon"
+                    type="is-primary"
+                    custom-size="mdil-48px"
+                    icon="mdil-information"
+                  />
+                  <p class="has-text-weight-bold">
+                    Project Info-card (ID: {{ projectId }})
+                  </p>
+                  <!-- TODO: Fetch project -->
+                  <ul>
+                    <li>Target Type: {{}} </li>
+                    <li>Target Name: {{}} </li>
+                    <li>Target Organism: {{}} </li>
+                    <li>Target Features: {{}} </li>
+                  </ul>
+                </div>
+              </b-notification>
+            </div>
           </div>
 
           <div class="columns">
@@ -341,6 +364,9 @@ export default {
     },
     isEdit() {
       return this.$route.params.action === 'edit'
+    },
+    projectId() {
+      return this.$route.params.id
     }
   },
   methods: {
