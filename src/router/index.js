@@ -16,7 +16,23 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "projects" */ '../views/Projects.vue')
+    component: () => import(/* webpackChunkName: "projects" */ '../views/Project/ProjectList.vue')
+  },
+  {
+    path: '/project/:id/:action',
+    name: 'Project',
+    // route level code-splitting
+    // this generates a separate chunk for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "project edit" */ '../views/Project/ProjectEdit.vue')
+  },
+  {
+    path: '/project/:id',
+    name: 'Project',
+    // route level code-splitting
+    // this generates a separate chunk for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "project view" */ '../views/Project/ProjectView.vue')
   },
   // User management related
   {

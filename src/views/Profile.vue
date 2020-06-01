@@ -462,6 +462,7 @@ export default {
 
       this.isLoading.save_profile_pic = true
 
+      // TODO: Check file size in the backend
       const res = await FileManage.uploadFile(file)
 
       if (res.error) {

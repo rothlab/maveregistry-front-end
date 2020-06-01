@@ -43,12 +43,15 @@
     <div class="container has-fullheight has-top-padding has-touch-container-padding">
       <!-- Project table -->
       <div>
+        <!-- TODO: implement backend pagination -->
         <b-table
           :data="targets"
           :loading="isLoading.fetch_targets"
           hoverable
           paginated
-          :per-page="20"
+          backend-pagination
+          icon-pack="mdi"
+          :per-page="pagination.limit"
         >
           <template slot-scope="props">
             <!-- Target ID -->
@@ -554,7 +557,7 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import * as ProjectManage from "../api/projectManage"
+import * as ProjectManage from "@/api/projectManage"
 
 //TODO: remove debug functions
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -570,11 +573,6 @@ export default {
   },
   data () {
     return {
-      user: {
-        id: "user_1",
-        name: "Kevin Kuang",
-        auth_token: "arandomtoken",
-      },
       targets: 
       [
         {
@@ -653,6 +651,11 @@ export default {
           ]
         },
       ],
+      pagination: {
+        count: 0,
+        limit: 10,
+        skip: 0
+      },
       features: variables.genomic_features,
       types: variables.target_types,
       organisms: variables.target_organisms,
@@ -818,6 +821,9 @@ export default {
       // Update targets
       const targets = await ProjectManage.fetchTargets(limit, skip)
       this.targets = targets.results
+
+      // Update pagination
+      this.pagination.count = targets.count
 
       this.isLoading.fetch_targets = false
     },
