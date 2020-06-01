@@ -49,14 +49,14 @@
     <div class="container has-fullheight has-top-padding has-touch-container-padding">
       <div class="content">
         <!-- Project information -->
+        <div class="project-header">
+          <p class="is-size-4">
+            Project Information
+          </p>
+        </div>
+        
         <div class="columns">
           <div class="column is-7">
-            <div class="project-header">
-              <p class="is-size-4">
-                Project Information
-              </p>
-            </div>
-            
             <!-- Project Lead -->
             <div class="project-content">
               <div
@@ -93,7 +93,11 @@
                 Add a Project Lead
               </b-button>
             </div>
+          </div>
+        </div>
 
+        <div class="columns">
+          <div class="column is-7">
             <!-- Principal Investigator -->
             <div class="project-content">
               <div class="columns">
@@ -110,7 +114,11 @@
                 </div>
               </div>
             </div>
+          </div> 
+        </div>
 
+        <div class="columns">
+          <div class="column is-7">
             <!-- Collaborators -->
             <div class="project-content">
               <div
@@ -150,6 +158,41 @@
             </div>
           </div>
         </div>
+
+        <div class="columns">
+          <div class="column is-7">
+            <!-- Funding -->
+            <div class="project-content">
+              <div class="columns">
+                <div class="column is-3">
+                  <p class="is-size-5">
+                    Funding
+                  </p>
+                </div>
+                <div class="column is-9">
+                  <b-checkbox v-model="openForFunding">
+                    Open for Funding Opportunities
+                  </b-checkbox>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="column is=5">
+            <div class="content">
+              <b-taglist attached>
+                <b-tag
+                  size="is-medium"
+                  type="is-primary"
+                >
+                  <b-icon icon="mdil-help" />
+                </b-tag>
+                <b-tag size="is-medium">
+                  Only trusted funders have access to funding status
+                </b-tag>
+              </b-taglist>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -178,7 +221,8 @@ export default {
       investigator: this.newPi(),
       collaborators: [
         this.newPi()
-      ]
+      ],
+      openForFunding: false
     }
   },
   computed: {
@@ -206,6 +250,14 @@ export default {
         email: "",
         affiliation: ""
       }
+    },
+    newFunding() {
+      return {
+        type: "",
+        agendcy: "",
+        start_date: new Date(),
+        end_date: new Date()
+      }
     }
   }
 }
@@ -213,9 +265,7 @@ export default {
 
 <style lang="sass" scoped>
 .project-content
-  padding: 0.5rem 1rem 1rem 1rem
+  padding: 0.5rem 1rem
   .columns
     margin-bottom: 0
-.add-record
-  margin-bottom: 1rem
 </style>
