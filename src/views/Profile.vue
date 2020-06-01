@@ -132,7 +132,7 @@
                     class="field-margin is-space-between"
                   >
                     <ValidationProvider
-                      rules="required|alpha_dash"
+                      rules="required"
                       name="FirstName"
                       v-slot="{ errors, valid }"
                       class="name"
@@ -150,7 +150,7 @@
                       </b-field>
                     </ValidationProvider>
                     <ValidationProvider
-                      rules="required|alpha_dash"
+                      rules="required"
                       name="LastName"
                       v-slot="{ errors, valid }"
                       class="name"

@@ -429,7 +429,7 @@
               <div class="content">
                 <!-- Target name -->
                 <ValidationProvider
-                  rules="required|alpha_dash"
+                  rules="required"
                   name="Name"
                   v-slot="{ errors, valid }"
                   :immediate="newProjectProp.organism !== ''"
