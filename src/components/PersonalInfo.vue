@@ -67,11 +67,12 @@
       rules="required"
       name="Position"
       v-slot="{ errors, valid }"
+      v-if="!isPi"
     > 
       <b-field
         grouped
         :type="{ 'is-danger': errors[0], '': valid }"
-        class="is-marginless"
+        class="field-margin"
       >
         <b-select
           placeholder="Position"
@@ -103,6 +104,28 @@
         {{ errors[0] }}
       </p>
     </ValidationProvider>
+    <!-- Affiliation. Only when PI -->
+    <ValidationProvider
+      rules="required"
+      name="Affiliation"
+      v-slot="{ errors, valid }"
+      v-else
+    > 
+      <b-field
+        :message="errors"
+        class="field-margin"
+        :type="{ 'is-danger': errors[0], '': valid }"
+      >
+        <b-input
+          icon="mdil-factory"
+          v-model="affiliation"
+          type="affiliation"
+          placeholder="Affiliation"
+          @input="updateVal"
+          expanded
+        />
+      </b-field>
+    </ValidationProvider>
   </div>
 </template>
 
@@ -114,6 +137,10 @@ export default {
     value: {
       type: Object,
       required: true
+    },
+    isPi: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -124,6 +151,8 @@ export default {
         this.email = val.email
         this.position = val.position
         this.custom_position = val.custom_position
+
+        if (this.isPi) this.affiliation = val.affiliation
       },
       deep: true
     }
@@ -144,17 +173,23 @@ export default {
       last_name: "",
       email: "",
       position: "",
-      custom_position: ""
+      custom_position: "",
+      affiliation: ""
     }
   },
   methods: {
     updateVal() {
-      const ret = {
+      let ret = {
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
-        position: this.position,
-        custom_position: this.custom_position
+      }
+
+      if (!this.isPi) {
+        ret.position = this.position
+        ret.custom_position = this.custom_position
+      } else {
+        ret.affiliation = this.affiliation
       }
 
       this.$emit("input", ret)

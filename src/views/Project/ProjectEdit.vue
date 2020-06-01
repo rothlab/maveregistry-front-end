@@ -56,6 +56,8 @@
                 Project Information
               </p>
             </div>
+            
+            <!-- Project Lead -->
             <div class="project-content">
               <div
                 v-for="(lead, index) in projectLeads"
@@ -82,12 +84,68 @@
               </div>
               <!-- Add project lead -->
               <b-button
+                class="add-record"
                 type="is-light"
                 icon-left="mdil-plus"
                 expanded
                 @click="projectLeads.push(newLead())"
               >
                 Add a Project Lead
+              </b-button>
+            </div>
+
+            <!-- Principal Investigator -->
+            <div class="project-content">
+              <div class="columns">
+                <div class="column is-3">
+                  <p class="is-size-5">
+                    Principal Investigator (*)
+                  </p>
+                </div>
+                <div class="column is-9">
+                  <PersonalInfo
+                    v-model="investigator"
+                    is-pi
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Collaborators -->
+            <div class="project-content">
+              <div
+                v-for="(collab, index) in collaborators"
+                :key="index"
+                class="columns"
+              >
+                <div class="column is-3">
+                  <p class="is-size-5">
+                    Collaborator
+                  </p>
+                  <b-button
+                    v-if="collaborators.length > 1"
+                    icon-left="mdil-delete"
+                    @click="collaborators.splice(index, 1)"
+                  >
+                    Delete
+                  </b-button>
+                </div>
+                <div class="column is-9">
+                  <PersonalInfo
+                    v-model="collaborators[index]"
+                    is-pi
+                  />
+                </div>
+              </div>
+              <!-- Add project lead -->
+              <b-button
+                class="add-record"
+                type="is-light"
+                icon-left="mdil-plus"
+                expanded
+                @click="collaborators.push(newLead())"
+              >
+                Add a Collaborator
               </b-button>
             </div>
           </div>
@@ -116,6 +174,10 @@ export default {
         "Faculty",
         "Research Staff",
         "Other"
+      ],
+      investigator: this.newPi(),
+      collaborators: [
+        this.newPi()
       ]
     }
   },
@@ -137,8 +199,13 @@ export default {
           custom_position: ""
       }
     },
-    handleInput (e) {
-      console.log(e)
+    newPi() {
+      return {
+        first_name: "",
+        last_name: "",
+        email: "",
+        affiliation: ""
+      }
     }
   }
 }
@@ -146,5 +213,9 @@ export default {
 
 <style lang="sass" scoped>
 .project-content
-  padding: 0.5rem 1rem
+  padding: 0.5rem 1rem 1rem 1rem
+  .columns
+    margin-bottom: 0
+.add-record
+  margin-bottom: 1rem
 </style>
