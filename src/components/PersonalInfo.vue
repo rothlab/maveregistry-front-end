@@ -6,7 +6,7 @@
       class="field-margin is-space-between"
     >
       <ValidationProvider
-        rules="required"
+        :rules="hasRequired"
         name="FirstName"
         v-slot="{ errors, valid }"
         class="name"
@@ -24,7 +24,7 @@
         </b-field>
       </ValidationProvider>
       <ValidationProvider
-        rules="required"
+        :rules="hasRequired"
         name="LastName"
         v-slot="{ errors, valid }"
         class="name"
@@ -44,7 +44,7 @@
     </b-field>
     <!-- Email -->
     <ValidationProvider
-      rules="required|email"
+      :rules="hasRequired + '|email'"
       name="Email"
       v-slot="{ errors, valid }"
     > 
@@ -64,7 +64,7 @@
     </ValidationProvider>
     <!-- Position -->
     <ValidationProvider
-      rules="required"
+      :rules="hasRequired"
       name="Position"
       v-slot="{ errors, valid }"
       v-if="!isPi"
@@ -106,7 +106,7 @@
     </ValidationProvider>
     <!-- Affiliation. Only when PI -->
     <ValidationProvider
-      rules="required"
+      :rules="hasRequired"
       name="Affiliation"
       v-slot="{ errors, valid }"
       v-else
@@ -141,6 +141,10 @@ export default {
     isPi: {
       type: Boolean,
       default: false
+    },
+    isRequired: {
+      type: Boolean,
+      default: true
     }
   },
   watch: {
@@ -155,6 +159,11 @@ export default {
         if (this.isPi) this.affiliation = val.affiliation
       },
       deep: true
+    }
+  },
+  computed: {
+    hasRequired() {
+      return this.isRequired ? 'required' : ''
     }
   },
   components: {

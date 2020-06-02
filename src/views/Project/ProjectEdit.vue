@@ -218,6 +218,7 @@
                     <PersonalInfo
                       v-model="collaborators[index]"
                       is-pi
+                      :is-required="false"
                     />
                   </div>
                 </div>
