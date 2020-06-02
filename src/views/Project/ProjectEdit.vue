@@ -47,7 +47,21 @@
     </div>
 
     <div class="container has-fullheight has-top-padding has-touch-container-padding">
-      <div class="content">
+      <!-- Loading -->
+      <b-loading
+        :is-full-page="false"
+        :active="isLoading.page"
+      />
+
+      <Error
+        v-if="!isLoading.page && errorMessage !== ''"
+        :message="errorMessage"
+      />
+
+      <div
+        class="content"
+        v-else-if="!isLoading.page && errorMessage === ''"
+      >
         <!-- Project information -->
         <ValidationObserver
           ref="observer"
@@ -376,6 +390,7 @@
 <script>
 import PersonalInfo from '@/components/PersonalInfo'
 import ProjectActivity from '@/components/ProjectActivity'
+import Error from '@/components/Error'
 import { ValidationObserver } from 'vee-validate'
 
 import * as ProjectManage from "@/api/projectManage"
@@ -384,7 +399,8 @@ export default {
   components: {
     PersonalInfo,
     ProjectActivity,
-    ValidationObserver
+    ValidationObserver,
+    Error
   },
   data () {
     return {
@@ -409,7 +425,12 @@ export default {
       ],
       features: [],
       user: {},
-      updatedDate: new Date
+      updatedDate: new Date,
+      isLoading: {
+        page: false,
+        submit: false
+      },
+      errorMessage: ""
     }
   },
   computed: {
@@ -460,13 +481,21 @@ export default {
       }
     },
     async fetchProject(id) {
-      // TODO: Error handling
-      const project = await ProjectManage.fetchProject(id)
+      this.isLoading.page = true
+
+      // Error handling
+      try {
+        const project = await ProjectManage.fetchProject(id)
       
-      this.target = project.target
-      this.features = project.features
-      this.user = project.user
-      this.updatedDate = project.update_date
+        this.target = project.target
+        this.features = project.features
+        this.user = project.user
+        this.updatedDate = project.update_date
+      } catch (error) {
+        this.errorMessage = error.message
+      } finally {
+        this.isLoading.page = false
+      }
     }
   }
 }
