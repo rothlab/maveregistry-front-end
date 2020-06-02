@@ -335,11 +335,11 @@
 </template>
 
 <script>
-import * as UserManage from "../api/userManage"
+import * as UserManage from "@/api/userManage"
 // eslint-disable-next-line no-unused-vars
-import * as FileManage from "../api/fileManage"
+import * as FileManage from "@/api/fileManage"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import Error from "../components/Error"
+import Error from "@/components/Error"
 
 function initialState (){
   return {

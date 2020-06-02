@@ -109,16 +109,64 @@
                     custom-size="mdil-48px"
                     icon="mdil-information"
                   />
-                  <p class="has-text-weight-bold">
-                    Project Info-card (ID: {{ projectId }})
-                  </p>
-                  <!-- TODO: Fetch project -->
-                  <ul>
-                    <li>Target Type: {{}} </li>
-                    <li>Target Name: {{}} </li>
-                    <li>Target Organism: {{}} </li>
-                    <li>Target Features: {{}} </li>
-                  </ul>
+
+                  <div class="field-margin">
+                    <div class="has-text-white has-round-title has-background-primary is-inline-block">
+                      <b-icon icon="mdil-lightbulb" />
+                      About
+                    </div>
+                    <div class="level is-mobile is-marginless">
+                      <div class="level-left">
+                        <b-tooltip
+                          label="Creator"
+                          type="is-dark"
+                        >
+                          <b-icon icon="mdil-account" />
+                          <router-link
+                            :to="`/profile/${user.username}`"
+                            target="_blank"
+                          >
+                            {{ user.first_name }} {{ user.last_name }}
+                          </router-link>
+                        </b-tooltip>
+                      </div>
+
+                      <div class="level-right">
+                        <b-tooltip
+                          label="Last Update Date"
+                          type="is-dark"
+                        >
+                          <b-icon icon="mdil-clock" />
+                          {{ updatedDate.toLocaleString() }}
+                        </b-tooltip>
+                      </div>
+                    </div>
+
+                    <div class="level">
+                      <div class="level-left">
+                        <b-icon icon="mdil-tag" />
+                        Feature: {{ features.join(", ") }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="has-text-white has-round-title has-background-primary is-inline-block">
+                      <b-icon icon="mdil-pin" />
+                      Target
+                    </div>
+                    <div class="level is-mobile">
+                      <div class="level-item is-capitalized">
+                        Type: {{ target.type }}
+                      </div>
+                      <div class="level-item is-capitalized">
+                        Name: {{ target.name }}
+                      </div>
+                      <div class="level-item">
+                        Organism: <i>{{ target.organism }}</i>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </b-notification>
             </div>
@@ -329,6 +377,8 @@ import PersonalInfo from '@/components/PersonalInfo'
 import ProjectActivity from '@/components/ProjectActivity'
 import { ValidationObserver } from 'vee-validate'
 
+import * as ProjectManage from "@/api/projectManage"
+
 export default {
   components: {
     PersonalInfo,
@@ -355,7 +405,10 @@ export default {
       openForFunding: false,
       activities: [
         this.newActivity()
-      ]
+      ],
+      features: [],
+      user: {},
+      updatedDate: new Date
     }
   },
   computed: {
@@ -367,7 +420,10 @@ export default {
     },
     projectId() {
       return this.$route.params.id
-    }
+    },
+  },
+  async mounted() {
+    await this.fetchProject(this.projectId)
   },
   methods: {
     newLead() {
@@ -401,6 +457,15 @@ export default {
         start_date: new Date(),
         description: "",
       }
+    },
+    async fetchProject(id) {
+      // TODO: Error handling
+      const project = await ProjectManage.fetchProject(id)
+      
+      this.target = project.target
+      this.features = project.features
+      this.user = project.user
+      this.updatedDate = project.update_date
     }
   }
 }
@@ -416,4 +481,6 @@ export default {
 .header-icon
   position: absolute
   right: 1.25rem
+.infocard-content
+  margin-left: 1rem
 </style>

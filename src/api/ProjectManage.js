@@ -72,8 +72,9 @@ const Project = Parse.Object.extend("Project", {
       attrs.features.some(val => variables.genomic_features.indexOf(val) === -1)) throw new Error("Some features are invalid")
   },
   format: async function() {
-    // Fetch target
+    // Fetch target and user
     const target = await this.get("target").fetch()
+    const user = await this.get("user").fetch()
 
     return {
       target: {
@@ -83,7 +84,13 @@ const Project = Parse.Object.extend("Project", {
         organism: target.get("organism"),
       },
       features: this.get("features"),
-      // progress: this.progress
+      user: {
+        username: user.get("username"),
+        first_name: user.get("first_name"),
+        last_name: user.get("last_name")
+      },
+      update_date: this.get("updatedAt")
+      // TODO: progress: this.progress
     }
   }
 })
@@ -121,7 +128,7 @@ export async function fetchTargets(limit, skip) {
   // TODO: enforce ACL
   
   // Fetch targets, applying pagination
-  let query = new Parse.Query(Target)
+  const query = new Parse.Query(Target)
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
@@ -130,4 +137,15 @@ export async function fetchTargets(limit, skip) {
   
   // Format and return
   return targets
+}
+
+export async function fetchProject(id) {
+  // TODO: enforce ACL
+
+  // Fetch project by ID
+  const query = new Parse.Query(Project)
+  const res = await query.get(id)
+
+  // Format and return
+  return res.format()
 }
