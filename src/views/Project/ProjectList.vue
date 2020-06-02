@@ -831,14 +831,14 @@ export default {
       // Loading
       this.isLoading.new_project = true
 
-      await ProjectManage.addProject(this.newProjectProp)
+      const projectId = await ProjectManage.addProject(this.newProjectProp)
 
       // Handle UI changes
       this.isLoading.new_project = false
       this.isNewActivityModalActive = false
 
-      // Refresh project list
-      this.fetchTargets()
+      // Jump to new project registration page
+      this.$router.push({ name: 'Project', params: { id: projectId, action: 'new' } })
     }
   }
 }

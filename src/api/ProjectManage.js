@@ -122,6 +122,9 @@ export async function addProject(projectInfo) {
   // Associate project to target
   target.addUnique("projects", project)
   await target.save()
+
+  // Return projectId
+  return project.id
 }
 
 export async function fetchTargets(limit, skip) {
