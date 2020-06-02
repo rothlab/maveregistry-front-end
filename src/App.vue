@@ -375,6 +375,8 @@
 </template>
 
 <style lang="sass">
+@import "@/assets/bulma-customization.sass"
+
 .login-tab .tab-content
   padding: 1rem 0 !important
 .help

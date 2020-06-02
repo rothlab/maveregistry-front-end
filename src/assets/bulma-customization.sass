@@ -1,0 +1,25 @@
+// Import Bulma's core
+@import "~bulma/sass/utilities/_all"
+
+// Import variables
+@import "@/assets/variables"
+
+// Configure colors
+$colors: ("white": ($white,$black))
+$colors: map-merge($colors, ("black": ($black, $white)))
+$colors: map-merge($colors, ("light": ($light, $light-invert)))
+$colors: map-merge($colors, ("dark": ($dark, $dark-invert)))
+$colors: map-merge($colors, ("primary": ($primary, $primary-invert)))
+$colors: map-merge($colors, ("info": ($info, $info-invert)))
+$colors: map-merge($colors, ("success": ($success, $success-invert)))
+$colors: map-merge($colors, ("warning": ($warning, $warning-invert)))
+$colors: map-merge($colors, ("danger": ($danger, $danger-invert)))
+$colors: map-merge($colors, ("twitter": ($twitter, $twitter-invert)))
+
+// Other setting
+// Shadow
+$input-shadow: none
+
+// Import Bulma and Buefy styles
+@import "~bulma"
+@import "~buefy/src/scss/buefy"

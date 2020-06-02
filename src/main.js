@@ -12,12 +12,12 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 
 // Import stylesheets
-import 'buefy/dist/buefy.css'
+// import 'buefy/dist/buefy.css'
 import '@mdi/font/css/materialdesignicons.css'
 import '@mdi/light-font/css/materialdesignicons-light.css'
-import '@/assets/styles.sass'
 import '@fortawesome/fontawesome-free/css/brands.css'
 import '@fortawesome/fontawesome-free/css/fontawesome.css'
+import '@/assets/styles.sass'
 
 // Import custom scripts
 import router from './router'

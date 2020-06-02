@@ -376,6 +376,7 @@
                 type="is-primary"
                 size="is-medium"
                 icon-left="mdil-content-save"
+                @click="updateProject"
               >
                 Register Project
               </b-button>
@@ -496,6 +497,11 @@ export default {
       } finally {
         this.isLoading.page = false
       }
+    },
+    updateProject() {
+      // TODO: update project
+
+      // 
     }
   }
 }
@@ -513,4 +519,6 @@ export default {
   right: 1.25rem
 .infocard-content
   margin-left: 1rem
+.input
+  box-shadow: none
 </style>
