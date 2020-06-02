@@ -20,7 +20,7 @@ const Target = Parse.Object.extend("Target", {
     const projects = await Promise.all(this.get("projects").map(e => e.fetch()))
     const userId = projects.map(e => e.get("user")).filter(uniqueById)
     const users = await Promise.all(userId.map(e => e.fetch()))
-
+    
     return {
       id: this.id,
       name: this.get("name"),
@@ -71,12 +71,13 @@ const Project = Parse.Object.extend("Project", {
     if (attrs.features && attrs.features.length > 0 && 
       attrs.features.some(val => variables.genomic_features.indexOf(val) === -1)) throw new Error("Some features are invalid")
   },
-  format: async function() {
+  format: async function(detail = false) {
     // Fetch target and user
     const target = await this.get("target").fetch()
     const user = await this.get("user").fetch()
 
-    return {
+    // Construct return object
+    let ret = {
       target: {
         id: target.id,
         name: target.get("name"),
@@ -90,8 +91,23 @@ const Project = Parse.Object.extend("Project", {
         last_name: user.get("last_name")
       },
       update_date: this.get("updatedAt")
-      // TODO: progress: this.progress
     }
+
+    if (detail) {
+      ret.leads = this.get("leads")
+      ret.principal_investigator = this.get("principal_investigator")
+      ret.collaborators = this.get("collaborators")
+      ret.funding = this.get("funding")
+      ret.activities = this.get("activities")
+    }
+
+    return ret
+  }
+}, {
+  fetchById: async function(id) {
+    const query = new Parse.Query(Project)
+
+    return await query.get(id)
   }
 })
 Parse.Object.registerSubclass('Project', Project);
@@ -142,13 +158,29 @@ export async function fetchTargets(limit, skip) {
   return targets
 }
 
-export async function fetchProject(id) {
+export async function fetchProject(id, detail = false) {
   // TODO: enforce ACL
 
   // Fetch project by ID
-  const query = new Parse.Query(Project)
-  const res = await query.get(id)
+  const project = await new Project.fetchById(id)
 
   // Format and return
-  return res.format()
+  return project.format(detail)
+}
+
+export async function updateProject(payload) {
+  // TODO: enforce ACL
+
+  // Fetch project by ID
+  let project = await new Project.fetchById(payload.id)
+
+  // Update project
+  project.set("leads", payload.leads)
+  project.set("principal_investigator", payload.principal_investigator)
+  project.set("collaborators", payload.collaborators)
+  project.set("funding", payload.funding)
+  project.set("activities", payload.activities)
+
+  // Save project
+  return await project.save()
 }

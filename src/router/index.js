@@ -20,7 +20,7 @@ Vue.use(VueRouter)
   },
   {
     path: '/project/:id/:action',
-    name: 'Project',
+    name: 'Project Edit',
     // route level code-splitting
     // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.
@@ -28,7 +28,7 @@ Vue.use(VueRouter)
   },
   {
     path: '/project/:id',
-    name: 'Project',
+    name: 'Project View',
     // route level code-splitting
     // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.

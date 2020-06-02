@@ -838,7 +838,7 @@ export default {
       this.isNewActivityModalActive = false
 
       // Jump to new project registration page
-      this.$router.push({ name: 'Project', params: { id: projectId, action: 'new' } })
+      this.$router.push({ name: 'Project Edit', params: { id: projectId, action: 'new' } })
     }
   }
 }

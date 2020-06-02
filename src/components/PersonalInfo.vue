@@ -66,48 +66,62 @@
       </b-field>
     </ValidationProvider>
     <!-- Position -->
-    <ValidationProvider
-      :rules="hasRequired"
-      :immediate="!hasRequired"
-      name="Position"
-      v-slot="{ errors, valid }"
+    <b-field
+      grouped
+      class="field-margin is-space-between"
       v-if="!isPi"
-    > 
-      <b-field
-        grouped
-        :type="{ 'is-danger': errors[0], '': valid }"
-        class="field-margin"
-      >
-        <b-select
-          placeholder="Position"
-          icon="mdil-briefcase"
-          v-model="position"
-          @input="updateVal"
+    >
+      <ValidationProvider
+        :rules="hasRequired"
+        :immediate="!hasRequired || position !== ''"
+        name="Position"
+        v-slot="{ errors, valid }"
+      > 
+        <b-field
+          grouped
+          :message="errors"
+          :type="{ 'is-danger': errors[0], '': valid }"
         >
-          <option
-            v-for="pos in positions"
-            :value="pos"
-            :key="pos"
+          <b-select
+            placeholder="Position"
+            icon="mdil-briefcase"
+            v-model="position"
+            @input="updateVal"
           >
-            {{ pos }}
-          </option>
-        </b-select>
-        <b-input
-          v-if="position === 'Other'"
-          v-model="custom_position"
-          type="position"
-          placeholder="Please specify your position"
-          @input="updateVal"
-          expanded
-        />
-      </b-field>
-      <p
-        v-if="errors[0]"
-        class="has-text-danger"
-      >
-        {{ errors[0] }}
-      </p>
-    </ValidationProvider>
+            <option
+              v-for="pos in positions"
+              :value="pos"
+              :key="pos"
+            >
+              {{ pos }}
+            </option>
+          </b-select>
+        </b-field>
+      </ValidationProvider>
+      <ValidationProvider
+        v-if="position === 'Other'"
+        :rules="hasRequired"
+        :immediate="!hasRequired || custom_position !== ''"
+        name="OtherPosition"
+        class="custom-position"
+        v-slot="{ errors, valid }"
+        slim
+      > 
+        <b-field
+          :message="errors"
+          :type="{ 'is-danger': errors[0], '': valid }"
+        >
+          <b-input
+            v-model="custom_position"
+            type="position"
+            placeholder="Please specify your position"
+            @input="updateVal"
+            expanded
+          />
+        </b-field>
+      </ValidationProvider>
+    </b-field>
+
     <!-- Affiliation. Only when PI -->
     <ValidationProvider
       :rules="hasRequired"
@@ -211,3 +225,8 @@ export default {
   }
 }
 </script>
+
+<style lang="sass" scoped>
+.custom-position
+  width: 62%
+</style>

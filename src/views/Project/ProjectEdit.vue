@@ -8,38 +8,11 @@
             <div class="level-left">
               <div class="content">
                 <p
-                  v-if="isNew"
                   class="is-size-3 has-text-weight-medium"
                 >
-                  Register New Project
+                  {{ isNew ? 'Register New' : 'Edit' }} Project
                 </p>
               </div>
-            </div>
-            <div
-              v-if="isEdit"
-              class="level-right"
-            >
-              <!-- Register new project -->
-              <!-- Non-mobile style -->
-              <b-button
-                icon-left="mdil-plus"
-                type="is-primary"
-                size="is-medium"
-                class="is-hidden-mobile"
-                @click="isNewActivityModalActive = true"
-              >
-                Edit Project
-              </b-button>
-              <!-- Mobile style -->
-              <b-button
-                icon-left="mdil-plus"
-                type="is-primary"
-                size="is-medium"
-                class="is-hidden-tablet"
-                @click="isNewActivityModalActive = true"
-              >
-                Edit
-              </b-button>
             </div>
           </div>
         </div>
@@ -377,8 +350,9 @@
                 size="is-medium"
                 icon-left="mdil-content-save"
                 @click="updateProject"
+                :loading="isLoading.submit"
               >
-                Register Project
+                {{ isNew ? 'Register' : 'Edit' }} Project
               </b-button>
             </div>
           </div>
@@ -446,7 +420,27 @@ export default {
     },
   },
   async mounted() {
-    await this.fetchProject(this.projectId)
+    // If invalid actionm jump to view page
+    if (!this.isNew && !this.isEdit) {
+      this.$router.push({ name: 'Project View', params: { id: this.projectId } })
+      return
+    }
+
+    const project = await this.fetchProject(this.projectId)
+
+    // If project details exist, jump to edit page
+    if (project && project.leads) {
+      this.$router.push({ name: 'Project Edit', params: { id: this.projectId, action: 'edit' } })
+    }
+
+    // Populate project details if editing
+    if (this.isEdit && project) {
+      this.leads = project.leads // Required, will always have value
+      this.investigator = project.principal_investigator // Required, will always have value
+      if (project.collaborators) this.collaborators = project.collaborators
+      this.openForFunding = project.funding.open_for_funding
+      this.activities = project.activities
+    }
   },
   methods: {
     newLead() {
@@ -486,22 +480,52 @@ export default {
 
       // Error handling
       try {
-        const project = await ProjectManage.fetchProject(id)
+        const project = await ProjectManage.fetchProject(id, true)
       
         this.target = project.target
         this.features = project.features
         this.user = project.user
         this.updatedDate = project.update_date
+
+        return project
       } catch (error) {
         this.errorMessage = error.message
       } finally {
         this.isLoading.page = false
       }
     },
-    updateProject() {
-      // TODO: update project
+    async updateProject() {
+      this.isLoading.submit = true
+      
+      // Construct payload
+      const project = {
+        id: this.projectId,
+        leads: this.leads,
+        principal_investigator: this.investigator,
+        collaborators: this.collaborators,
+        funding: {
+          open_for_funding: this.openForFunding
+        },
+        activities: this.activities
+      }
 
-      // 
+      // Update project
+      try {
+        await ProjectManage.updateProject(project)
+      } catch (e) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: e.message,
+          type: 'is-danger',
+          queue: false
+        })
+        this.isLoading.submit = false
+        return
+      }
+
+      // Update UI and router
+      this.isLoading.submit = false
+      this.$router.push({ name: 'Project View', params: { id: this.projectId } })
     }
   }
 }

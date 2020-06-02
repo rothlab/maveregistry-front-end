@@ -3,6 +3,7 @@
     <!-- Type -->
     <ValidationProvider
       rules="required"
+      :immediate="type.length > 0"
       name="Type"
       v-slot="{ errors, valid }"
     > 
@@ -108,6 +109,7 @@
     <!-- Description -->
     <ValidationProvider
       rules="required|max:3000"
+      :immediate="description.length > 0"
       name="Description"
       v-slot="{ errors, valid }"
     > 
