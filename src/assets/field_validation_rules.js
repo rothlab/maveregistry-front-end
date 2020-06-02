@@ -50,7 +50,8 @@ extend('password_strength', {
 extend('end_date', {
   params: ['target'],
   validate(value, { target }) {
-    return value > target
+    // Remove hours
+    return value.setHours(0,0,0,0) >= target.setHours(0,0,0,0)
   },
   message: 'End Date must be later than the Start Date.'
 })

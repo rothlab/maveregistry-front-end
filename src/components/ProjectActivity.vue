@@ -37,6 +37,7 @@
     >
       <ValidationProvider
         rules="required"
+        immediate
         name="StartDate"
         v-slot="{ errors, valid }"
         class="name"
@@ -59,17 +60,19 @@
 
       <ValidationProvider
         :rules="isOngoing ? '' : 'required|end_date:@StartDate'"
+        immediate
         name="EndDate"
         v-slot="{ errors, valid }"
         class="name"
       > 
         <b-field
+          class="end-date"
           label="End Date"
           :message="errors"
           :type="{ 'is-danger': errors[0], '': valid }"
         >
           <b-datepicker
-            v-if="!isOngoing"
+            v-show="!isOngoing"
             v-model="endDate"
             :first-day-of-week="1"
             placeholder="End Date"
@@ -87,7 +90,9 @@
             </b-button>
           </b-datepicker>
 
-          <div v-else>
+          <div
+            v-if="isOngoing"
+          >
             <b-button
               @click="isOngoing = false; updateVal()"
               icon-left="mdil-calendar"
@@ -181,3 +186,8 @@ export default {
   }
 }
 </script>
+
+<style lang="sass" scoped>
+.end-date, .has-addons
+  display: block
+</style>
