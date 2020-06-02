@@ -7,6 +7,7 @@
     >
       <ValidationProvider
         :rules="hasRequired"
+        :immediate="!hasRequired"
         name="FirstName"
         v-slot="{ errors, valid }"
         class="name"
@@ -25,6 +26,7 @@
       </ValidationProvider>
       <ValidationProvider
         :rules="hasRequired"
+        :immediate="!hasRequired"
         name="LastName"
         v-slot="{ errors, valid }"
         class="name"
@@ -45,6 +47,7 @@
     <!-- Email -->
     <ValidationProvider
       :rules="hasRequired + '|email'"
+      :immediate="!hasRequired"
       name="Email"
       v-slot="{ errors, valid }"
     > 
@@ -65,6 +68,7 @@
     <!-- Position -->
     <ValidationProvider
       :rules="hasRequired"
+      :immediate="!hasRequired"
       name="Position"
       v-slot="{ errors, valid }"
       v-if="!isPi"
@@ -107,6 +111,7 @@
     <!-- Affiliation. Only when PI -->
     <ValidationProvider
       :rules="hasRequired"
+      :immediate="!hasRequired"
       name="Affiliation"
       v-slot="{ errors, valid }"
       v-else

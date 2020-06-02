@@ -37,7 +37,7 @@
     >
       <ValidationProvider
         rules="required"
-        name="Start Date"
+        name="StartDate"
         v-slot="{ errors, valid }"
         class="name"
       > 
@@ -58,8 +58,8 @@
       </ValidationProvider>
 
       <ValidationProvider
-        rules="required"
-        name="End Date"
+        :rules="isOngoing ? '' : 'required|end_date:@StartDate'"
+        name="EndDate"
         v-slot="{ errors, valid }"
         class="name"
       > 
@@ -102,7 +102,7 @@
 
     <!-- Description -->
     <ValidationProvider
-      rules="required"
+      rules="required|max:3000"
       name="Description"
       v-slot="{ errors, valid }"
     > 

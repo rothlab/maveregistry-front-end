@@ -294,13 +294,13 @@
                       v-if="!activity.end_date"
                       class="is-size-5"
                     >
-                      Current Activity
+                      Current Activity (*)
                     </p>
                     <p
                       v-else
                       class="is-size-5"
                     >
-                      Previous Activity
+                      Previous Activity (*)
                     </p>
                     <b-button
                       v-if="activities.length > 1"
