@@ -219,7 +219,15 @@
             </div>
           </div>
 
-          <!-- TODO: Move funding to it's own category -->
+          <hr>
+
+          <div class="project-header">
+            <p class="is-size-4">
+              <b-icon icon="mdil-currency-usd" />
+              Funding
+            </p>
+          </div>
+
           <div class="columns is-mobile">
             <div class="column is-7">
               <!-- Funding -->
@@ -227,10 +235,10 @@
                 <div class="columns">
                   <div class="column is-3">
                     <p class="is-size-5">
-                      Funding
+                      Seek Funding
                     </p>
                   </div>
-                  <div class="column is-9">
+                  <div class="column is-9 is-flex">
                     <b-checkbox v-model="openForFunding">
                       Open for Funding Opportunities
                     </b-checkbox>
@@ -239,19 +247,17 @@
               </div>
             </div>
             <div class="column is-5">
-              <div class="content">
-                <b-taglist attached>
-                  <b-tag
-                    size="is-medium"
+              <b-notification :closable="false">
+                <div class="content">
+                  <b-icon
+                    class="header-icon"
                     type="is-primary"
-                  >
-                    <b-icon icon="mdil-information" />
-                  </b-tag>
-                  <b-tag size="is-medium">
-                    Only trusted funders have access to funding status
-                  </b-tag>
-                </b-taglist>
-              </div>
+                    custom-size="mdil-48px"
+                    icon="mdil-information"
+                  />
+                  <p>Only trusted funders can access funding information</p>
+                </div>
+              </b-notification>
             </div>
           </div>
 
@@ -539,4 +545,6 @@ export default {
   margin-left: 1rem
 .input
   box-shadow: none
+.has-margin-right
+  margin-right: -0.15rem !important
 </style>

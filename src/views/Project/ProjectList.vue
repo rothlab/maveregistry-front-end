@@ -93,7 +93,7 @@
             <!-- Progress -->
             <b-table-column
               field="projects"
-              label="Projects"
+              label="Project Progress"
               width="25vw"
             >
               <div class="has-text-left">
@@ -112,11 +112,20 @@
                   >
                     <p class="card-header-title is-capitalized">
                       <b-icon :icon="selectProgressIcon(project.type)" />
-                      <!-- TODO: Add a proper progress interface -->
-                      <!-- {{ project.description }} -->
-                      ID: {{ project.id }}
+                      {{ project.type }}
                     </p>
                     <a class="card-header-icon">
+                      <b-tooltip
+                        label="Seek Funding"
+                        v-if="project.open_for_funding"
+                        type="is-warning"
+                        position="is-left"
+                      >
+                        <b-icon
+                          class="circle-icon has-background-warning"
+                          icon="mdil-currency-usd"
+                        />
+                      </b-tooltip>
                       <b-icon
                         :icon="innerProps.open ? 'mdil-chevron-up' : 'mdil-chevron-down'"
                       />
@@ -124,48 +133,23 @@
                   </div>
                   <div class="card-content">
                     <div class="content">
-                      Features: {{ project.features }}
-                      <!-- Show links when available -->
-                      <div
-                        v-if="project.links"
-                      >
-                        <span
-                          v-for="(link, i) in project.links"
-                          :key="i"
+                      <p>
+                        <span class="has-text-primary">Project ID:</span>
+                        <router-link
+                          :to="{ path: `/project/${project.id}`}"
+                          target="_blank"
                         >
-                          <a
-                            :href="link.url"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >{{ link.text }}</a>
-                          <span v-if="i < project.links.length - 1">, </span>
+                          {{ project.id }}
+                        </router-link>
+                        <br>
+                        <span class="has-text-primary">
+                          Feature{{ project.features.length > 1 ? 's:' : ':' }}
                         </span>
-                      </div>
-
-                      <!-- Show assay detail when available -->
-                      <div
-                        v-if="project.phenotype"
-                        class="is-capitalized"
-                      >
-                        <div class="level is-paddingless is-mobile">
-                          <div class="level-left">
-                            <p>
-                              Organism: {{ project.organism }} <br>
-                              Phenotype: {{ project.phenotype }} <br>
-                              Submitter: {{ project.team }}
-                            </p>
-                          </div>
-                          <div class="level-right">
-                            <a
-                              :href="'/project/' + project.id"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <b-icon icon="mdil-link-variant" />
-                            </a>
-                          </div>
-                        </div>
-                      </div>
+                        {{ project.features.join(",") }}
+                        <br>
+                        <span class="has-text-primary">Progress description:</span>
+                        {{ project.description }}
+                      </p>
                     </div>
                   </div>
                 </b-collapse>
@@ -199,11 +183,6 @@
                           class="team-icon"
                         />
                         {{ team.name }}
-                        <b-icon
-                          v-if="team.open_for_funding"
-                          class="circle-icon has-background-warning"
-                          icon="mdil-currency-usd"
-                        />
                       </b-tag>
                     </router-link>
                     <!-- Followed status -->
@@ -685,6 +664,7 @@ export default {
   methods: {
     selectProgressIcon(type) {
       const icons = {
+        "MAVE Data Analysis" : "mdil-chart-line",
         publication: "mdil-file-multiple",
         assay: "mdil-flask"
       }
@@ -772,7 +752,6 @@ export default {
           {
             id: "team_2",
             name: "Smith J",
-            open_for_funding: true,
             has_followed: false,
           },
         ]

@@ -6,6 +6,16 @@ function uniqueById(value, index, self) {
   return self.map(e => e.id).indexOf(value.id) === index;
 }
 
+// Find most recent activity by start date
+// If there are multiple, select the first one
+function findRecentActivity(activities) {
+  // If there's only one activity, there's no point to sort
+  if (activities.length === 1) return activities[0]
+
+  const sorted = activities.sort((a, b) => b.start_date - a.start_date)
+  return sorted[0]
+}
+
 // Define target object
 const Target = Parse.Object.extend("Target", {
   initialize: function (attrs) {
@@ -20,16 +30,21 @@ const Target = Parse.Object.extend("Target", {
     const projects = await Promise.all(this.get("projects").map(e => e.fetch()))
     const userId = projects.map(e => e.get("user")).filter(uniqueById)
     const users = await Promise.all(userId.map(e => e.fetch()))
-    
+
     return {
       id: this.id,
       name: this.get("name"),
       type: this.get("type"),
       organism: this.get("organism"),
       projects: projects.map(e => {
+        const recentActivity = findRecentActivity(e.get("activities"))
+
         return {
           id: e.id,
-          features: e.get("features")
+          features: e.get("features"),
+          open_for_funding: e.get("funding").open_for_funding,
+          type: recentActivity.type, // Find most recent activity
+          description: recentActivity.description
         }
       }),
       teams: users.map(e => {
