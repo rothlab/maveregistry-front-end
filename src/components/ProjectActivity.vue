@@ -133,6 +133,8 @@
 <script>
 import { ValidationProvider } from 'vee-validate'
 
+const progressTypes = require("@/assets/variables.json").progress_type
+
 export default {
   components: {
     ValidationProvider
@@ -159,14 +161,7 @@ export default {
   data () {
     return {
       isOngoing: true,
-      types: [
-        "Literature Search",
-        "Assay Development",
-        "MAVE Data Collection",
-        "MAVE Data Analysis",
-        "Publication in preparation",
-        "Publication available"
-      ],
+      types: progressTypes,
       type: "",
       startDate: new Date(),
       endDate: new Date(),

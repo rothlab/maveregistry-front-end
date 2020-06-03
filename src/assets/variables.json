@@ -39,5 +39,21 @@
     "tmRNA",
     "Transcript",
     "tRNA"
-  ]
+  ],
+  "progress_type": [
+    "Literature Search",
+    "Assay Development",
+    "MAVE Data Collection",
+    "MAVE Data Analysis",
+    "Publication in Preparation",
+    "Publication Available"
+  ],
+  "progress_type_icons": {
+    "Literature Search": "mdil-magnify",
+    "Assay Development": "mdil-flask",
+    "MAVE Data Collection": "mdil-clipboard-plus",
+    "MAVE Data Analysis": "mdil-chart-line",
+    "Publication in Preparation": "mdil-pencil",
+    "Publication Available": "mdil-note-text"
+  }
 }

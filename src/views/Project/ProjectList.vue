@@ -111,7 +111,7 @@
                     role="button"
                   >
                     <p class="card-header-title is-capitalized">
-                      <b-icon :icon="selectProgressIcon(project.type)" />
+                      <b-icon :icon="progressIcons[project.type]" />
                       {{ project.type }}
                     </p>
                     <a class="card-header-icon">
@@ -638,6 +638,7 @@ export default {
       features: variables.genomic_features,
       types: variables.target_types,
       organisms: variables.target_organisms,
+      progressIcons: variables.progress_type_icons,
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
       followProp: null,
@@ -662,15 +663,6 @@ export default {
     await this.fetchTargets()
   },
   methods: {
-    selectProgressIcon(type) {
-      const icons = {
-        "MAVE Data Analysis" : "mdil-chart-line",
-        publication: "mdil-file-multiple",
-        assay: "mdil-flask"
-      }
-
-      return icons[type]
-    },
     confirmFollowTeam(team, target, index) {
       this.isFollowModelActive = true
       this.followProp = {
