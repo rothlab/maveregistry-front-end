@@ -18,24 +18,13 @@
             >
               <!-- Edit project -->
               <b-button
-                v-if="!isEditing"
                 icon-left="mdil-pencil"
                 type="is-primary"
                 size="is-medium"
                 outlined
-                @click="isEditing = true"
+                @click="editProject"
               >
                 Edit
-              </b-button>
-              <b-button
-                v-else
-                icon-left="mdil-content-save"
-                type="is-primary"
-                size="is-medium"
-                :loading="isLoading.save_edit"
-                @click="saveProfile"
-              >
-                Save
               </b-button>
             </div>
           </div>
@@ -61,10 +50,7 @@
             <div class="project-content">
               <div class="columns">
                 <!-- Display profile -->
-                <div
-                  class="column"
-                  v-if="!isEditing"
-                >
+                <div class="column">
                   <p
                     class="is-size-5"
                     v-if="userInfo.username"
@@ -172,7 +158,6 @@
 
 <script>
 import * as UserManage from "@/api/userManage"
-import * as FileManage from "@/api/fileManage"
 import Error from "@/components/Error"
 import UserProfileAction from "@/components/UserProfileAction"
 
@@ -181,7 +166,6 @@ function initialState (){
     userInfo: {},
     showProfile: false,
     isOwner: false,
-    isEditing: false,
     isLoading: {
       page: true,
       reset_pass: false,
@@ -250,69 +234,8 @@ export default {
       this.isLoading.page = false
       return res.user
     },
-    async saveProfile() {
-      this.isLoading.save_edit = true
-
-      // Update user
-      try {
-        await this.$store.dispatch('updateUserProfile', this.userInfo)
-      } catch (e) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: e.message,
-          type: 'is-danger',
-          queue: false
-        })
-
-        this.isLoading.save_edit = false
-        return
-      }
-
-      // Handle UI changes
-      this.isLoading.save_edit = false
-      this.isEditing = false
-
-      // Refresh user info
-      if (this.userInfo.username === this.$route.params.username) {
-        this.userInfo = await this.fetchUserInfo(this.userInfo.username)
-      } else {
-        this.$router.replace('/profile/' + this.userInfo.username)
-      }
-    },
-    async uploadProfileImg(file) {
-      if (!file || file.length < 1) return
-
-      // Check file size
-      if (file.size > 2048 * 1000) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: "File size exceeds limit of 2 MB",
-          type: 'is-danger',
-          queue: false
-        })
-
-        return
-      }
-
-      this.isLoading.save_profile_pic = true
-
-      // TODO: Check file size in the backend
-      const res = await FileManage.uploadFile(file)
-
-      if (res.error) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: res.error.message,
-          type: 'is-danger',
-          queue: false
-        })
-
-        this.isLoading.save_profile_pic = false
-        return
-      }
-
-      this.userInfo.profile_image = res.file.url()
-      this.isLoading.save_profile_pic = false
+    editProject() {
+      this.$router.push({ name: 'User Profile Edit', params: { username: this.userInfo.username, action: 'edit' } })
     },
   }
 }
@@ -321,13 +244,6 @@ export default {
 <style lang="sass" scoped>
 .profile-image
   margin-bottom: 1rem
-  .upload
-    position: absolute
-    top: 0.5rem
-    right: 0.5rem
-.action-buttons
-  .button
-    margin-bottom: 0.5rem
 .social-media
   margin-top: 0.5rem
 </style>

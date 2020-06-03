@@ -63,3 +63,9 @@ export default {
   }
 }
 </script>
+
+<style lang="sass" scoped>
+.action-buttons
+  .button
+    margin-bottom: 0.5rem
+</style>
