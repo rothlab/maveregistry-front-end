@@ -177,7 +177,7 @@
                 <b>Creator</b> <br>
                 <b-icon icon="mdil-account" />
                 <router-link
-                  :to="`/profile/${user.username}`"
+                  :to="{ name: 'User Profile View', params: { username: user.username } }"
                   target="_blank"
                 >
                   {{ user.first_name + ' ' + user.last_name }}

@@ -58,30 +58,48 @@
         slot="end"
         v-if="hasLoggedIn"
       >
-        <b-navbar-item
-          tag="router-link"
-          :to="{ path: '/profile/' + user.username }"
-          :key="$route.path"
+        <b-navbar-dropdown
+          hoverable
+          right
         >
-          <span class="profile-tag">Profile</span>
-          <figure
-            class="image is-24x24"
-          >
-            <img
-              class="is-rounded"
-              :src="profileImageUrl"
-              alt="Profile Image"
+          <template slot="label">
+            <figure
+              class="image is-24x24"
             >
-          </figure>
-        </b-navbar-item>
-        <b-navbar-item tag="div">
-          <b-button
-            @click="logout"
-            icon-right="mdil-logout"
+              <img
+                class="is-rounded"
+                :src="profileImageUrl"
+                alt="Profile Image"
+              >
+            </figure>
+          </template>
+
+          <b-navbar-item
+            tag="router-link"
+            :to="{ name: 'User Profile View', params: { username: user.username } }"
+            :key="$route.path"
           >
-            Log out
-          </b-button>
-        </b-navbar-item>
+            <div class="is-flex">
+              <b-icon
+                icon="mdil-account"
+                class="icon-margin-right"
+              />
+              User Profile
+            </div>
+          </b-navbar-item>
+          <b-navbar-item
+            tag="a"
+            @click.prevent="logout"
+          >
+            <div class="is-flex">
+              <b-icon
+                icon="mdil-logout"
+                class="icon-margin-right"
+              />
+              Log out
+            </div>
+          </b-navbar-item>
+        </b-navbar-dropdown>
       </template>
 
       <!-- Log in or sign up -->
@@ -402,6 +420,8 @@
   background-color: transparent !important
 .forget-password
   padding: 0.25rem 0 1rem 0
+.icon-margin-right
+  margin-right: 0.1rem !important
 </style>
 
 <script>
