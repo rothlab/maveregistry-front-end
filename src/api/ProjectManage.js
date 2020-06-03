@@ -28,6 +28,8 @@ const Target = Parse.Object.extend("Target", {
   format: async function () {
     // Fetch projects and users
     const projects = await Promise.all(this.get("projects").map(e => e.fetch()))
+
+    // TODO: handle team properly
     const userId = projects.map(e => e.get("user")).filter(uniqueById)
     const users = await Promise.all(userId.map(e => e.fetch()))
 
