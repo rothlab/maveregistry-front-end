@@ -4,16 +4,12 @@
     <div class="hero is-light is-bold">
       <div class="hero-body has-page-header-padding">
         <div class="container">
-          <div class="level is-mobile">
-            <div class="level-left">
-              <div class="content">
-                <p
-                  class="is-size-3 has-text-weight-medium"
-                >
-                  {{ isNew ? 'Register New' : 'Edit' }} Project
-                </p>
-              </div>
-            </div>
+          <div class="content">
+            <p
+              class="is-size-3 has-text-weight-medium"
+            >
+              {{ isNew ? 'Register New' : 'Edit' }} Project
+            </p>
           </div>
         </div>
       </div>
@@ -223,6 +219,7 @@
             </div>
           </div>
 
+          <!-- TODO: Move funding to it's own category -->
           <div class="columns is-mobile">
             <div class="column is-7">
               <!-- Funding -->
@@ -496,7 +493,8 @@ export default {
     },
     async updateProject() {
       this.isLoading.submit = true
-      
+
+      // TODO: handle multiple empty fields
       // Construct payload
       const project = {
         id: this.projectId,
@@ -534,10 +532,6 @@ export default {
 <style lang="sass" scoped>
 @import "@/assets/variables"
 
-.project-content
-  padding: 0.5rem 1rem
-  .columns
-    margin-bottom: 0
 .header-icon
   position: absolute
   right: 1.25rem
