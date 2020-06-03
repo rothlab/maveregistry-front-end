@@ -58,11 +58,13 @@
             <b-table-column
               field="target_id"
               label="Target ID"
-              class="is-capitalized"
             >
-              <a :href="'/target/' + props.row.id">
+              <router-link
+                :to="{ path: `/target/${props.row.id}`}"
+                target="_blank"
+              >
                 {{ props.row.id }}
-              </a>
+              </router-link>
             </b-table-column>
 
             <!-- Target name-->
@@ -411,7 +413,7 @@
                   rules="required"
                   name="Name"
                   v-slot="{ errors, valid }"
-                  :immediate="newProjectProp.organism !== ''"
+                  :immediate="newProjectProp.name !== ''"
                 > 
                   <b-field
                     :message="errors"
@@ -432,7 +434,7 @@
                   rules="required|alpha"
                   name="Type"
                   v-slot="{ errors, valid }"
-                  :immediate="newProjectProp.organism !== ''"
+                  :immediate="newProjectProp.type !== ''"
                 > 
                   <!-- Target type -->
                   <b-field
@@ -818,21 +820,6 @@ export default {
 <style lang="sass" scoped>
 @import "@/assets/variables.sass"
 
-.project-card
-  box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
-  &:first-child
-    border-radius: 0.4rem 0.4rem 0 0
-  &:last-child
-    border-radius: 0rem 0rem 0.4rem 0.4rem
-  &:only-child
-    border-radius: 0.4rem
-  .card-header
-    box-shadow: none
-  .card-header-title, .card-header-icon
-    font-weight: normal
-    padding: 0.25rem 0.5rem
-  .card-content
-    padding: 0.25rem 0.5rem 0.25rem 0.9rem
 .action-button
   justify-content: space-between
   button, a

@@ -461,6 +461,7 @@ export default {
     },
     newPi() {
       return {
+        id: "",
         first_name: "",
         last_name: "",
         email: "",
@@ -516,7 +517,7 @@ export default {
         activities: this.activities
       }
 
-      // Update project and team
+      // Update project
       try {
         await ProjectManage.updateProject(project)
       } catch (e) {

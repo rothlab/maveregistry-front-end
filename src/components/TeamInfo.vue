@@ -7,6 +7,7 @@
       Find or Add a Principal Investigator
     </label>
     <b-autocomplete
+      v-model="id"
       class="field-margin"
       placeholder="Search by Name"
       open-on-focus
@@ -140,7 +141,8 @@ export default {
   watch: {
     value: {
       handler (val) {
-        this.isAddPi = !(val.first_name === "" && val.last_name === "" && val.email === "" && val.affiliation === "")
+        this.isAddPi = !(val.id === "" && val.first_name === "" && val.last_name === "" && val.email === "" && val.affiliation === "")
+        this.id = val.id
         this.first_name = val.first_name
         this.last_name = val.last_name
         this.email = val.email
@@ -158,10 +160,11 @@ export default {
     ValidationProvider
   },
   mounted() {
-    this.isAddPi = !(this.first_name === "" && this.last_name === "" && this.email === "" && this.affiliation === "")
+    this.isAddPi = !(this.id === "" && this.first_name === "" && this.last_name === "" && this.email === "" && this.affiliation === "")
   },
   data () {
     return {
+      id: "",
       first_name: "",
       last_name: "",
       email: "",
@@ -172,6 +175,7 @@ export default {
   methods: {
     updateVal() {
       let ret = {
+        id: this.id,
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
@@ -181,6 +185,7 @@ export default {
       this.$emit("input", ret)
     },
     cleanUp() {
+        this.id = ""
         this.first_name = ""
         this.last_name = ""
         this.email = ""

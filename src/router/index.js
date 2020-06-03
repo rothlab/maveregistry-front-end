@@ -41,7 +41,7 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "user" */ '../views/Profile/UserProfileView.vue')
+    component: () => import(/* webpackChunkName: "user proile view" */ '../views/Profile/UserProfileView.vue')
   },
   {
     path: '/user/:username/:action',
@@ -49,15 +49,15 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "user" */ '../views/Profile/UserProfileEdit.vue')
+    component: () => import(/* webpackChunkName: "user profile edit" */ '../views/Profile/UserProfileEdit.vue')
   },
   {
-    path: '/team/:id',
-    name: 'Team',
+    path: '/teams',
+    name: 'Teams',
     // route level code-splitting
     // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "user" */ '../views/Profile/TeamProfile.vue')
+    component: () => import(/* webpackChunkName: "teams" */ '../views/Team/TeamList.vue')
   },
   {
     path: '/reset_password',
