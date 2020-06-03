@@ -37,8 +37,7 @@
           v-slot="{ passed }"
         >
           <div class="project-header">
-            <p class="is-size-4">
-              <b-icon icon="mdil-account" />
+            <p class="is-size-4 has-text-weight-bold">
               People
             </p>
           </div>
@@ -53,12 +52,13 @@
                   class="columns"
                 >
                   <div class="column is-3">
-                    <p class="is-size-5">
+                    <span class="is-size-5">
                       Project Lead {{ index === 0 ? '(*)' : '' }}
-                    </p>
+                    </span>
                     <b-button
                       v-if="leads.length > 1"
                       icon-left="mdil-delete"
+                      type="is-light"
                       @click="leads.splice(index, 1)"
                     >
                       Delete
@@ -161,19 +161,16 @@
               <div class="project-content">
                 <div class="columns">
                   <div class="column is-3">
-                    <p class="is-size-5">
-                      Principal Investigator (*)
-                    </p>
+                    <span class="is-size-5">
+                      Team (*)
+                    </span>
                   </div>
                   <div class="column is-9">
-                    <PersonalInfo
-                      v-model="investigator"
-                      is-pi
-                    />
+                    <TeamInfo v-model="investigator" />
                   </div>
                 </div>
               </div>
-            </div> 
+            </div>
           </div>
 
           <div class="columns">
@@ -186,21 +183,21 @@
                   class="columns"
                 >
                   <div class="column is-3">
-                    <p class="is-size-5">
+                    <span class="is-size-5">
                       Collaborator
-                    </p>
+                    </span>
                     <b-button
                       v-if="collaborators.length > 1"
                       icon-left="mdil-delete"
+                      type="is-light"
                       @click="collaborators.splice(index, 1)"
                     >
                       Delete
                     </b-button>
                   </div>
                   <div class="column is-9">
-                    <PersonalInfo
+                    <TeamInfo
                       v-model="collaborators[index]"
-                      is-pi
                       :is-required="false"
                     />
                   </div>
@@ -222,8 +219,7 @@
           <hr>
 
           <div class="project-header">
-            <p class="is-size-4">
-              <b-icon icon="mdil-currency-usd" />
+            <p class="is-size-4 has-text-weight-bold">
               Funding
             </p>
           </div>
@@ -265,8 +261,7 @@
           
           <!-- Activity -->
           <div class="project-header">
-            <p class="is-size-4">
-              <b-icon icon="mdil-clipboard-text" />
+            <p class="is-size-4 has-text-weight-bold">
               Activity
             </p>
           </div>
@@ -367,6 +362,7 @@
 
 <script>
 import PersonalInfo from '@/components/PersonalInfo'
+import TeamInfo from '@/components/TeamInfo'
 import ProjectActivity from '@/components/ProjectActivity'
 import Error from '@/components/Error'
 import { ValidationObserver } from 'vee-validate'
@@ -382,6 +378,7 @@ function isNotEmptyPerson (person, emptyPerson) {
 export default {
   components: {
     PersonalInfo,
+    TeamInfo,
     ProjectActivity,
     ValidationObserver,
     Error
@@ -414,7 +411,8 @@ export default {
         page: false,
         submit: false
       },
-      errorMessage: ""
+      errorMessage: "",
+      addPi: false
     }
   },
   computed: {
@@ -446,7 +444,7 @@ export default {
     if (this.isEdit && project) {
       this.leads = project.leads // Required, will always have value
       this.investigator = project.principal_investigator // Required, will always have value
-      if (project.collaborators) this.collaborators = project.collaborators
+      if (project.collaborators.length > 0) this.collaborators = project.collaborators
       this.openForFunding = project.funding.open_for_funding
       this.activities = project.activities
     }
@@ -518,7 +516,7 @@ export default {
         activities: this.activities
       }
 
-      // Update project
+      // Update project and team
       try {
         await ProjectManage.updateProject(project)
       } catch (e) {

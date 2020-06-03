@@ -69,7 +69,6 @@
     <b-field
       grouped
       class="field-margin is-space-between"
-      v-if="!isPi"
     >
       <ValidationProvider
         :rules="hasRequired"
@@ -121,30 +120,6 @@
         </b-field>
       </ValidationProvider>
     </b-field>
-
-    <!-- Affiliation. Only when PI -->
-    <ValidationProvider
-      :rules="hasRequired"
-      :immediate="!hasRequired"
-      name="Affiliation"
-      v-slot="{ errors, valid }"
-      v-else
-    > 
-      <b-field
-        :message="errors"
-        class="field-margin"
-        :type="{ 'is-danger': errors[0], '': valid }"
-      >
-        <b-input
-          icon="mdil-factory"
-          v-model="affiliation"
-          type="affiliation"
-          placeholder="Affiliation"
-          @input="updateVal"
-          expanded
-        />
-      </b-field>
-    </ValidationProvider>
   </div>
 </template>
 
@@ -156,10 +131,6 @@ export default {
     value: {
       type: Object,
       required: true
-    },
-    isPi: {
-      type: Boolean,
-      default: false
     },
     isRequired: {
       type: Boolean,
@@ -174,8 +145,6 @@ export default {
         this.email = val.email
         this.position = val.position
         this.custom_position = val.custom_position
-
-        if (this.isPi) this.affiliation = val.affiliation
       },
       deep: true
     }
@@ -211,13 +180,8 @@ export default {
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
-      }
-
-      if (!this.isPi) {
-        ret.position = this.position
-        ret.custom_position = this.custom_position
-      } else {
-        ret.affiliation = this.affiliation
+        position: this.position,
+        custom_position: this.custom_position
       }
 
       this.$emit("input", ret)
