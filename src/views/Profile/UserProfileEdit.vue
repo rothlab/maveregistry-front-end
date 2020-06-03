@@ -18,17 +18,6 @@
             >
               <!-- Edit project -->
               <b-button
-                v-if="!isEditing"
-                icon-left="mdil-pencil"
-                type="is-primary"
-                size="is-medium"
-                outlined
-                @click="isEditing = true"
-              >
-                Edit
-              </b-button>
-              <b-button
-                v-else
                 icon-left="mdil-content-save"
                 type="is-primary"
                 size="is-medium"
@@ -48,7 +37,7 @@
         class="columns"
         v-if="showProfile"
       >
-        <div class="column">
+        <div class="column is-6">
           <div
             class="content"
           >
@@ -59,243 +48,177 @@
             </div>
 
             <div class="project-content">
-              <div class="columns">
-                <!-- Display profile -->
-                <div
-                  class="column"
-                  v-if="!isEditing"
+              <ValidationObserver ref="observer">
+                <b-field
+                  grouped
+                  class="field-margin is-space-between"
                 >
-                  <p
-                    class="is-size-5"
-                    v-if="userInfo.username"
-                  >
-                    <b>Username</b> <br>
-                    {{ userInfo.username }}
-                  </p>
-                  <p
-                    class="is-size-5"
-                    v-if="userInfo.first_name && userInfo.last_name"
-                  >
-                    <b>Name</b> <br>
-                    {{ userInfo.first_name }} {{ userInfo.last_name }}
-                  </p>
-                  <p
-                    class="is-size-5"
-                    v-if="userInfo.email"
-                  >
-                    <b>Email</b> <br>
-                    {{ userInfo.email }}
-                  </p>
-                  <p
-                    class="is-size-5"
-                    v-if="userInfo.website"
-                  >
-                    <b>Website</b> <br>
-                    <a
-                      :href="userInfo.website"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >{{ userInfo.website }}</a>
-                  </p>
-                  <div
-                    class="is-size-5"
-                    v-if="userInfo.social && Object.keys(userInfo.social).length"
-                  >
-                    <span><b>Social Media</b></span>
-                    <br>
-                    <div
-                      class="buttons"
-                    >
-                      <b-button
-                        icon-left="twitter"
-                        icon-pack="mdi"
-                        v-if="userInfo.social.twitter"
-                      >
-                        @{{ userInfo.social.twitter }}
-                      </b-button>
-                      <b-button
-                        icon-left="twitter"
-                        icon-pack="mdi"
-                        v-if="userInfo.social.linkedin"
-                      >
-                        {{ userInfo.social.linkedin }}
-                      </b-button>
-                    </div>
-                  </div>
-                </div>
-                <!-- Edit profile -->
-                <div
-                  class="column is-6"
-                  v-else
-                >
-                  <ValidationObserver
-                    ref="observer"
+                  <ValidationProvider
+                    rules="required"
+                    name="FirstName"
+                    v-slot="{ errors, valid }"
+                    class="name"
                   >
                     <b-field
-                      grouped
-                      class="field-margin is-space-between"
+                      :message="errors"
+                      :type="{ 'is-danger': errors[0], '': valid }"
+                      label="First Name"
                     >
-                      <ValidationProvider
-                        rules="required"
-                        name="FirstName"
-                        v-slot="{ errors, valid }"
-                        class="name"
-                      >
-                        <b-field
-                          :message="errors"
-                          :type="{ 'is-danger': errors[0], '': valid }"
-                          label="First Name"
-                        >
-                          <b-input
-                            type="text"
-                            placeholder="First Name"
-                            v-model="userInfo.first_name"
-                          />
-                        </b-field>
-                      </ValidationProvider>
-                      <ValidationProvider
-                        rules="required"
-                        name="LastName"
-                        v-slot="{ errors, valid }"
-                        class="name"
-                      >
-                        <b-field
-                          :message="errors"
-                          :type="{ 'is-danger': errors[0], '': valid }"
-                          label="Last Name"
-                        >
-                          <b-input
-                            type="text"
-                            placeholder="Last Name"
-                            v-model="userInfo.last_name"
-                          />
-                        </b-field>
-                      </ValidationProvider>
+                      <b-input
+                        type="text"
+                        placeholder="First Name"
+                        v-model="userInfo.first_name"
+                      />
                     </b-field>
-                    <ValidationProvider
-                      rules="required|alpha_dash"
-                      name="Username"
-                      v-slot="{ errors, valid }"
-                    > 
-                      <b-field
-                        :message="errors"
-                        class="field-margin"
-                        :type="{ 'is-danger': errors[0], '': valid }"
-                        label="Username"
-                      >
-                        <b-input
-                          icon="mdil-account"
-                          type="text"
-                          placeholder="Username"
-                          v-model="userInfo.username"
-                        />
-                      </b-field>
-                    </ValidationProvider>
-                    <ValidationProvider
-                      rules="required|email"
-                      name="Email"
-                      v-slot="{ errors, valid }"
-                    > 
-                      <b-field
-                        :message="errors"
-                        class="field-margin"
-                        :type="{ 'is-danger': errors[0], '': valid }"
-                        label="Email"
-                      >
-                        <b-input
-                          icon="mdil-email"
-                          type="email"
-                          placeholder="Email"
-                          v-model="userInfo.email"
-                        />
-                      </b-field>
-                    </ValidationProvider>
-                    <ValidationProvider
-                      :rules="{ regex: 
-                        /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/ 
-                      }"
-                      name="Website"
-                      v-slot="{ errors, valid }"
-                    > 
-                      <b-field
-                        :message="errors"
-                        class="field-margin"
-                        :type="{ 'is-danger': errors[0], '': valid }"
-                        label="Website (Optional)"
-                      >
-                        <b-input
-                          icon="mdil-link"
-                          type="website"
-                          placeholder="http:// or https://"
-                          v-model="userInfo.website"
-                        />
-                      </b-field>
-                    </ValidationProvider>
-                    <ValidationProvider
-                      rules="alpha_num"
-                      name="Twitter"
-                      v-slot="{ errors, valid }"
-                      v-if="userInfo.social"
-                    > 
-                      <b-field
-                        :message="errors"
-                        class="field-margin"
-                        :type="{ 'is-danger': errors[0], '': valid }"
-                        label="Twitter (Optional)"
-                      >
-                        <b-input
-                          icon-pack="mdi"
-                          icon="twitter"
-                          type="text"
-                          placeholder="Twitter Handle"
-                          v-model="userInfo.social.twitter"
-                        />
-                      </b-field>
-                    </ValidationProvider>
-                  </ValidationObserver>
-                </div>
-                <div class="column is-3 is-offset-3">
-                  <!-- Profile image -->
-                  <div class="profile-image">
-                    <figure class="image is-square is-marginless">
-                      <img :src="profileImageUrl">
-                      <div
-                        class="upload"
-                        v-if="isEditing"
-                      >
-                        <b-upload
-                          accept="image/png, image/jpeg"
-                          @input="uploadProfileImg"
-                        >
-                          <a class="button is-white">
-                            <b-icon
-                              icon="mdil-upload"
-                              type="is-primary"
-                            />
-                          </a>
-                        </b-upload>
-                      </div>
-                    </figure>
-                    <div
-                      class="content"
-                      v-if="isEditing"
+                  </ValidationProvider>
+                  <ValidationProvider
+                    rules="required"
+                    name="LastName"
+                    v-slot="{ errors, valid }"
+                    class="name"
+                  >
+                    <b-field
+                      :message="errors"
+                      :type="{ 'is-danger': errors[0], '': valid }"
+                      label="Last Name"
                     >
-                      <p class="is-size-7 has-text-grey has-text-right">
-                        Max file size: 2 MB. Format: jpg, png.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                      <b-input
+                        type="text"
+                        placeholder="Last Name"
+                        v-model="userInfo.last_name"
+                      />
+                    </b-field>
+                  </ValidationProvider>
+                </b-field>
+                <ValidationProvider
+                  rules="required|alpha_dash"
+                  name="Username"
+                  v-slot="{ errors, valid }"
+                > 
+                  <b-field
+                    :message="errors"
+                    class="field-margin"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                    label="Username"
+                  >
+                    <b-input
+                      icon="mdil-account"
+                      type="text"
+                      placeholder="Username"
+                      v-model="userInfo.username"
+                    />
+                  </b-field>
+                </ValidationProvider>
+                <ValidationProvider
+                  rules="required|email"
+                  name="Email"
+                  v-slot="{ errors, valid }"
+                > 
+                  <b-field
+                    :message="errors"
+                    class="field-margin"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                    label="Email"
+                  >
+                    <b-input
+                      icon="mdil-email"
+                      type="email"
+                      placeholder="Email"
+                      v-model="userInfo.email"
+                    />
+                  </b-field>
+                </ValidationProvider>
+                <ValidationProvider
+                  :rules="{ regex: 
+                    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/ 
+                  }"
+                  name="Website"
+                  v-slot="{ errors, valid }"
+                > 
+                  <b-field
+                    :message="errors"
+                    class="field-margin"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                    label="Website (Optional)"
+                  >
+                    <b-input
+                      icon="mdil-link"
+                      type="website"
+                      placeholder="http:// or https://"
+                      v-model="userInfo.website"
+                    />
+                  </b-field>
+                </ValidationProvider>
+                <ValidationProvider
+                  rules="alpha_num"
+                  name="Twitter"
+                  v-slot="{ errors, valid }"
+                  v-if="userInfo.social"
+                > 
+                  <b-field
+                    :message="errors"
+                    class="field-margin"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                    label="Twitter (Optional)"
+                  >
+                    <b-input
+                      type="text"
+                      placeholder="Twitter Handle without @"
+                      v-model="userInfo.social.twitter"
+                    />
+                  </b-field>
+                </ValidationProvider>
+              </ValidationObserver>
+            </div>
+
+            <div class="project-header">
+              <p class="is-size-4 has-text-weight-bold">
+                Team
+              </p>
+            </div>
+
+            <div class="project-content">
+              <!-- TODO: Finish team setting -->
+              <b-button
+                type="is-light"
+                icon-left="mdil-pencil"
+                expanded
+              >
+                Edit Team Setting
+              </b-button>
             </div>
           </div>
         </div>
 
         <!-- Profile image and actions -->
         <div
-          class="column is-3"
+          class="column is-3 is-offset-3"
           v-if="isOwner"
         >
+          <!-- Profile image -->
+          <div class="profile-image">
+            <figure class="image is-square is-marginless">
+              <img :src="profileImageUrl">
+              <div class="upload">
+                <b-upload
+                  accept="image/png, image/jpeg"
+                  @input="uploadProfileImg"
+                >
+                  <a class="button is-white">
+                    <b-icon
+                      icon="mdil-upload"
+                      type="is-primary"
+                    />
+                  </a>
+                </b-upload>
+              </div>
+            </figure>
+            <div class="content">
+              <p class="is-size-7 has-text-grey has-text-right">
+                Max file size: 2 MB. Format: jpg, png.
+              </p>
+            </div>
+          </div>
           <!-- Actions -->
           <div class="project-header">
             <p class="is-size-4 has-text-weight-bold">
@@ -354,7 +277,6 @@ function initialState (){
     userInfo: {},
     showProfile: false,
     isOwner: false,
-    isEditing: false,
     isLoading: {
       page: true,
       reset_pass: false,
@@ -379,23 +301,21 @@ export default {
       if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
 
       return url
-    }
-  },
-  watch: {
-    async $route() {
-      // Reset parameters
-      Object.assign(this.$data, initialState())
-
-      // Fetch and store user information
-      const username = this.$route.params.username
-      this.userInfo = await this.fetchUserInfo(username)
-      if (this.userInfo) this.userInfo.social = {}
+    },
+    isEditing() {
+      return this.$route.params.action && this.$route.params.action === "edit"
     }
   },
   data () {
     return initialState()
   },
   async mounted () {
+    // If not a valid action, jump to view
+    if (!this.isEditing) {
+      this.$router.push({ name: 'User Profile View', params: { username: this.$route.params.username } })
+      return
+    }
+
     const username = this.$route.params.username
     this.userInfo = await this.fetchUserInfo(username)
 
@@ -444,14 +364,9 @@ export default {
 
       // Handle UI changes
       this.isLoading.save_edit = false
-      this.isEditing = false
 
-      // Refresh user info
-      if (this.userInfo.username === this.$route.params.username) {
-        this.userInfo = await this.fetchUserInfo(this.userInfo.username)
-      } else {
-        this.$router.replace('/profile/' + this.userInfo.username)
-      }
+      // Redirect to view layout
+      this.$router.push({ name: 'User Profile View', params: { username: this.userInfo.username } })
     },
     async uploadProfileImg(file) {
       if (!file || file.length < 1) return

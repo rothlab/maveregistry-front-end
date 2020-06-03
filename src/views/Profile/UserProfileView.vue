@@ -37,88 +37,84 @@
         class="columns"
         v-if="showProfile"
       >
-        <div class="column">
+        <div class="column is-9">
           <div
             class="content"
           >
             <div class="project-header">
               <p class="is-size-4 has-text-weight-bold">
-                Personal Information
+                Personal
               </p>
             </div>
 
             <div class="project-content">
-              <div class="columns">
-                <!-- Display profile -->
-                <div class="column">
-                  <p
-                    class="is-size-5"
-                    v-if="userInfo.username"
+              <p
+                class="is-size-5"
+                v-if="userInfo.username"
+              >
+                <b>Username</b> <br>
+                {{ userInfo.username }}
+              </p>
+              <p
+                class="is-size-5"
+                v-if="userInfo.first_name && userInfo.last_name"
+              >
+                <b>Name</b> <br>
+                {{ userInfo.first_name }} {{ userInfo.last_name }}
+              </p>
+              <p
+                class="is-size-5"
+                v-if="userInfo.email"
+              >
+                <b>Email</b> <br>
+                {{ userInfo.email }}
+              </p>
+              <p
+                class="is-size-5"
+                v-if="userInfo.website"
+              >
+                <b>Website</b> <br>
+                <a
+                  :href="userInfo.website"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >{{ userInfo.website }}</a>
+              </p>
+              <div
+                class="is-size-5"
+                v-if="userInfo.social && Object.keys(userInfo.social).length"
+              >
+                <span><b>Social Media</b></span>
+                <br>
+                <div
+                  class="buttons"
+                >
+                  <b-button
+                    icon-left="twitter"
+                    icon-pack="mdi"
+                    v-if="userInfo.social.twitter"
                   >
-                    <b>Username</b> <br>
-                    {{ userInfo.username }}
-                  </p>
-                  <p
-                    class="is-size-5"
-                    v-if="userInfo.first_name && userInfo.last_name"
+                    @{{ userInfo.social.twitter }}
+                  </b-button>
+                  <b-button
+                    icon-left="twitter"
+                    icon-pack="mdi"
+                    v-if="userInfo.social.linkedin"
                   >
-                    <b>Name</b> <br>
-                    {{ userInfo.first_name }} {{ userInfo.last_name }}
-                  </p>
-                  <p
-                    class="is-size-5"
-                    v-if="userInfo.email"
-                  >
-                    <b>Email</b> <br>
-                    {{ userInfo.email }}
-                  </p>
-                  <p
-                    class="is-size-5"
-                    v-if="userInfo.website"
-                  >
-                    <b>Website</b> <br>
-                    <a
-                      :href="userInfo.website"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >{{ userInfo.website }}</a>
-                  </p>
-                  <div
-                    class="is-size-5"
-                    v-if="userInfo.social && Object.keys(userInfo.social).length"
-                  >
-                    <span><b>Social Media</b></span>
-                    <br>
-                    <div
-                      class="buttons"
-                    >
-                      <b-button
-                        icon-left="twitter"
-                        icon-pack="mdi"
-                        v-if="userInfo.social.twitter"
-                      >
-                        @{{ userInfo.social.twitter }}
-                      </b-button>
-                      <b-button
-                        icon-left="twitter"
-                        icon-pack="mdi"
-                        v-if="userInfo.social.linkedin"
-                      >
-                        {{ userInfo.social.linkedin }}
-                      </b-button>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="column is-3 is-offset-3">
-                  <!-- Profile image -->
-                  <div class="profile-image">
-                    <figure class="image is-square is-marginless">
-                      <img :src="profileImageUrl">
-                    </figure>
-                  </div>
+                    {{ userInfo.social.linkedin }}
+                  </b-button>
                 </div>
               </div>
+            </div>
+
+            <div class="project-header">
+              <p class="is-size-4 has-text-weight-bold">
+                Team
+              </p>
+            </div>
+
+            <div class="project-content">
+              abc
             </div>
           </div>
         </div>
@@ -126,17 +122,25 @@
         <!-- Profile image and actions -->
         <div
           class="column is-3"
-          v-if="isOwner"
         >
-          <!-- Actions -->
-          <div class="project-header">
-            <p class="is-size-4 has-text-weight-bold">
-              Actions
-            </p>
+          <!-- Profile image -->
+          <div class="profile-image">
+            <figure class="image is-square is-marginless">
+              <img :src="profileImageUrl">
+            </figure>
           </div>
 
-          <div class="project-content">
-            <UserProfileAction :email="userInfo.email" />
+          <!-- Actions -->
+          <div v-if="isOwner">
+            <div class="project-header">
+              <p class="is-size-4 has-text-weight-bold">
+                Actions
+              </p>
+            </div>
+
+            <div class="project-content">
+              <UserProfileAction :email="userInfo.email" />
+            </div>
           </div>
         </div>
       </div>
