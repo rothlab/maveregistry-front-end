@@ -363,7 +363,7 @@
       <div class="container">
         <div class="level">
           <div class="level-left">
-            <p>Copyright © 2020 MAVE Registry. All rights reserved.</p>
+            <p>Copyright © 2020 MAVE Registry. All rights reserved. Ver. {{ appVersion }}.</p>
           </div>
           <div class="level-right">
             <p>About | Contact Us | Terms | Privacy</p>
@@ -431,6 +431,7 @@ export default {
         password: "",
       },
       isActionButtonLoading: false,
+      appVersion: process.env.VUE_APP_VERSION
     }
   },
   computed: {
