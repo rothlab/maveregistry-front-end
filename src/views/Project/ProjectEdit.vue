@@ -211,7 +211,7 @@
                   type="is-light"
                   icon-left="mdil-plus"
                   expanded
-                  @click="collaborators.push(newLead())"
+                  @click="collaborators.push(newPi())"
                 >
                   Add a Collaborator
                 </b-button>
@@ -373,6 +373,12 @@ import { ValidationObserver } from 'vee-validate'
 
 import * as ProjectManage from "@/api/projectManage"
 
+// Helper functions
+// Check if a person is empty
+function isNotEmptyPerson (person, emptyPerson) {
+  return JSON.stringify(person) !== JSON.stringify(emptyPerson)
+}
+
 export default {
   components: {
     PersonalInfo,
@@ -500,13 +506,12 @@ export default {
     async updateProject() {
       this.isLoading.submit = true
 
-      // TODO: handle multiple empty fields
       // Construct payload
       const project = {
         id: this.projectId,
-        leads: this.leads,
+        leads: this.leads.filter(e => isNotEmptyPerson(e, this.newLead())),
         principal_investigator: this.investigator,
-        collaborators: this.collaborators,
+        collaborators: this.collaborators.filter(e => isNotEmptyPerson(e, this.newPi())),
         funding: {
           open_for_funding: this.openForFunding
         },
@@ -525,10 +530,11 @@ export default {
         })
         this.isLoading.submit = false
         return
+      } finally {
+        this.isLoading.submit = false
       }
 
       // Update UI and router
-      this.isLoading.submit = false
       this.$router.push({ name: 'Project View', params: { id: this.projectId } })
     }
   }
