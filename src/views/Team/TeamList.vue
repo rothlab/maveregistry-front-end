@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="isNewTeamModalActive = true"
+                @click="cleanupNewTeam(); isNewTeamModalActive = true"
               >
                 New Team
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="isNewTeamModalActive = true"
+                @click="cleanupNewTeam(); isNewTeamModalActive = true"
               >
                 New
               </b-button>
@@ -43,6 +43,7 @@
     <div class="container has-fullheight has-top-padding has-touch-container-padding">
       <!-- Team table -->
       <div>
+        <!-- TODO: proper pagination -->
         <b-table
           :data="teams"
           :loading="isLoading.fetch_team"
@@ -71,7 +72,16 @@
               field="principal_investigator"
               label="Principal Investigaor"
             >
-              {{ props.row.first_name + ' ' + props.row.last_name }}, 
+              <span class="is-capitalized">
+                {{ props.row.first_name + ' ' + props.row.last_name }}
+              </span>
+            </b-table-column>
+
+            <!-- Affiliation -->
+            <b-table-column
+              field="affiliation"
+              label="Affiliation"
+            >
               {{ props.row.affiliation }}
             </b-table-column>
 
@@ -144,7 +154,6 @@
       :active.sync="isNewTeamModalActive"
       has-modal-card
       :can-cancel="['escape', 'outside']"
-      @close="cleanupNewTeam()"
     >
       <div class="modal-card">
         <header class="modal-card-head">
@@ -154,7 +163,7 @@
           <button
             class="delete"
             aria-label="close"
-            @click="isNewTeamModalActive = false; cleanupNewTeam();"
+            @click="isNewTeamModalActive = false"
           />
         </header>
 
@@ -285,7 +294,7 @@
               :loading="isLoading.new_team"
               :disabled="!passed"
               type="is-primary"
-              @click="addTeam(newTeamProp); cleanupNewTeam()"
+              @click="addTeam(newTeamProp)"
             >
               Add Team
             </b-button>
@@ -364,22 +373,47 @@ export default {
     async addTeam(team) {
       this.isLoading.new_team = true
 
-      await TeamManage.addTeam(team)
+      try {
+        await TeamManage.addTeam(team)
 
-      this.isLoading.new_team = false
+        // Handle UI changes
+        this.cleanupNewTeam()
+        this.isNewTeamModalActive = false
+
+        // Fetch again
+        this.fetchTeams()
+      } catch (error) {
+        this.$buefy.toast.open({
+          message: error.message,
+          type: 'is-danger',
+          queue: false,
+          duration: 5000
+        })
+      } finally {
+        this.isLoading.new_team = false
+      }
     },
     async fetchTeams(limit = 10, skip = 0) {
       // Loading
       this.isLoading.fetch_team = true
 
       // Update targets
-      const teams = await TeamManage.fetchTeams(limit, skip)
-      this.teams = teams.results
+      try {
+        const teams = await TeamManage.fetchTeams(limit, skip)
+        this.teams = teams.results
 
-      // Update pagination
-      this.pagination.count = teams.count
-
-      this.isLoading.fetch_team = false
+        // Update pagination
+        this.pagination.count = teams.count
+      } catch (error) {
+        this.$buefy.toast.open({
+          message: error.message,
+          type: 'is-danger',
+          queue: false,
+          duration: 5000
+        })
+      } finally {
+        this.isLoading.fetch_team = false
+      }
     }
   }
 }

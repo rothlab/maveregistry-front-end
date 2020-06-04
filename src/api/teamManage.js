@@ -28,12 +28,12 @@ const Team = Parse.Object.extend("Team", {
       // An id is provided, use it as the key
       query.equalTo("objectId", attrs.id)
     } else {
-      // Otherwise, search by key fields
+      // Otherwise, search by key fields in a case insensitive way
       const nameQuery = new Parse.Query(Team)
       const emailQuery = new Parse.Query(Team)
-      nameQuery.equalTo("first_name", attrs.first_name)
-      nameQuery.equalTo("last_name", attrs.last_name)
-      emailQuery.equalTo("email", attrs.email)
+      nameQuery.equalTo("first_name", attrs.first_name.toLowerCase())
+      nameQuery.equalTo("last_name", attrs.last_name.toLowerCase())
+      emailQuery.equalTo("email", attrs.email.toLowerCase())
 
       // Apply OR batch query
       query = Parse.Query.or(nameQuery, emailQuery)
@@ -51,13 +51,18 @@ export async function addTeam(teamInfo) {
   if (!Parse.User.current()) throw new Error("Not logged in")
 
   // Initialize team
+  // First, last and email are stored in lower case so that it can be queried in a case-insensitive way
   const team = await new Team.create({
-    first_name: teamInfo.first_name,
-    last_name: teamInfo.last_name,
-    email: teamInfo.email,
+    first_name: teamInfo.first_name.toLowerCase(),
+    last_name: teamInfo.last_name.toLowerCase(),
+    email: teamInfo.email.toLowerCase(),
     affiliation: teamInfo.affiliation,
     website: teamInfo.website
   })
+
+  // If already exists, throw an error
+  // Because existing team has an assigned ID, we use that to distinguish
+  if (team.id) throw new Error("Team exists")
 
   // Add creator and save
   team.set("creator", Parse.User.current())
@@ -73,7 +78,6 @@ export async function fetchTeams(limit, skip) {
   let teams = await query.find()
   teams.results = teams.results.map(e => e.format()) // Format targets
   
-  console.log(teams)
   // Format and return
   return teams
 }

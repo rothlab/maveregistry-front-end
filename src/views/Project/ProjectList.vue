@@ -710,7 +710,7 @@ export default {
 
       // Show status update
       this.$buefy.toast.open({
-        message: `Followed ${team.name} on ${target.name}`,
+        message: `Followed successfully.`,
         type: "is-success",
         duration: 5000
       })
@@ -761,7 +761,7 @@ export default {
 
       // Show status update
       this.$buefy.toast.open({
-        message: `Unfollowed ${team.name} on ${target.name}`,
+        message: `Unfollowed successfully.`,
         type: "is-success"
       })
     },
