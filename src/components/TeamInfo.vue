@@ -32,8 +32,10 @@
       </template>
       <template slot-scope="props">
         <b-icon icon="mdil-account" />
-        <!-- TODO: add highlight -->
-        <span class="is-capitalized">{{ props.option.first_name }} {{ props.option.last_name }}</span>,
+        <!-- Add keyword bolding -->
+        <!-- To prevent XSS attack, we don't want to allow html tags, although it's going to be make the job much easier. -->
+        <b class="is-capitalized">{{ props.option.first_name.includes(keyword) ? keyword : '' }}</b>{{ trimKeyword(props.option.first_name, keyword) }}
+        <b class="is-capitalized">{{ props.option.last_name.includes(keyword) ? keyword : '' }}</b>{{ trimKeyword(props.option.last_name, keyword) }},
         {{ props.option.affiliation }}
       </template>
     </b-autocomplete>
@@ -195,7 +197,8 @@ export default {
       affiliation: "",
       isAddPi: true,
       teams: [],
-      errorMessage: ""
+      errorMessage: "",
+      keyword: ""
     }
   },
   methods: {
@@ -227,6 +230,9 @@ export default {
     async fetchTeams(query = "") {
       this.isLoading = true
 
+      // Set keyword for bolding
+      this.keyword = query.toLowerCase()
+
       // Fetch some teams to populate the dropdown menu
       if (query.length <= 0) {
         try {
@@ -254,6 +260,10 @@ export default {
       } finally {
         this.isLoading = false
       }
+    },
+    trimKeyword(string, keyword) {
+      if (keyword.length <= 0 || !string.includes(keyword)) return capitalize(string)
+      return string.replace(keyword, '')
     }
   }
 }

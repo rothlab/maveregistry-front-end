@@ -95,6 +95,5 @@ export async function queryByName(name) {
   let teams = await query.find()
   teams.results = teams.results.map(e => e.format())
 
-  console.log(teams)
   return teams
 }
