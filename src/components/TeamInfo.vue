@@ -7,19 +7,33 @@
       Find or Add a Principal Investigator
     </label>
     <b-autocomplete
-      v-model="id"
       class="field-margin"
       placeholder="Search by Name"
       open-on-focus
       icon="mdil-magnify"
       v-if="!isAddPi"
-      :data="['abc']"
+      field="display"
+      :data="teams"
+      :loading="isLoading"
+      @typing="fetchTeams"
+      @select="option => selected = option"
     >
+      <template slot="empty">
+        <p class="has-text-centered">
+          <b-icon icon="mdil-information" />
+          No results found
+        </p>
+      </template>
       <template slot="footer">
         <a @click="isAddPi = true">
           <b-icon icon="mdil-plus" />
           <span>Add new...</span>
         </a> 
+      </template>
+      <template slot-scope="props">
+        <b-icon icon="mdil-account" />
+        <span class="is-capitalized">{{ props.option.first_name }} {{ props.option.last_name }}</span>,
+        {{ props.option.affiliation }}
       </template>
     </b-autocomplete>
     <div v-else>
@@ -88,7 +102,7 @@
           />
         </b-field>
       </ValidationProvider>
-      <!-- Affiliation. Only when PI -->
+      <!-- Affiliation -->
       <ValidationProvider
         :rules="hasRequired"
         :immediate="!hasRequired"
@@ -126,6 +140,12 @@
 
 <script>
 import { ValidationProvider } from 'vee-validate'
+import * as TeamManage from "@/api/teamManage"
+
+// Helper
+function capitalize(string) {
+  return string.slice(0,1).toUpperCase() + string.slice(1)
+}
 
 export default {
   props: {
@@ -159,8 +179,11 @@ export default {
   components: {
     ValidationProvider
   },
-  mounted() {
+  async mounted() {
     this.isAddPi = !(this.id === "" && this.first_name === "" && this.last_name === "" && this.email === "" && this.affiliation === "")
+
+    // Fetch teams
+    await this.fetchTeams()
   },
   data () {
     return {
@@ -169,7 +192,9 @@ export default {
       last_name: "",
       email: "",
       affiliation: "",
-      isAddPi: true
+      isAddPi: true,
+      teams: [],
+      errorMessage: ""
     }
   },
   methods: {
@@ -179,7 +204,8 @@ export default {
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
-        affiliation: this.affiliation
+        affiliation: this.affiliation,
+        isLoading: false
       }
 
       this.$emit("input", ret)
@@ -191,6 +217,42 @@ export default {
         this.email = ""
         this.affiliation = ""
         this.isAddPi = false
+    },
+    formatTeam(team) {
+      team.display = `${capitalize(team.first_name)} ${capitalize(team.last_name)}, ${team.affiliation}`
+
+      return team
+    },
+    async fetchTeams(query = "") {
+      this.isLoading = true
+
+      // Fetch some teams to populate the dropdown menu
+      if (query.length <= 0) {
+        try {
+          const teams = await TeamManage.fetchTeams(10, 0)
+
+          // Format and store
+          this.teams = teams.results.map(this.formatTeam)
+        } catch (error) {
+          this.errorMessage = error.message
+        } finally {
+          this.isLoading = false
+        }
+
+        return 
+      }
+
+      // Otherwise, search team with matching names
+      try {
+        const teams = await TeamManage.queryByName(query)
+
+        // Format and store
+        this.teams = teams.results.map(this.formatTeam)
+      } catch (error) {
+        this.errorMessage = error.message
+      } finally {
+        this.isLoading = false
+      }
     }
   }
 }

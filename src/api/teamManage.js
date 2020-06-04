@@ -17,7 +17,7 @@ const Team = Parse.Object.extend("Team", {
       last_name: this.get("last_name"),
       email: this.get("email"),
       affiliation: this.get("affiliation"),
-      website: this.get("website")
+      website: this.get("website"),
     }
   }
 }, {
@@ -79,5 +79,22 @@ export async function fetchTeams(limit, skip) {
   teams.results = teams.results.map(e => e.format()) // Format targets
   
   // Format and return
+  return teams
+}
+
+export async function queryByName(name) {
+  // TODO: add pagination
+  const firstNameQuery = new Parse.Query(Team)
+  const lastNameQuery = new Parse.Query(Team)
+  firstNameQuery.startsWith('first_name', name.toLowerCase())
+  lastNameQuery.startsWith('last_name', name.toLowerCase())
+
+  // Execute OR query
+  const query = Parse.Query.or(firstNameQuery, lastNameQuery)
+  query.withCount() // include total amount of targets in the DB
+  let teams = await query.find()
+  teams.results = teams.results.map(e => e.format())
+
+  console.log(teams)
   return teams
 }
