@@ -32,6 +32,7 @@
       </template>
       <template slot-scope="props">
         <b-icon icon="mdil-account" />
+        <!-- TODO: add highlight -->
         <span class="is-capitalized">{{ props.option.first_name }} {{ props.option.last_name }}</span>,
         {{ props.option.affiliation }}
       </template>

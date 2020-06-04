@@ -435,11 +435,6 @@ export default {
 
     const project = await this.fetchProject(this.projectId)
 
-    // If project details exist, jump to edit page
-    if (project && project.leads) {
-      this.$router.push({ name: 'Project Edit', params: { id: this.projectId, action: 'edit' } })
-    }
-
     // Populate project details if editing
     if (this.isEdit && project) {
       this.leads = project.leads // Required, will always have value
