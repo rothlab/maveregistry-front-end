@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="isNewActivityModalActive = true"
+                @click="cleanupNewActivity(); isNewActivityModalActive = true"
               >
                 New Project
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="isNewActivityModalActive = true"
+                @click="cleanupNewActivity(); isNewActivityModalActive = true"
               >
                 New
               </b-button>
@@ -112,9 +112,19 @@
                     class="card-header"
                     role="button"
                   >
-                    <p class="card-header-title is-capitalized">
+                    <p
+                      v-if="project.type"
+                      class="card-header-title is-capitalized"
+                    >
                       <b-icon :icon="progressIcons[project.type]" />
                       {{ project.type }}
+                    </p>
+                    <p
+                      v-else
+                      class="card-header-title is-capitalized"
+                    >
+                      <b-icon icon="mdil-circle" />
+                      No Progress Description
                     </p>
                     <a class="card-header-icon">
                       <b-tooltip
@@ -149,7 +159,10 @@
                         </span>
                         {{ project.features.join(",") }}
                         <br>
-                        <span class="has-text-primary">Progress description:</span>
+                        <span
+                          v-if="project.description"
+                          class="has-text-primary"
+                        >Progress description:</span>
                         {{ project.description }}
                       </p>
                     </div>
@@ -232,7 +245,7 @@
                 >
                   <b-button
                     icon-right="mdil-plus"
-                    @click="prepareNewActivity(props.row); isNewActivityModalActive = true"
+                    @click="cleanupNewActivity(); prepareNewActivity(props.row); isNewActivityModalActive = true"
                   />
                 </b-tooltip>
                 <!-- Show MaveQuest for human genes -->
@@ -246,7 +259,7 @@
                     tag="a"
                     :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
                     target="_blank"
-                    icon-right="mdil-magnify"
+                    icon-right="mdil-lightbulb-on"
                   />
                 </b-tooltip>
                 <!-- Show Google search for others -->
@@ -283,7 +296,7 @@
         >
           <header class="modal-card-head">
             <p class="modal-card-title">
-              <span>Follow {{ followProp.team.name }}</span>
+              <span class="is-capitalized">Follow {{ followProp.team.name }}</span>
             </p>
             <button
               class="delete"
@@ -391,7 +404,6 @@
         :active.sync="isNewActivityModalActive"
         has-modal-card
         :can-cancel="['escape', 'outside']"
-        @close="cleanupNewActivity()"
       >
         <div class="modal-card">
           <header class="modal-card-head">
@@ -401,7 +413,7 @@
             <button
               class="delete"
               aria-label="close"
-              @click="isNewActivityModalActive = false; cleanupNewActivity();"
+              @click="isNewActivityModalActive = false"
             />
           </header>
           <ValidationObserver
@@ -526,7 +538,7 @@
                 :loading="isLoading.new_project"
                 :disabled="!passed"
                 type="is-primary"
-                @click="addProject(newProjectProp); cleanupNewActivity()"
+                @click="addProject(newProjectProp)"
               >
                 Add Project
               </b-button>
@@ -542,11 +554,6 @@
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import * as ProjectManage from "@/api/projectManage"
 
-//TODO: remove debug functions
-const delay = ms => new Promise(res => setTimeout(res, ms));
-
-// Feature list
-// Source: https://docs.patricbrc.org/user_guides/organisms_taxon/genome_annotations.html
 const variables = require("@/assets/variables.json")
 
 export default {
@@ -556,84 +563,7 @@ export default {
   },
   data () {
     return {
-      targets: 
-      [
-        {
-          id: "target_1",
-          name: "BRCA1",
-          type: "gene",
-          organism: "H. sapiens",
-          project: [{
-            id: "project_1",
-            type: "publication",
-            description: "publication",
-            links: [
-              {
-                url: "https://www.ncbi.nlm.nih.gov/pubmed/30219179",
-                text: "PMID: 30219179"
-              },
-              {
-                url: "https://www.ncbi.nlm.nih.gov/pubmed/25823446",
-                text: "PMID: 25823446"
-              },
-              {
-                url: "https://www.mavedb.org/search/?search=brca1",
-                text: "MaveDB"
-              },
-            ],
-          }],
-          teams: [
-            {
-              username: "team_1",
-              name: "F Roth",
-              has_followed: false,
-            },
-            {
-              username: "team_2",
-              nanme: "J Smith",
-              open_for_funding: true,
-              has_followed: true,
-            },
-          ]
-        },
-        {
-          id: "target_2",
-          name: "CHEK2",
-          type: "gene",
-          organism: "H. sapiens",
-          project: [
-            {
-              id: "project_3",
-              type: "assay",
-              description: "complementation",
-              organism: "S. Cerevisiae",
-              phenotype: "growth defect",
-              team: "Roth FP",
-            },
-            {
-              id: "project_4",
-              type: "assay",
-              description: "two-hybrid",
-              organism: "S. Cerevisiae",
-              phenotype: "growth defect",
-              team: "Smith J",
-            }
-          ],
-          teams: [
-            {
-              id: "team_1",
-              name: "Roth FP",
-              has_followed: true,
-            },
-            {
-              id: "team_2",
-              name: "Smith J",
-              open_for_funding: true,
-              has_followed: true,
-            },
-          ]
-        },
-      ],
+      targets: [],
       pagination: {
         count: 0,
         limit: 10,
@@ -679,27 +609,6 @@ export default {
       // Loading
       this.isLoading.follow_unfollow = true
 
-      //TODO: remove debug delay
-      await delay(2000);
-
-      //TODO: remove debug response
-      const response = {
-        status: "success",
-        teams: [
-          {
-            id: "team_1",
-            name: "Roth FP",
-            has_followed: true,
-          },
-          {
-            id: "team_2",
-            name: "Smith J",
-            open_for_funding: true,
-            has_followed: true,
-          },
-        ]
-      }
-
       //TODO: implement API to accept follow request
 
       // Handle UI changes
@@ -708,7 +617,7 @@ export default {
       this.cleanupFollow()
 
       // Update team
-      this.projects[index].teams = response.teams
+      // this.projects[index].teams = response.teams
 
       // Show status update
       this.$buefy.toast.open({
@@ -730,9 +639,6 @@ export default {
     async unfollowTeam(team, target, index) {
       // Loading
       this.isLoading.follow_unfollow = true
-
-      //TODO: remove debug delay
-      await delay(2000);
 
       // TODO: Implement API to accept unfollow request
 

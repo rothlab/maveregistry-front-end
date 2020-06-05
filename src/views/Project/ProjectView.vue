@@ -51,15 +51,44 @@
         v-else-if="!isLoading.page && errorMessage === ''"
       >
         <div class="columns">
-          <div class="column is-8">
-            <div class="project-header">
+          <div
+            class="column is-6"
+          >
+            <!-- Add no project detail display -->
+            <div
+              class="no-project has-vcentered"
+              v-if="!hasPeople && !hasActivity"
+            >
+              <div class="info-icon">
+                <b-icon
+                  icon="mdil-flask-empty"
+                  custom-size="mdil-48px"
+                  type="is-grey-light"
+                />
+              </div>
+              <div class="info-content">
+                <p class="has-text-grey">
+                  <span class="is-size-5 has-text-grey-dark">No Project Detail</span><br>
+                  <span v-if="isOwner">Using the "Edit" function to add project detail.</span>
+                  <span v-else>You may contact the creator for more information.</span>
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="project-header"
+              v-if="hasPeople"
+            >
               <p class="is-size-4 has-text-weight-bold">
                 People
               </p>
             </div>
 
             <div class="project-content">
-              <p class="is-size-5">
+              <p
+                class="is-size-5"
+                v-if="leads.length > 0"
+              >
                 <span>
                   <b>{{ 'Project Lead' + (leads.length > 1 ? 's' : '') }}</b> <br>
                 </span>
@@ -80,7 +109,7 @@
               </p>
 
               <p class="is-size-5">
-                <span>
+                <span v-if="team">
                   <b>Team</b> <br>
                   <a
                     :href="'mailto:' + team.email"
@@ -118,13 +147,21 @@
               </p>
             </div>
 
-            <div class="project-header">
-              <p class="is-size-4 has-text-weight-bold">
+            <div
+              class="project-header"
+              v-if="hasActivity"
+            >
+              <p
+                class="is-size-4 has-text-weight-bold"
+              >
                 Activity
               </p>
             </div>
 
-            <div class="project-content">
+            <div
+              class="project-content"
+              v-if="hasActivity"
+            >
               <p
                 class="is-size-5"
                 v-for="(activity, id) in activities"
@@ -139,7 +176,8 @@
               </p>
             </div>
           </div>
-          <div class="column is-4">
+
+          <div class="column is-4 is-offset-2">
             <div class="project-header">
               <p class="is-size-4 has-text-weight-bold">
                 About Project
@@ -168,12 +206,18 @@
                 <b-icon icon="mdil-tag" />
                 {{ features.join(",") }}
               </p>
-              <p class="is-size-5">
+              <p
+                class="is-size-5"
+                v-if="funding"
+              >
                 <b>Funding</b> <br>
                 <b-icon :icon="funding.open_for_funding ? 'mdil-eye' : 'mdil-eye-off'" />
                 {{ funding.open_for_funding ? "Seek" : "Not Seek" }} Funding
               </p>
-              <p class="is-size-5">
+              <p
+                class="is-size-5"
+                v-if="user"
+              >
                 <b>Creator</b> <br>
                 <b-icon icon="mdil-account" />
                 <router-link
@@ -214,12 +258,12 @@ export default {
       errorMessage: "",
       target: {},
       features: [],
-      user: {},
+      user: undefined,
       updatedDate: new Date(),
       leads: [],
-      team: {},
+      team: undefined,
       collaborators: [],
-      funding: {},
+      funding: undefined,
       activities: []
     }
   },
@@ -227,22 +271,28 @@ export default {
     projectId() {
       return this.$route.params.id
     },
+    hasPeople() {
+      return this.leads.length > 0 && this.team && this.collaborators.length > 0
+    },
+    hasActivity() {
+      return this.activities.length > 0
+    }
   },
   async mounted() {
     const project = await this.fetchProject(this.projectId)
 
     if (project) {
-      this.leads = project.leads // Required, will always have value
-      this.team = await TeamManage.queryById(project.team) // Required, will always have value
-      // Only apply collaborators when it's not empty
+      if (project.leads) this.leads = project.leads // Required, will always have value
+      if (project.team) this.team = await TeamManage.queryById(project.team) // Required, will always have value
       if (project.collaborators)
         this.collaborators = await Promise.all(project.collaborators.map(e => TeamManage.queryById(e)))
-      this.funding = project.funding
-      this.activities = project.activities
+      if (project.funding) this.funding = project.funding
+      if (project.activities) this.activities = project.activities
     }
 
     // Set owner property
-    this.isOwner = this.$store.state.hasLoggedIn && (this.user.username === this.$store.state.user.username)
+    if (this.user && this.user.username)
+      this.isOwner = this.$store.state.hasLoggedIn && (this.user.username === this.$store.state.user.username)
   },
   methods: {
     async fetchProject(id) {
@@ -251,7 +301,7 @@ export default {
       // Error handling
       try {
         const project = await ProjectManage.fetchProject(id, true)
-      
+
         this.target = project.target
         this.features = project.features
         this.user = project.user
@@ -274,4 +324,13 @@ export default {
 <style lang="sass" scoped>
 .project-header
   margin-bottom: 0.5rem
+.no-project
+  border: 1px dashed #b5b5b5
+  border-radius: 6px
+  height: 100%
+  display: flex
+  justify-content: center
+  .info-icon
+    margin: 2rem
+    display: flex
 </style>

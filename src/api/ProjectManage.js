@@ -10,6 +10,8 @@ function uniqueById(value, index, self) {
 // Find most recent activity by start date
 // If there are multiple, select the first one
 function findRecentActivity(activities) {
+  if (!activities) return activities
+
   // If there's only one activity, there's no point to sort
   if (activities.length === 1) return activities[0]
 
@@ -30,8 +32,8 @@ const Target = Parse.Object.extend("Target", {
     // Fetch projects
     const projects = await Promise.all(this.get("projects").map(e => e.fetch()))
 
-    // TODO: handle team properly
-    const teamId = projects.map(e => e.get("team")).filter(uniqueById)
+    // Handle team object
+    const teamId = projects.map(e => e.get("team")).filter(Boolean).filter(uniqueById)
     const teams = await Promise.all(teamId.map(e => e.fetch()))
 
     return {
@@ -41,14 +43,18 @@ const Target = Parse.Object.extend("Target", {
       organism: this.get("organism"),
       projects: projects.map(e => {
         const recentActivity = findRecentActivity(e.get("activities"))
+        const funding = e.get("funding")
 
-        return {
+        let ret = {
           id: e.id,
-          features: e.get("features"),
-          open_for_funding: e.get("funding").open_for_funding,
-          type: recentActivity.type, // Find most recent activity
-          description: recentActivity.description
+          features: e.get("features")
         }
+
+        if (funding && funding.open_for_funding) ret.funding = funding.open_for_funding
+        if (recentActivity && recentActivity.type) ret.type = recentActivity.type
+        if (recentActivity && recentActivity.description) ret.description = recentActivity.description
+
+        return ret
       }),
       teams: teams.map(e => {
         return {
@@ -115,9 +121,11 @@ const Project = Parse.Object.extend("Project", {
     }
 
     if (detail) {
+      const team = this.get("team")
+
       ret.leads = this.get("leads")
-      ret.team = this.get("team").id
-      ret.collaborators = collaborators ? collaborators.map(e => e.id) : undefined
+      if (team && team.id) ret.team = team.id
+      if (collaborators) ret.collaborators = collaborators.map(e => e.id)
       ret.funding = this.get("funding")
       ret.activities = this.get("activities")
     }
