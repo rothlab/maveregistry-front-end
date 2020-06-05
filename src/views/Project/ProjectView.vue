@@ -170,7 +170,7 @@
                 <b>
                   {{ activity.start_date.toLocaleDateString() }} -
                   {{ activity.end_date ? activity.end_date.toLocaleDateString() : "Present" }}
-                </b>, {{ activity.type }}
+                </b> | {{ activity.type }}
                 <br>
                 {{ activity.description }}
               </p>
@@ -279,6 +279,8 @@ export default {
     }
   },
   async mounted() {
+    this.isLoading.page = true
+
     const project = await this.fetchProject(this.projectId)
 
     if (project) {
@@ -293,11 +295,11 @@ export default {
     // Set owner property
     if (this.user && this.user.username)
       this.isOwner = this.$store.state.hasLoggedIn && (this.user.username === this.$store.state.user.username)
+
+    this.isLoading.page = false
   },
   methods: {
     async fetchProject(id) {
-      this.isLoading.page = true
-
       // Error handling
       try {
         const project = await ProjectManage.fetchProject(id, true)
@@ -310,8 +312,6 @@ export default {
         return project
       } catch (error) {
         this.errorMessage = error.message
-      } finally {
-        this.isLoading.page = false
       }
     },
     editProject() {

@@ -306,10 +306,33 @@
           </header>
           <section class="modal-card-body">
             <div class="content">
-              <p>
-                <strong>Target: </strong>
-                <span>{{ followProp.target.name }}</span>
-              </p>
+              <span class="is-size-5 has-text-weight-bold">
+                About the Target 
+              </span>
+
+              <div class="level is-mobile is-marginless project-content">
+                <div class="level-item">
+                  <span>
+                    <b>Name</b><br>
+                    {{ followProp.target.name }}
+                  </span>
+                </div>
+                <div class="level-item">
+                  <span>
+                    <b>Type</b><br>
+                    <span class="is-capitalized">{{ followProp.target.type }}</span>
+                  </span>
+                </div>
+                <div class="level-item">
+                  <span>
+                    <b>Organism</b><br>
+                    <span class="is-italic">{{ followProp.target.organism }}</span> 
+                  </span>
+                </div>
+              </div>
+
+              <hr>
+
               <b-field label="Please briefly summarize your interest in following this target and team.">
                 <b-input
                   v-model="followRequest"
@@ -327,7 +350,6 @@
               :disabled="followRequest.length <= 0"
               :loading="isLoading.follow_unfollow"
               type="is-primary"
-              outlined
               @click="followTeam(followProp.team, followProp.target, followProp.project_index, followRequest)"
             >
               Submit Request
