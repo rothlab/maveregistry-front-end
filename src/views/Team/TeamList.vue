@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="cleanupNewTeam(); isNewTeamModalActive = true"
+                @click="isNewTeamModalActive = true"
               >
                 New Team
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="cleanupNewTeam(); isNewTeamModalActive = true"
+                @click="isNewTeamModalActive = true"
               >
                 New
               </b-button>
@@ -150,169 +150,20 @@
     </div>
 
     <!-- New Team Modal -->
-    <b-modal
+    <NewTeamModal
       :active.sync="isNewTeamModalActive"
-      has-modal-card
-      :can-cancel="['escape', 'outside']"
-    >
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">
-            <span>Add a New Team</span>
-          </p>
-          <button
-            class="delete"
-            aria-label="close"
-            @click="isNewTeamModalActive = false"
-          />
-        </header>
-
-        <ValidationObserver
-          ref="observer"
-          v-slot="{ passed }"
-        >
-          <section class="modal-card-body">
-            <div class="content">
-              <p class="is-size-5 has-text-weight-bold">
-                Principal Investigator
-              </p>
-          
-              <!-- First and last name -->
-              <b-field
-                grouped
-                class="field-margin is-space-between"
-              >
-                <ValidationProvider
-                  rules="required"
-                  name="FirstName"
-                  v-slot="{ errors, valid }"
-                  class="name"
-                >
-                  <b-field
-                    :message="errors"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="First Name"
-                  >
-                    <b-input
-                      type="text"
-                      placeholder="First Name"
-                      v-model="newTeamProp.first_name"
-                    />
-                  </b-field>
-                </ValidationProvider>
-                <ValidationProvider
-                  rules="required"
-                  name="LastName"
-                  v-slot="{ errors, valid }"
-                  class="name"
-                >
-                  <b-field
-                    :message="errors"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="Last Name"
-                  >
-                    <b-input
-                      type="text"
-                      placeholder="Last Name"
-                      v-model="newTeamProp.last_name"
-                    />
-                  </b-field>
-                </ValidationProvider>
-              </b-field>
-
-              <!-- Email -->
-              <ValidationProvider
-                rules="required|email"
-                name="Email"
-                v-slot="{ errors, valid }"
-              > 
-                <b-field
-                  :message="errors"
-                  class="field-margin"
-                  :type="{ 'is-danger': errors[0], '': valid }"
-                  label="Email"
-                >
-                  <b-input
-                    icon="mdil-email"
-                    type="email"
-                    placeholder="Email"
-                    v-model="newTeamProp.email"
-                  />
-                </b-field>
-              </ValidationProvider>
-
-              <!-- Association -->
-              <ValidationProvider
-                rules="required"
-                name="Affiliation"
-                v-slot="{ errors, valid }"
-              > 
-                <b-field
-                  :message="errors"
-                  class="field-margin"
-                  :type="{ 'is-danger': errors[0], '': valid }"
-                  label="Affiliation"
-                >
-                  <b-input
-                    icon="mdil-factory"
-                    v-model="newTeamProp.affiliation"
-                    type="affiliation"
-                    placeholder="Affiliation"
-                  />
-                </b-field>
-              </ValidationProvider>
-
-              <!-- Website -->
-              <ValidationProvider
-                :rules="{ regex: 
-                  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/ 
-                }"
-                name="Website (Optional)"
-                v-slot="{ errors, valid }"
-                immediate
-              > 
-                <b-field
-                  :message="errors"
-                  class="field-margin"
-                  :type="{ 'is-danger': errors[0], '': valid }"
-                  label="Website (Optional)"
-                >
-                  <b-input
-                    icon="mdil-link"
-                    type="website"
-                    placeholder="http:// or https://"
-                    v-model="newTeamProp.website"
-                  />
-                </b-field>
-              </ValidationProvider>
-            </div>
-          </section>
-
-          <footer class="modal-card-foot">
-            <b-button
-              expanded
-              :loading="isLoading.new_team"
-              :disabled="!passed"
-              type="is-primary"
-              @click="addTeam(newTeamProp)"
-            >
-              Add Team
-            </b-button>
-          </footer>
-        </ValidationObserver>
-      </div>
-    </b-modal>
+      @change="fetchTeams"
+    />
   </div>
 </template>
 
 <script>
-import { ValidationObserver, ValidationProvider } from 'vee-validate'
 import * as TeamManage from "@/api/teamManage"
+import NewTeamModal from "@/components/NewTeamModal"
 
 export default {
   components: {
-    ValidationObserver,
-    ValidationProvider
+    NewTeamModal
   },
   data() {
     return {
@@ -320,13 +171,6 @@ export default {
       isLoading: {
         fetch_team: false,
         new_team: false
-      },
-      newTeamProp: {
-        first_name: "",
-        last_name: "",
-        email: "",
-        affiliation: "",
-        website: ""
       },
       teams: [
         {
@@ -361,38 +205,6 @@ export default {
     await this.fetchTeams()
   },
   methods: {
-    cleanupNewTeam() {
-      this.newTeamProp = {
-        first_name: "",
-        last_name: "",
-        email: "",
-        affiliation: "",
-        website: ""
-      }
-    },
-    async addTeam(team) {
-      this.isLoading.new_team = true
-
-      try {
-        await TeamManage.addTeam(team)
-
-        // Handle UI changes
-        this.cleanupNewTeam()
-        this.isNewTeamModalActive = false
-
-        // Fetch again
-        this.fetchTeams()
-      } catch (error) {
-        this.$buefy.toast.open({
-          message: error.message,
-          type: 'is-danger',
-          queue: false,
-          duration: 5000
-        })
-      } finally {
-        this.isLoading.new_team = false
-      }
-    },
     async fetchTeams(limit = 10, skip = 0) {
       // Loading
       this.isLoading.fetch_team = true
