@@ -174,12 +174,14 @@
                   :key="index"
                 >
                   <b-taglist attached>
-                    <!-- TODO: implement a proper team interface -->
                     <router-link
                       :to="{ path: `/team/${team.id}`}"
                       target="_blank"
                     >
-                      <b-tag size="is-medium">
+                      <b-tag
+                        size="is-medium"
+                        class="is-capitalized"
+                      >
                         <b-icon
                           icon="mdil-account"
                           class="team-icon"
@@ -840,4 +842,8 @@ export default {
   margin-right: -0.2rem !important
 .team-control .tag
   box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
+  &:first-child
+    border-top-right-radius: 0
+    border-bottom-right-radius: 0
+
 </style>

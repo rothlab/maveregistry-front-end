@@ -31,8 +31,8 @@ const Target = Parse.Object.extend("Target", {
     const projects = await Promise.all(this.get("projects").map(e => e.fetch()))
 
     // TODO: handle team properly
-    const userId = projects.map(e => e.get("user")).filter(uniqueById)
-    const users = await Promise.all(userId.map(e => e.fetch()))
+    const teamId = projects.map(e => e.get("team")).filter(uniqueById)
+    const teams = await Promise.all(teamId.map(e => e.fetch()))
 
     return {
       id: this.id,
@@ -50,9 +50,9 @@ const Target = Parse.Object.extend("Target", {
           description: recentActivity.description
         }
       }),
-      teams: users.map(e => {
+      teams: teams.map(e => {
         return {
-          id: e.get("username"),
+          id: e.id,
           name: e.get("first_name").substring(0, 1) + ' ' + e.get("last_name")
         }
       })
