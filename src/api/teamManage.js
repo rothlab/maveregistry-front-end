@@ -1,7 +1,7 @@
 import { Parse } from "./parseConnect"
 
 // Define team object
-const Team = Parse.Object.extend("Team", {
+export const Team = Parse.Object.extend("Team", {
   initialize: function (attrs) {
     // Validate attrs
     if (!attrs) return
@@ -38,8 +38,15 @@ const Team = Parse.Object.extend("Team", {
       // Apply OR batch query
       query = Parse.Query.or(nameQuery, emailQuery)
     }
+
+    // Limit to at most one return
+    query.limit(1)
     const result = await query.find()
-    if (result.length >= 1) return result[0] // If found, just return the team object
+
+    // If found team object, or we tried to create with an ID, then just return what we have
+    // Notice - we might have no result, but it's okay because it just means we didn't find any team object
+    // with that given ID
+    if (result.length > 0 || attrs.id) return result
     
     // Create a new team object
     return new Team(attrs)
@@ -66,7 +73,7 @@ export async function addTeam(teamInfo) {
 
   // Add creator and save
   team.set("creator", Parse.User.current())
-  await team.save()
+  return await team.save()
 }
 
 export async function fetchTeams(limit, skip) {
@@ -96,4 +103,10 @@ export async function queryByName(name) {
   teams.results = teams.results.map(e => e.format())
 
   return teams
+}
+
+export async function queryById(id) {
+  const team = await new Team.create({ id: id })
+  
+  return team.format()
 }

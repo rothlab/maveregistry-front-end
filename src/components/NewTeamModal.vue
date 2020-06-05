@@ -7,7 +7,7 @@
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">
-          <span>Add a New Team</span>
+          <span>Add a New {{ isCollaborator ? "Collaborator" : "Team" }}</span>
         </p>
         <button
           class="delete"
@@ -145,7 +145,7 @@
             type="is-primary"
             @click="addTeam"
           >
-            Add Team
+            Add {{ isCollaborator ? "Collaborator" : "Team" }}
           </b-button>
         </footer>
       </ValidationObserver>
@@ -166,6 +166,10 @@ export default {
     active: {
       type: Boolean,
       default: false
+    },
+    isCollaborator: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -176,7 +180,7 @@ export default {
       lastName: "",
       email: "",
       affiliation: "",
-      website: ""
+      website: "",
     }
   },
   watch: {
@@ -203,7 +207,7 @@ export default {
       this.isLoading = true
 
       try {
-        await TeamManage.addTeam({
+        const team = await TeamManage.addTeam({
           first_name: this.firstName,
           last_name: this.lastName,
           email: this.email,
@@ -215,7 +219,7 @@ export default {
         this.isActive = false
 
         // Trigger change
-        this.$emit("change")
+        this.$emit("change", team.id)
       } catch (error) {
         this.$buefy.toast.open({
           message: error.message,
@@ -230,3 +234,8 @@ export default {
   }
 }
 </script>
+
+<style lang="sass" scoped>
+.modal-card-title
+  margin-bottom: 0 !important
+</style>

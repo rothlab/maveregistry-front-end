@@ -1,22 +1,19 @@
 <template>
   <div>
-    <label
-      class="label"
-      v-if="!isAddPi"
-    >
+    <label class="label">
       Find or Add a Principal Investigator
     </label>
     <b-autocomplete
+      v-model="existingTeamDisplay"
       class="field-margin"
       placeholder="Search by Name"
       open-on-focus
       icon="mdil-magnify"
-      v-if="!isAddPi"
       field="display"
       :data="teams"
       :loading="isLoading"
       @typing="fetchTeams"
-      @select="option => selected = option"
+      @select="updateVal"
     >
       <template slot="empty">
         <p class="has-text-centered">
@@ -25,7 +22,7 @@
         </p>
       </template>
       <template slot="footer">
-        <a @click="isAddPi = true">
+        <a @click="isNewTeamModalActive = true">
           <b-icon icon="mdil-plus" />
           <span>Add new...</span>
         </a> 
@@ -39,111 +36,20 @@
         {{ props.option.affiliation }}
       </template>
     </b-autocomplete>
-    <div v-else>
-      <!-- First and Last name -->
-      <b-field
-        grouped
-        class="field-margin is-space-between"
-      >
-        <ValidationProvider
-          :rules="hasRequired"
-          :immediate="!hasRequired"
-          name="FirstName"
-          v-slot="{ errors, valid }"
-          class="name"
-        >
-          <b-field
-            :message="errors"
-            :type="{ 'is-danger': errors[0], '': valid }"
-          >
-            <b-input
-              type="text"
-              placeholder="First Name"
-              v-model="first_name"
-              @input="updateVal"
-            />
-          </b-field>
-        </ValidationProvider>
-        <ValidationProvider
-          :rules="hasRequired"
-          :immediate="!hasRequired"
-          name="LastName"
-          v-slot="{ errors, valid }"
-          class="name"
-        >
-          <b-field
-            :message="errors"
-            :type="{ 'is-danger': errors[0], '': valid }"
-          >
-            <b-input
-              type="text"
-              placeholder="Last Name"
-              v-model="last_name"
-              @input="updateVal"
-            />
-          </b-field>
-        </ValidationProvider>
-      </b-field>
-      <!-- Email -->
-      <ValidationProvider
-        :rules="hasRequired + '|email'"
-        :immediate="!hasRequired"
-        name="Email"
-        v-slot="{ errors, valid }"
-      > 
-        <b-field
-          :message="errors"
-          class="field-margin"
-          :type="{ 'is-danger': errors[0], '': valid }"
-        >
-          <b-input
-            icon="mdil-email"
-            type="email"
-            placeholder="Email"
-            v-model="email"
-            @input="updateVal"
-          />
-        </b-field>
-      </ValidationProvider>
-      <!-- Affiliation -->
-      <ValidationProvider
-        :rules="hasRequired"
-        :immediate="!hasRequired"
-        name="Affiliation"
-        v-slot="{ errors, valid }"
-      > 
-        <b-field
-          :message="errors"
-          class="field-margin"
-          :type="{ 'is-danger': errors[0], '': valid }"
-        >
-          <b-input
-            icon="mdil-factory"
-            v-model="affiliation"
-            type="affiliation"
-            placeholder="Affiliation"
-            @input="updateVal"
-            expanded
-          />
-        </b-field>
-      </ValidationProvider>
-      <div class="has-text-right field-margin">
-        <b-button
-          icon-left="mdil-cancel"
-          type="is-danger"
-          outlined
-          @click="cleanUp"
-        >
-          Clear
-        </b-button>
-      </div>
+
+    <!-- New team modal -->
+    <div class="container">
+      <NewTeamModal
+        :active.sync="isNewTeamModalActive"
+        :is-collaborator="isCollaborator"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { ValidationProvider } from 'vee-validate'
 import * as TeamManage from "@/api/teamManage"
+import NewTeamModal from "@/components/NewTeamModal"
 
 // Helper
 function capitalize(string) {
@@ -153,25 +59,24 @@ function capitalize(string) {
 export default {
   props: {
     value: {
-      type: Object,
+      type: String,
       required: true
     },
     isRequired: {
       type: Boolean,
       default: true
+    },
+    isCollaborator: {
+      type: Boolean,
+      default: false
     }
   },
+  components: {
+    NewTeamModal
+  },
   watch: {
-    value: {
-      handler (val) {
-        this.isAddPi = !(val.id === "" && val.first_name === "" && val.last_name === "" && val.email === "" && val.affiliation === "")
-        this.id = val.id
-        this.first_name = val.first_name
-        this.last_name = val.last_name
-        this.email = val.email
-        this.affiliation = val.affiliation
-      },
-      deep: true
+    value () {
+      this.id = this.value
     }
   },
   computed: {
@@ -179,11 +84,10 @@ export default {
       return this.isRequired ? 'required' : ''
     }
   },
-  components: {
-    ValidationProvider
-  },
   async mounted() {
-    this.isAddPi = !(this.id === "" && this.first_name === "" && this.last_name === "" && this.email === "" && this.affiliation === "")
+    // Query existing team
+    const team = await this.queryTeamById(this.id)
+    if (team && team.length > 0) this.existingTeamDisplay = this.formatTeam(team)
 
     // Fetch teams
     await this.fetchTeams()
@@ -191,41 +95,38 @@ export default {
   data () {
     return {
       id: "",
-      first_name: "",
-      last_name: "",
-      email: "",
-      affiliation: "",
-      isAddPi: true,
+      existingTeamDisplay: "",
       teams: [],
       errorMessage: "",
-      keyword: ""
+      keyword: "",
+      isNewTeamModalActive: false,
+      isLoading: false
     }
   },
   methods: {
-    updateVal() {
-      let ret = {
-        id: this.id,
-        first_name: this.first_name,
-        last_name: this.last_name,
-        email: this.email,
-        affiliation: this.affiliation,
-        isLoading: false
-      }
-
-      this.$emit("input", ret)
-    },
-    cleanUp() {
-        this.id = ""
-        this.first_name = ""
-        this.last_name = ""
-        this.email = ""
-        this.affiliation = ""
-        this.isAddPi = false
+    updateVal(option) {
+      this.id = option.id
+      this.$emit("input", this.id)
     },
     formatTeam(team) {
       team.display = `${capitalize(team.first_name)} ${capitalize(team.last_name)}, ${team.affiliation}`
 
       return team
+    },
+    async queryTeamById(id) {
+      if (id.length < 1) return
+
+      this.isLoading = true
+
+      try {
+        const team = await TeamManage.queryById(id)
+
+        return team
+      } catch (error) {
+        this.errorMessage = error.message
+      } finally {
+        this.isLoading = false
+      }
     },
     async fetchTeams(query = "") {
       this.isLoading = true
