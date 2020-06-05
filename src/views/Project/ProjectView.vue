@@ -74,23 +74,23 @@
                   >
                     <b-icon icon="mdil-email" />
                   </a>
-                  {{ lead.first_name + " " + lead.last_name }},
+                  <span class="is-capitalized">{{ lead.first_name + " " + lead.last_name }},</span>
                   {{ lead.position === "Other" ? lead.custom_position : lead.position }}
                 </span>
               </p>
 
               <p class="is-size-5">
                 <span>
-                  <b>Principal Investigator</b> <br>
+                  <b>Team</b> <br>
                   <a
-                    :href="'mailto:' + investigator.email"
+                    :href="'mailto:' + team.email"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     <b-icon icon="mdil-email" />
                   </a>
-                  {{ investigator.first_name + " " + investigator.last_name }},
-                  {{ investigator.affiliation }}
+                  <span class="is-capitalized">{{ team.first_name + " " + team.last_name }},</span>
+                  {{ team.affiliation }}
                 </span>
               </p>
 
@@ -112,7 +112,7 @@
                   >
                     <b-icon icon="mdil-email" />
                   </a>
-                  {{ collaborator.first_name + " " + collaborator.last_name }},
+                  <span class="is-capitalized">{{ collaborator.first_name + " " + collaborator.last_name }},</span>
                   {{ collaborator.affiliation }}
                 </span>
               </p>
@@ -198,18 +198,8 @@
 
 <script>
 import * as ProjectManage from "@/api/projectManage"
+import * as TeamManage from "@/api/teamManage"
 import Error from '@/components/Error'
-
-// Helper function
-function isEmptyPiCollaborator (person) {
-  const emptyPerson = {
-    first_name: "",
-    last_name: "",
-    email: "",
-    affiliation: ""
-  }
-  return JSON.stringify(person) === JSON.stringify(emptyPerson)
-}
 
 export default {
   components: {
@@ -227,7 +217,7 @@ export default {
       user: {},
       updatedDate: new Date(),
       leads: [],
-      investigator: {},
+      team: {},
       collaborators: [],
       funding: {},
       activities: []
@@ -243,9 +233,10 @@ export default {
 
     if (project) {
       this.leads = project.leads // Required, will always have value
-      this.investigator = project.principal_investigator // Required, will always have value
+      this.team = await TeamManage.queryById(project.team) // Required, will always have value
       // Only apply collaborators when it's not empty
-      if (project.collaborators && !project.collaborators.every(isEmptyPiCollaborator)) this.collaborators = project.collaborators
+      if (project.collaborators)
+        this.collaborators = await Promise.all(project.collaborators.map(e => TeamManage.queryById(e)))
       this.funding = project.funding
       this.activities = project.activities
     }

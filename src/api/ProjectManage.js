@@ -93,6 +93,9 @@ const Project = Parse.Object.extend("Project", {
     // Fetch target and user
     const target = await this.get("target").fetch()
     const user = await this.get("user").fetch()
+    
+    // Fetch collaborators
+    const collaborators = this.get("collaborators")
 
     // Construct return object
     let ret = {
@@ -113,8 +116,8 @@ const Project = Parse.Object.extend("Project", {
 
     if (detail) {
       ret.leads = this.get("leads")
-      ret.team = this.get("team")
-      ret.collaborators = this.get("collaborators")
+      ret.team = this.get("team").id
+      ret.collaborators = collaborators ? collaborators.map(e => e.id) : undefined
       ret.funding = this.get("funding")
       ret.activities = this.get("activities")
     }
@@ -198,7 +201,7 @@ export async function updateProject(payload) {
   
   // Query collaborators
   const collaborators = await Promise.all(payload.collaborators.map(e => new Team.create({ id: e })))
-  if (collaborators.length > 0 && collaborators.any(e => e.length < 1)) return new Error("Some collaborators are invalid")
+  if (collaborators.length > 0 && collaborators.some(e => e.length < 1)) return new Error("Some collaborators are invalid")
 
   // Update project
   project.set("leads", payload.leads)

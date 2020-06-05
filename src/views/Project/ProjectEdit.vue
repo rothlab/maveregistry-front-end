@@ -437,7 +437,7 @@ export default {
     if (this.isEdit && project) {
       this.leads = project.leads // Required, will always have value
       this.team = project.team // Required, will always have value
-      if (project.collaborators.length > 0) this.collaborators = project.collaborators
+      if (project.collaborators && project.collaborators.length > 0) this.collaborators = project.collaborators
       this.openForFunding = project.funding.open_for_funding
       this.activities = project.activities
     }

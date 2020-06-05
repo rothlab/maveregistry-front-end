@@ -4,7 +4,7 @@
       Find or Add a Principal Investigator
     </label>
     <b-autocomplete
-      v-model="existingTeamDisplay"
+      v-model="existTeamDisplay"
       class="field-margin"
       placeholder="Search by Name"
       open-on-focus
@@ -75,8 +75,12 @@ export default {
     NewTeamModal
   },
   watch: {
-    value () {
-      this.id = this.value
+    async value () {
+      if (this.id !== this.value) {
+        this.id = this.value
+        const team = await this.queryTeamById(this.id)
+        this.existTeamDisplay = this.formatTeam(team).display
+      }
     }
   },
   computed: {
@@ -85,17 +89,13 @@ export default {
     }
   },
   async mounted() {
-    // Query existing team
-    const team = await this.queryTeamById(this.id)
-    if (team && team.length > 0) this.existingTeamDisplay = this.formatTeam(team)
-
     // Fetch teams
     await this.fetchTeams()
   },
   data () {
     return {
       id: "",
-      existingTeamDisplay: "",
+      existTeamDisplay: "",
       teams: [],
       errorMessage: "",
       keyword: "",
@@ -169,6 +169,3 @@ export default {
   }
 }
 </script>
-
-<style lang="sass" scoped>
-</style>

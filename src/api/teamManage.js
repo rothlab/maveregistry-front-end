@@ -46,7 +46,7 @@ export const Team = Parse.Object.extend("Team", {
     // If found team object, or we tried to create with an ID, then just return what we have
     // Notice - we might have no result, but it's okay because it just means we didn't find any team object
     // with that given ID
-    if (result.length > 0 || attrs.id) return result
+    if (result.length > 0 || attrs.id) return result[0]
     
     // Create a new team object
     return new Team(attrs)
