@@ -157,7 +157,7 @@
 
           <div class="columns">
             <div class="column is-7">
-              <!-- Principal Investigator -->
+              <!-- Team -->
               <div class="project-content">
                 <div class="columns">
                   <div class="column is-3">
@@ -166,7 +166,7 @@
                     </span>
                   </div>
                   <div class="column is-9">
-                    <TeamInfo v-model="investigator" />
+                    <TeamInfo v-model="team" />
                   </div>
                 </div>
               </div>
@@ -199,6 +199,7 @@
                     <TeamInfo
                       v-model="collaborators[index]"
                       :is-required="false"
+                      is-collaborator
                     />
                   </div>
                 </div>
@@ -208,7 +209,7 @@
                   type="is-light"
                   icon-left="mdil-plus"
                   expanded
-                  @click="collaborators.push(newPi())"
+                  @click="collaborators.push('')"
                 >
                   Add a Collaborator
                 </b-button>
@@ -396,10 +397,8 @@ export default {
         "Research Staff",
         "Other"
       ],
-      investigator: this.newPi(),
-      collaborators: [
-        this.newPi()
-      ],
+      team: "",
+      collaborators: [""],
       openForFunding: false,
       activities: [
         this.newActivity()
@@ -411,8 +410,7 @@ export default {
         page: false,
         submit: false
       },
-      errorMessage: "",
-      addPi: false
+      errorMessage: ""
     }
   },
   computed: {
@@ -438,7 +436,7 @@ export default {
     // Populate project details if editing
     if (this.isEdit && project) {
       this.leads = project.leads // Required, will always have value
-      this.investigator = project.principal_investigator // Required, will always have value
+      this.team = project.team // Required, will always have value
       if (project.collaborators.length > 0) this.collaborators = project.collaborators
       this.openForFunding = project.funding.open_for_funding
       this.activities = project.activities
@@ -452,23 +450,6 @@ export default {
           email: "",
           position: "",
           custom_position: ""
-      }
-    },
-    newPi() {
-      return {
-        id: "",
-        first_name: "",
-        last_name: "",
-        email: "",
-        affiliation: ""
-      }
-    },
-    newFunding() {
-      return {
-        type: "",
-        agendcy: "",
-        start_date: new Date(),
-        end_date: new Date()
       }
     },
     newActivity() {
@@ -504,8 +485,8 @@ export default {
       const project = {
         id: this.projectId,
         leads: this.leads.filter(e => isNotEmptyPerson(e, this.newLead())),
-        principal_investigator: this.investigator,
-        collaborators: this.collaborators.filter(e => isNotEmptyPerson(e, this.newPi())),
+        team: this.team,
+        collaborators: this.collaborators.filter(e => e !== ""),
         funding: {
           open_for_funding: this.openForFunding
         },

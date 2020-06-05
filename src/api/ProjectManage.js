@@ -1,4 +1,5 @@
 import { Parse } from "./parseConnect"
+import { Team } from "./teamManage"
 
 // Helper function
 // Find unqiue entries
@@ -26,7 +27,7 @@ const Target = Parse.Object.extend("Target", {
     if (attrs.organism === "") throw new Error("Target organism is empty")
   },
   format: async function () {
-    // Fetch projects and users
+    // Fetch projects
     const projects = await Promise.all(this.get("projects").map(e => e.fetch()))
 
     // TODO: handle team properly
@@ -112,7 +113,7 @@ const Project = Parse.Object.extend("Project", {
 
     if (detail) {
       ret.leads = this.get("leads")
-      ret.principal_investigator = this.get("principal_investigator")
+      ret.team = this.get("team")
       ret.collaborators = this.get("collaborators")
       ret.funding = this.get("funding")
       ret.activities = this.get("activities")
@@ -191,10 +192,18 @@ export async function updateProject(payload) {
   // Fetch project by ID
   let project = await new Project.fetchById(payload.id)
 
+  // Query team
+  const team = await new Team.create({ id: payload.team })
+  if (team.length < 1) return new Error("Invalid team")
+  
+  // Query collaborators
+  const collaborators = await Promise.all(payload.collaborators.map(e => new Team.create({ id: e })))
+  if (collaborators.length > 0 && collaborators.any(e => e.length < 1)) return new Error("Some collaborators are invalid")
+
   // Update project
   project.set("leads", payload.leads)
-  project.set("principal_investigator", payload.principal_investigator)
-  project.set("collaborators", payload.collaborators)
+  project.set("team", team)
+  if (collaborators.length > 0 ) project.set("collaborators", collaborators)
   project.set("funding", payload.funding)
   project.set("activities", payload.activities)
 
