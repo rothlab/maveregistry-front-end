@@ -147,13 +147,8 @@ export default {
   },
   watch: {
     value: {
-      handler (val) {
-        this.type = val.type
-        this.startDate = val.start_date
-        this.isOngoing = !val.end_date
-        this.description = val.description
-
-        if (!this.isOngoing) this.endDate = val.end_date
+      handler () {
+        this.initData()
       },
       deep: true
     }
@@ -179,7 +174,18 @@ export default {
       if (!this.isOngoing) ret.end_date = this.endDate
 
       this.$emit("input", ret)
+    },
+    initData() {
+      this.type = this.value.type
+      this.startDate = this.value.start_date
+      this.isOngoing = !this.value.end_date
+      this.description = this.value.description
+
+      if (!this.isOngoing) this.endDate = this.value.end_date
     }
+  },
+  mounted() {
+    this.initData()
   }
 }
 </script>
