@@ -54,7 +54,7 @@
 <script>
 import * as TeamManage from "@/api/teamManage.js"
 import NewTeamModal from "@/components/NewTeamModal.vue"
-import { handleError } from "@/assets/errorHandler.js"
+import { handleError } from "@/api/errorHandler.js"
 
 // Helper
 function capitalize(string) {

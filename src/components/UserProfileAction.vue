@@ -22,7 +22,7 @@
 
 <script>
 import * as UserManage from "@/api/userManage.js"
-import { handleError } from "@/assets/errorHandler.js"
+import { handleError } from "@/api/errorHandler.js"
 
 export default {
   props: {

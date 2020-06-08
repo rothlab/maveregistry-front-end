@@ -63,7 +63,7 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import { handleError } from "@/assets/errorHandler.js"
+import { handleError } from "@/api/errorHandler.js"
 
 export default {
   components: {

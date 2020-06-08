@@ -96,7 +96,7 @@
 import * as UserManage from "../api/userManage"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Success from "../components/Success"
-import { handleError } from "@/assets/errorHandler.js"
+import { handleError } from "@/api/errorHandler.js"
 
 export default {
   props: {

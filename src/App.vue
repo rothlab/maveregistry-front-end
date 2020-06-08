@@ -426,7 +426,7 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import { handleError } from "@/assets/errorHandler.js"
+import { handleError } from "@/api/errorHandler.js"
 
 // Lazy loading
 const PasswordWithRevealAndValidation = () => import('./components/PasswordWithRevealAndValidation.vue')
@@ -684,7 +684,17 @@ export default {
           }, 1000);
           break;
         case "cache":
-          await this.$store.dispatch('loginUserCache')
+          try {
+            await this.$store.dispatch('loginUserCache')
+          } catch (e) {
+            this.$buefy.toast.open({
+              duration: 5000,
+              message: await handleError(e),
+              type: 'is-danger',
+              queue: false
+            })
+          }
+          
           break;
         default:
           break;

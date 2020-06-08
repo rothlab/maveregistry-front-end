@@ -41,8 +41,13 @@
     </div>
     
     <div class="container has-fullheight has-top-padding has-touch-container-padding">
+      <Error
+        :message="errorMessage"
+        v-if="errorMessage !== ''"
+      />
+
       <!-- Project table -->
-      <div>
+      <div v-else>
         <!-- TODO: implement backend pagination -->
         <b-table
           :data="targets"
@@ -575,13 +580,16 @@
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import * as ProjectManage from "@/api/projectManage.js"
+import { handleError } from "@/api/errorHandler.js"
+import Error from '@/components/Error.vue'
 
 const variables = require("@/assets/variables.json")
 
 export default {
   components: {
     ValidationProvider,
-    ValidationObserver
+    ValidationObserver,
+    Error
   },
   data () {
     return {
@@ -612,7 +620,8 @@ export default {
         new_project: false,
         follow_unfollow: false,
         fetch_targets: false
-      }
+      },
+      errorMessage: ""
     }
   },
   async mounted () {
@@ -722,26 +731,35 @@ export default {
       this.isLoading.fetch_targets = true
 
       // Update targets
-      const targets = await ProjectManage.fetchTargets(limit, skip)
-      this.targets = targets.results
+      try {
+        const targets = await ProjectManage.fetchTargets(limit, skip)
+        this.targets = targets.results
 
-      // Update pagination
-      this.pagination.count = targets.count
-
-      this.isLoading.fetch_targets = false
+        // Update pagination
+        this.pagination.count = targets.count
+      } catch (error) {
+        console.log(error)
+        this.errorMessage = await handleError(error)
+      } finally {
+        this.isLoading.fetch_targets = false
+      }
     },
     async addProject() {
       // Loading
       this.isLoading.new_project = true
 
-      const projectId = await ProjectManage.addProject(this.newProjectProp)
+      try {
+        const projectId = await ProjectManage.addProject(this.newProjectProp)
 
-      // Handle UI changes
-      this.isLoading.new_project = false
-      this.isNewActivityModalActive = false
-
-      // Jump to new project registration page
-      this.$router.push({ name: 'Project Edit', params: { id: projectId, action: 'new' } })
+        // Jump to new project registration page
+        this.$router.push({ name: 'Project Edit', params: { id: projectId, action: 'new' } })
+      } catch (error) {
+        this.errorMessage = await handleError(error)
+      } finally {
+        // Handle UI changes
+        this.isLoading.new_project = false
+        this.isNewActivityModalActive = false
+      }
     }
   }
 }

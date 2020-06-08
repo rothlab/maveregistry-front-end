@@ -367,7 +367,7 @@ import TeamInfo from '@/components/TeamInfo.vue'
 import ProjectActivity from '@/components/ProjectActivity.vue'
 import Error from '@/components/Error.vue'
 import { ValidationObserver } from 'vee-validate'
-import { handleError } from "@/assets/errorHandler.js"
+import { handleError } from "@/api/errorHandler.js"
 import * as ProjectManage from "@/api/projectManage.js"
 
 // Helper functions

@@ -1,4 +1,4 @@
-import { Parse, handleParseError } from "./parseConnect.js"
+import { Parse } from "./parseConnect.js"
 
 // Helper: parse user metadata
 function parseUserMetadata (user) {
@@ -14,38 +14,22 @@ function parseUserMetadata (user) {
 
 // Log in user with password
 export async function loginUserPassword (username, password) {
-  let res = new Object
-
   // Authenticate
-  try {
-    const user = await Parse.User.logIn(username, password)
-
-    // Parse user
-    res.user = parseUserMetadata(user)
-  } catch (e) {
-    handleParseError(e)
-    res.error = e
-  }
-
-  return res
+  const user = await Parse.User.logIn(username, password)
+  
+  return parseUserMetadata(user)
 }
 
 // Log in user from cache
 export async function loginUserCache () {
-  let res = new Object
-
   const currentUser = Parse.User.current()
-  if (currentUser) {
-    res.user = parseUserMetadata(currentUser)
-  }
+  if (currentUser) return parseUserMetadata(currentUser)
 
-  return res
+  return undefined
 }
 
 // Sign up user with username, email and password
 export async function signupUserPassword (username, email, password, firstName, lastName) {
-  let res = new Object
-
   // Prepare new user
   let user = new Parse.User()
   user.set("username", username)
@@ -55,43 +39,24 @@ export async function signupUserPassword (username, email, password, firstName, 
   user.set("last_name", lastName)
 
   // Sign up
-  try {
-    const retUser = await user.signUp()
+  const retUser = await user.signUp()
 
-    // Parse user
-    res.user = parseUserMetadata(retUser)
-  } catch (e) {
-    handleParseError(e)
-    res.error = e
-  }
-
-  return res
+  return parseUserMetadata(retUser)
 }
 
 // Sign up user with Google auth code
 export async function signupLoginUserGoogle (userInfo) {
-  let res = new Object
+  // Link account
+  let user = new Parse.User()
+  user.set("email", userInfo.email)
+  user.set("first_name", userInfo.first_name)
+  user.set("last_name", userInfo.last_name)
+  user.set("profile_image", userInfo.profile_image)
+  await user.linkWith("google", {
+    authData: userInfo.auth
+  })
 
-  // Sign up
-  try {
-    // Link account
-    let user = new Parse.User()
-    user.set("email", userInfo.email)
-    user.set("first_name", userInfo.first_name)
-    user.set("last_name", userInfo.last_name)
-    user.set("profile_image", userInfo.profile_image)
-    await user.linkWith("google", {
-      authData: userInfo.auth
-    })
-
-    // Set user info
-    res.user = parseUserMetadata(Parse.User.current())
-  } catch (e) {
-    handleParseError(e)
-    res.error = e
-  }
-
-  return res
+  return parseUserMetadata(Parse.User.current())
 }
 
 // Sign up user with ORCID OAuth2
@@ -117,44 +82,29 @@ export async function signupLoginUserOrcid (userInfo) {
 
   let res = new Object
 
-  // Sign up
-  try {
-    // Link account
-    let user = new Parse.User()
-    user.set("email", userInfo.email)
-    user.set("first_name", userInfo.first_name)
-    user.set("last_name", userInfo.last_name)
-    user.set("profile_image", userInfo.profile_image)
+  // Link account
+  let user = new Parse.User()
+  user.set("email", userInfo.email)
+  user.set("first_name", userInfo.first_name)
+  user.set("last_name", userInfo.last_name)
+  user.set("profile_image", userInfo.profile_image)
 
-    // Check if current user has email
-    // Because user might use the log in function to sign up
-    // We need to handle that case
-    res.response = await user.linkWith(provider.getAuthType(), provider.getAuthData())
-    res.hasEmail = res.response.getEmail() !== ""
-    delete res.response
+  // Check if current user has email
+  // Because user might use the log in function to sign up
+  // We need to handle that case
+  const ret = await user.linkWith(provider.getAuthType(), provider.getAuthData())
 
-    // Set user info
-    res.user = parseUserMetadata(Parse.User.current())
-  } catch (e) {
-    handleParseError(e)
-    res.error = e
-  }
+  // Set user info
+  res = parseUserMetadata(Parse.User.current())
+  res.hasEmail = ret.getEmail() !== ""
 
   return res
 }
 
 // Log out user
 export async function logoutUser () {
-  let res = new Object
 
-  try {
-    res.user = await Parse.User.logOut()
-  } catch (e) {
-    handleParseError(e)
-    res.error = e
-  }
-
-  return res
+  return await Parse.User.logOut()
 }
 
 // Fetch user info with username
@@ -162,24 +112,15 @@ export async function fetchUserInfo (username) {
   // Clear cache
   Parse.User._clearCache()
 
-  let res = new Object
-
-  try {
-    // Query user info
-    const query = new Parse.Query(Parse.User)
-    query.equalTo("username", username)
-    const user = await query.find()
-    if (user.length > 0) {
-      res.user = parseUserMetadata(user[0])
-    } else {
-      throw new Error(`User '${username}' does not exist`)
-    }
-  } catch (e) {
-    handleParseError(e)
-    res.error = e
+  // Query user info
+  const query = new Parse.Query(Parse.User)
+  query.equalTo("username", username)
+  const user = await query.find()
+  if (user.length > 0) {
+    return parseUserMetadata(user[0])
+  } else {
+    throw new Error(`User does not exist`)
   }
-
-  return res
 }
 
 // Update user profile
@@ -197,16 +138,8 @@ export async function updateUserProfile (userInfo) {
   if (userInfo.profile_image) user.set("profile_image", userInfo.profile_image)
 
   // Save user info changes
-  let res = new Object
-  try {
-    const retUser = await user.save()
-    res.user = parseUserMetadata(retUser)
-  } catch (e) {
-    handleParseError(e)
-    res.error = e
-  }
-
-  return res
+  const retUser = await user.save()
+  return parseUserMetadata(retUser)
 }
 
 // Reset password

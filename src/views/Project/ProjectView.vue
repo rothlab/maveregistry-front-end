@@ -244,7 +244,7 @@
 <script>
 import * as ProjectManage from "@/api/projectManage.js"
 import * as TeamManage from "@/api/teamManage.js"
-import { handleError } from "@/assets/errorHandler.js"
+import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 
 export default {

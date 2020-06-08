@@ -156,7 +156,7 @@
 <script>
 import * as TeamManage from "@/api/teamManage.js"
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
-import { handleError } from "@/assets/errorHandler.js"
+import { handleError } from "@/api/errorHandler.js"
 
 export default {
   components: {

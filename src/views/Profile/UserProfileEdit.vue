@@ -271,7 +271,7 @@ import * as UserManage from "@/api/userManage.js"
 import * as FileManage from "@/api/fileManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "@/components/Error.vue"
-import { handleError } from "@/assets/errorHandler.js"
+import { handleError } from "@/api/errorHandler.js"
 
 function initialState (){
   return {
