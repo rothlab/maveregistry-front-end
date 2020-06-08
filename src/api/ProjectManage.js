@@ -1,5 +1,5 @@
-import { Parse } from "./parseConnect"
-import { Team } from "./teamManage"
+import { Parse } from "./parseConnect.js"
+import { Team } from "./teamManage.js"
 
 // Helper function
 // Find unqiue entries

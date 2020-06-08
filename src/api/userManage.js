@@ -1,4 +1,4 @@
-import { Parse } from "./parseConnect"
+import { Parse } from "./parseConnect.js"
 
 // Helper: parse user metadata
 function parseUserMetadata (user) {

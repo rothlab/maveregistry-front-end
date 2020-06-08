@@ -1,4 +1,4 @@
-import { Parse } from "./parseConnect"
+import { Parse } from "./parseConnect.js"
 
 export async function uploadFile(file) {
   const parseFile = new Parse.File(file.name, file)

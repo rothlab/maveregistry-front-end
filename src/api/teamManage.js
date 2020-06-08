@@ -1,4 +1,4 @@
-import { Parse } from "./parseConnect"
+import { Parse } from "./parseConnect.js"
 
 // Define team object
 export const Team = Parse.Object.extend("Team", {
