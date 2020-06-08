@@ -81,8 +81,7 @@ export default {
   watch: {
     async value () {
       if (this.id !== this.value) {
-        this.id = this.value
-        await this.updateExistTeamById(this.id)
+        await this.updateExistTeamById(this.value)
       }
     },
     async existTeamDisplay (newVal, oldVal) {
@@ -98,6 +97,10 @@ export default {
     }
   },
   async mounted() {
+    if (this.value !== "") {
+      await this.updateExistTeamById(this.value)
+    }
+
     // Fetch teams
     await this.fetchTeams()
   },
@@ -123,6 +126,8 @@ export default {
       return team
     },
     async updateExistTeamById(id) {
+      this.id = id
+
       // Update existing team
       const team = await this.queryTeamById(id)
       this.existTeamDisplay = this.formatTeam(team).display
