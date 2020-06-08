@@ -311,13 +311,15 @@ export default {
     return initialState()
   },
   async mounted () {
-    // If not a valid action, jump to view
-    if (!this.isEditing) {
-      this.$router.push({ name: 'User Profile View', params: { username: this.$route.params.username } })
+    const username = this.$route.params.username
+    this.isOwner = this.$store.state.hasLoggedIn && (username === this.$store.state.user.username)
+
+    // If not a valid action or not the owner, jump to view
+    if (!this.isEditing || !this.isOwner) {
+      this.$router.push({ name: 'User Profile View', params: { username: username } })
       return
     }
 
-    const username = this.$route.params.username
     this.userInfo = await this.fetchUserInfo(username)
 
     if (this.userInfo) {
@@ -329,21 +331,19 @@ export default {
       this.isLoading.page = true
       
       // Get user info using username
-      const res = await UserManage.fetchUserInfo(username)
-
-      // Handle error
-      if (res.error) {
-        this.errorMessage = res.error.message
+      let res
+      try {
+        res = await UserManage.fetchUserInfo(username)
+      } catch (error) {
+        this.errorMessage = await handleError(error)
         this.isLoading.page = false
         return undefined
       }
 
-      // Check if owning the account.
-      // Only the owner can make changes
+      // Handle UI changes
       this.showProfile = true
-      this.isOwner = this.$store.state.hasLoggedIn && (res.user.username === this.$store.state.user.username)
       this.isLoading.page = false
-      return res.user
+      return res
     },
     async saveProfile() {
       this.isLoading.save_edit = true

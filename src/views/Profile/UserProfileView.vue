@@ -138,7 +138,10 @@
               </p>
             </div>
 
-            <div class="project-content">
+            <div
+              class="project-content"
+              v-if="userInfo.email"
+            >
               <UserProfileAction :email="userInfo.email" />
             </div>
           </div>
@@ -162,6 +165,7 @@
 
 <script>
 import * as UserManage from "@/api/userManage.js"
+import { handleError } from "@/api/errorHandler.js"
 import Error from "@/components/Error.vue"
 import UserProfileAction from "@/components/UserProfileAction.vue"
 
@@ -222,11 +226,11 @@ export default {
       this.isLoading.page = true
       
       // Get user info using username
-      const res = await UserManage.fetchUserInfo(username)
-
-      // Handle error
-      if (res.error) {
-        this.errorMessage = res.error.message
+      let res
+      try {
+        res = await UserManage.fetchUserInfo(username)
+      } catch (error) {
+        this.errorMessage = await handleError(error)
         this.isLoading.page = false
         return undefined
       }
@@ -234,9 +238,9 @@ export default {
       // Check if owning the account.
       // Only the owner can make changes
       this.showProfile = true
-      this.isOwner = this.$store.state.hasLoggedIn && (res.user.username === this.$store.state.user.username)
+      this.isOwner = this.$store.state.hasLoggedIn && (res.username === this.$store.state.user.username)
       this.isLoading.page = false
-      return res.user
+      return res
     },
     editProject() {
       this.$router.push({ name: 'User Profile Edit', params: { username: this.userInfo.username, action: 'edit' } })
