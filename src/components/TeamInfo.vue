@@ -16,6 +16,7 @@
       :loading="isLoading"
       @typing="fetchTeams"
       @select="updateVal"
+      @focus="fetchTeams()"
     >
       <template slot="empty">
         <p class="has-text-centered">
@@ -44,6 +45,7 @@
       <NewTeamModal
         :active.sync="isNewTeamModalActive"
         :is-collaborator="isCollaborator"
+        @change="updateExistTeamById"
       />
     </div>
   </div>
@@ -80,8 +82,7 @@ export default {
     async value () {
       if (this.id !== this.value) {
         this.id = this.value
-        const team = await this.queryTeamById(this.id)
-        this.existTeamDisplay = this.formatTeam(team).display
+        await this.updateExistTeamById(this.id)
       }
     },
     async existTeamDisplay (newVal, oldVal) {
@@ -120,6 +121,14 @@ export default {
       team.display = `${capitalize(team.first_name)} ${capitalize(team.last_name)}, ${team.affiliation}`
 
       return team
+    },
+    async updateExistTeamById(id) {
+      // Update existing team
+      const team = await this.queryTeamById(id)
+      this.existTeamDisplay = this.formatTeam(team).display
+
+      // update ID
+      this.updateVal(team)
     },
     async queryTeamById(id) {
       if (id.length < 1) return
