@@ -154,7 +154,7 @@
 </template>
 
 <script>
-import * as TeamManage from "@/api/teamManage"
+import * as TeamManage from "@/api/teamManage.js"
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 
 export default {

@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import * as UserManage from "@/api/userManage"
+import * as UserManage from "@/api/userManage.js"
 
 export default {
   props: {

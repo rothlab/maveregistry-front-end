@@ -242,9 +242,9 @@
 </template>
 
 <script>
-import * as ProjectManage from "@/api/projectManage"
-import * as TeamManage from "@/api/teamManage"
-import Error from '@/components/Error'
+import * as ProjectManage from "@/api/projectManage.js"
+import * as TeamManage from "@/api/teamManage.js"
+import Error from '@/components/Error.vue'
 
 export default {
   components: {
