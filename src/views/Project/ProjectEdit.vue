@@ -367,7 +367,7 @@ import TeamInfo from '@/components/TeamInfo.vue'
 import ProjectActivity from '@/components/ProjectActivity.vue'
 import Error from '@/components/Error.vue'
 import { ValidationObserver } from 'vee-validate'
-
+import { handleError } from "@/assets/errorHandler.js"
 import * as ProjectManage from "@/api/projectManage.js"
 
 // Helper functions
@@ -473,7 +473,7 @@ export default {
 
         return project
       } catch (error) {
-        this.errorMessage = error.message
+        this.errorMessage = await handleError(error)
       } finally {
         this.isLoading.page = false
       }
@@ -499,7 +499,7 @@ export default {
       } catch (e) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: e.message,
+          message: await handleError(e),
           type: 'is-danger',
           queue: false
         })

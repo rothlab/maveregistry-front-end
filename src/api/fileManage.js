@@ -1,4 +1,4 @@
-import { Parse } from "./parseConnect.js"
+import { Parse, handleParseError } from "./parseConnect.js"
 
 export async function uploadFile(file) {
   const parseFile = new Parse.File(file.name, file)
@@ -7,6 +7,7 @@ export async function uploadFile(file) {
   try {
     res.file = await parseFile.save()
   } catch (e) {
+    handleParseError(e)
     res.error = e
   }
 

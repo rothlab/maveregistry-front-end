@@ -54,6 +54,7 @@
 <script>
 import * as TeamManage from "@/api/teamManage.js"
 import NewTeamModal from "@/components/NewTeamModal.vue"
+import { handleError } from "@/assets/errorHandler.js"
 
 // Helper
 function capitalize(string) {
@@ -145,7 +146,7 @@ export default {
 
         return team
       } catch (error) {
-        this.errorMessage = error.message
+        this.errorMessage = await handleError(error)
       } finally {
         this.isLoading = false
       }
@@ -164,7 +165,7 @@ export default {
           // Format and store
           this.teams = teams.results.map(this.formatTeam)
         } catch (error) {
-          this.errorMessage = error.message
+          this.errorMessage = await handleError(error)
         } finally {
           this.isLoading = false
         }
@@ -179,7 +180,7 @@ export default {
         // Format and store
         this.teams = teams.results.map(this.formatTeam)
       } catch (error) {
-        this.errorMessage = error.message
+        this.errorMessage = await handleError(error)
       } finally {
         this.isLoading = false
       }

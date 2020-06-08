@@ -63,6 +63,7 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
+import { handleError } from "@/assets/errorHandler.js"
 
 export default {
   components: {
@@ -137,7 +138,7 @@ export default {
       } catch (e) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: e.message,
+          message: await handleError(e),
           type: 'is-danger',
             queue: false
         })
@@ -165,7 +166,7 @@ export default {
         } catch (e) {
           this.$buefy.toast.open({
           duration: 5000,
-          message: e.message,
+          message: await handleError(e),
           type: 'is-danger',
           queue: false
           })

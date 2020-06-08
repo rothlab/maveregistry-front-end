@@ -271,6 +271,7 @@ import * as UserManage from "@/api/userManage.js"
 import * as FileManage from "@/api/fileManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "@/components/Error.vue"
+import { handleError } from "@/assets/errorHandler.js"
 
 function initialState (){
   return {
@@ -353,7 +354,7 @@ export default {
       } catch (e) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: e.message,
+          message: await handleError(e),
           type: 'is-danger',
           queue: false
         })
@@ -423,7 +424,7 @@ export default {
       } catch (error) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: error.message,
+          message: await handleError(error),
           type: 'is-danger',
           queue: false
         })

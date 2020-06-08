@@ -426,6 +426,7 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
+import { handleError } from "@/assets/errorHandler.js"
 
 // Lazy loading
 const PasswordWithRevealAndValidation = () => import('./components/PasswordWithRevealAndValidation.vue')
@@ -538,7 +539,7 @@ export default {
             // Handle error
             this.$buefy.toast.open({
               duration: 5000,
-              message: e.message,
+              message: await handleError(e),
               type: 'is-danger',
               queue: false
             })
@@ -567,7 +568,7 @@ export default {
           } catch (e) {
             this.$buefy.toast.open({
               duration: 5000,
-              message: e.message,
+              message: await handleError(e),
               type: 'is-danger',
               queue: false
             })
@@ -623,7 +624,7 @@ export default {
             // Handle error
             this.$buefy.toast.open({
               duration: 5000,
-              message: e.message,
+              message: await handleError(e),
               type: 'is-danger',
               queue: false
             })
@@ -649,7 +650,7 @@ export default {
           } catch (e) {
             this.$buefy.toast.open({
               duration: 5000,
-              message: e.message,
+              message: await handleError(e),
               type: 'is-danger',
               queue: false
             })

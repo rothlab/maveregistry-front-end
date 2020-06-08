@@ -1,4 +1,4 @@
-import { Parse } from "./parseConnect.js"
+import { Parse, handleParseError } from "./parseConnect.js"
 
 // Helper: parse user metadata
 function parseUserMetadata (user) {
@@ -23,6 +23,7 @@ export async function loginUserPassword (username, password) {
     // Parse user
     res.user = parseUserMetadata(user)
   } catch (e) {
+    handleParseError(e)
     res.error = e
   }
 
@@ -60,6 +61,7 @@ export async function signupUserPassword (username, email, password, firstName, 
     // Parse user
     res.user = parseUserMetadata(retUser)
   } catch (e) {
+    handleParseError(e)
     res.error = e
   }
 
@@ -85,6 +87,7 @@ export async function signupLoginUserGoogle (userInfo) {
     // Set user info
     res.user = parseUserMetadata(Parse.User.current())
   } catch (e) {
+    handleParseError(e)
     res.error = e
   }
 
@@ -133,6 +136,7 @@ export async function signupLoginUserOrcid (userInfo) {
     // Set user info
     res.user = parseUserMetadata(Parse.User.current())
   } catch (e) {
+    handleParseError(e)
     res.error = e
   }
 
@@ -146,6 +150,7 @@ export async function logoutUser () {
   try {
     res.user = await Parse.User.logOut()
   } catch (e) {
+    handleParseError(e)
     res.error = e
   }
 
@@ -170,6 +175,7 @@ export async function fetchUserInfo (username) {
       throw new Error(`User '${username}' does not exist`)
     }
   } catch (e) {
+    handleParseError(e)
     res.error = e
   }
 
@@ -196,6 +202,7 @@ export async function updateUserProfile (userInfo) {
     const retUser = await user.save()
     res.user = parseUserMetadata(retUser)
   } catch (e) {
+    handleParseError(e)
     res.error = e
   }
 

@@ -160,6 +160,7 @@
 <script>
 import * as TeamManage from "@/api/teamManage.js"
 import NewTeamModal from "@/components/NewTeamModal.vue"
+import { handleError } from "@/assets/errorHandler.js"
 
 export default {
   components: {
@@ -218,7 +219,7 @@ export default {
         this.pagination.count = teams.count
       } catch (error) {
         this.$buefy.toast.open({
-          message: error.message,
+          message: await handleError(error),
           type: 'is-danger',
           queue: false,
           duration: 5000

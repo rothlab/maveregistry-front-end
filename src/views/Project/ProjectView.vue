@@ -244,6 +244,7 @@
 <script>
 import * as ProjectManage from "@/api/projectManage.js"
 import * as TeamManage from "@/api/teamManage.js"
+import { handleError } from "@/assets/errorHandler.js"
 import Error from '@/components/Error.vue'
 
 export default {
@@ -312,7 +313,7 @@ export default {
 
         return project
       } catch (error) {
-        this.errorMessage = error.message
+        this.errorMessage = await handleError(error)
       }
     },
     editProject() {

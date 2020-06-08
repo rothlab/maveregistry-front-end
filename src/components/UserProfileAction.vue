@@ -22,6 +22,7 @@
 
 <script>
 import * as UserManage from "@/api/userManage.js"
+import { handleError } from "@/assets/errorHandler.js"
 
 export default {
   props: {
@@ -52,7 +53,7 @@ export default {
       } catch (error) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: error.message,
+          message: await handleError(error),
           type: 'is-danger',
           queue: false
         })
