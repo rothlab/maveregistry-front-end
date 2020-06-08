@@ -574,7 +574,7 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import * as ProjectManage from "@/api/projectManage"
+import * as ProjectManage from "@/api/projectManage.js"
 
 const variables = require("@/assets/variables.json")
 

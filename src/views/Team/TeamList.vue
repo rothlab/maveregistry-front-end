@@ -158,8 +158,8 @@
 </template>
 
 <script>
-import * as TeamManage from "@/api/teamManage"
-import NewTeamModal from "@/components/NewTeamModal"
+import * as TeamManage from "@/api/teamManage.js"
+import NewTeamModal from "@/components/NewTeamModal.vue"
 
 export default {
   components: {

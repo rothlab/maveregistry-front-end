@@ -266,11 +266,11 @@
 </template>
 
 <script>
-import * as UserManage from "@/api/userManage"
+import * as UserManage from "@/api/userManage.js"
 // eslint-disable-next-line no-unused-vars
-import * as FileManage from "@/api/fileManage"
+import * as FileManage from "@/api/fileManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import Error from "@/components/Error"
+import Error from "@/components/Error.vue"
 
 function initialState (){
   return {

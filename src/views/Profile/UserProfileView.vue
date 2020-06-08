@@ -161,9 +161,9 @@
 </template>
 
 <script>
-import * as UserManage from "@/api/userManage"
-import Error from "@/components/Error"
-import UserProfileAction from "@/components/UserProfileAction"
+import * as UserManage from "@/api/userManage.js"
+import Error from "@/components/Error.vue"
+import UserProfileAction from "@/components/UserProfileAction.vue"
 
 function initialState (){
   return {

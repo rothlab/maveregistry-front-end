@@ -362,13 +362,13 @@
 </template>
 
 <script>
-import PersonalInfo from '@/components/PersonalInfo'
-import TeamInfo from '@/components/TeamInfo'
-import ProjectActivity from '@/components/ProjectActivity'
-import Error from '@/components/Error'
+import PersonalInfo from '@/components/PersonalInfo.vue'
+import TeamInfo from '@/components/TeamInfo.vue'
+import ProjectActivity from '@/components/ProjectActivity.vue'
+import Error from '@/components/Error.vue'
 import { ValidationObserver } from 'vee-validate'
 
-import * as ProjectManage from "@/api/projectManage"
+import * as ProjectManage from "@/api/projectManage.js"
 
 // Helper functions
 // Check if a person is empty
