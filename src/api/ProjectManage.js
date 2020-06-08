@@ -214,7 +214,7 @@ export async function updateProject(payload) {
   // Update project
   project.set("leads", payload.leads)
   project.set("team", team)
-  if (collaborators.length > 0 ) project.set("collaborators", collaborators)
+  project.set("collaborators", collaborators)
   project.set("funding", payload.funding)
   project.set("activities", payload.activities)
 
