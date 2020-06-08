@@ -8,8 +8,10 @@
       class="field-margin"
       placeholder="Search by Name"
       open-on-focus
-      icon="mdil-magnify"
+      icon-pack="mdi"
+      icon="magnify"
       field="display"
+      clearable
       :data="teams"
       :loading="isLoading"
       @typing="fetchTeams"
@@ -80,6 +82,12 @@ export default {
         this.id = this.value
         const team = await this.queryTeamById(this.id)
         this.existTeamDisplay = this.formatTeam(team).display
+      }
+    },
+    async existTeamDisplay (newVal, oldVal) {
+      if (newVal === "" && newVal !== oldVal) {
+        this.id = ""
+        this.$emit("input", this.id)
       }
     }
   },

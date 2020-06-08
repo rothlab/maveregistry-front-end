@@ -7,7 +7,7 @@
     >
       <ValidationProvider
         :rules="hasRequired"
-        :immediate="!hasRequired"
+        :immediate="!isRequired || first_name !== ''"
         name="FirstName"
         v-slot="{ errors, valid }"
         class="name"
@@ -26,7 +26,7 @@
       </ValidationProvider>
       <ValidationProvider
         :rules="hasRequired"
-        :immediate="!hasRequired"
+        :immediate="!isRequired || last_name !== ''"
         name="LastName"
         v-slot="{ errors, valid }"
         class="name"
@@ -47,7 +47,7 @@
     <!-- Email -->
     <ValidationProvider
       :rules="hasRequired + '|email'"
-      :immediate="!hasRequired"
+      :immediate="!isRequired || email !== ''"
       name="Email"
       v-slot="{ errors, valid }"
     > 
@@ -72,7 +72,7 @@
     >
       <ValidationProvider
         :rules="hasRequired"
-        :immediate="!hasRequired || position !== ''"
+        :immediate="!isRequired || position !== ''"
         name="Position"
         v-slot="{ errors, valid }"
       > 
@@ -100,7 +100,7 @@
       <ValidationProvider
         v-if="position === 'Other'"
         :rules="hasRequired"
-        :immediate="!hasRequired || custom_position !== ''"
+        :immediate="!isRequired || custom_position !== ''"
         name="OtherPosition"
         class="custom-position"
         v-slot="{ errors, valid }"
