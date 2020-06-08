@@ -143,6 +143,7 @@
                   </a>
                   <span class="is-capitalized">{{ collaborator.first_name + " " + collaborator.last_name }},</span>
                   {{ collaborator.affiliation }}
+                  <br>
                 </span>
               </p>
             </div>

@@ -308,7 +308,8 @@ export default {
     top: 1.6rem
   left: 15%
   width: 70%
-  border: 0.5px solid $primary
+  height: 1px
+  background: $primary
   z-index: -1
 .step-number
   height: 5rem
@@ -321,6 +322,7 @@ export default {
   font-weight: lighter
   border-radius: 50%
   border: 1px solid $primary
+  margin-bottom: 0.5rem
 .tab-title
   padding: 1rem
 @media screen and (min-width: $break-mobile)

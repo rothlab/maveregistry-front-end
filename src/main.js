@@ -1,7 +1,6 @@
+// Import frameworks
 import Vue from 'vue'
 import App from './App.vue'
-
-// Import frameworks
 import Buefy from 'buefy'
 
 // Import plugins
@@ -10,9 +9,10 @@ import GAuth from 'vue-google-oauth2'
 import { VueReCaptcha } from 'vue-recaptcha-v3'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import * as Sentry from '@sentry/browser';
+import { Vue as VueIntegration } from '@sentry/integrations';
 
 // Import stylesheets
-// import 'buefy/dist/buefy.css'
 import '@mdi/font/css/materialdesignicons.css'
 import '@mdi/light-font/css/materialdesignicons-light.css'
 import '@fortawesome/fontawesome-free/css/brands.css'
@@ -23,7 +23,7 @@ import '@/assets/styles.sass'
 import router from './router'
 import store from './store'
 
-// Initialize frameworks
+// Initialize framework
 Vue.use(Buefy, {
   defaultIconPack: 'mdil',
 })
@@ -36,6 +36,16 @@ const gauthOption = { // Google O-Auth
 }
 Vue.config.productionTip = false
 
+// Initialize Sentry
+Sentry.init({
+  dsn: 'https://937e133d79854ca7a2301bbaa9aa8a36@o239664.ingest.sentry.io/5266396',
+  integrations: [new VueIntegration({
+    Vue,
+    attachProps: true,
+    logErrors: process.env.NODE_ENV === "development"
+  })],
+});
+
 // Inject plugins
 Vue.use(GAuth, gauthOption)
 Vue.use(VueReCaptcha, {
@@ -47,6 +57,7 @@ Vue.use(VueReCaptcha, {
 })
 Vue.use(VueAxios, axios)
 
+// Initialize a new Vue instance
 new Vue({
   router,
   store,

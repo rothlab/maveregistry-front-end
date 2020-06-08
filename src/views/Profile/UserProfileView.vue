@@ -114,7 +114,7 @@
             </div>
 
             <div class="project-content">
-              abc
+              Under Development
             </div>
           </div>
         </div>
