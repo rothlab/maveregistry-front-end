@@ -65,7 +65,7 @@
                     </b-button>
                   </div>
                   <div class="column is-9">
-                    <PersonalInfo
+                    <PersonalInfoField
                       v-model="leads[index]"
                     />
                   </div>
@@ -166,7 +166,7 @@
                     </span>
                   </div>
                   <div class="column is-9">
-                    <TeamInfo v-model="team" />
+                    <TeamInfoField v-model="team" />
                   </div>
                 </div>
               </div>
@@ -196,7 +196,7 @@
                     </b-button>
                   </div>
                   <div class="column is-9">
-                    <TeamInfo
+                    <TeamInfoField
                       v-model="collaborators[index]"
                       :is-required="false"
                       is-collaborator
@@ -297,7 +297,7 @@
                     </b-button>
                   </div>
                   <div class="column is-9">
-                    <ProjectActivity v-model="activities[index]" />
+                    <ProjectActivityField v-model="activities[index]" />
                   </div>
                 </div>
                 <!-- Add project lead -->
@@ -362,9 +362,9 @@
 </template>
 
 <script>
-import PersonalInfo from '@/components/PersonalInfo.vue'
-import TeamInfo from '@/components/TeamInfo.vue'
-import ProjectActivity from '@/components/ProjectActivity.vue'
+import PersonalInfoField from '@/components/Field/PersonalInfoField.vue'
+import TeamInfoField from '@/components/Field/TeamInfoField.vue'
+import ProjectActivityField from '@/components/Field/ProjectActivityField.vue'
 import Error from '@/components/Error.vue'
 import { ValidationObserver } from 'vee-validate'
 import { handleError } from "@/api/errorHandler.js"
@@ -378,9 +378,9 @@ function isNotEmptyPerson (person, emptyPerson) {
 
 export default {
   components: {
-    PersonalInfo,
-    TeamInfo,
-    ProjectActivity,
+    PersonalInfoField,
+    TeamInfoField,
+    ProjectActivityField,
     ValidationObserver,
     Error
   },
@@ -517,7 +517,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "@/assets/variables"
+@import "../../assets/style/variables.sass"
 
 .header-icon
   position: absolute

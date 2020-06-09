@@ -53,7 +53,7 @@
 
 <script>
 import * as TeamManage from "@/api/teamManage.js"
-import NewTeamModal from "@/components/NewTeamModal.vue"
+import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
 import { handleError } from "@/api/errorHandler.js"
 
 // Helper

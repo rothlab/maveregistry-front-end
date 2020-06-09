@@ -297,7 +297,7 @@ export default {
   computed: {
     profileImageUrl() {
       // Set url as placeholder
-      let url = require("@/assets/blank-profile.png")
+      let url = require("@/assets/image/blank-profile.png")
 
       if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
 

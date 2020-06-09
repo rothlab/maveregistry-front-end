@@ -167,7 +167,7 @@
 import * as UserManage from "@/api/userManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from "@/components/Error.vue"
-import UserProfileAction from "@/components/UserProfileAction.vue"
+import UserProfileAction from "@/components/Action/UserProfileAction.vue"
 
 function initialState (){
   return {
@@ -192,7 +192,7 @@ export default {
   computed: {
     profileImageUrl() {
       // Set url as placeholder
-      let url = require("@/assets/blank-profile.png")
+      let url = require("@/assets/image/blank-profile.png")
 
       if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
 

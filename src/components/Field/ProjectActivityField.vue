@@ -133,7 +133,7 @@
 <script>
 import { ValidationProvider } from 'vee-validate'
 
-const progressTypes = require("@/assets/variables.json").progress_type
+const progressTypes = require("@/assets/script/variables.json").progress_type
 
 export default {
   components: {

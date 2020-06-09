@@ -494,10 +494,10 @@ import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import * as ProjectManage from "@/api/projectManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
-import FollowModal from '@/components/FollowModal.vue'
-import UnfollowModal from '@/components/UnfollowModal.vue'
+import FollowModal from '@/components/Modal/FollowModal.vue'
+import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 
-const variables = require("@/assets/variables.json")
+const variables = require("@/assets/script/variables.json")
 
 export default {
   components: {
@@ -615,7 +615,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "@/assets/variables.sass"
+@import "../../assets/style/variables.sass"
 
 .action-button
   justify-content: space-between

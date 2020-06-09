@@ -65,7 +65,7 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "resetPass" */ '../views/ResetPassword.vue')
+    component: () => import(/* webpackChunkName: "reset password" */ '../views/Account/ResetPassword.vue')
   },
   {
     path: '/change_password',
@@ -73,7 +73,7 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "changePass" */ '../views/ChangePassword.vue')
+    component: () => import(/* webpackChunkName: "change password" */ '../views/Account/ChangePassword.vue')
   },
   {
     path: '/reset_password_success',
@@ -81,14 +81,14 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "resetPass" */ '../views/ResetPassword.vue'),
+    component: () => import(/* webpackChunkName: "reset password success" */ '../views/Account/ResetPassword.vue'),
     props: { showSuccess: true }
   },
   {
     path: '/callback/:method/:action',
     name: 'Callback',
     meta: { hideNav: true, hideFooter: true },
-    component: () => import(/* webpackChunkName: "callback" */ '../views/Callback.vue')
+    component: () => import(/* webpackChunkName: "callback" */ '../views/Account/Callback.vue')
   }
 ]
 

@@ -170,7 +170,7 @@
                       />
                     </b-field>
                   </ValidationProvider>
-                  <PasswordWithRevealAndValidation
+                  <PasswordField
                     v-model="loginSignupProp.password"
                   />
                   <p class="control">
@@ -305,7 +305,7 @@
                       />
                     </b-field>
                   </ValidationProvider>
-                  <PasswordWithRevealAndValidation
+                  <PasswordField
                     has-confirm
                     v-model="loginSignupProp.password"
                   />
@@ -393,7 +393,7 @@
 </template>
 
 <style lang="sass">
-@import "@/assets/bulma-customization.sass"
+@import "@/assets/style/bulma-customization.sass"
 
 .login-tab .tab-content
   padding: 1rem 0 !important
@@ -402,7 +402,7 @@
 </style>
 
 <style lang="sass" scoped>
-@import "@/assets/variables.sass"
+@import "./assets/style/variables.sass"
 
 .profile-tag
   padding-right: 0.5rem
@@ -429,13 +429,13 @@ import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import { handleError } from "@/api/errorHandler.js"
 
 // Lazy loading
-const PasswordWithRevealAndValidation = () => import('./components/PasswordWithRevealAndValidation.vue')
+const PasswordField = () => import('./components/Field/PasswordField.vue')
 
 export default {
   components: {
     ValidationProvider,
     ValidationObserver,
-    PasswordWithRevealAndValidation
+    PasswordField
   },
   async mounted () {
     // Check if an user has logged in, if so, use it
@@ -464,7 +464,7 @@ export default {
     },
     profileImageUrl() {
       // Set url as placeholder
-      let url = require("./assets/blank-profile.png")
+      let url = require("@/assets/image/blank-profile.png")
 
       if (this.user && this.user.profile_image) url = this.user.profile_image
 
