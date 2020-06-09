@@ -10,6 +10,22 @@ export const Follow = Parse.Object.extend("Follow", {
     if (!attrs.reason || attrs.reason.length <= 0) throw new Error("Follow reason is empty")
     if (!attrs.by) throw new Error("Follower is empty. Pleaes make sure you have logged in.")
   },
+  format: async function () {
+    // Fetch user
+    const user = await this.get("by").fetch()
+
+    return {
+      id: this.id,
+      type: this.get("type"),
+      by: {
+        username: user.get("username"),
+        first_name: user.get("first_name"),
+        last_name: user.get("last_name")
+      },
+      create_date: this.get("createdAt"),
+      reason: this.get("reason")
+    }
+  }
 }, {
   create: async function(attrs) {
     // An id is provided, use it as the key and check if it exists
@@ -85,4 +101,13 @@ export async function unfollow(id) {
   
   // Remove the follow object
   if (follow) await follow.destroy()
+}
+
+export async function fetchFollows(target, type) {
+  const query = new Parse.Query(Follow)
+  query.equalTo("type", type)
+  query.equalTo("target", target)
+  const follows = await query.find()
+
+  return await Promise.all(follows.map(e => e.format()))
 }

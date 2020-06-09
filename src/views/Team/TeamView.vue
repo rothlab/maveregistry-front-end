@@ -193,6 +193,7 @@
                   class="action-button"
                   icon-left="mdil-settings"
                   type="is-light"
+                  @click="isManageFollowerModalActive = true"
                 >
                   Manage <b>{{ followers.length }}</b> follower{{ followers.length > 1 ? 's' : '' }}
                 </b-button>
@@ -201,6 +202,12 @@
           </div>
         </div>
       </div>
+
+      <!-- Manage follower modal -->
+      <ManageFollowerModal
+        :active.sync="isManageFollowerModalActive"
+        :followers="followers"
+      />
     </div>
   </div>
 </template>
@@ -208,12 +215,15 @@
 <script>
 import * as TeamManage from "@/api/teamManage.js"
 import * as ProjectManage from "@/api/projectManage.js"
+import * as FollowManage from "@/api/followManage.js"
 import Error from '@/components/Error.vue'
+import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import { handleError } from '@/api/errorHandler.js'
 
 export default {
   components: {
-    Error
+    Error,
+    ManageFollowerModal
   },
   computed: {
     teamId() {
@@ -229,14 +239,13 @@ export default {
       isLoading: {
         page: false
       },
+      isManageFollowerModalActive: false,
       principalInvestigator: {},
       projects: [],
       updatedDate: new Date(),
       user: {},
       errorMessage: "",
-      followers: [
-        'abc'
-      ]
+      followers: []
     }
   },
   async mounted() {
@@ -246,8 +255,10 @@ export default {
     const team = await this.fetchTeam()
 
     // Fetch projects that the team has
-    // eslint-disable-next-line no-unused-vars
-    const projects = await this.fetchProjects(team.id)
+    await this.fetchProjects(team.id)
+
+    // Fetch team followers
+    await this.fetchFollowers(team.id)
 
     this.isLoading.page = false
   },
@@ -286,7 +297,13 @@ export default {
         this.projects = await ProjectManage.fetchProjectByTeamId(teamId)
       } catch (error) {
         this.errorMessage = await handleError(error)
-        return
+      }
+    },
+    async fetchFollowers(teamId) {
+      try {
+        this.followers = await FollowManage.fetchFollows(teamId, "team")
+      } catch (error) {
+        this.errorMessage = await handleError(error)
       }
     }
   }
