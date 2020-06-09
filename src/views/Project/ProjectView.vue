@@ -148,7 +148,7 @@
             </div>
 
             <hr>
-            
+
             <div
               class="project-header"
               v-if="hasActivity"
@@ -323,17 +323,3 @@ export default {
   }
 }
 </script>
-
-<style lang="sass" scoped>
-.project-header
-  margin-bottom: 0.5rem
-.no-project
-  border: 1px dashed #b5b5b5
-  border-radius: 6px
-  height: 100%
-  display: flex
-  justify-content: center
-  .info-icon
-    margin: 2rem
-    display: flex
-</style>

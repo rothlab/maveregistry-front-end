@@ -109,7 +109,7 @@ export const Project = Parse.Object.extend("Project", {
     
     // Fetch collaborators
     const collaborators = this.get("collaborators")
-
+    
     // Construct return object
     let ret = {
       id: this.id,
@@ -125,12 +125,16 @@ export const Project = Parse.Object.extend("Project", {
         first_name: user.get("first_name"),
         last_name: user.get("last_name")
       },
-      update_date: this.get("updatedAt")
+      update_date: this.get("updatedAt"),
     }
 
     // Check if followed by the current user
     const followStatus = await getFollowStatus(this, "project", Parse.User.current())
     ret.follow_status = followStatus
+    
+    // Add recemt activity
+    const recentActivity = findRecentActivity(this.get("activities"))
+    if (recentActivity) ret.activities = recentActivity
     
     // Access project progress detail
     if (detail) {
@@ -210,7 +214,8 @@ export async function fetchProject(id, detail = false) {
   return project.format(detail)
 }
 
-export async function fetchProjectByTeam(team) {
+export async function fetchProjectByTeamId(id) {
+  const team = await new Team.fetchById(id)
   const query = new Parse.Query(Project)
   query.equalTo("team", team)
   const projects = await query.find()

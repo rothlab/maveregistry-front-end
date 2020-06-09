@@ -1,6 +1,6 @@
 import { Parse } from "./parseConnect.js"
 import { getFollowStatus } from "./followManage.js"
-import { fetchProjectByTeam } from "./projectManage.js"
+import { fetchProjectByTeamId } from "./projectManage.js"
 
 // Define team object
 export const Team = Parse.Object.extend("Team", {
@@ -31,12 +31,13 @@ export const Team = Parse.Object.extend("Team", {
         username: user.get("username"),
         first_name: user.get("first_name"),
         last_name: user.get("last_name")
-      }
+      },
+      update_date: this.get("updatedAt")
     }
 
     if (detail) {
       // Fetch Project
-      const projects = await fetchProjectByTeam(this)
+      const projects = await fetchProjectByTeamId(this.id)
       ret.projects = projects
     }
 
@@ -79,6 +80,7 @@ export const Team = Parse.Object.extend("Team", {
     return await query.get(id)
   }
 })
+Parse.Object.registerSubclass('Team', Team);
 
 export async function addTeam(teamInfo) {
   // Validate if logged in
