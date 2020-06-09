@@ -236,16 +236,22 @@
                     </router-link>
                     <!-- Followed status -->
                     <b-tag
-                      v-if="team.has_followed"
+                      v-if="team.follow_status.id"
                       size="is-medium"
-                      class="is-clickable has-background-primary"
+                      class="is-clickable"
+                      :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-primary': team.follow_status.status === 'yes' }"
+                      @click.native="confirmUnfollow(team.follow_status.id, 'team')"
                     >
-                      <b-icon
-                        type="is-white"
-                        custom-size="mdi-16px"
-                        pack="mdi"
-                        icon="bell"
-                      />
+                      <b-tooltip
+                        :label="team.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Team'"
+                        type="is-dark"
+                      >
+                        <b-icon
+                          :type="team.follow_status.status === 'yes' ? 'is-white' : ''"
+                          custom-size="mdi-16px"
+                          icon="mdil-bell-off"
+                        />
+                      </b-tooltip>
                     </b-tag>
                     <!-- Unfollowed status -->
                     <b-tag

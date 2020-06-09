@@ -1,6 +1,4 @@
 import { Parse } from "./parseConnect.js"
-import { Project } from "./projectManage.js"
-// import { Team } from "./teamManage.js"
 
 // Define follow object
 export const Follow = Parse.Object.extend("Follow", {
@@ -66,13 +64,12 @@ export async function getFollowStatus(target, type, by) {
   return ret
 }
 
-export async function followProject(id, reason) {
+export async function follow(target, type, reason) {
   const currentUser = Parse.User.current()
-  const project = await new Project.fetchById(id)
   
   let follow = await new Follow.create({
-    type: "project",
-    target: project,
+    target: target,
+    type: type,
     reason: reason,
     by: currentUser
   })

@@ -37,9 +37,10 @@ const Target = Parse.Object.extend("Target", {
     const teamId = projects.map(e => e.get("team")).filter(Boolean).filter(uniqueById)
     const teams = await Promise.all(teamId.map(e => e.fetch()))
 
-    // Get follow status
-    const followStatus = await Promise.all(projects.map(e => getFollowStatus(e, "project", Parse.User.current())))
-
+    // Get follow status for projects and teams
+    const projectFollowStatus = await Promise.all(projects.map(e => getFollowStatus(e.id, "project", Parse.User.current())))
+    const teamFollowStatus = await Promise.all(teamId.map(e => getFollowStatus(e.id, "team", Parse.User.current())))
+    
     return {
       id: this.id,
       name: this.get("name"),
@@ -52,7 +53,7 @@ const Target = Parse.Object.extend("Target", {
         let ret = {
           id: e.id,
           features: e.get("features"),
-          follow_status: followStatus[i]
+          follow_status: projectFollowStatus[i]
         }
 
         if (funding && funding.open_for_funding) ret.funding = funding.open_for_funding
@@ -61,10 +62,11 @@ const Target = Parse.Object.extend("Target", {
 
         return ret
       }),
-      teams: teams.map(e => {
+      teams: teams.map((e, i) => {
         return {
           id: e.id,
-          name: e.get("first_name").substring(0, 1) + ' ' + e.get("last_name")
+          name: e.get("first_name").substring(0, 1) + ' ' + e.get("last_name"),
+          follow_status: teamFollowStatus[i]
         }
       })
     }
@@ -122,13 +124,12 @@ export const Project = Parse.Object.extend("Project", {
         first_name: user.get("first_name"),
         last_name: user.get("last_name")
       },
-      has_followed: 'no',
       update_date: this.get("updatedAt")
     }
 
     // Check if followed by the current user
-    // eslint-disable-next-line no-unused-vars
-    const followStatus = await getFollowStatus(this, Parse.User.current())
+    const followStatus = getFollowStatus(this, "project", Parse.User.current())
+    ret.follow_status = followStatus
     
     // Access project progress detail
     if (detail) {

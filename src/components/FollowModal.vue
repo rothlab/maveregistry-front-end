@@ -87,15 +87,7 @@ export default {
       this.isLoading = true
 
       try {
-        switch (this.type) {
-          case "project":
-            await FollowManage.followProject(this.source, this.request)
-            break;
-          case "team":
-            break;
-          default:
-            throw new Error("Invalid follow type.")
-        }
+        FollowManage.follow(this.source, this.type, this.request)
       } catch (error) {
         this.$buefy.toast.open({
           message: await handleError(error),

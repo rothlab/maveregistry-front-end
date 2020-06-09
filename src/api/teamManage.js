@@ -50,6 +50,11 @@ export const Team = Parse.Object.extend("Team", {
     
     // Create a new team object
     return new Team(attrs)
+  },
+  fetchById: async function(id) {
+    const query = new Parse.Query(Team)
+
+    return await query.get(id)
   }
 })
 
@@ -106,7 +111,7 @@ export async function queryByName(name) {
 }
 
 export async function queryById(id) {
-  const team = await new Team.create({ id: id })
+  const team = await new Team.fetchById(id)
   
   return team.format()
 }
