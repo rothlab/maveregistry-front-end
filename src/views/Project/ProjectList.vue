@@ -150,26 +150,38 @@
                   </div>
                   <div class="card-content">
                     <div class="content">
-                      <p>
-                        <span class="has-text-primary">Project ID:</span>
-                        <router-link
-                          :to="{ path: `/project/${project.id}`}"
-                          target="_blank"
-                        >
-                          {{ project.id }}
-                        </router-link>
-                        <br>
-                        <span class="has-text-primary">
-                          Feature{{ project.features.length > 1 ? 's:' : ':' }}
-                        </span>
-                        {{ project.features.join(",") }}
-                        <br>
-                        <span
-                          v-if="project.description"
-                          class="has-text-primary"
-                        >Progress description:</span>
-                        {{ project.description }}
-                      </p>
+                      <div class="level is-mobile is-paddingless">
+                        <div class="level-left">
+                          <p>
+                            <span class="has-text-primary">Project ID:</span>
+                            <router-link
+                              :to="{ path: `/project/${project.id}`}"
+                              target="_blank"
+                            >
+                              {{ project.id }}
+                            </router-link>
+                            <br>
+                            <span class="has-text-primary">
+                              Feature{{ project.features.length > 1 ? 's:' : ':' }}
+                            </span>
+                            {{ project.features.join(",") }}
+                            <br>
+                            <span
+                              v-if="project.description"
+                              class="has-text-primary"
+                            >Progress description:</span>
+                            {{ project.description }}
+                          </p>
+                        </div>
+                        <div class="level-right">
+                          <b-tooltip
+                            label="Follow Project"
+                            type="is-dark"
+                          >
+                            <a @click="confirmFollow(project.id, 'project')"><b-icon icon="mdil-bell" /></a>
+                          </b-tooltip>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </b-collapse>
@@ -212,7 +224,6 @@
                       v-if="team.has_followed"
                       size="is-medium"
                       class="is-clickable has-background-primary"
-                      @click.native="confirmUnfollowTeam(team, props.row, props.index)"
                     >
                       <b-icon
                         type="is-white"
@@ -226,7 +237,6 @@
                       v-else
                       size="is-medium"
                       class="is-clickable has-background-grey-lighter"
-                      @click.native="confirmFollowTeam(team, props.row, props.index)"
                     >
                       <b-icon
                         icon="mdil-bell"
@@ -289,142 +299,13 @@
       </div>
 
       <!-- Follow up modal -->
-      <b-modal
+      <FollowModal
         :active.sync="isFollowModelActive"
-        has-modal-card
-        :can-cancel="['escape', 'outside']"
-        @close="cleanupFollow()"
-      >
-        <div
-          class="modal-card"
-          v-if="followProp"
-        >
-          <header class="modal-card-head">
-            <p class="modal-card-title">
-              <span class="is-capitalized">Follow {{ followProp.team.name }}</span>
-            </p>
-            <button
-              class="delete"
-              aria-label="close"
-              @click="isFollowModelActive = false; cleanupFollow();"
-            />
-          </header>
-          <section class="modal-card-body">
-            <div class="content">
-              <span class="is-size-5 has-text-weight-bold">
-                About the Target 
-              </span>
-
-              <div class="level is-mobile is-marginless project-content">
-                <div class="level-item">
-                  <span>
-                    <b>Name</b><br>
-                    {{ followProp.target.name }}
-                  </span>
-                </div>
-                <div class="level-item">
-                  <span>
-                    <b>Type</b><br>
-                    <span class="is-capitalized">{{ followProp.target.type }}</span>
-                  </span>
-                </div>
-                <div class="level-item">
-                  <span>
-                    <b>Organism</b><br>
-                    <span class="is-italic">{{ followProp.target.organism }}</span> 
-                  </span>
-                </div>
-              </div>
-
-              <hr>
-
-              <b-field label="Please briefly summarize your interest in following this target and team.">
-                <b-input
-                  v-model="followRequest"
-                  maxlength="300"
-                  type="textarea"
-                  placeholder="Maximum 300 characters."
-                  required
-                />
-              </b-field>
-            </div>
-          </section>
-          <footer class="modal-card-foot">
-            <b-button
-              expanded
-              :disabled="followRequest.length <= 0"
-              :loading="isLoading.follow_unfollow"
-              type="is-primary"
-              @click="followTeam(followProp.team, followProp.target, followProp.project_index, followRequest)"
-            >
-              Submit Request
-            </b-button>
-          </footer>
-        </div>
-      </b-modal>
+        :source="followProp.source"
+        :type="followProp.type"
+      />
 
       <!-- Unfollow modal -->
-      <b-modal
-        :active.sync="isUnfollowModelActive"
-        has-modal-card
-        :can-cancel="['escape', 'outside']"
-        @close="cleanupFollow()"
-      >
-        <div
-          class="modal-card"
-          v-if="followProp"
-        >
-          <header class="modal-card-head">
-            <p class="modal-card-title">
-              <span>Unfollow target?</span>
-            </p>
-            <button
-              class="delete"
-              aria-label="close"
-              @click="isUnfollowModelActive = false; cleanupFollow();"
-            />
-          </header>
-          <section class="modal-card-body">
-            <div class="container">
-              <div class="media">
-                <div class="media-left">
-                  <b-icon
-                    pack="mdi"
-                    icon="alert-circle"
-                    size="is-large"
-                    type="is-warning"
-                  />
-                </div>
-                <div class="media-content">
-                  <div class="content">
-                    <p>
-                      Are you sure you want to unfollow {{ followProp.team.name }} on {{ followProp.target.name }}? <br>
-                      Once unfollowed, you will need their permission to follow again.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-          <footer class="modal-card-foot has-hright">
-            <div class="buttons">
-              <b-button
-                @click="isUnfollowModelActive = false; cleanupFollow();"
-              >
-                Cancel
-              </b-button>
-              <b-button
-                :loading="isLoading.follow_unfollow"
-                type="is-primary"
-                outlined
-                @click="unfollowTeam(followProp.team, followProp.target, followProp.project_index)"
-              >
-                Unfollow
-              </b-button>
-            </div>
-          </footer>
-        </div>
-      </b-modal>
 
       <!-- New project modal -->
       <b-modal
@@ -582,6 +463,7 @@ import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import * as ProjectManage from "@/api/projectManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
+import FollowModal from '@/components/FollowModal.vue'
 
 const variables = require("@/assets/variables.json")
 
@@ -589,7 +471,8 @@ export default {
   components: {
     ValidationProvider,
     ValidationObserver,
-    Error
+    Error,
+    FollowModal
   },
   data () {
     return {
@@ -605,7 +488,10 @@ export default {
       progressIcons: variables.progress_type_icons,
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
-      followProp: null,
+      followProp: {
+        source: "",
+        type: ""
+      },
       followRequest: "",
       isUnfollowModelActive: false,
       // Register new activity related parameters
@@ -628,36 +514,10 @@ export default {
     await this.fetchTargets()
   },
   methods: {
-    confirmFollowTeam(team, target, index) {
+    confirmFollow(id, type) {
+      this.followProp.source = id
+      this.followProp.type = type
       this.isFollowModelActive = true
-      this.followProp = {
-        team: team,
-        target: target,
-        project_index: index
-      }
-    },
-    async followTeam(team, target, index, request) {
-      // Loading
-      this.isLoading.follow_unfollow = true
-
-      //TODO: implement API to accept follow request
-
-      // Handle UI changes
-      this.isLoading.follow_unfollow = false
-      this.isFollowModelActive = false
-      this.cleanupFollow()
-
-      // Update team
-      // this.projects[index].teams = response.teams
-
-      // Show status update
-      this.$buefy.toast.open({
-        message: `Followed successfully.`,
-        type: "is-success",
-        duration: 5000
-      })
-
-      request
     },
     confirmUnfollowTeam(team, target, index) {
       this.isUnfollowModelActive = true
@@ -693,7 +553,6 @@ export default {
       // Handle UI changes
       this.isLoading.follow_unfollow = false
       this.isUnfollowModelActive = false
-      this.cleanupFollow()
 
       // Update team
       this.projects[index].teams = response.teams
@@ -703,10 +562,6 @@ export default {
         message: `Unfollowed successfully.`,
         type: "is-success"
       })
-    },
-    cleanupFollow() {
-      this.followProp = null
-      this.followRequest = ""
     },
     prepareNewActivity(target) {
       this.newProjectProp.type = target.type

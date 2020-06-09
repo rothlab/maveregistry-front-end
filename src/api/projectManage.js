@@ -88,7 +88,7 @@ Parse.Object.registerSubclass('Target', Target);
 
 // Define Project object
 const variables = require("@/assets/variables.json")
-const Project = Parse.Object.extend("Project", {
+export const Project = Parse.Object.extend("Project", {
   initialize: function (attrs) {
     // Validate
     if (!attrs) return
