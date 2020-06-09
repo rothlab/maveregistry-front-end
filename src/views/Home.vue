@@ -37,7 +37,7 @@
                         tag="router-link"
                         to="/teams"
                       >
-                        Team Progress
+                        Team Summary
                       </b-button>
                     </div>
                   </div>

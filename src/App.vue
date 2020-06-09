@@ -29,7 +29,7 @@
           tag="router-link"
           :to="{ path: '/teams' }"
         >
-          Team Progress
+          Team Summary
         </b-navbar-item>
         <b-navbar-item
           tag="router-link"
