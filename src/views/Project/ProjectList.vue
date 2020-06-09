@@ -174,11 +174,26 @@
                           </p>
                         </div>
                         <div class="level-right">
+                          <!-- If not followed, show follow icon -->
                           <b-tooltip
                             label="Follow Project"
                             type="is-dark"
+                            v-if="!project.follow_status.id"
                           >
                             <a @click="confirmFollow(project.id, 'project')"><b-icon icon="mdil-bell" /></a>
+                          </b-tooltip>
+                          <!-- If pending, show pending status and unfollow-->
+                          <b-tooltip
+                            :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Project'"
+                            type="is-dark"
+                            v-else
+                          >
+                            <a @click="confirmUnfollow(project.follow_status.id, 'project')">
+                              <b-icon
+                                icon="mdil-bell-off"
+                                type="is-danger"
+                              />
+                            </a>
                           </b-tooltip>
                         </div>
                       </div>
@@ -237,6 +252,7 @@
                       v-else
                       size="is-medium"
                       class="is-clickable has-background-grey-lighter"
+                      @click.native="confirmFollow(team.id, 'team')"
                     >
                       <b-icon
                         icon="mdil-bell"
@@ -303,9 +319,16 @@
         :active.sync="isFollowModelActive"
         :source="followProp.source"
         :type="followProp.type"
+        @change="fetchTargets()"
       />
 
       <!-- Unfollow modal -->
+      <UnfollowModal
+        :active.sync="isUnfollowModelActive"
+        :follow="followProp.follow"
+        :type="followProp.type"
+        @change="fetchTargets()"
+      />
 
       <!-- New project modal -->
       <b-modal
@@ -464,6 +487,7 @@ import * as ProjectManage from "@/api/projectManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import FollowModal from '@/components/FollowModal.vue'
+import UnfollowModal from '@/components/UnfollowModal.vue'
 
 const variables = require("@/assets/variables.json")
 
@@ -472,7 +496,8 @@ export default {
     ValidationProvider,
     ValidationObserver,
     Error,
-    FollowModal
+    FollowModal,
+    UnfollowModal
   },
   data () {
     return {
@@ -490,9 +515,9 @@ export default {
       isFollowModelActive: false,
       followProp: {
         source: "",
+        follow: "",
         type: ""
       },
-      followRequest: "",
       isUnfollowModelActive: false,
       // Register new activity related parameters
       isNewActivityModalActive: false,
@@ -519,49 +544,10 @@ export default {
       this.followProp.type = type
       this.isFollowModelActive = true
     },
-    confirmUnfollowTeam(team, target, index) {
+    confirmUnfollow(id, type) {
+      this.followProp.follow = id
+      this.followProp.type = type
       this.isUnfollowModelActive = true
-      this.followProp = {
-        team: team,
-        target: target, 
-        project_index: index
-      }
-    },
-    async unfollowTeam(team, target, index) {
-      // Loading
-      this.isLoading.follow_unfollow = true
-
-      // TODO: Implement API to accept unfollow request
-
-      //TODO: remove debug response
-      const response = {
-        status: "success",
-        teams: [
-          {
-            id: "team_1",
-            name: "Roth FP",
-            has_followed: false,
-          },
-          {
-            id: "team_2",
-            name: "Smith J",
-            has_followed: false,
-          },
-        ]
-      }
-
-      // Handle UI changes
-      this.isLoading.follow_unfollow = false
-      this.isUnfollowModelActive = false
-
-      // Update team
-      this.projects[index].teams = response.teams
-
-      // Show status update
-      this.$buefy.toast.open({
-        message: `Unfollowed successfully.`,
-        type: "is-success"
-      })
     },
     prepareNewActivity(target) {
       this.newProjectProp.type = target.type
@@ -646,5 +632,4 @@ export default {
   &:first-child
     border-top-right-radius: 0
     border-bottom-right-radius: 0
-
 </style>

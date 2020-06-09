@@ -3,7 +3,7 @@ import { Project } from "./projectManage.js"
 // import { Team } from "./teamManage.js"
 
 // Define follow object
-const Follow = Parse.Object.extend("Follow", {
+export const Follow = Parse.Object.extend("Follow", {
   initialize: function (attrs) {
     // Validate attrs
     if (!attrs) return
@@ -35,9 +35,35 @@ const Follow = Parse.Object.extend("Follow", {
 Parse.Object.registerSubclass('Follow', Follow);
 
 export async function queryFollowById(id) {
-  const follow = await Follow.create({ id: id })
+  const query = new Parse.Query(Follow)
+  query.equalTo("objectId", id)
+  const follow = await query.find()
 
-  return follow
+  return follow[0]
+}
+
+export async function getFollowStatus(target, type, by) {
+  // Fetch follow object
+  const query = new Parse.Query(Follow)
+  query.equalTo("type", type)
+  query.equalTo("target", target)
+  query.equalTo("by", by)
+  let follow = await query.find()
+
+  let ret = {
+    id: undefined,
+    status: "no"
+  }
+  
+  // If no result, just return ret
+  if (follow && follow.length < 1) return ret
+
+  follow = follow[0]
+  // If follow object does exist, but is not approved
+  ret.id = follow.id
+  ret.status = follow.get("is_approved") ? "yes" : "pending"
+
+  return ret
 }
 
 export async function followProject(id, reason) {
@@ -55,4 +81,11 @@ export async function followProject(id, reason) {
   if (!follow.id) follow = await follow.save()
 
   return follow
+}
+
+export async function unfollow(id) {
+  const follow = await queryFollowById(id)
+  
+  // Remove the follow object
+  if (follow) await follow.destroy()
 }

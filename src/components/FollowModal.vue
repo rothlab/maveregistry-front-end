@@ -7,7 +7,7 @@
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">
-          <span class="is-capitalized">Follow Project</span>
+          <span class="is-capitalized">Follow {{ type }}</span>
         </p>
         <button
           class="delete"
@@ -17,7 +17,7 @@
       </header>
       <section class="modal-card-body">
         <div class="content">
-          <b-field label="Please briefly summarize your interest in following this project.">
+          <b-field :label="`Please briefly summarize your interest in following this ${type}.`">
             <b-input
               v-model="request"
               maxlength="300"
@@ -115,6 +115,8 @@ export default {
         type: "is-success",
         duration: 5000
       })
+
+      this.$emit("change")
     }
   }
 }

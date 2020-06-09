@@ -1,5 +1,6 @@
 import { Parse } from "./parseConnect.js"
 import { Team } from "./teamManage.js"
+import { getFollowStatus } from "./followManage.js"
 
 // Helper function
 // Find unqiue entries
@@ -36,18 +37,22 @@ const Target = Parse.Object.extend("Target", {
     const teamId = projects.map(e => e.get("team")).filter(Boolean).filter(uniqueById)
     const teams = await Promise.all(teamId.map(e => e.fetch()))
 
+    // Get follow status
+    const followStatus = await Promise.all(projects.map(e => getFollowStatus(e, "project", Parse.User.current())))
+
     return {
       id: this.id,
       name: this.get("name"),
       type: this.get("type"),
       organism: this.get("organism"),
-      projects: projects.map(e => {
+      projects: projects.map((e, i) => {
         const recentActivity = findRecentActivity(e.get("activities"))
         const funding = e.get("funding")
 
         let ret = {
           id: e.id,
-          features: e.get("features")
+          features: e.get("features"),
+          follow_status: followStatus[i]
         }
 
         if (funding && funding.open_for_funding) ret.funding = funding.open_for_funding
@@ -117,9 +122,15 @@ export const Project = Parse.Object.extend("Project", {
         first_name: user.get("first_name"),
         last_name: user.get("last_name")
       },
+      has_followed: 'no',
       update_date: this.get("updatedAt")
     }
 
+    // Check if followed by the current user
+    // eslint-disable-next-line no-unused-vars
+    const followStatus = await getFollowStatus(this, Parse.User.current())
+    
+    // Access project progress detail
     if (detail) {
       const team = this.get("team")
 
