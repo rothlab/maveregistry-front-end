@@ -16,6 +16,9 @@ export const Team = Parse.Object.extend("Team", {
     // Fetch follow status
     const followStatus = await getFollowStatus(this.id, "team", Parse.User.current())
 
+    // Fetch creator
+    const user = await this.get("creator").fetch()
+
     let ret = {
       id: this.id,
       first_name: this.get("first_name"),
@@ -23,7 +26,12 @@ export const Team = Parse.Object.extend("Team", {
       email: this.get("email"),
       affiliation: this.get("affiliation"),
       website: this.get("website"),
-      follow_status: followStatus
+      follow_status: followStatus,
+      user: {
+        username: user.get("username"),
+        first_name: user.get("first_name"),
+        last_name: user.get("last_name")
+      }
     }
 
     if (detail) {

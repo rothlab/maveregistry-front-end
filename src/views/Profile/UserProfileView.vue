@@ -21,7 +21,6 @@
                 icon-left="mdil-pencil"
                 type="is-primary"
                 size="is-medium"
-                outlined
                 @click="editProject"
               >
                 Edit

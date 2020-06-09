@@ -37,7 +37,7 @@
                         tag="router-link"
                         to="/teams"
                       >
-                        Team Summary
+                        View Teams
                       </b-button>
                     </div>
                   </div>

@@ -8,7 +8,7 @@
             <div class="level-left">
               <div class="content">
                 <p class="is-size-3 has-text-weight-medium">
-                  Team Summary
+                  Teams
                 </p>
               </div>
             </div>
@@ -80,19 +80,19 @@
                 <div class="level-right">
                   <!-- Email link -->
                   <a
-                    v-if="props.row.email"
-                    :href="`mailto:${props.row.email}`"
-                  >
-                    <b-icon icon="mdil-email" />
-                  </a>
-
-                  <!-- Website icon -->
-                  <a
                     v-if="props.row.website"
                     :href="props.row.website"
                     target="_blank"
                   >
                     <b-icon icon="mdil-link" />
+                  </a>
+
+                  <!-- Website icon -->
+                  <a
+                    v-if="props.row.email"
+                    :href="`mailto:${props.row.email}`"
+                  >
+                    <b-icon icon="mdil-email" />
                   </a>
                 </div>
               </div>
