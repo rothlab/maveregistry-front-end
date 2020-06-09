@@ -1,4 +1,5 @@
 import { Parse } from "./parseConnect.js"
+import { getFollowStatus } from "./followManage.js"
 
 // Define team object
 export const Team = Parse.Object.extend("Team", {
@@ -10,7 +11,9 @@ export const Team = Parse.Object.extend("Team", {
     if (attrs.email === "") throw new Error("Principal Investigator email is empty")
     if (attrs.affiliation === "") throw new Error("Principal Investigator affiliation is empty")
   },
-  format: function () {
+  format: async function () {
+    const followStatus = await getFollowStatus(this.id, "team", Parse.User.current())
+
     return {
       id: this.id,
       first_name: this.get("first_name"),
@@ -18,6 +21,7 @@ export const Team = Parse.Object.extend("Team", {
       email: this.get("email"),
       affiliation: this.get("affiliation"),
       website: this.get("website"),
+      follow_status: followStatus
     }
   }
 }, {
@@ -88,7 +92,7 @@ export async function fetchTeams(limit, skip) {
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
   let teams = await query.find()
-  teams.results = teams.results.map(e => e.format()) // Format targets
+  teams.results = await Promise.all(teams.results.map(e => e.format())) // Format targets
   
   // Format and return
   return teams

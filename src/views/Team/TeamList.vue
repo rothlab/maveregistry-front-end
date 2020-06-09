@@ -137,11 +137,18 @@
             >
               <div class="action-button is-flex">
                 <b-button
-                  icon-left="mdil-rss"
-                  @click="prepareNewActivity(props.row); isNewActivityModalActive = true"
-                >
-                  Follow Team
-                </b-button>
+                  v-if="props.row.follow_status.id"
+                  icon-left="mdil-bell-off"
+                  :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-primary'"
+                  @click="confirmUnfollow(props.row.follow_status.id)"
+                  @change="fetchTeams()"
+                />
+                <b-button
+                  v-else
+                  icon-left="mdil-bell"
+                  @click="confirmFollow(props.row.id)"
+                  @change="fetchTeams()"
+                />
               </div>
             </b-table-column>
           </template>
@@ -154,51 +161,57 @@
       :active.sync="isNewTeamModalActive"
       @change="fetchTeams"
     />
+
+    <!-- Follow Team Modal -->
+    <FollowModal
+      :active.sync="isFollowModelActive"
+      :source="followProp.source"
+      :type="followProp.type"
+      @change="fetchTeams()"
+    />
+
+    <!-- Unfollow Team Modal -->
+    <UnfollowModal
+      :active.sync="isUnfollowModelActive"
+      :follow="followProp.follow"
+      :type="followProp.type"
+      @change="fetchTeams()"
+    />
   </div>
 </template>
 
 <script>
 import * as TeamManage from "@/api/teamManage.js"
 import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
+import FollowModal from '@/components/Modal/FollowModal.vue'
+import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import { handleError } from "@/api/errorHandler.js"
 
 export default {
   components: {
-    NewTeamModal
+    NewTeamModal,
+    FollowModal,
+    UnfollowModal
   },
   data() {
     return {
       isNewTeamModalActive: false,
+      isFollowModelActive: false,
+      isUnfollowModelActive: false,
       isLoading: {
         fetch_team: false,
         new_team: false
       },
-      teams: [
-        {
-          id: "123",
-          first_name: "Fritz",
-          last_name: "Roth",
-          affiliation: "University of Toronto",
-          projects: [
-            {
-              id: "123",
-              name: "CHEK2",
-              type: "kk",
-              open_for_funding: true
-            },
-            {
-              id: "1234",
-              name: "SDHB",
-              type: "kkk",
-              open_for_funding: false
-            }
-          ]
-        }
-      ],
+      teams: [],
       pagination: {
         count: 0,
         limit: 10,
         skip: 0
+      },
+      followProp: {
+        source: "",
+        follow: "",
+        type: "team"
       },
     }
   },
@@ -206,6 +219,14 @@ export default {
     await this.fetchTeams()
   },
   methods: {
+    confirmFollow(id) {
+      this.followProp.source = id
+      this.isFollowModelActive = true
+    },
+    confirmUnfollow(id) {
+      this.followProp.follow = id
+      this.isUnfollowModelActive = true
+    },
     async fetchTeams(limit = 10, skip = 0) {
       // Loading
       this.isLoading.fetch_team = true
