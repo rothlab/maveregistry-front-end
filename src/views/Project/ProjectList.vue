@@ -191,7 +191,9 @@
                             <a @click="confirmUnfollow(project.follow_status.id, 'project')">
                               <b-icon
                                 icon="mdil-bell-off"
-                                type="is-danger"
+                                class="circle-icon"
+                                :class="{ 'has-background-warning': project.follow_status.status === 'pending', 'has-background-primary': project.follow_status.status === 'yes' }"
+                                :type="project.follow_status.status === 'yes' ? 'is-white' : 'is-dark'"
                               />
                             </a>
                           </b-tooltip>
