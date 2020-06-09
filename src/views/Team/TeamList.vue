@@ -72,9 +72,30 @@
               field="principal_investigator"
               label="Principal Investigaor"
             >
-              <span class="is-capitalized">
-                {{ props.row.first_name + ' ' + props.row.last_name }}
-              </span>
+              <div class="level is-mobile is-paddingless">
+                <div class="level-left is-capitalized">
+                  {{ props.row.first_name + ' ' + props.row.last_name }}
+                </div>
+
+                <div class="level-right">
+                  <!-- Email link -->
+                  <a
+                    v-if="props.row.email"
+                    :href="`mailto:${props.row.email}`"
+                  >
+                    <b-icon icon="mdil-email" />
+                  </a>
+
+                  <!-- Website icon -->
+                  <a
+                    v-if="props.row.website"
+                    :href="props.row.website"
+                    target="_blank"
+                  >
+                    <b-icon icon="mdil-link" />
+                  </a>
+                </div>
+              </div>
             </b-table-column>
 
             <!-- Affiliation -->
@@ -88,7 +109,7 @@
             <!-- Project Progress -->
             <b-table-column
               field="progress"
-              label="Project Progress"
+              label="Project"
             >
               <div class="has-text-left">
                 <b-collapse
@@ -108,7 +129,8 @@
                         :to="{ path: `/project/${project.id}`}"
                         target="_blank"
                       >
-                        {{ project.name + ": " + project.type }}
+                        <b-icon icon="mdil-link" />
+                        {{ project.target.name }} ({{ project.target.type }}): {{ project.features.join(",") }}
                       </router-link>
                     </div>
                     
@@ -133,7 +155,7 @@
             <b-table-column
               field="action"
               label="Action"
-              width="8vw"
+              width="5vw"
             >
               <div class="action-button is-flex">
                 <b-button
@@ -142,13 +164,26 @@
                   :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-primary'"
                   @click="confirmUnfollow(props.row.follow_status.id)"
                   @change="fetchTeams()"
-                />
+                  expanded
+                >
+                  <b-tooltip
+                    v-if="props.row.follow_status.status === 'pending'"
+                    label="Pending Approval"
+                    type="is-dark"
+                  >
+                    Unfollow
+                  </b-tooltip>
+                  <span v-else>Unfollow</span>
+                </b-button>
                 <b-button
                   v-else
                   icon-left="mdil-bell"
                   @click="confirmFollow(props.row.id)"
                   @change="fetchTeams()"
-                />
+                  expanded
+                >
+                  Follow
+                </b-button>
               </div>
             </b-table-column>
           </template>
