@@ -147,6 +147,8 @@
               </p>
             </div>
 
+            <hr>
+            
             <div
               class="project-header"
               v-if="hasActivity"
@@ -273,7 +275,7 @@ export default {
       return this.$route.params.id
     },
     hasPeople() {
-      return this.leads.length > 0 && this.team && this.collaborators.length > 0
+      return this.leads.length > 0 && this.team
     },
     hasActivity() {
       return this.activities.length > 0
