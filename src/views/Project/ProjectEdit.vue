@@ -503,7 +503,6 @@ export default {
           type: 'is-danger',
           queue: false
         })
-        this.isLoading.submit = false
         return
       } finally {
         this.isLoading.submit = false

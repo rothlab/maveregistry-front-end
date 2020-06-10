@@ -9,6 +9,7 @@
         name="FirstName"
         v-slot="{ errors, valid }"
         class="name"
+        :immediate="firstName !== ''"
       >
         <b-field
           :message="errors"
@@ -28,6 +29,7 @@
         name="LastName"
         v-slot="{ errors, valid }"
         class="name"
+        :immediate="lastName !== ''"
       >
         <b-field
           :message="errors"
@@ -49,6 +51,7 @@
       rules="required|email"
       name="Email"
       v-slot="{ errors, valid }"
+      :immediate="email !== ''"
     > 
       <b-field
         :message="errors"
@@ -71,6 +74,7 @@
       rules="required"
       name="Affiliation"
       v-slot="{ errors, valid }"
+      :immediate="affiliation !== ''"
     > 
       <b-field
         :message="errors"

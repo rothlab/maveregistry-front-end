@@ -105,6 +105,18 @@ export async function addTeam(teamInfo) {
   return await team.save()
 }
 
+export async function updateTeam(id, payload) {
+  const team = await new Team.fetchById(id)
+
+  // Update
+  team.set("first_name", payload.first_name)
+  team.set("last_name", payload.last_name)
+  team.set("email", payload.email)
+  team.set("affiliation", payload.affiliation)
+  if (payload.website) team.set("website", payload.website)
+  
+  return await team.save()
+}
 export async function fetchTeams(limit, skip) {
   // Fetch teams, applying pagination
   const query = new Parse.Query(Team)

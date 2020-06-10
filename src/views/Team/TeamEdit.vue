@@ -60,18 +60,6 @@
                     <PIInfoField v-model="principalInvestigator" />
                   </div>
                 </div>
-
-                <div class="columns">
-                  <div class="column is-3">
-                    <span class="is-size-5">
-                      Members
-                    </span>
-                  </div>
-
-                  <div class="column is-9">
-                    Under Development
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -125,6 +113,7 @@
                 size="is-medium"
                 icon-left="mdil-content-save"
                 :loading="isLoading.submit"
+                @click="editTeam"
               >
                 Edit Team
               </b-button>
@@ -203,6 +192,26 @@ export default {
       
       return team
     },
+    async editTeam() {
+      this.isLoading.submit = true
+
+      try {
+        await TeamManage.updateTeam(this.teamId, this.principalInvestigator)
+      } catch (error) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: await handleError(error),
+          type: 'is-danger',
+          queue: false
+        })
+        return
+      } finally {
+        this.isLoading.submit = true
+      }
+
+      // Jump to view
+      this.$router.push({ name: 'Team View', params: { id: this.teamId } })
+    }
   }
 }
 </script>
