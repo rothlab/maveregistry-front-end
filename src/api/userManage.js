@@ -35,8 +35,8 @@ export async function signupUserPassword (username, email, password, firstName, 
   user.set("username", username)
   user.set("email", email)
   user.set("password", password)
-  user.set("first_name", firstName)
-  user.set("last_name", lastName)
+  user.set("first_name", firstName.toLowerCase())
+  user.set("last_name", lastName.toLowerCase())
 
   // Sign up
   const retUser = await user.signUp()
@@ -49,8 +49,8 @@ export async function signupLoginUserGoogle (userInfo) {
   // Link account
   let user = new Parse.User()
   user.set("email", userInfo.email)
-  user.set("first_name", userInfo.first_name)
-  user.set("last_name", userInfo.last_name)
+  user.set("first_name", userInfo.first_name.toLowerCase())
+  user.set("last_name", userInfo.last_name.toLowerCase())
   user.set("profile_image", userInfo.profile_image)
   await user.linkWith("google", {
     authData: userInfo.auth
@@ -85,8 +85,8 @@ export async function signupLoginUserOrcid (userInfo) {
   // Link account
   let user = new Parse.User()
   user.set("email", userInfo.email)
-  user.set("first_name", userInfo.first_name)
-  user.set("last_name", userInfo.last_name)
+  user.set("first_name", userInfo.first_name.toLowerCase())
+  user.set("last_name", userInfo.last_name.toLowerCase())
   user.set("profile_image", userInfo.profile_image)
 
   // Check if current user has email
@@ -131,8 +131,8 @@ export async function updateUserProfile (userInfo) {
 
   // Update user info
   if (userInfo.username) user.set("username", userInfo.username)
-  if (userInfo.first_name) user.set("first_name", userInfo.first_name)
-  if (userInfo.last_name) user.set("last_name", userInfo.last_name)
+  if (userInfo.first_name) user.set("first_name", userInfo.first_name.toLowerCase())
+  if (userInfo.last_name) user.set("last_name", userInfo.last_name.toLowerCase())
   if (userInfo.email) user.set("email", userInfo.email)
   if (userInfo.website) user.set("website", userInfo.website)
   if (userInfo.profile_image) user.set("profile_image", userInfo.profile_image)
