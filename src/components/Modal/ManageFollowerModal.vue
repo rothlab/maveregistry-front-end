@@ -1,21 +1,27 @@
 <template>
   <b-modal
     :active.sync="isActive"
-    has-modal-card
     :can-cancel="['escape', 'outside']"
+    :width="600"
   >
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">
-          <span class="is-capitalized">Manage Followers</span>
-        </p>
-        <button
-          class="delete"
-          aria-label="close"
-          @click="isActive = false"
-        />
-      </header>
-      <section class="modal-card-body">
+    <div class="card">      
+      <div class="card-content manage-follower">
+        <!-- Title -->
+        <header class="level is-mobile">
+          <div class="level-left">
+            <p class="is-capitalized is-size-5">
+              Manage Followers
+            </p>
+          </div>
+          <div class="level-right">
+            <button
+              class="delete"
+              aria-label="close"
+              @click="isActive = false"
+            />
+          </div>
+        </header>
+
         <!-- Search and pagination function -->
         <div class="level is-mobile">
           <div class="level-left">
@@ -85,7 +91,7 @@
                 position="is-left"
                 type="is-dark"
               >
-                <a><b-icon icon="mdil-delete" /></a>
+                <a @click="removeFollower(follower.id)"><b-icon icon="mdil-delete" /></a>
               </b-tooltip>
             </div>
           </div>
@@ -101,22 +107,14 @@
             No followers found with first or last name starting with "{{ keyword }}".
           </p>
         </div>
-      </section>
-      <footer class="modal-card-foot">
-        <b-button
-          expanded
-          :loading="isLoading.save"
-          type="is-primary"
-        >
-          Save Changes
-        </b-button>
-      </footer>
+      </div>
     </div>
   </b-modal>
 </template>
 
 <script>
 import * as FollowManage from "@/api/followManage.js"
+import { handleError } from "@/api/errorHandler.js"
 
 export default {
   props: {
@@ -187,7 +185,44 @@ export default {
     trimKeyword(string, keyword) {
       if (keyword.length <= 0 || !string.startsWith(keyword)) return string.slice(0,1).toUpperCase() + string.slice(1)
       return string.replace(keyword, '')
+    },
+    removeFollower(id) {
+      this.$buefy.dialog.confirm({
+        title: "Remove Follower",
+        message: "Are you sure you want to remove this follower?<br>They will <b>not</b> be notified.",
+        type: "is-danger",
+        hasIcon: true,
+        iconPack: "mdi",
+        icon: "alert-circle",
+        cancelText: "Cancel",
+        confirmText: "Remove Follower",
+        onConfirm: async () => {
+          // Delete follower
+          try {
+            await FollowManage.unfollow(id)
+
+            this.$buefy.toast.open({
+              duration: 5000,
+              message: "Successfully removed follower",
+              type: 'is-success',
+              queue: false
+            })
+          } catch (error) {
+            this.$buefy.toast.open({
+              duration: 5000,
+              message: await handleError(error),
+              type: 'is-danger',
+              queue: false
+            })
+          }
+        }
+      })
     }
   }
 }
 </script>
+
+<style lang="sass" scoped>
+.manage-follower
+  padding: 2rem
+</style>
