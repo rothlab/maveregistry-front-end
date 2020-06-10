@@ -34,8 +34,8 @@
         <b-icon icon="mdil-account" />
         <!-- Add keyword bolding -->
         <!-- To prevent XSS attack, we don't want to allow html tags, although it's going to be make the job much easier. -->
-        <b class="is-capitalized">{{ props.option.first_name.includes(keyword) ? keyword : '' }}</b>{{ trimKeyword(props.option.first_name, keyword) }}
-        <b class="is-capitalized">{{ props.option.last_name.includes(keyword) ? keyword : '' }}</b>{{ trimKeyword(props.option.last_name, keyword) }},
+        <b class="is-capitalized">{{ props.option.first_name.startsWith(keyword) ? keyword : '' }}</b>{{ trimKeyword(props.option.first_name, keyword) }}
+        <b class="is-capitalized">{{ props.option.last_name.startsWith(keyword) ? keyword : '' }}</b>{{ trimKeyword(props.option.last_name, keyword) }},
         {{ props.option.affiliation }}
       </template>
     </b-autocomplete>
@@ -186,7 +186,7 @@ export default {
       }
     },
     trimKeyword(string, keyword) {
-      if (keyword.length <= 0 || !string.includes(keyword)) return capitalize(string)
+      if (keyword.length <= 0 || !string.startsWith(keyword)) return capitalize(string)
       return string.replace(keyword, '')
     }
   }
