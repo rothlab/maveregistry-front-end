@@ -170,8 +170,7 @@ export default {
       last_name: "",
       email: "",
       position: "",
-      custom_position: "",
-      affiliation: ""
+      custom_position: ""
     }
   },
   methods: {
