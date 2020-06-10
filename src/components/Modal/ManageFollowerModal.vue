@@ -3,6 +3,7 @@
     :active.sync="isActive"
     :can-cancel="['escape', 'outside']"
     :width="600"
+    @close="followers = {}"
   >
     <div class="card">      
       <div class="card-content manage-follower">
@@ -10,7 +11,7 @@
         <header class="level is-mobile">
           <div class="level-left">
             <p class="is-capitalized is-size-5">
-              Manage Followers
+              Manage {{ classText }}
             </p>
           </div>
           <div class="level-right">
@@ -28,15 +29,15 @@
             <b-input
               type="search"
               icon="mdil-magnify"
-              placeholder="Search followers"
-              :loading="isLoading.search"
+              :placeholder="`Search ${classText}s`"
+              :loading="isLoading"
               @input="filterByName"
             />
           </div>
 
           <div class="level-right">
             <b-pagination
-              :total="filteredFollowers.count"
+              :total="filteredFollowers.count ? filteredFollowers.count : 0"
               icon-pack="mdi"
               icon-prev="chevron-left"
               order="is-right"
@@ -85,13 +86,29 @@
                 </router-link>
               </b-tooltip>
 
+              <!-- Approve -->
+              <b-tooltip
+                label="Approve"
+                position="is-left"
+                type="is-dark"
+                v-if="isRequest"
+              >
+                <a @click="approveFollower(follower.id)"><b-icon
+                  icon="mdil-check"
+                  type="is-success"
+                /></a>
+              </b-tooltip>
+
               <!-- Remove -->
               <b-tooltip
                 label="Remove"
                 position="is-left"
                 type="is-dark"
               >
-                <a @click="removeFollower(follower.id)"><b-icon icon="mdil-delete" /></a>
+                <a @click="removeFollower(follower.id)"><b-icon
+                  icon="mdil-delete"
+                  type="is-danger"
+                /></a>
               </b-tooltip>
             </div>
           </div>
@@ -104,7 +121,7 @@
         >
           <p class="has-text-grey">
             <b-icon icon="mdil-information" />
-            No followers found with first or last name starting with "{{ keyword }}".
+            No {{ classText }} found{{ keyword.length > 0 ? ` with first or last name starting with "${keyword}".` : '.' }}
           </p>
         </div>
       </div>
@@ -122,10 +139,6 @@ export default {
       type: Boolean,
       required: true
     },
-    followers: {
-      type: Object,
-      required: true
-    },
     target: {
       type: String,
       required: true
@@ -133,6 +146,10 @@ export default {
     type: {
       type: String,
       required: true
+    },
+    isRequest: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -141,25 +158,28 @@ export default {
         this.$emit("update:active", val)
       }
     },
-    active(val) {
+    async active(val) {
       if (val != this.isActive) {
         this.isActive = val
       }
+
+      // Fetch followers if active
+      if (val) {
+        this.filteredFollowers = {}
+        this.fetchFollowers()
+      }
     },
-    followers(val) {
-      this.filteredFollowers = val
-    }
   },
-  mounted() {
-    this.filteredFollowers = this.followers
+  computed: {
+    classText() {
+      return this.isRequest ? 'request' : 'follower'
+    }
   },
   data () {
     return {
       isActive: false,
-      isLoading: {
-        save: false,
-        search: false
-      },
+      isLoading: false,
+      followers: {},
       filteredFollowers: {} ,
       keyword: ""
     }
@@ -168,18 +188,27 @@ export default {
     getProfileImage(url) {
       return url ? url : require("@/assets/image/blank-profile.png")
     },
+    async fetchFollowers() {
+      this.isLoading = true
+
+      this.followers = await FollowManage.fetchFollows(this.target, this.type, this.isRequest)
+      this.filteredFollowers = this.followers
+
+       this.isLoading = false
+    },
     async filterByName(keyword) {
       if (keyword === "") {
         this.filteredFollowers = this.followers
         this.keyword = ""
       } else {
-        this.isLoading.search = true
+        this.isLoading = true
+
         this.keyword = keyword.toLowerCase()
 
         // Fetch followers
         this.filteredFollowers = await FollowManage.queryByName(this.target, this.type, this.keyword)
 
-        this.isLoading.search = false
+        this.isLoading = false
       }
     },
     trimKeyword(string, keyword) {
@@ -188,22 +217,23 @@ export default {
     },
     removeFollower(id) {
       this.$buefy.dialog.confirm({
-        title: "Remove Follower",
-        message: "Are you sure you want to remove this follower?<br>They will <b>not</b> be notified.",
+        title: `Remove ${this.classText}`,
+        message: `Are you sure you want to remove this ${this.classText}?<br>They will <b>not</b> be notified.`,
         type: "is-danger",
         hasIcon: true,
         iconPack: "mdi",
         icon: "alert-circle",
         cancelText: "Cancel",
-        confirmText: "Remove Follower",
+        confirmText: "Remove",
         onConfirm: async () => {
           // Delete follower
           try {
             await FollowManage.unfollow(id)
+            await this.fetchFollowers()
 
             this.$buefy.toast.open({
               duration: 5000,
-              message: "Successfully removed follower",
+              message: `Successfully removed ${this.classText}`,
               type: 'is-success',
               queue: false
             })
@@ -217,6 +247,27 @@ export default {
           }
         }
       })
+    },
+    async approveFollower(id) {
+      // Approve and refresh list
+      try {
+        await FollowManage.approve(id)
+        await this.fetchFollowers()
+
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: "Successfully approved request",
+          type: 'is-success',
+          queue: false
+        })
+      } catch (error) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: await handleError(error),
+          type: 'is-danger',
+          queue: false
+        })
+      }
     }
   }
 }

@@ -76,7 +76,7 @@ export async function getFollowStatus(target, type, by) {
   follow = follow[0]
   // If follow object does exist, but is not approved
   ret.id = follow.id
-  ret.status = follow.get("is_approved") ? "yes" : "pending"
+  ret.status = follow.exists("approvedAt") ? "yes" : "pending"
 
   return ret
 }
@@ -98,16 +98,35 @@ export async function follow(target, type, reason) {
 }
 
 export async function unfollow(id) {
+  // TODO: check permission
   const follow = await queryFollowById(id)
   
   // Remove the follow object
   if (follow) await follow.destroy()
 }
 
-export async function fetchFollows(target, type, limit = 10, skip = 0) {
+export async function approve(id) {
+  // TODO: check permission
+
+  const follow = await queryFollowById(id)
+
+  if (follow) {
+    follow.set("approvedAt", new Date())
+    await follow.save()
+
+    // TODO: trigger email notification
+  }
+}
+
+export async function fetchFollows(target, type, request = false, limit = 10, skip = 0) {
   const query = new Parse.Query(Follow)
   query.equalTo("type", type)
   query.equalTo("target", target)
+  if (request) {
+    query.doesNotExist("approvedAt")
+  } else {
+    query.exists("approvedAt")
+  }
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
@@ -115,6 +134,19 @@ export async function fetchFollows(target, type, limit = 10, skip = 0) {
   follows.results = await Promise.all(follows.results.map(e => e.format()))
 
   return follows 
+}
+
+export async function countFollows(target, type, request = false) {
+  const query = new Parse.Query(Follow)
+  query.equalTo("type", type)
+  query.equalTo("target", target)
+  if (request) {
+    query.doesNotExist("approvedAt")
+  } else {
+    query.exists("approvedAt")
+  }
+  
+  return await query.count()
 }
 
 export async function queryByName(target, type, keyword, limit = 10, skip = 0) {

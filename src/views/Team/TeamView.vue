@@ -185,20 +185,32 @@
                 <b-icon icon="mdil-clock" />
                 {{ updatedDate.toLocaleString() }}
               </p>
-              <p
+              <div
                 class="is-size-5"
-                v-if="followers.count && followers.count > 0 && isOwner"
+                v-if="(followerCount > 0 || requestCount > 0) && isOwner"
               >
-                <b>Follower{{ followers.count > 1 ? 's' : '' }}</b> <br>
-                <b-button
-                  class="action-button"
-                  icon-left="mdil-settings"
-                  type="is-light"
-                  @click="isManageFollowerModalActive = true"
-                >
-                  Manage <b>{{ followers.count }}</b> follower{{ followers.count > 1 ? 's' : '' }}
-                </b-button>
-              </p>
+                <b>Follower{{ followerCount > 1 ? 's' : '' }}</b> <br>
+                <div class="buttons">
+                  <b-button
+                    v-if="followerCount > 0"
+                    class="action-button"
+                    icon-left="mdil-settings"
+                    type="is-light"
+                    @click="openFollowerModal(false)"
+                  >
+                    Manage <b>{{ followerCount }}</b> Follower{{ followerCount > 1 ? 's' : '' }}
+                  </b-button>
+                  <b-button
+                    v-if="requestCount > 0"
+                    class="action-button"
+                    icon-left="mdil-comment-text"
+                    type="is-light"
+                    @click="openFollowerModal(true)"
+                  >
+                    Review <b>{{ requestCount }}</b> Request{{ requestCount > 1 ? 's' : '' }}
+                  </b-button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -207,8 +219,8 @@
       <!-- Manage follower modal -->
       <ManageFollowerModal
         :active.sync="isManageFollowerModalActive"
-        :followers="followers"
         :target="teamId"
+        :is-request="isRequest"
         type="team"
       />
     </div>
@@ -248,7 +260,9 @@ export default {
       updatedDate: new Date(),
       user: {},
       errorMessage: "",
-      followers: {}
+      followerCount: 0,
+      requestCount: 0,
+      isRequest: false
     }
   },
   async mounted() {
@@ -260,8 +274,8 @@ export default {
     // Fetch projects that the team has
     await this.fetchProjects(team.id)
 
-    // Fetch team followers
-    await this.fetchFollowers(team.id)
+    // Fetch team follower and request count
+    await this.fetchFollowerAndRequestCount(team.id)
 
     this.isLoading.page = false
   },
@@ -302,12 +316,17 @@ export default {
         this.errorMessage = await handleError(error)
       }
     },
-    async fetchFollowers(teamId) {
+    async fetchFollowerAndRequestCount(teamId) {
       try {
-        this.followers = await FollowManage.fetchFollows(teamId, "team")
+        this.followerCount = await FollowManage.countFollows(teamId, "team")
+        this.requestCount = await FollowManage.countFollows(teamId, "team", true)
       } catch (error) {
         this.errorMessage = await handleError(error)
       }
+    },
+    openFollowerModal(request) {
+      this.isManageFollowerModalActive = true
+      this.isRequest = request
     }
   }
 }
