@@ -20,7 +20,8 @@ export const Follow = Parse.Object.extend("Follow", {
       by: {
         username: user.get("username"),
         first_name: user.get("first_name"),
-        last_name: user.get("last_name")
+        last_name: user.get("last_name"),
+        profile_image: user.get("profile_image")
       },
       create_date: this.get("createdAt"),
       reason: this.get("reason")
@@ -103,11 +104,37 @@ export async function unfollow(id) {
   if (follow) await follow.destroy()
 }
 
-export async function fetchFollows(target, type) {
+export async function fetchFollows(target, type, limit = 10, skip = 0) {
   const query = new Parse.Query(Follow)
   query.equalTo("type", type)
   query.equalTo("target", target)
-  const follows = await query.find()
+  query.limit(limit)
+  query.skip(skip)
+  query.withCount() // include total amount of targets in the DB
+  let follows = await query.find()
+  follows.results = await Promise.all(follows.results.map(e => e.format()))
 
-  return await Promise.all(follows.map(e => e.format()))
+  return follows 
+}
+
+export async function queryByName(target, type, keyword, limit = 10, skip = 0) {
+  // Set user query
+  const firstNameQuery = new Parse.Query(Parse.User)
+  const lastNameQuery = new Parse.Query(Parse.User)
+  firstNameQuery.startsWith("first_name", keyword)
+  lastNameQuery.startsWith("last_name", keyword)
+  const userQuery =  Parse.Query.or(firstNameQuery, lastNameQuery)
+
+  // Set follow query
+  const followQuery = new Parse.Query(Follow)
+  followQuery.equalTo("type", type)
+  followQuery.equalTo("target", target)
+  followQuery.matchesQuery("by", userQuery)
+  followQuery.limit(limit)
+  followQuery.skip(skip)
+  followQuery.withCount() // include total amount of targets in the DB
+  let follows = await followQuery.find()
+  follows.results = await Promise.all(follows.results.map(e => e.format()))
+
+  return follows
 }

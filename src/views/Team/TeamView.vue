@@ -175,6 +175,7 @@
                 <router-link
                   :to="{ name: 'User Profile View', params: { username: user.username } }"
                   target="_blank"
+                  class="is-capitalized"
                 >
                   {{ user.first_name + ' ' + user.last_name }}
                 </router-link>
@@ -186,16 +187,16 @@
               </p>
               <p
                 class="is-size-5"
-                v-if="followers.length > 0"
+                v-if="followers.count && followers.count > 0 && isOwner"
               >
-                <b>Follower{{ followers.length > 1 ? 's' : '' }}</b> <br>
+                <b>Follower{{ followers.count > 1 ? 's' : '' }}</b> <br>
                 <b-button
                   class="action-button"
                   icon-left="mdil-settings"
                   type="is-light"
                   @click="isManageFollowerModalActive = true"
                 >
-                  Manage <b>{{ followers.length }}</b> follower{{ followers.length > 1 ? 's' : '' }}
+                  Manage <b>{{ followers.count }}</b> follower{{ followers.count > 1 ? 's' : '' }}
                 </b-button>
               </p>
             </div>
@@ -207,6 +208,8 @@
       <ManageFollowerModal
         :active.sync="isManageFollowerModalActive"
         :followers="followers"
+        :target="teamId"
+        type="team"
       />
     </div>
   </div>
@@ -245,7 +248,7 @@ export default {
       updatedDate: new Date(),
       user: {},
       errorMessage: "",
-      followers: []
+      followers: {}
     }
   },
   async mounted() {
