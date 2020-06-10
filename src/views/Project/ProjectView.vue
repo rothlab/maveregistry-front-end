@@ -147,7 +147,7 @@
               </p>
             </div>
 
-            <hr>
+            <hr v-if="hasPeople || hasActivity">
 
             <div
               class="project-header"

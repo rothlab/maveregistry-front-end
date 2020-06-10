@@ -76,7 +76,7 @@ export async function getFollowStatus(target, type, by) {
   follow = follow[0]
   // If follow object does exist, but is not approved
   ret.id = follow.id
-  ret.status = follow.exists("approvedAt") ? "yes" : "pending"
+  ret.status = follow.get("approvedAt") ? "yes" : "pending"
 
   return ret
 }
