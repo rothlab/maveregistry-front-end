@@ -222,6 +222,7 @@
         :target="teamId"
         :is-request="isRequest"
         type="team"
+        @change="fetchFollowerAndRequestCount(teamId)"
       />
     </div>
   </div>

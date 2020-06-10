@@ -230,6 +230,7 @@ export default {
           try {
             await FollowManage.unfollow(id)
             await this.fetchFollowers()
+            this.$emit("change")
 
             this.$buefy.toast.open({
               duration: 5000,
@@ -253,6 +254,7 @@ export default {
       try {
         await FollowManage.approve(id)
         await this.fetchFollowers()
+        this.$emit("change")
 
         this.$buefy.toast.open({
           duration: 5000,

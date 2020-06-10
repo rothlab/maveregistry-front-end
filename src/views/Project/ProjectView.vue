@@ -234,10 +234,45 @@
                 <b-icon icon="mdil-clock" />
                 {{ updatedDate.toLocaleString() }}
               </p>
+              <div
+                class="is-size-5"
+                v-if="(followerCount > 0 || requestCount > 0) && isOwner"
+              >
+                <b>Follower{{ followerCount > 1 ? 's' : '' }}</b> <br>
+                <div class="buttons">
+                  <b-button
+                    v-if="followerCount > 0"
+                    class="action-button"
+                    icon-left="mdil-settings"
+                    type="is-light"
+                    @click="openFollowerModal(false)"
+                  >
+                    Manage <b>{{ followerCount }}</b> Follower{{ followerCount > 1 ? 's' : '' }}
+                  </b-button>
+                  <b-button
+                    v-if="requestCount > 0"
+                    class="action-button"
+                    icon-left="mdil-comment-text"
+                    type="is-light"
+                    @click="openFollowerModal(true)"
+                  >
+                    Review <b>{{ requestCount }}</b> Request{{ requestCount > 1 ? 's' : '' }}
+                  </b-button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Manage follower modal -->
+      <ManageFollowerModal
+        :active.sync="isManageFollowerModalActive"
+        :target="projectId"
+        :is-request="isRequest"
+        type="project"
+        @change="fetchFollowerAndRequestCount(projectId)"
+      />
     </div>
   </div>
 </template>
@@ -245,12 +280,15 @@
 <script>
 import * as ProjectManage from "@/api/projectManage.js"
 import * as TeamManage from "@/api/teamManage.js"
+import * as FollowManage from "@/api/followManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
+import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 
 export default {
   components: {
-    Error
+    Error,
+    ManageFollowerModal
   },
   data() {
     return {
@@ -258,6 +296,8 @@ export default {
         page: false
       },
       isOwner: false,
+      isManageFollowerModalActive: false,
+      isRequest: false,
       errorMessage: "",
       target: {},
       features: [],
@@ -267,7 +307,9 @@ export default {
       team: undefined,
       collaborators: [],
       funding: undefined,
-      activities: []
+      activities: [],
+      followerCount: 0,
+      requestCount: 0
     }
   },
   computed: {
@@ -299,6 +341,8 @@ export default {
     if (this.user && this.user.username)
       this.isOwner = this.$store.state.hasLoggedIn && (this.user.username === this.$store.state.user.username)
 
+    // Fetch team follower and request count
+    await this.fetchFollowerAndRequestCount(this.projectId)
     this.isLoading.page = false
   },
   methods: {
@@ -319,6 +363,18 @@ export default {
     },
     editProject() {
       this.$router.push({ name: 'Project Edit', params: { id: this.projectId, action: 'edit' } })
+    },
+    async fetchFollowerAndRequestCount(id) {
+      try {
+        this.followerCount = await FollowManage.countFollows(id, "project")
+        this.requestCount = await FollowManage.countFollows(id, "project", true)
+      } catch (error) {
+        this.errorMessage = await handleError(error)
+      }
+    },
+    openFollowerModal(request) {
+      this.isManageFollowerModalActive = true
+      this.isRequest = request
     }
   }
 }
