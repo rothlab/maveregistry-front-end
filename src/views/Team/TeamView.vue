@@ -22,6 +22,7 @@
                 icon-left="mdil-pencil"
                 type="is-primary"
                 size="is-medium"
+                @click="editTeam"
               >
                 Edit
               </b-button>
@@ -328,6 +329,9 @@ export default {
     openFollowerModal(request) {
       this.isManageFollowerModalActive = true
       this.isRequest = request
+    },
+    editTeam() {
+      this.$router.push({ name: 'Team Edit', params: { id: this.teamId, action: 'edit' } })
     }
   }
 }

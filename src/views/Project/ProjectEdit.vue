@@ -517,8 +517,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "../../assets/style/variables.sass"
-
 .header-icon
   position: absolute
   right: 1.25rem

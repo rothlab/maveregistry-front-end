@@ -54,6 +54,11 @@ Vue.use(VueRouter)
     name: 'Team View',
     component: () => import(/* webpackChunkName: "team view" */ '../views/Team/TeamView.vue')
   },
+  {
+    path: '/team/:id/:action',
+    name: 'Team Edit',
+    component: () => import(/* webpackChunkName: "team edit" */ '../views/Team/TeamEdit.vue')
+  },
 
   // Account related
   {
