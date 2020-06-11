@@ -72,7 +72,7 @@
                     <figure
                       v-for="(member, id) in members"
                       :key="id"
-                      class="image is-32x32 is-inline-block member-icons"
+                      class="image is-48x48 is-inline-block member-icons"
                     >
                       <router-link
                         :to="{ name: 'User Profile View', params: { username: member.username } }"
@@ -89,15 +89,11 @@
                           >
                         </b-tooltip>
                       </router-link>
+                      <button
+                        class="delete right-corner has-background-primary"
+                        @click="confirmRemoveMember(member.username)"
+                      />
                     </figure>
-                    <b-button
-                      class="member-setting"
-                      icon-left="mdil-settings"
-                      rounded
-                      type="is-light"
-                    >
-                      Manage
-                    </b-button>
                   </div>
                 </div> 
               </div>
@@ -258,6 +254,36 @@ export default {
     },
     getProfileImage(url) {
       return url ? url : require("@/assets/image/blank-profile.png")
+    },
+    confirmRemoveMember(username) {
+      this.$buefy.dialog.confirm({
+        title: "Remove member",
+        message: "Are you sure you want to remove this member?<br>They will be notified.",
+        confirmText: "Remove",
+        type: "is-danger",
+        hasIcon: true,
+        iconPack: "mdi",
+        onConfirm: async () => {
+          try {
+            await TeamManage.removeMember(this.teamId, username)
+          } catch (error) {
+            this.$buefy.toast.open({
+              duration: 5000,
+              message: await handleError(error),
+              type: 'is-danger',
+              queue: false
+            })
+            return
+          }
+
+          this.$buefy.toast.open({
+            duration: 5000,
+            message: "Member removed",
+            type: 'is-success',
+            queue: false
+          })
+        }
+      })
     }
   }
 }
@@ -272,10 +298,9 @@ export default {
   &:not(:first-of-type)
     margin-left: 0.25rem !important
   img
-    width: 32px
-    height: 32px
-.member-setting
-  margin: 0.5rem 0 0 0
-  position: relative
-  float: right
+    width: 48px
+    height: 48px
+  .right-corner
+    position: absolute
+    right: -0.5rem
 </style>

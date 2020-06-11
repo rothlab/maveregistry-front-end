@@ -156,3 +156,17 @@ export async function queryById(id, detail = false) {
   
   return team.format(detail)
 }
+
+export async function removeMember(teamId, username) {
+  // Fetch user
+  const query = new Parse.Query(Parse.User)
+  query.equalTo("username", username)
+  let user = await query.find()
+  user = user[0]
+
+  // Valid user belongs to a team and the team ID matches
+  const userTeam = user.get("team")
+  if (!userTeam || userTeam.id !== teamId) throw Error("User team mismatch")
+  user.unset("team")
+  await user.save()
+}
