@@ -90,7 +90,7 @@
                         </b-tooltip>
                       </router-link>
                       <button
-                        class="delete right-corner has-background-primary"
+                        class="delete right-corner"
                         @click="confirmRemoveMember(member.username)"
                       />
                     </figure>
@@ -290,6 +290,8 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+@import "@/assets/style/variables.sass"
+
 .header-icon
   position: absolute
   right: 1.25rem
@@ -303,4 +305,6 @@ export default {
   .right-corner
     position: absolute
     right: -0.5rem
+    &:hover
+      background-color: $danger
 </style>

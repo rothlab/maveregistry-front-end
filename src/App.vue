@@ -402,7 +402,7 @@
 </style>
 
 <style lang="sass" scoped>
-@import "./assets/style/variables.sass"
+@import "@/assets/style/variables.sass"
 
 .profile-tag
   padding-right: 0.5rem
