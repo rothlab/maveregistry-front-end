@@ -177,15 +177,10 @@
               </p>
             </div>
 
-            <div class="project-content">
-              <!-- TODO: Finish team setting -->
-              <b-button
-                type="is-light"
-                icon-left="mdil-pencil"
-                expanded
-              >
-                Edit Team Setting
-              </b-button>
+            <div
+              class="project-content"
+            >
+              <TeamInfoField v-model="team" />
             </div>
           </div>
         </div>
@@ -272,27 +267,14 @@ import * as FileManage from "@/api/fileManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "@/components/Error.vue"
 import { handleError } from "@/api/errorHandler.js"
-
-function initialState (){
-  return {
-    userInfo: {},
-    showProfile: false,
-    isOwner: false,
-    isLoading: {
-      page: true,
-      reset_pass: false,
-      save_edit: false,
-      save_profile_pic: false
-    },
-    errorMessage: "",
-  }
-}
+import TeamInfoField from '@/components/Field/TeamInfoField.vue'
 
 export default {
   components: {
     ValidationProvider,
     ValidationObserver,
-    Error
+    Error,
+    TeamInfoField
   },
   computed: {
     profileImageUrl() {
@@ -308,7 +290,19 @@ export default {
     }
   },
   data () {
-    return initialState()
+    return {
+      userInfo: {},
+      team: "",
+      showProfile: false,
+      isOwner: false,
+      isLoading: {
+        page: true,
+        reset_pass: false,
+        save_edit: false,
+        save_profile_pic: false
+      },
+      errorMessage: "",
+    }
   },
   async mounted () {
     const username = this.$route.params.username
@@ -350,6 +344,7 @@ export default {
 
       // Update user
       try {
+        this.userInfo.team = this.team
         await this.$store.dispatch('updateUserProfile', this.userInfo)
       } catch (e) {
         this.$buefy.toast.open({

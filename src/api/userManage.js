@@ -1,8 +1,9 @@
 import { Parse } from "./parseConnect.js"
+import { Team } from "./teamManage.js"
 
 // Helper: parse user metadata
 function parseUserMetadata (user) {
-  return {
+  let ret = {
     username: user.get("username"),
     email: user.get("email"),
     first_name: user.get("first_name"),
@@ -10,6 +11,12 @@ function parseUserMetadata (user) {
     website: user.get("website"),
     profile_image: user.get("profile_image"),
   }
+
+  // Get team when available
+  const team = user.get("team")
+  if (team) ret.team = team.id
+
+  return ret
 }
 
 // Log in user with password
@@ -136,6 +143,10 @@ export async function updateUserProfile (userInfo) {
   if (userInfo.email) user.set("email", userInfo.email)
   if (userInfo.website) user.set("website", userInfo.website)
   if (userInfo.profile_image) user.set("profile_image", userInfo.profile_image)
+  if (userInfo.team) {
+    const team = await new Team.fetchById(userInfo.team)
+    user.set("team", team)
+  }
 
   // Save user info changes
   const retUser = await user.save()

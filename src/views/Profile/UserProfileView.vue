@@ -36,7 +36,7 @@
         class="columns"
         v-if="showProfile"
       >
-        <div class="column is-9">
+        <div class="column is-7">
           <div
             class="content"
           >
@@ -81,7 +81,7 @@
               </p>
               <div
                 class="is-size-5"
-                v-if="userInfo.social && Object.keys(userInfo.social).length"
+                v-if="userInfo && userInfo.social && Object.keys(userInfo.social).length"
               >
                 <span><b>Social Media</b></span>
                 <br>
@@ -106,21 +106,36 @@
               </div>
             </div>
 
+            <hr>
+
             <div class="project-header">
               <p class="is-size-4 has-text-weight-bold">
-                Team
+                Project
               </p>
             </div>
 
             <div class="project-content">
-              Under Development
+              <p class="is-size-5">
+                <span v-if="userInfo.team">
+                  <b>Team</b> <br>
+                  <a
+                    :href="'mailto:' + userInfo.team.email"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <b-icon icon="mdil-email" />
+                  </a>
+                  <span class="is-capitalized">{{ userInfo.team.first_name + " " + userInfo.team.last_name }},</span>
+                  {{ userInfo.team.affiliation }}
+                </span>
+              </p>
             </div>
           </div>
         </div>
 
         <!-- Profile image and actions -->
         <div
-          class="column is-3"
+          class="column is-3 is-offset-2"
         >
           <!-- Profile image -->
           <div class="profile-image">
@@ -164,6 +179,7 @@
 
 <script>
 import * as UserManage from "@/api/userManage.js"
+import * as TeamManage from "@/api/teamManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from "@/components/Error.vue"
 import UserProfileAction from "@/components/Action/UserProfileAction.vue"
@@ -206,7 +222,6 @@ export default {
       // Fetch and store user information
       const username = this.$route.params.username
       this.userInfo = await this.fetchUserInfo(username)
-      if (this.userInfo) this.userInfo.social = {}
     }
   },
   data () {
@@ -215,10 +230,6 @@ export default {
   async mounted () {
     const username = this.$route.params.username
     this.userInfo = await this.fetchUserInfo(username)
-
-    if (this.userInfo) {
-      this.userInfo.social = {}
-    }
   },
   methods: {
     async fetchUserInfo(username) {
@@ -228,6 +239,11 @@ export default {
       let res
       try {
         res = await UserManage.fetchUserInfo(username)
+
+        if (res && res.team) {
+          // Fetch team
+          res.team = await TeamManage.queryById(res.team)
+        }
       } catch (error) {
         this.errorMessage = await handleError(error)
         this.isLoading.page = false
