@@ -1,6 +1,7 @@
 import { Parse } from "./parseConnect.js"
 import { getFollowStatus } from "./followManage.js"
 import { fetchProjectByTeamId } from "./projectManage.js"
+import { fetchUsersByTeamId } from "./userManage.js"
 
 // Define team object
 export const Team = Parse.Object.extend("Team", {
@@ -36,6 +37,10 @@ export const Team = Parse.Object.extend("Team", {
     }
 
     if (detail) {
+      // Fetch members
+      const members = await fetchUsersByTeamId(this.id)
+      ret.members = members
+
       // Fetch Project
       const projects = await fetchProjectByTeamId(this.id)
       ret.projects = projects
@@ -117,14 +122,14 @@ export async function updateTeam(id, payload) {
   
   return await team.save()
 }
-export async function fetchTeams(limit, skip) {
+export async function fetchTeams(limit, skip, detail = false) {
   // Fetch teams, applying pagination
   const query = new Parse.Query(Team)
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
   let teams = await query.find()
-  teams.results = await Promise.all(teams.results.map(e => e.format(true))) // Format targets
+  teams.results = await Promise.all(teams.results.map(e => e.format(detail))) // Format targets
   
   // Format and return
   return teams
@@ -146,8 +151,8 @@ export async function queryByName(name) {
   return teams
 }
 
-export async function queryById(id) {
+export async function queryById(id, detail = false) {
   const team = await new Team.fetchById(id)
   
-  return team.format()
+  return team.format(detail)
 }

@@ -2,7 +2,7 @@ import { Parse } from "./parseConnect.js"
 import { Team } from "./teamManage.js"
 
 // Helper: parse user metadata
-function parseUserMetadata (user) {
+function parseUserMetadata (user, includeTeam = true) {
   let ret = {
     username: user.get("username"),
     email: user.get("email"),
@@ -12,9 +12,11 @@ function parseUserMetadata (user) {
     profile_image: user.get("profile_image"),
   }
 
-  // Get team when available
-  const team = user.get("team")
-  if (team) ret.team = team.id
+  if (includeTeam) {
+    // Get team when available
+    const team = user.get("team")
+    if (team) ret.team = team.id
+  }
 
   return ret
 }
@@ -156,4 +158,16 @@ export async function updateUserProfile (userInfo) {
 // Reset password
 export async function resetPassword (email) {
   return await Parse.User.requestPasswordReset(email)
+}
+
+export async function fetchUsersByTeamId (id) {
+  // Fetch team
+  const team = await new Team.fetchById(id)
+  if (!team) return []
+
+  const query = new Parse.Query(Parse.User)
+  query.equalTo("team", team)
+  const members = await query.find()
+
+  return members.map(e => parseUserMetadata(e, false))
 }

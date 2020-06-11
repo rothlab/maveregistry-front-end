@@ -88,13 +88,33 @@
                 {{ principalInvestigator.affiliation }}
               </p>
 
-              <p
+              <div
                 class="is-size-5"
-                v-if="principalInvestigator"
+                v-if="members.length > 0"
               >
-                <b>Members</b> <br>
-                Under Development
-              </p>
+                <b>Member{{ members.length > 1 ? 's' : '' }}</b><br>
+                <figure
+                  v-for="(member, id) in members"
+                  :key="id"
+                  class="image is-32x32 is-inline-block member-icons"
+                >
+                  <router-link
+                    :to="{ name: 'User Profile View', params: { username: member.username } }"
+                    target="_blank"
+                    class="is-capitalized"
+                  >
+                    <b-tooltip
+                      :label="`${member.first_name} ${member.last_name}`"
+                      type="is-dark"
+                    >
+                      <img
+                        :src="getProfileImage(member.profile_image)"
+                        class="is-rounded"
+                      >
+                    </b-tooltip>
+                  </router-link>
+                </figure>
+              </div>
             </div>
 
             <hr>
@@ -169,7 +189,7 @@
             <div class="project-content">
               <p
                 class="is-size-5"
-                v-if="user"
+                v-if="user && user.username"
               >
                 <b>Creator</b> <br>
                 <b-icon icon="mdil-account" />
@@ -231,7 +251,6 @@
 
 <script>
 import * as TeamManage from "@/api/teamManage.js"
-import * as ProjectManage from "@/api/projectManage.js"
 import * as FollowManage from "@/api/followManage.js"
 import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
@@ -258,6 +277,7 @@ export default {
       },
       isManageFollowerModalActive: false,
       principalInvestigator: {},
+      members: [],
       projects: [],
       updatedDate: new Date(),
       user: {},
@@ -273,9 +293,6 @@ export default {
     // Fetch team
     const team = await this.fetchTeam()
 
-    // Fetch projects that the team has
-    await this.fetchProjects(team.id)
-
     // Fetch team follower and request count
     await this.fetchFollowerAndRequestCount(team.id)
 
@@ -286,7 +303,7 @@ export default {
       // Fetch team
       let team
       try {
-        team = await TeamManage.queryById(this.teamId)
+        team = await TeamManage.queryById(this.teamId, true)
       } catch (error) {
         this.errorMessage = await handleError(error)
         return
@@ -301,22 +318,21 @@ export default {
       }
       if (team.website && team.website.length > 0) this.principalInvestigator.website = team.website
 
+      // Format members
+      if (team.members) this.members = team.members
+
       // Format creator and update date
       this.user = team.user
       this.updatedDate = team.update_date
+
+      // Format projects
+      if (team.projects) this.projects = team.projects
 
       // Set owner property
       if (this.user && this.user.username) 
         this.isOwner = this.$store.state.hasLoggedIn && (this.user.username === this.$store.state.user.username)
       
       return team
-    },
-    async fetchProjects(teamId) {
-      try {
-        this.projects = await ProjectManage.fetchProjectByTeamId(teamId)
-      } catch (error) {
-        this.errorMessage = await handleError(error)
-      }
     },
     async fetchFollowerAndRequestCount(teamId) {
       try {
@@ -332,6 +348,9 @@ export default {
     },
     editTeam() {
       this.$router.push({ name: 'Team Edit', params: { id: this.teamId, action: 'edit' } })
+    },
+    getProfileImage(url) {
+      return url ? url : require("@/assets/image/blank-profile.png")
     }
   }
 }
@@ -340,4 +359,6 @@ export default {
 <style lang="sass" scoped>
 .action-button
   margin-top: 0.5rem
+.member-icons
+  margin: 0.5rem 0 0 0 !important
 </style>
