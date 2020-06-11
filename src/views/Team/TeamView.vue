@@ -361,4 +361,9 @@ export default {
   margin-top: 0.5rem
 .member-icons
   margin: 0.5rem 0 0 0 !important
+  &:not(:first-of-type)
+    margin-left: 0.25rem !important
+  img
+    width: 32px
+    height: 32px
 </style>

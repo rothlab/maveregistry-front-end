@@ -60,6 +60,46 @@
                     <PIInfoField v-model="principalInvestigator" />
                   </div>
                 </div>
+
+                <div class="columns">
+                  <div class="column is-3">
+                    <span class="is-size-5">
+                      Members
+                    </span>
+                  </div>
+
+                  <div class="column is-9">
+                    <figure
+                      v-for="(member, id) in members"
+                      :key="id"
+                      class="image is-32x32 is-inline-block member-icons"
+                    >
+                      <router-link
+                        :to="{ name: 'User Profile View', params: { username: member.username } }"
+                        target="_blank"
+                        class="is-capitalized"
+                      >
+                        <b-tooltip
+                          :label="`${member.first_name} ${member.last_name}`"
+                          type="is-dark"
+                        >
+                          <img
+                            :src="getProfileImage(member.profile_image)"
+                            class="is-rounded"
+                          >
+                        </b-tooltip>
+                      </router-link>
+                    </figure>
+                    <b-button
+                      class="member-setting"
+                      icon-left="mdil-settings"
+                      rounded
+                      type="is-light"
+                    >
+                      Manage
+                    </b-button>
+                  </div>
+                </div> 
               </div>
             </div>
 
@@ -144,6 +184,7 @@ export default {
       },
       errorMessage: "",
       principalInvestigator: undefined,
+      members: [],
       isOwner: true,
       user: undefined,
       updatedDate: new Date()
@@ -167,7 +208,7 @@ export default {
       // Fetch team
       let team
       try {
-        team = await TeamManage.queryById(this.teamId)
+        team = await TeamManage.queryById(this.teamId, true)
       } catch (error) {
         this.errorMessage = await handleError(error)
         return
@@ -181,6 +222,9 @@ export default {
         affiliation: team.affiliation
       }
       if (team.website && team.website.length > 0) this.principalInvestigator.website = team.website
+
+      // Format members
+      if (team.members) this.members = team.members
 
       // Format creator and update date
       this.user = team.user
@@ -211,6 +255,9 @@ export default {
 
       // Jump to view
       this.$router.push({ name: 'Team View', params: { id: this.teamId } })
+    },
+    getProfileImage(url) {
+      return url ? url : require("@/assets/image/blank-profile.png")
     }
   }
 }
@@ -220,4 +267,15 @@ export default {
 .header-icon
   position: absolute
   right: 1.25rem
+.member-icons
+  margin: 0.5rem 0 0 0 !important
+  &:not(:first-of-type)
+    margin-left: 0.25rem !important
+  img
+    width: 32px
+    height: 32px
+.member-setting
+  margin: 0.5rem 0 0 0
+  position: relative
+  float: right
 </style>
