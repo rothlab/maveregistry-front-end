@@ -181,7 +181,6 @@ export default {
       errorMessage: "",
       principalInvestigator: undefined,
       members: [],
-      isOwner: true,
       user: undefined,
       updatedDate: new Date()
     }
@@ -190,12 +189,24 @@ export default {
     teamId() {
       return this.$route.params.id
     },
+    isEdit() {
+      return this.$route.params.action === 'edit'
+    },
+    isOwner() {
+      return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
+    }
   },
   async mounted() {
     this.isLoading.page = true
 
     // Fetch team
-    await this.fetchTeam()
+    if (this.isEdit) await this.fetchTeam()
+
+    // If invalid action jump to view page
+    if (!this.isEdit || !this.isOwner) {
+      this.$router.push({ name: 'Team View', params: { id: this.teamId } })
+      return
+    }
 
     this.isLoading.page = false
   },
@@ -225,10 +236,6 @@ export default {
       // Format creator and update date
       this.user = team.user
       this.updatedDate = team.update_date
-
-      // Set owner property
-      if (this.user && this.user.username) 
-        this.isOwner = this.$store.state.hasLoggedIn && (this.user.username === this.$store.state.user.username)
       
       return team
     },

@@ -13,12 +13,12 @@ import * as Sentry from '@sentry/browser';
 import { Vue as VueIntegration } from '@sentry/integrations';
 
 // Import stylesheets
+import "@/assets/style/bulma-customization.sass"
 import '@mdi/font/css/materialdesignicons.css'
 import '@mdi/light-font/css/materialdesignicons-light.css'
 import '@fortawesome/fontawesome-free/css/brands.css'
 import '@fortawesome/fontawesome-free/css/fontawesome.css'
 import '@/assets/style/styles.sass'
-import "@/assets/style/bulma-customization.sass"
 
 // Import custom scripts
 import router from './router'

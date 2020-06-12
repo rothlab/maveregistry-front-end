@@ -99,7 +99,7 @@
                       About
                     </div>
                     <div class="level is-mobile is-marginless">
-                      <div class="level-left">
+                      <div class="level-left is-capitalized">
                         <b-tooltip
                           label="Creator"
                           type="is-dark"
@@ -420,27 +420,36 @@ export default {
     isEdit() {
       return this.$route.params.action === 'edit'
     },
+    isOwner() {
+      return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
+    },
     projectId() {
       return this.$route.params.id
     },
   },
   async mounted() {
-    // If invalid actionm jump to view page
-    if (!this.isNew && !this.isEdit) {
+    this.isLoading.page = true
+
+    if (this.isEdit) {
+      const project = await this.fetchProject(this.projectId)
+
+      // Populate project details if editing
+      if (project) {
+        if (project.leads) this.leads = project.leads // Required, will always have value
+        if (project.team) this.team = project.team // Required, will always have value
+        if (project.collaborators && project.collaborators.length > 0) this.collaborators = project.collaborators
+        if (project.funding && project.funding.open_for_funding) this.openForFunding = project.funding.open_for_funding
+        if (project.activities) this.activities = project.activities
+      }
+    }
+
+    // If not owner or invalid action jump to view page
+    if ((!this.isNew && !this.isEdit) || !this.isOwner) {
       this.$router.push({ name: 'Project View', params: { id: this.projectId } })
       return
     }
 
-    const project = await this.fetchProject(this.projectId)
-
-    // Populate project details if editing
-    if (this.isEdit && project) {
-      if (project.leads) this.leads = project.leads // Required, will always have value
-      if (project.team) this.team = project.team // Required, will always have value
-      if (project.collaborators && project.collaborators.length > 0) this.collaborators = project.collaborators
-      if (project.funding && project.funding.open_for_funding) this.openForFunding = project.funding.open_for_funding
-      if (project.activities) this.activities = project.activities
-    }
+    this.isLoading.page = false
   },
   methods: {
     newLead() {
@@ -460,8 +469,6 @@ export default {
       }
     },
     async fetchProject(id) {
-      this.isLoading.page = true
-
       // Error handling
       try {
         const project = await ProjectManage.fetchProject(id, true)
@@ -474,8 +481,6 @@ export default {
         return project
       } catch (error) {
         this.errorMessage = await handleError(error)
-      } finally {
-        this.isLoading.page = false
       }
     },
     async updateProject() {

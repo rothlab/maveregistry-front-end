@@ -267,11 +267,13 @@ export default {
     },
     hasProject() {
       return this.projects.length > 0
+    },
+    isOwner() {
+      return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
     }
   },
   data () {
     return {
-      isOwner: false,
       isLoading: {
         page: false
       },
@@ -327,10 +329,6 @@ export default {
 
       // Format projects
       if (team.projects) this.projects = team.projects
-
-      // Set owner property
-      if (this.user && this.user.username) 
-        this.isOwner = this.$store.state.hasLoggedIn && (this.user.username === this.$store.state.user.username)
       
       return team
     },

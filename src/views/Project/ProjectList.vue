@@ -507,6 +507,11 @@ export default {
     FollowModal,
     UnfollowModal
   },
+  computed: {
+    hasLoggedIn() {
+      return this.$store.state.hasLoggedIn
+    }
+  },
   data () {
     return {
       targets: [],

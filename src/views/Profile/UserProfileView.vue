@@ -188,7 +188,6 @@ function initialState (){
   return {
     userInfo: {},
     showProfile: false,
-    isOwner: false,
     isLoading: {
       page: true,
       reset_pass: false,
@@ -212,6 +211,9 @@ export default {
       if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
 
       return url
+    },
+    isOwner() {
+      return this.$store.state.hasLoggedIn && (this.$route.params.username === this.$store.state.user.username)
     }
   },
   watch: {
@@ -253,7 +255,6 @@ export default {
       // Check if owning the account.
       // Only the owner can make changes
       this.showProfile = true
-      this.isOwner = this.$store.state.hasLoggedIn && (res.username === this.$store.state.user.username)
       this.isLoading.page = false
       return res
     },

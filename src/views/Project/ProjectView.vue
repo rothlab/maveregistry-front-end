@@ -217,7 +217,7 @@
                 {{ funding.open_for_funding ? "Seek" : "Not Seek" }} Funding
               </p>
               <p
-                class="is-size-5"
+                class="is-size-5 is-capitalized"
                 v-if="user"
               >
                 <b>Creator</b> <br>
@@ -295,7 +295,6 @@ export default {
       isLoading: {
         page: false
       },
-      isOwner: false,
       isManageFollowerModalActive: false,
       isRequest: false,
       errorMessage: "",
@@ -321,6 +320,9 @@ export default {
     },
     hasActivity() {
       return this.activities.length > 0
+    },
+    isOwner() {
+      return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
     }
   },
   async mounted() {
@@ -336,10 +338,6 @@ export default {
       if (project.funding) this.funding = project.funding
       if (project.activities) this.activities = project.activities
     }
-
-    // Set owner property
-    if (this.user && this.user.username)
-      this.isOwner = this.$store.state.hasLoggedIn && (this.user.username === this.$store.state.user.username)
 
     // Fetch team follower and request count
     await this.fetchFollowerAndRequestCount(this.projectId)

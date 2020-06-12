@@ -285,8 +285,11 @@ export default {
 
       return url
     },
-    isEditing() {
-      return this.$route.params.action && this.$route.params.action === "edit"
+    isEdit() {
+      return this.$route.params.action === "edit"
+    },
+    isOwner() {
+      return this.$store.state.hasLoggedIn && (this.$route.params.username === this.$store.state.user.username)
     }
   },
   data () {
@@ -294,7 +297,6 @@ export default {
       userInfo: {},
       team: "",
       showProfile: false,
-      isOwner: false,
       isLoading: {
         page: true,
         reset_pass: false,
@@ -306,10 +308,9 @@ export default {
   },
   async mounted () {
     const username = this.$route.params.username
-    this.isOwner = this.$store.state.hasLoggedIn && (username === this.$store.state.user.username)
 
     // If not a valid action or not the owner, jump to view
-    if (!this.isEditing || !this.isOwner) {
+    if (!this.isEdit || !this.isOwner) {
       this.$router.push({ name: 'User Profile View', params: { username: username } })
       return
     }
