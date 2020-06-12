@@ -89,8 +89,6 @@ export async function signupLoginUserOrcid (userInfo) {
   };
   Parse.User._registerAuthenticationProvider(provider);
 
-  let res = new Object
-
   // Link account
   let user = new Parse.User()
   user.set("email", userInfo.email)
@@ -101,13 +99,10 @@ export async function signupLoginUserOrcid (userInfo) {
   // Check if current user has email
   // Because user might use the log in function to sign up
   // We need to handle that case
-  const ret = await user.linkWith(provider.getAuthType(), provider.getAuthData())
+  await user.linkWith(provider.getAuthType(), provider.getAuthData())
 
-  // Set user info
-  res = parseUserMetadata(Parse.User.current())
-  res.hasEmail = ret.getEmail() !== ""
-
-  return res
+  // Set user info and return
+  return parseUserMetadata(Parse.User.current())
 }
 
 // Log out user

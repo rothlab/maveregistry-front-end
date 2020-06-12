@@ -151,7 +151,7 @@ export default {
       // If email is missing from the returned user,
       // it means we were registering and if the router is /login
       // we still need to collect user email
-      this.hasEmail = ret.hasEmail
+      this.hasEmail = ret.email && ret.email !== ""
       if (!this.hasEmail && this.firstTry) {
         this.firstTry = false
         return

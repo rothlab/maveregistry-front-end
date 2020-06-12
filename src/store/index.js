@@ -58,11 +58,13 @@ export default new Vuex.Store({
     async signupLoginUserOrcid ({ commit }, userInfo) {
       const user = await UserManage.signupLoginUserOrcid(userInfo)
 
-      if (!user && !!user.hasEmail) {
+      console.log(user)
+      if (user && user.email) {
         // Update user info if loggined in successfully
         commit('loginUser', user)
-        return user
       }
+
+      return user
     },
     async updateUserProfile ({ commit }, userInfo) {
       const user = await UserManage.updateUserProfile(userInfo)

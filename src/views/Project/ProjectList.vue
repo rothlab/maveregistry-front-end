@@ -587,7 +587,6 @@ export default {
         // Update pagination
         this.pagination.count = targets.count
       } catch (error) {
-        console.log(error)
         this.errorMessage = await handleError(error)
       } finally {
         this.isLoading.fetch_targets = false
