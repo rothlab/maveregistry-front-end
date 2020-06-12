@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="isNewProjectModalActive = true"
+                @click="addProject"
               >
                 New Project
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="isNewProjectModalActive = true"
+                @click="addProject"
               >
                 New
               </b-button>
@@ -284,7 +284,7 @@
                 >
                   <b-button
                     icon-right="mdil-plus"
-                    @click="prefillProject(props.row); isNewProjectModalActive = true"
+                    @click="addProject(true)"
                   />
                 </b-tooltip>
                 <!-- Show MaveQuest for human genes -->
@@ -440,6 +440,17 @@ export default {
       } finally {
         this.isLoading.fetch_targets = false
       }
+    },
+    addProject(prefill = false) {
+      // If not logged in, show the login panel instead
+      if (!this.hasLoggedIn) {
+        this.$emit("login")
+        return
+      }
+      
+      if (prefill) this.preFilledProject()
+
+      this.isNewProjectModalActive = true
     }
   }
 }

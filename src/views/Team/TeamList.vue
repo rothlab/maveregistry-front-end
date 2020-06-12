@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="isNewTeamModalActive = true"
+                @click="addTeam"
               >
                 New Team
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="isNewTeamModalActive = true"
+                @click="addTeam"
               >
                 New
               </b-button>
@@ -228,6 +228,11 @@ export default {
     FollowModal,
     UnfollowModal
   },
+  computed: {
+    hasLoggedIn() {
+      return this.$store.state.hasLoggedIn
+    }
+  },
   data() {
     return {
       isNewTeamModalActive: false,
@@ -255,10 +260,22 @@ export default {
   },
   methods: {
     confirmFollow(id) {
+      // If not logged in, show the login panel instead
+      if (!this.hasLoggedIn) {
+        this.$emit("login")
+        return
+      }
+
       this.followProp.source = id
       this.isFollowModelActive = true
     },
     confirmUnfollow(id) {
+      // If not logged in, show the login panel instead
+      if (!this.hasLoggedIn) {
+        this.$emit("login")
+        return
+      }
+
       this.followProp.follow = id
       this.isUnfollowModelActive = true
     },
@@ -283,6 +300,15 @@ export default {
       } finally {
         this.isLoading.fetch_team = false
       }
+    },
+    addTeam() {
+      // If not logged in, show the login panel instead
+      if (!this.hasLoggedIn) {
+        this.$emit("login")
+        return
+      }
+
+      this.isNewProjectModalActive = true
     }
   }
 }

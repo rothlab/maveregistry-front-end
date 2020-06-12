@@ -124,7 +124,7 @@
     <LoginSignupModal :active.sync="isLoginSignupModalActive" />
 
     <!-- Component injection -->
-    <router-view />
+    <router-view @login="isLoginSignupModalActive = true" />
 
     <footer
       class="footer has-background-dark has-text-light"
