@@ -43,7 +43,6 @@
     <div class="container has-fullheight has-top-padding has-touch-container-padding">
       <!-- Team table -->
       <div>
-        <!-- TODO: proper pagination -->
         <b-table
           :data="teams"
           :loading="isLoading.fetch_team"
@@ -52,6 +51,9 @@
           backend-pagination
           icon-pack="mdi"
           :per-page="pagination.limit"
+          :total="pagination.count"
+          :current-page="pagination.current"
+          @page-change="(change) => { pagination.current = change; fetchTeams() }"
         >
           <template slot-scope="props">
             <!-- Team ID -->
@@ -163,7 +165,7 @@
                   icon-left="mdil-bell-off"
                   :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-primary'"
                   @click="confirmUnfollow(props.row.follow_status.id)"
-                  @change="fetchTeams()"
+                  @change="fetchTeams"
                   expanded
                 >
                   <b-tooltip
@@ -179,7 +181,7 @@
                   v-else
                   icon-left="mdil-bell"
                   @click="confirmFollow(props.row.id)"
-                  @change="fetchTeams()"
+                  @change="fetchTeams"
                   expanded
                 >
                   Follow
@@ -246,7 +248,7 @@ export default {
       pagination: {
         count: 0,
         limit: 10,
-        skip: 0
+        current: 1
       },
       followProp: {
         source: "",
@@ -279,13 +281,16 @@ export default {
       this.followProp.follow = id
       this.isUnfollowModelActive = true
     },
-    async fetchTeams(limit = 10, skip = 0) {
+    async fetchTeams() {
       // Loading
       this.isLoading.fetch_team = true
 
+      // Calculate skip
+      const skip = (this.pagination.current - 1) * this.pagination.limit
+      console.log(skip)
       // Update targets
       try {
-        const teams = await TeamManage.fetchTeams(limit, skip)
+        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip)
         this.teams = teams.results
 
         // Update pagination
