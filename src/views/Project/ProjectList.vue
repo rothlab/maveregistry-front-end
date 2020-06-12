@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="cleanupNewActivity(); isNewActivityModalActive = true"
+                @click="isNewProjectModalActive = true"
               >
                 New Project
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="cleanupNewActivity(); isNewActivityModalActive = true"
+                @click="isNewProjectModalActive = true"
               >
                 New
               </b-button>
@@ -284,7 +284,7 @@
                 >
                   <b-button
                     icon-right="mdil-plus"
-                    @click="cleanupNewActivity(); prepareNewActivity(props.row); isNewActivityModalActive = true"
+                    @click="prefillProject(props.row); isNewProjectModalActive = true"
                   />
                 </b-tooltip>
                 <!-- Show MaveQuest for human genes -->
@@ -339,173 +339,31 @@
       />
 
       <!-- New project modal -->
-      <b-modal
-        :active.sync="isNewActivityModalActive"
-        has-modal-card
-        :can-cancel="['escape', 'outside']"
-      >
-        <div class="modal-card">
-          <header class="modal-card-head">
-            <p class="modal-card-title">
-              <span>Add a New Project</span>
-            </p>
-            <button
-              class="delete"
-              aria-label="close"
-              @click="isNewActivityModalActive = false"
-            />
-          </header>
-          <ValidationObserver
-            ref="observer"
-            v-slot="{ passed }"
-          >
-            <section class="modal-card-body">
-              <div class="content">
-                <!-- Target name -->
-                <ValidationProvider
-                  rules="required"
-                  name="Name"
-                  v-slot="{ errors, valid }"
-                  :immediate="newProjectProp.name !== ''"
-                > 
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="Target name"
-                  >
-                    <b-input
-                      v-model="newProjectProp.name"
-                      placeholder="e.g. Gene Symbol, Domain Name"
-                      required
-                      expanded
-                    />
-                  </b-field>
-                </ValidationProvider>
-
-                <ValidationProvider
-                  rules="required|alpha"
-                  name="Type"
-                  v-slot="{ errors, valid }"
-                  :immediate="newProjectProp.type !== ''"
-                > 
-                  <!-- Target type -->
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="Type of target"
-                  >
-                    <b-select
-                      v-model="newProjectProp.type"
-                      placeholder="Select a target type"
-                      required
-                      expanded
-                    >
-                      <option
-                        v-for="(type, index) in types"
-                        :key="index"
-                        :value="type.id"
-                      >
-                        {{ type.name }}
-                      </option>
-                    </b-select>
-                  </b-field>
-                </ValidationProvider>
-
-                <!-- Target organism -->
-                <ValidationProvider
-                  rules="required"
-                  name="Organism"
-                  v-slot="{ errors, valid }"
-                  :immediate="newProjectProp.organism !== ''"
-                > 
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="Target organism"
-                  >
-                    <b-select
-                      v-model="newProjectProp.organism"
-                      placeholder="Select a target organism"
-                      required
-                      expanded
-                    >
-                      <option
-                        v-for="(organism, index) in organisms"
-                        :key="index"
-                        :value="organism"
-                      >
-                        {{ organism }}
-                      </option>
-                    </b-select>
-                  </b-field>
-                </ValidationProvider>
-                
-                <ValidationProvider
-                  :rules="'oneOf:' + features.join(',')"
-                  name="Features"
-                  v-slot="{ errors, valid }"
-                  immediate
-                > 
-                  <!-- Target features -->
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="Target features"
-                  >
-                    <b-taginput
-                      v-model="newProjectProp.features"
-                      :data="features"
-                      autocomplete
-                      append-to-body
-                      open-on-focus
-                      readonly
-                      icon="mdil-magnify"
-                      placeholder="Search for a genomic feature"
-                      @typing="getFilteredFeatures"
-                    />
-                  </b-field>
-                </ValidationProvider>
-              </div>
-            </section>
-            <footer class="modal-card-foot">
-              <b-button
-                expanded
-                :loading="isLoading.new_project"
-                :disabled="!passed"
-                type="is-primary"
-                @click="addProject(newProjectProp)"
-              >
-                Add Project
-              </b-button>
-            </footer>
-          </ValidationObserver>
-        </div>
-      </b-modal>
+      <NewProjectModal
+        :active.sync="isNewProjectModalActive"
+        :project="preFilledProject"
+        @update="prefillProject(undefined)"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import * as ProjectManage from "@/api/projectManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
+import NewProjectModal from '@/components/Modal/NewProjectModal.vue'
 
 const variables = require("@/assets/script/variables.json")
 
 export default {
   components: {
-    ValidationProvider,
-    ValidationObserver,
     Error,
     FollowModal,
-    UnfollowModal
+    UnfollowModal,
+    NewProjectModal
   },
   computed: {
     hasLoggedIn() {
@@ -520,9 +378,6 @@ export default {
         limit: 10,
         skip: 0
       },
-      features: variables.genomic_features,
-      types: variables.target_types,
-      organisms: variables.target_organisms,
       progressIcons: variables.progress_type_icons,
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
@@ -531,15 +386,10 @@ export default {
         follow: "",
         type: ""
       },
+      preFilledProject: undefined,
       isUnfollowModelActive: false,
       // Register new activity related parameters
-      isNewActivityModalActive: false,
-      newProjectProp: {
-        type: "",
-        name: "",
-        organism: "",
-        features: []
-      },
+      isNewProjectModalActive: false,
       isLoading: {
         new_project: false,
         follow_unfollow: false,
@@ -562,23 +412,17 @@ export default {
       this.followProp.type = type
       this.isUnfollowModelActive = true
     },
-    prepareNewActivity(target) {
-      this.newProjectProp.type = target.type
-      this.newProjectProp.name = target.name
-      this.newProjectProp.organism = target.organism
-    },
-    cleanupNewActivity() {
-      this.newProjectProp = {
-        type: "",
-        name: "",
-        organism: "",
-        features: []
+    prefillProject(target) {
+      if (!target) {
+        this.preFilledProject = undefined
+        return
       }
-    },
-    getFilteredFeatures(text) {
-      this.features = variables.genomic_features.filter(feature => {
-        return feature.toLowerCase().indexOf(text.toLowerCase()) >= 0
-      })
+
+      this.preFilledProject = {
+        type: target.type,
+        name: target.name,
+        organism: target.organism
+      }
     },
     async fetchTargets(limit = 10, skip = 0) {
       // Loading
@@ -596,30 +440,13 @@ export default {
       } finally {
         this.isLoading.fetch_targets = false
       }
-    },
-    async addProject() {
-      // Loading
-      this.isLoading.new_project = true
-
-      try {
-        const projectId = await ProjectManage.addProject(this.newProjectProp)
-
-        // Jump to new project registration page
-        this.$router.push({ name: 'Project Edit', params: { id: projectId, action: 'new' } })
-      } catch (error) {
-        this.errorMessage = await handleError(error)
-      } finally {
-        // Handle UI changes
-        this.isLoading.new_project = false
-        this.isNewActivityModalActive = false
-      }
     }
   }
 }
 </script>
 
 <style lang="sass" scoped>
-@import "../../assets/style/variables.sass"
+@import "@/assets/style/variables.sass"
 
 .action-button
   justify-content: space-between
