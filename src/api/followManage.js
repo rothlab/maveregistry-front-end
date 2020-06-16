@@ -66,18 +66,18 @@ export async function getFollowStatus(targets, type, by) {
   query.equalTo("by", by)
   query.containedIn("target", targets)
   const follow = await query.find()
-  
+
   return targets.map(e => {
-    const status = follow.filter(f => f.id === e)
-    
+    const status = follow.filter(f => f.get("target") === e)
+
     if (status.length <= 0) return {
       id: undefined,
       status: "no"
     }
 
     return {
-      id: e.id,
-      status: status.get("approvedAt") ? "yes" : "pending"
+      id: status[0].id,
+      status: status[0].get("approvedAt") ? "yes" : "pending"
     }
   })
 }
