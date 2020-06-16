@@ -287,7 +287,7 @@ export default {
 
       // Calculate skip
       const skip = (this.pagination.current - 1) * this.pagination.limit
-      console.log(skip)
+      
       // Update targets
       try {
         const teams = await TeamManage.fetchTeams(this.pagination.limit, skip)

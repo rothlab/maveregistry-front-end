@@ -48,7 +48,6 @@
 
       <!-- Project table -->
       <div v-else>
-        <!-- TODO: implement backend pagination -->
         <b-table
           :data="targets"
           :loading="isLoading.fetch_targets"
@@ -57,6 +56,9 @@
           backend-pagination
           icon-pack="mdi"
           :per-page="pagination.limit"
+          :total="pagination.count"
+          :current-page="pagination.current"
+          @page-change="(change) => { pagination.current = change; fetchTargets() }"
         >
           <template slot-scope="props">
             <!-- Target ID -->
@@ -254,7 +256,7 @@
                     <b-tag
                       v-else
                       size="is-medium"
-                      class="is-clickable has-background-grey-lighter"
+                      class="is-clickable has-background-white-bis"
                       @click.native="confirmFollow(team.id, 'team')"
                     >
                       <b-icon
@@ -371,7 +373,7 @@ export default {
       pagination: {
         count: 0,
         limit: 10,
-        skip: 0
+        current: 1
       },
       progressIcons: variables.progress_type_icons,
       // Follow/unfollow target related parameters
@@ -419,13 +421,16 @@ export default {
         organism: target.organism
       }
     },
-    async fetchTargets(limit = 10, skip = 0) {
+    async fetchTargets() {
       // Loading
       this.isLoading.fetch_targets = true
 
+      // Calculate skip
+      const skip = (this.pagination.current - 1) * this.pagination.limit
+
       // Update targets
       try {
-        const targets = await ProjectManage.fetchTargets(limit, skip)
+        const targets = await ProjectManage.fetchTargets(this.pagination.limit, skip)
         this.targets = targets.results
 
         // Update pagination
@@ -443,7 +448,7 @@ export default {
         return
       }
       
-      if (prefill) this.preFilledProject()
+      if (prefill) this.prefillProject()
 
       this.isNewProjectModalActive = true
     }
