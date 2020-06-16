@@ -441,7 +441,7 @@ export default {
   async mounted() {
     this.isLoading.page = true
 
-    if (this.isEdit) {
+    if (this.isEdit || this.isNew) {
       const project = await this.fetchProject(this.projectId)
 
       // Populate project details if editing
