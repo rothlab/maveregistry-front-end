@@ -64,12 +64,7 @@
               field="target_id"
               label="Target ID"
             >
-              <router-link
-                :to="{ path: `/target/${props.row.id}`}"
-                target="_blank"
-              >
-                {{ props.row.id }}
-              </router-link>
+              {{ props.row.id }}
             </b-table-column>
 
             <!-- Target name-->
