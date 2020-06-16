@@ -13,9 +13,7 @@ export const Team = Parse.Object.extend("Team", {
     if (attrs.email === "") throw new Error("Principal Investigator email is empty")
     if (attrs.affiliation === "") throw new Error("Principal Investigator affiliation is empty")
   },
-  format: async function (detail = false) {
-
-
+  format: async function (detail = false, follow = false) {
     let ret = {
       id: this.id,
       first_name: this.get("first_name"),
@@ -28,7 +26,8 @@ export const Team = Parse.Object.extend("Team", {
 
     if (detail) {
       // Fetch creator
-      const user = await this.get("creator").fetch()
+      const user = this.get("creator")
+      
       ret.user = {
         username: user.get("username"),
         first_name: user.get("first_name"),
@@ -40,9 +39,11 @@ export const Team = Parse.Object.extend("Team", {
       ret.members = members
 
       // Fetch Project
-      const projects = await fetchProjectByTeamId(this.id)
+      const projects = await fetchProjectByTeamId(this.id, ["target"])
       ret.projects = projects
-    } else {
+    }
+
+    if (follow) {
       // Fetch follow status
       ret.follow_status = await getFollowStatus([this.id], "team", Parse.User.current())
     }
@@ -80,10 +81,19 @@ export const Team = Parse.Object.extend("Team", {
     // Create a new team object
     return new Team(attrs)
   },
-  fetchById: async function(id) {
+  fetchById: async function(id, objects = []) {
+    // Set up basic query
     const query = new Parse.Query(Team)
+    query.equalTo("objectId", id)
 
-    return await query.get(id)
+    // Include additional objects
+    for (let index = 0; index < objects.length; index++) {
+      query.include(objects[index])
+    }
+
+    const res = await query.find()
+
+    return res[0]
   }
 })
 Parse.Object.registerSubclass('Team', Team);
@@ -123,14 +133,14 @@ export async function updateTeam(id, payload) {
   
   return await team.save()
 }
-export async function fetchTeams(limit, skip) {
+export async function fetchTeams(limit, skip, follow = false) {
   // Fetch teams, applying pagination
   const query = new Parse.Query(Team)
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
   let teams = await query.find()
-  teams.results = await Promise.all(teams.results.map(e => e.format())) // Format targets
+  teams.results = await Promise.all(teams.results.map(e => e.format(false, follow))) // Format targets
   
   // Format and return
   return teams
@@ -152,10 +162,14 @@ export async function queryByName(name) {
   return teams
 }
 
-export async function queryById(id, detail = false) {
-  const team = await new Team.fetchById(id)
+export async function queryById(id, detail = false, followers = false) {
+  let objects = []
+  if (detail) objects.push("creator")
   
-  return team.format(detail)
+  const team = await new Team.fetchById(id, objects)
+  if (!team) throw new Error("Invalid team ID")
+
+  return team.format(detail, followers)
 }
 
 export async function removeMember(teamId, username) {

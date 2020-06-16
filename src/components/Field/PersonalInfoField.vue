@@ -157,6 +157,13 @@ export default {
   components: {
     ValidationProvider
   },
+  mounted() {
+    this.first_name = this.value.first_name
+    this.last_name = this.value.last_name
+    this.email = this.value.email
+    this.position = this.value.position
+    this.custom_position = this.value.custom_position
+  },
   data () {
     return {
       positions: [

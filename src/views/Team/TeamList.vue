@@ -290,7 +290,7 @@ export default {
       
       // Update targets
       try {
-        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip)
+        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, true)
         this.teams = teams.results
 
         // Update pagination

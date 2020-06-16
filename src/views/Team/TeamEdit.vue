@@ -215,7 +215,7 @@ export default {
       // Fetch team
       let team
       try {
-        team = await TeamManage.queryById(this.teamId, true)
+        team = await TeamManage.queryById(this.teamId, true, false)
       } catch (error) {
         this.errorMessage = await handleError(error)
         return

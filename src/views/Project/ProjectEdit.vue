@@ -447,8 +447,8 @@ export default {
       // Populate project details if editing
       if (project) {
         if (project.leads) this.leads = project.leads // Required, will always have value
-        if (project.team) this.team = project.team // Required, will always have value
-        if (project.collaborators && project.collaborators.length > 0) this.collaborators = project.collaborators
+        if (project.team) this.team = project.team.id // Required, will always have value
+        if (project.collaborators && project.collaborators.length > 0) this.collaborators = project.collaborators.map(e => e.id)
         if (project.funding && project.funding.open_for_funding) this.openForFunding = project.funding.open_for_funding
         if (project.activities) this.activities = project.activities
       }

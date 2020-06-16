@@ -101,58 +101,76 @@ export const Project = Parse.Object.extend("Project", {
     if (attrs.features && attrs.features.length > 0 && 
       attrs.features.some(val => variables.genomic_features.indexOf(val) === -1)) throw new Error("Some features are invalid")
   },
-  format: async function(detail = false) {
-    // Fetch target and user
-    const target = await this.get("target").fetch()
-    const user = await this.get("user").fetch()
-    
-    // Fetch collaborators
-    const collaborators = this.get("collaborators")
-    
+  format: async function(detail = false, followers = false) {
     // Construct return object
     let ret = {
       id: this.id,
-      target: {
+      features: this.get("features"),
+      update_date: this.get("updatedAt"),
+    }
+
+    // Format target
+    const target = this.get("target")
+    if (target.isDataAvailable()) {
+      ret.target = {
         id: target.id,
         name: target.get("name"),
         type: target.get("type"),
         organism: target.get("organism"),
-      },
-      features: this.get("features"),
-      user: {
+      }
+    }
+
+    // Format user
+    const user = this.get("user")
+    if (user.isDataAvailable()) {
+      ret.user = {
         username: user.get("username"),
         first_name: user.get("first_name"),
         last_name: user.get("last_name")
-      },
-      update_date: this.get("updatedAt"),
+      }
     }
-
-    // Check if followed by the current user
-    const followStatus = await getFollowStatus(this, "project", Parse.User.current())
-    ret.follow_status = followStatus
-    
-    // Add recemt activity
-    const recentActivity = findRecentActivity(this.get("activities"))
-    if (recentActivity) ret.activities = recentActivity
     
     // Access project progress detail
     if (detail) {
-      const team = this.get("team")
-
       ret.leads = this.get("leads")
-      if (team && team.id) ret.team = team.id
-      if (collaborators) ret.collaborators = collaborators.map(e => e.id)
+
+      // Format team
+      const team = this.get("team")
+      if (team && team.isDataAvailable()) ret.team = await team.format()
+
+      // Format collaborators
+      const collaborators = this.get("collaborators")
+      if (collaborators && collaborators.length > 0) ret.collaborators = await Promise.all(collaborators.map(e => e.format()))
+
       ret.funding = this.get("funding")
       ret.activities = this.get("activities")
+    }
+    
+    if (followers) {
+      // Check if followed by the current user
+      ret.follow_status = await getFollowStatus([this.id], "project", Parse.User.current())
+
+      // Add recemt activity
+      const recentActivity = findRecentActivity(this.get("activities"))
+      if (recentActivity) ret.activities = recentActivity
     }
 
     return ret
   }
 }, {
-  fetchById: async function(id) {
+  fetchById: async function(id, objects = []) {
+    // Set up basic query
     const query = new Parse.Query(Project)
+    query.equalTo("objectId", id)
 
-    return await query.get(id)
+    // Include additional objects
+    for (let index = 0; index < objects.length; index++) {
+      query.include(objects[index])
+    }
+
+    const res = await query.find()
+
+    return res[0]
   }
 })
 Parse.Object.registerSubclass('Project', Project);
@@ -208,17 +226,22 @@ export async function fetchProject(id, detail = false) {
   // TODO: enforce ACL
 
   // Fetch project by ID
-  const project = await new Project.fetchById(id)
+  const project = await new Project.fetchById(id, ["target", "user", "team", "collaborators"])
 
   // Format and return
   return project.format(detail)
 }
 
-export async function fetchProjectByTeamId(id) {
+export async function fetchProjectByTeamId(id, objects = []) {
   const teamQuery = new Parse.Query(Team)
   teamQuery.equalTo("objectId", id)
   const query = new Parse.Query(Project)
   query.matchesQuery("team", teamQuery)
+
+  // Include additional objects
+  for (let index = 0; index < objects.length; index++) {
+    query.include(objects[index])
+  }
   const projects = await query.find()
 
   // Format and return

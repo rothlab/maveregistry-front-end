@@ -296,7 +296,7 @@ export default {
     const team = await this.fetchTeam()
 
     // Fetch team follower and request count
-    await this.fetchFollowerAndRequestCount(team.id)
+    if (team) await this.fetchFollowerAndRequestCount(team.id)
 
     this.isLoading.page = false
   },
@@ -305,7 +305,7 @@ export default {
       // Fetch team
       let team
       try {
-        team = await TeamManage.queryById(this.teamId, true)
+        team = await TeamManage.queryById(this.teamId, true, false)
       } catch (error) {
         this.errorMessage = await handleError(error)
         return

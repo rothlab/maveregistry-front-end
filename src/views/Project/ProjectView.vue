@@ -279,7 +279,6 @@
 
 <script>
 import * as ProjectManage from "@/api/projectManage.js"
-import * as TeamManage from "@/api/teamManage.js"
 import * as FollowManage from "@/api/followManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
@@ -332,9 +331,9 @@ export default {
 
     if (project) {
       if (project.leads) this.leads = project.leads // Required, will always have value
-      if (project.team) this.team = await TeamManage.queryById(project.team) // Required, will always have value
+      if (project.team) this.team = project.team // Required, will always have value
       if (project.collaborators)
-        this.collaborators = await Promise.all(project.collaborators.map(e => TeamManage.queryById(e)))
+        this.collaborators = project.collaborators
       if (project.funding) this.funding = project.funding
       if (project.activities) this.activities = project.activities
     }

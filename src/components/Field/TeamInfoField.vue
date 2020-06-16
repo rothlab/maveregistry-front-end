@@ -99,12 +99,7 @@ export default {
     }
   },
   async mounted() {
-    if (this.value !== "") {
-      await this.updateExistTeamById(this.value)
-    }
-
-    // Fetch teams
-    await this.fetchTeams()
+    if (this.value) this.updateExistTeamById(this.value)
   },
   data () {
     return {
