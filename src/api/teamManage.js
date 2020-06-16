@@ -157,7 +157,7 @@ export async function queryByName(name) {
   const query = Parse.Query.or(firstNameQuery, lastNameQuery)
   query.withCount() // include total amount of targets in the DB
   let teams = await query.find()
-  teams.results = teams.results.map(e => e.format())
+  teams.results = await Promise.all(teams.results.map(e => e.format(false, false)))
 
   return teams
 }

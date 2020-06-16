@@ -3,7 +3,7 @@
     <label class="label">
       Find or Add a Principal Investigator
     </label>
-    <!-- TODO: handle pagination -->
+
     <b-autocomplete
       v-model="existTeamDisplay"
       class="field-margin"
@@ -18,18 +18,30 @@
       @typing="fetchTeams"
       @select="updateVal"
       @focus="fetchTeams()"
+      :check-infinite-scroll="true"
+      @infinite-scroll="fetchMoreTeams"
     >
       <template slot="empty">
-        <p class="has-text-centered">
+        <p class="has-text-centered has-text-grey-light">
           <b-icon icon="mdil-information" />
           No results found
         </p>
       </template>
-      <template slot="footer">
+      <template slot="header">
         <a @click="isNewTeamModalActive = true">
           <b-icon icon="mdil-plus" />
           <span>Add new...</span>
         </a> 
+      </template>
+      <template slot="footer">
+        <p
+          class="has-text-centered has-text-grey-light"
+          v-show="this.teams.length > 0"
+        >
+          <b-icon icon="mdil-information" />
+          <span v-if="pagination.count <= this.teams.length">That's it! No more results.</span>
+          <span v-else>Scroll down to see more results.</span>
+        </p>
       </template>
       <template slot-scope="props">
         <b-icon icon="mdil-account" />
@@ -109,7 +121,12 @@ export default {
       errorMessage: "",
       keyword: "",
       isNewTeamModalActive: false,
-      isLoading: false
+      isLoading: false,
+      pagination: {
+        count: 0,
+        limit: 10,
+        skip: 0
+      }
     }
   },
   methods: {
@@ -147,39 +164,43 @@ export default {
         this.isLoading = false
       }
     },
-    async fetchTeams(query = "") {
+    async fetchTeams(query = "", store = true) {
       this.isLoading = true
 
       // Set keyword for bolding
       this.keyword = query.toLowerCase()
 
       // Fetch some teams to populate the dropdown menu
-      if (query.length <= 0) {
-        try {
-          const teams = await TeamManage.fetchTeams(10, 0)
-
-          // Format and store
-          this.teams = teams.results.map(this.formatTeam)
-        } catch (error) {
-          this.errorMessage = await handleError(error)
-        } finally {
-          this.isLoading = false
-        }
-
-        return 
-      }
-
-      // Otherwise, search team with matching names
+      let teams
       try {
-        const teams = await TeamManage.queryByName(query)
-
-        // Format and store
-        this.teams = teams.results.map(this.formatTeam)
+        if (query.length <= 0) {
+          teams = await TeamManage.fetchTeams(this.pagination.limit, this.pagination.skip)
+        } else {
+          // Otherwise, search team with matching names
+          teams = await TeamManage.queryByName(query)
+          this.pagination.skip = 0
+        }
       } catch (error) {
         this.errorMessage = await handleError(error)
+        return
       } finally {
         this.isLoading = false
       }
+
+      // Format and store
+      this.pagination.count = teams.count
+      teams = teams.results.map(this.formatTeam)
+      if (store) this.teams = teams
+      return teams
+    },
+    async fetchMoreTeams() {
+      // Update pagination
+      this.pagination.skip += this.pagination.limit
+
+      if (this.pagination.skip >= this.pagination.count) return
+
+      // Fetch teams and add to current teams
+      this.teams = this.teams.concat(await this.fetchTeams(this.keyword, false))
     },
     trimKeyword(string, keyword) {
       if (keyword.length <= 0 || !string.startsWith(keyword)) return capitalize(string)
