@@ -156,12 +156,11 @@ export async function resetPassword (email) {
 }
 
 export async function fetchUsersByTeamId (id) {
-  // Fetch team
-  const team = await new Team.fetchById(id)
-  if (!team) return []
-
+  // Construct query
+  const teamQuery = new Parse.Query(Team)
+  teamQuery.equalTo("objectId", id)
   const query = new Parse.Query(Parse.User)
-  query.equalTo("team", team)
+  query.matchesQuery("team", teamQuery)
   const members = await query.find()
 
   return members.map(e => parseUserMetadata(e, false))

@@ -57,28 +57,29 @@ export async function queryFollowById(id) {
   return follow[0]
 }
 
-export async function getFollowStatus(target, type, by) {
+export async function getFollowStatus(targets, type, by) {
+  if (targets.length <= 0) return []
+
   // Fetch follow object
   const query = new Parse.Query(Follow)
   query.equalTo("type", type)
-  query.equalTo("target", target)
   query.equalTo("by", by)
-  let follow = await query.find()
-
-  let ret = {
-    id: undefined,
-    status: "no"
-  }
+  query.containedIn("target", targets)
+  const follow = await query.find()
   
-  // If no result, just return ret
-  if (follow && follow.length < 1) return ret
+  return targets.map(e => {
+    const status = follow.filter(f => f.id === e)
+    
+    if (status.length <= 0) return {
+      id: undefined,
+      status: "no"
+    }
 
-  follow = follow[0]
-  // If follow object does exist, but is not approved
-  ret.id = follow.id
-  ret.status = follow.get("approvedAt") ? "yes" : "pending"
-
-  return ret
+    return {
+      id: e.id,
+      status: status.get("approvedAt") ? "yes" : "pending"
+    }
+  })
 }
 
 export async function follow(target, type, reason) {

@@ -31,16 +31,15 @@ const Target = Parse.Object.extend("Target", {
   },
   format: async function () {
     // Fetch projects
-    const projects = await Promise.all(this.get("projects").map(e => e.fetch()))
+    const projects = this.get("projects")
 
     // Handle team object
-    const teamId = projects.map(e => e.get("team")).filter(Boolean).filter(uniqueById)
-    const teams = await Promise.all(teamId.map(e => e.fetch()))
+    const teams = projects.map(e => e.get("team")).filter(Boolean).filter(uniqueById)
 
     // Get follow status for projects and teams
-    const projectFollowStatus = await Promise.all(projects.map(e => getFollowStatus(e.id, "project", Parse.User.current())))
-    const teamFollowStatus = await Promise.all(teamId.map(e => getFollowStatus(e.id, "team", Parse.User.current())))
-    
+    const projectFollowStatus = await getFollowStatus(projects.map(e => e.id), "project", Parse.User.current())
+    const teamFollowStatus = await getFollowStatus(teams.map(e => e.id), "team", Parse.User.current())
+
     return {
       id: this.id,
       name: this.get("name"),
@@ -197,6 +196,7 @@ export async function fetchTargets(limit, skip) {
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
+  query.include("projects.team") // Include projects and team objects on the return
   let targets = await query.find()
   targets.results = await Promise.all(targets.results.map(e => e.format())) // Format targets
   
@@ -215,9 +215,10 @@ export async function fetchProject(id, detail = false) {
 }
 
 export async function fetchProjectByTeamId(id) {
-  const team = await new Team.fetchById(id)
+  const teamQuery = new Parse.Query(Team)
+  teamQuery.equalTo("objectId", id)
   const query = new Parse.Query(Project)
-  query.equalTo("team", team)
+  query.matchesQuery("team", teamQuery)
   const projects = await query.find()
 
   // Format and return

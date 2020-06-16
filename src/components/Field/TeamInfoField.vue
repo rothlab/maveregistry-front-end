@@ -3,6 +3,7 @@
     <label class="label">
       Find or Add a Principal Investigator
     </label>
+    <!-- TODO: handle pagination -->
     <b-autocomplete
       v-model="existTeamDisplay"
       class="field-margin"

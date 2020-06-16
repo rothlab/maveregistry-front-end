@@ -121,7 +121,9 @@
     </b-navbar>
 
     <!-- Log in/Sign up panel -->
-    <LoginSignupModal :active.sync="isLoginSignupModalActive" />
+    <LoginSignupModal
+      :active.sync="isLoginSignupModalActive"
+    />
 
     <!-- Component injection -->
     <router-view @login="isLoginSignupModalActive = true" />

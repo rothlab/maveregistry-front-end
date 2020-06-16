@@ -14,11 +14,7 @@ export const Team = Parse.Object.extend("Team", {
     if (attrs.affiliation === "") throw new Error("Principal Investigator affiliation is empty")
   },
   format: async function (detail = false) {
-    // Fetch follow status
-    const followStatus = await getFollowStatus(this.id, "team", Parse.User.current())
 
-    // Fetch creator
-    const user = await this.get("creator").fetch()
 
     let ret = {
       id: this.id,
@@ -27,16 +23,18 @@ export const Team = Parse.Object.extend("Team", {
       email: this.get("email"),
       affiliation: this.get("affiliation"),
       website: this.get("website"),
-      follow_status: followStatus,
-      user: {
-        username: user.get("username"),
-        first_name: user.get("first_name"),
-        last_name: user.get("last_name")
-      },
       update_date: this.get("updatedAt")
     }
 
     if (detail) {
+      // Fetch creator
+      const user = await this.get("creator").fetch()
+      ret.user = {
+        username: user.get("username"),
+        first_name: user.get("first_name"),
+        last_name: user.get("last_name")
+      }
+
       // Fetch members
       const members = await fetchUsersByTeamId(this.id)
       ret.members = members
@@ -44,6 +42,9 @@ export const Team = Parse.Object.extend("Team", {
       // Fetch Project
       const projects = await fetchProjectByTeamId(this.id)
       ret.projects = projects
+    } else {
+      // Fetch follow status
+      ret.follow_status = await getFollowStatus([this.id], "team", Parse.User.current())
     }
 
     return ret
@@ -122,14 +123,14 @@ export async function updateTeam(id, payload) {
   
   return await team.save()
 }
-export async function fetchTeams(limit, skip, detail = false) {
+export async function fetchTeams(limit, skip) {
   // Fetch teams, applying pagination
   const query = new Parse.Query(Team)
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
   let teams = await query.find()
-  teams.results = await Promise.all(teams.results.map(e => e.format(detail))) // Format targets
+  teams.results = await Promise.all(teams.results.map(e => e.format())) // Format targets
   
   // Format and return
   return teams
