@@ -138,7 +138,7 @@
                       <b-icon icon="mdil-pin" />
                       Target
                     </div>
-                    <div class="level is-mobile">
+                    <div class="level is-mobile is-marginless">
                       <div class="level-item is-capitalized">
                         Type: {{ target.type }}
                       </div>
@@ -146,10 +146,21 @@
                         Name: {{ target.name }}
                       </div>
                       <div class="level-item">
-                        Organism: <i>{{ target.organism }}</i>
+                        <span>Organism: <i>{{ target.organism }}</i></span>
                       </div>
                     </div>
                   </div>
+                </div>
+
+                <div class="content has-text-right">
+                  <b-tooltip
+                    label="Sorry, please create a new project instead."
+                    type="is-dark"
+                  >
+                    <p class="has-text-primary">
+                      Can I edit this?
+                    </p>
+                  </b-tooltip>
                 </div>
               </b-notification>
             </div>
