@@ -22,7 +22,6 @@
                 icon-left="mdil-pencil"
                 type="is-primary"
                 size="is-medium"
-                outlined
                 @click="editProject"
               >
                 Edit
@@ -148,6 +147,8 @@
               </p>
             </div>
 
+            <hr v-if="hasPeople || hasActivity">
+
             <div
               class="project-header"
               v-if="hasActivity"
@@ -163,7 +164,7 @@
               class="project-content"
               v-if="hasActivity"
             >
-              <p
+              <div
                 class="is-size-5"
                 v-for="(activity, id) in activities"
                 :key="id"
@@ -172,9 +173,27 @@
                   {{ activity.start_date.toLocaleDateString() }} -
                   {{ activity.end_date ? activity.end_date.toLocaleDateString() : "Present" }}
                 </b> | {{ activity.type }}
+
                 <br>
+
+                <div class="is-size-6 has-text-grey">
+                  <b-icon icon="mdil-link" />
+                  Links:
+                  <span
+                    v-for="(link, linkId) in activity.links"
+                    :key="linkId"
+                  >
+                    <a
+                      :href="link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >{{ linkId + 1 }}</a>
+                    <span v-if="activity.links.length > linkId + 1">, </span>
+                  </span>
+                </div>
+
                 {{ activity.description }}
-              </p>
+              </div>
             </div>
           </div>
 
@@ -216,7 +235,7 @@
                 {{ funding.open_for_funding ? "Seek" : "Not Seek" }} Funding
               </p>
               <p
-                class="is-size-5"
+                class="is-size-5 is-capitalized"
                 v-if="user"
               >
                 <b>Creator</b> <br>
@@ -233,29 +252,68 @@
                 <b-icon icon="mdil-clock" />
                 {{ updatedDate.toLocaleString() }}
               </p>
+              <div
+                class="is-size-5"
+                v-if="(followerCount > 0 || requestCount > 0) && isOwner"
+              >
+                <b>Follower{{ followerCount > 1 ? 's' : '' }}</b> <br>
+                <div class="buttons">
+                  <b-button
+                    v-if="followerCount > 0"
+                    class="action-button"
+                    icon-left="mdil-settings"
+                    type="is-light"
+                    @click="openFollowerModal(false)"
+                  >
+                    Manage <b>{{ followerCount }}</b> Follower{{ followerCount > 1 ? 's' : '' }}
+                  </b-button>
+                  <b-button
+                    v-if="requestCount > 0"
+                    class="action-button"
+                    icon-left="mdil-comment-text"
+                    type="is-light"
+                    @click="openFollowerModal(true)"
+                  >
+                    Review <b>{{ requestCount }}</b> Request{{ requestCount > 1 ? 's' : '' }}
+                  </b-button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Manage follower modal -->
+      <ManageFollowerModal
+        :active.sync="isManageFollowerModalActive"
+        :target="projectId"
+        :is-request="isRequest"
+        type="project"
+        @change="fetchFollowerAndRequestCount(projectId)"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import * as ProjectManage from "@/api/projectManage.js"
-import * as TeamManage from "@/api/teamManage.js"
+import * as FollowManage from "@/api/followManage.js"
+import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
+import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 
 export default {
   components: {
-    Error
+    Error,
+    ManageFollowerModal
   },
   data() {
     return {
       isLoading: {
         page: false
       },
-      isOwner: false,
+      isManageFollowerModalActive: false,
+      isRequest: false,
       errorMessage: "",
       target: {},
       features: [],
@@ -265,7 +323,9 @@ export default {
       team: undefined,
       collaborators: [],
       funding: undefined,
-      activities: []
+      activities: [],
+      followerCount: 0,
+      requestCount: 0
     }
   },
   computed: {
@@ -273,10 +333,13 @@ export default {
       return this.$route.params.id
     },
     hasPeople() {
-      return this.leads.length > 0 && this.team && this.collaborators.length > 0
+      return this.leads.length > 0 && this.team
     },
     hasActivity() {
       return this.activities.length > 0
+    },
+    isOwner() {
+      return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
     }
   },
   async mounted() {
@@ -286,17 +349,15 @@ export default {
 
     if (project) {
       if (project.leads) this.leads = project.leads // Required, will always have value
-      if (project.team) this.team = await TeamManage.queryById(project.team) // Required, will always have value
+      if (project.team) this.team = project.team // Required, will always have value
       if (project.collaborators)
-        this.collaborators = await Promise.all(project.collaborators.map(e => TeamManage.queryById(e)))
+        this.collaborators = project.collaborators
       if (project.funding) this.funding = project.funding
       if (project.activities) this.activities = project.activities
     }
 
-    // Set owner property
-    if (this.user && this.user.username)
-      this.isOwner = this.$store.state.hasLoggedIn && (this.user.username === this.$store.state.user.username)
-
+    // Fetch team follower and request count
+    await this.fetchFollowerAndRequestCount(this.projectId)
     this.isLoading.page = false
   },
   methods: {
@@ -312,26 +373,24 @@ export default {
 
         return project
       } catch (error) {
-        this.errorMessage = error.message
+        this.errorMessage = await handleError(error)
       }
     },
     editProject() {
       this.$router.push({ name: 'Project Edit', params: { id: this.projectId, action: 'edit' } })
+    },
+    async fetchFollowerAndRequestCount(id) {
+      try {
+        this.followerCount = await FollowManage.countFollows(id, "project")
+        this.requestCount = await FollowManage.countFollows(id, "project", true)
+      } catch (error) {
+        this.errorMessage = await handleError(error)
+      }
+    },
+    openFollowerModal(request) {
+      this.isManageFollowerModalActive = true
+      this.isRequest = request
     }
   }
 }
 </script>
-
-<style lang="sass" scoped>
-.project-header
-  margin-bottom: 0.5rem
-.no-project
-  border: 1px dashed #b5b5b5
-  border-radius: 6px
-  height: 100%
-  display: flex
-  justify-content: center
-  .info-icon
-    margin: 2rem
-    display: flex
-</style>

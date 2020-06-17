@@ -18,86 +18,65 @@ export default new Vuex.Store({
       state.user = undefined
     },
     loginUser(state, user) {
-      state.hasLoggedIn = true
-      state.user = user
+      if (user) {
+        state.hasLoggedIn = true
+        state.user = user
+      }
     }
   },
   actions: {
     async logoutUser ({ commit }) {
       // Logout user no matter what
       commit('logoutUser')
-
-      const res = await UserManage.logoutUser()
-
-      if (res.error) {
-        throw res.error
-      }
+      
+      await UserManage.logoutUser()
     },
     async loginUserPassword ({ commit }, credential) {
-      let res = new Object;
-      res = await UserManage.loginUserPassword(credential.username, credential.password)
+      const user = await UserManage.loginUserPassword(credential.username, credential.password)
 
-      if (!res.error) {
-        // Update user info if loggined in successfully
-        commit('loginUser', res.user)
-      } else {
-        throw res.error
-      }
+      commit('loginUser', user)
     },
     async loginUserCache ({ commit }) {
-      const res = await UserManage.loginUserCache()
+      const user = await UserManage.loginUserCache()
 
-      if (res.user) {
-        // Update user info if loggined in successfully
-        commit('loginUser', res.user)
-      }
+      // Update user info if loggined in successfully
+      commit('loginUser', user)
     },
     async signupUserPassword ({ commit }, userInfo) {
-      let res = await UserManage.signupUserPassword(userInfo.username, userInfo.email, userInfo.password, 
+      const user = await UserManage.signupUserPassword(userInfo.username, userInfo.email, userInfo.password, 
         userInfo.first_name, userInfo.last_name)
 
-      if (!res.error) {
-        // Update user info if loggined in successfully
-        commit('loginUser', res.user)
-      } else {
-        throw res.error
-      }
+      // Update user info if loggined in successfully
+      commit('loginUser', user)
     },
     async signupLoginUserGoogle ({ commit }, userInfo) {
-      let res = await UserManage.signupLoginUserGoogle(userInfo)
+      const user = await UserManage.signupLoginUserGoogle(userInfo)
       
-      if (!res.error) {
-        // Update user info if loggined in successfully
-        commit('loginUser', res.user)
-      } else {
-        throw res.error
-      }
+      // Update user info if loggined in successfully
+      commit('loginUser', user)
     },
     async signupLoginUserOrcid ({ commit }, userInfo) {
-      let res = await UserManage.signupLoginUserOrcid(userInfo)
+      const user = await UserManage.signupLoginUserOrcid(userInfo)
 
-      if (!res.error && !!res.hasEmail) {
+      if (user && user.email) {
         // Update user info if loggined in successfully
-        commit('loginUser', res.user)
-      } else if (res.error) {
-        throw res.error
+        commit('loginUser', user)
       }
 
-      return res
+      return user
     },
     async updateUserProfile ({ commit }, userInfo) {
-      let res = await UserManage.updateUserProfile(userInfo)
-      if (!res.error) {
-        // Update user info if loggined in successfully
-        commit('loginUser', res.user)
-      } else {
-        throw res.error
-      }
+      const user = await UserManage.updateUserProfile(userInfo)
+
+      // Update user info if loggined in successfully
+      commit('loginUser', user)
     }
   },
   modules: {
   },
-  plugins: [createMutationsSharer({
-    predicate: ['loginUser', 'logoutUser']
-  })]
+  plugins: [
+    createMutationsSharer({
+      predicate: ['loginUser', 'logoutUser']
+    })
+  ]
 })

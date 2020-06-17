@@ -1,13 +1,7 @@
 {
   "target_types": [
-    {
-      "id": "gene",
-      "name": "Gene"
-    },
-    {
-      "id": "other",
-      "name": "Other Genomic Regions"
-    }
+    "Gene",
+    "Other Genomic Regions"
   ],
   "target_organisms": [
     "H. sapiens",

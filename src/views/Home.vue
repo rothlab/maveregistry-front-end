@@ -37,7 +37,7 @@
                         tag="router-link"
                         to="/teams"
                       >
-                        Team Progress
+                        View Teams
                       </b-button>
                     </div>
                   </div>
@@ -271,7 +271,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "@/assets/variables.sass"
+@import "../assets/style/variables.sass"
 
 @media screen and (min-width: $break-desktop)
   .landing
@@ -294,7 +294,7 @@ export default {
   right: -2rem
   min-height: 20rem
   height: 70vh
-  background-image: url("../assets/laptop-wire.svg")
+  background-image: url("../assets/image/laptop-wire.svg")
   background-size: cover
   overflow-x: show
 .tip

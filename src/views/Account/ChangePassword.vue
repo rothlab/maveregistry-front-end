@@ -27,7 +27,7 @@
                     <p class="has-text-weight-semibold">
                       Please choose a new password
                     </p>
-                    <PasswordWithRevealAndValidation
+                    <PasswordField
                       has-confirm
                       v-model="password"
                     />
@@ -77,13 +77,13 @@
 
 <script>
 import { ValidationObserver } from 'vee-validate'
-import PasswordWithRevealAndValidation from '../components/PasswordWithRevealAndValidation.vue'
-import { Parse } from "../api/parseConnect"
+import PasswordField from '@/components/Field/PasswordField.vue'
+import { Parse } from "@/api/parseConnect.js"
 
 export default {
   components: {
     ValidationObserver,
-    PasswordWithRevealAndValidation
+    PasswordField
   },
   computed: {
     token() {

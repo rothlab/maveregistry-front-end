@@ -1,4 +1,7 @@
 import { Parse } from "./parseConnect.js"
+import { getFollowStatus } from "./followManage.js"
+import { fetchProjectByTeamId } from "./projectManage.js"
+import { fetchUsersByTeamId } from "./userManage.js"
 
 // Define team object
 export const Team = Parse.Object.extend("Team", {
@@ -10,15 +13,42 @@ export const Team = Parse.Object.extend("Team", {
     if (attrs.email === "") throw new Error("Principal Investigator email is empty")
     if (attrs.affiliation === "") throw new Error("Principal Investigator affiliation is empty")
   },
-  format: function () {
-    return {
+  format: async function (detail = false, follow = false) {
+    let ret = {
       id: this.id,
       first_name: this.get("first_name"),
       last_name: this.get("last_name"),
       email: this.get("email"),
       affiliation: this.get("affiliation"),
       website: this.get("website"),
+      update_date: this.get("updatedAt")
     }
+
+    if (detail) {
+      // Fetch creator
+      const user = this.get("creator")
+      
+      ret.user = {
+        username: user.get("username"),
+        first_name: user.get("first_name"),
+        last_name: user.get("last_name")
+      }
+
+      // Fetch members
+      const members = await fetchUsersByTeamId(this.id)
+      ret.members = members
+
+      // Fetch Project
+      const projects = await fetchProjectByTeamId(this.id, ["target"])
+      ret.projects = projects
+    }
+
+    if (follow) {
+      // Fetch follow status
+      ret.follow_status = await getFollowStatus([this.id], "team", Parse.User.current())
+    }
+
+    return ret
   }
 }, {
   create: async function(attrs) {
@@ -50,8 +80,23 @@ export const Team = Parse.Object.extend("Team", {
     
     // Create a new team object
     return new Team(attrs)
+  },
+  fetchById: async function(id, objects = []) {
+    // Set up basic query
+    const query = new Parse.Query(Team)
+    query.equalTo("objectId", id)
+
+    // Include additional objects
+    for (let index = 0; index < objects.length; index++) {
+      query.include(objects[index])
+    }
+
+    const res = await query.find()
+
+    return res[0]
   }
 })
+Parse.Object.registerSubclass('Team', Team);
 
 export async function addTeam(teamInfo) {
   // Validate if logged in
@@ -76,14 +121,26 @@ export async function addTeam(teamInfo) {
   return await team.save()
 }
 
-export async function fetchTeams(limit, skip) {
+export async function updateTeam(id, payload) {
+  const team = await new Team.fetchById(id)
+
+  // Update
+  team.set("first_name", payload.first_name)
+  team.set("last_name", payload.last_name)
+  team.set("email", payload.email)
+  team.set("affiliation", payload.affiliation)
+  if (payload.website) team.set("website", payload.website)
+  
+  return await team.save()
+}
+export async function fetchTeams(limit, skip, follow = false) {
   // Fetch teams, applying pagination
   const query = new Parse.Query(Team)
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
   let teams = await query.find()
-  teams.results = teams.results.map(e => e.format()) // Format targets
+  teams.results = await Promise.all(teams.results.map(e => e.format(false, follow))) // Format targets
   
   // Format and return
   return teams
@@ -100,13 +157,31 @@ export async function queryByName(name) {
   const query = Parse.Query.or(firstNameQuery, lastNameQuery)
   query.withCount() // include total amount of targets in the DB
   let teams = await query.find()
-  teams.results = teams.results.map(e => e.format())
+  teams.results = await Promise.all(teams.results.map(e => e.format(false, false)))
 
   return teams
 }
 
-export async function queryById(id) {
-  const team = await new Team.create({ id: id })
+export async function queryById(id, detail = false, followers = false) {
+  let objects = []
+  if (detail) objects.push("creator")
   
-  return team.format()
+  const team = await new Team.fetchById(id, objects)
+  if (!team) throw new Error("Invalid team ID")
+
+  return team.format(detail, followers)
+}
+
+export async function removeMember(teamId, username) {
+  // Fetch user
+  const query = new Parse.Query(Parse.User)
+  query.equalTo("username", username)
+  let user = await query.find()
+  user = user[0]
+
+  // Valid user belongs to a team and the team ID matches
+  const userTeam = user.get("team")
+  if (!userTeam || userTeam.id !== teamId) throw Error("User team mismatch")
+  user.unset("team")
+  await user.save()
 }

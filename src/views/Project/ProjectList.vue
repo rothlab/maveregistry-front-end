@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="cleanupNewActivity(); isNewActivityModalActive = true"
+                @click="addProject"
               >
                 New Project
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="cleanupNewActivity(); isNewActivityModalActive = true"
+                @click="addProject"
               >
                 New
               </b-button>
@@ -41,9 +41,13 @@
     </div>
     
     <div class="container has-fullheight has-top-padding has-touch-container-padding">
+      <Error
+        :message="errorMessage"
+        v-if="errorMessage !== ''"
+      />
+
       <!-- Project table -->
-      <div>
-        <!-- TODO: implement backend pagination -->
+      <div v-else>
         <b-table
           :data="targets"
           :loading="isLoading.fetch_targets"
@@ -52,21 +56,11 @@
           backend-pagination
           icon-pack="mdi"
           :per-page="pagination.limit"
+          :total="pagination.count"
+          :current-page="pagination.current"
+          @page-change="(change) => { pagination.current = change; fetchTargets() }"
         >
           <template slot-scope="props">
-            <!-- Target ID -->
-            <b-table-column
-              field="target_id"
-              label="Target ID"
-            >
-              <router-link
-                :to="{ path: `/target/${props.row.id}`}"
-                target="_blank"
-              >
-                {{ props.row.id }}
-              </router-link>
-            </b-table-column>
-
             <!-- Target name-->
             <b-table-column
               field="target_name"
@@ -96,7 +90,6 @@
             <b-table-column
               field="projects"
               label="Project Progress"
-              width="25vw"
             >
               <div class="has-text-left">
                 <b-collapse
@@ -145,26 +138,55 @@
                   </div>
                   <div class="card-content">
                     <div class="content">
-                      <p>
-                        <span class="has-text-primary">Project ID:</span>
-                        <router-link
-                          :to="{ path: `/project/${project.id}`}"
-                          target="_blank"
-                        >
-                          {{ project.id }}
-                        </router-link>
-                        <br>
-                        <span class="has-text-primary">
-                          Feature{{ project.features.length > 1 ? 's:' : ':' }}
-                        </span>
-                        {{ project.features.join(",") }}
-                        <br>
-                        <span
-                          v-if="project.description"
-                          class="has-text-primary"
-                        >Progress description:</span>
-                        {{ project.description }}
-                      </p>
+                      <div class="level is-mobile is-paddingless">
+                        <div class="level-left">
+                          <p>
+                            <span class="has-text-primary">Project ID:</span>
+                            <router-link
+                              :to="{ path: `/project/${project.id}`}"
+                              target="_blank"
+                            >
+                              {{ project.id }}
+                            </router-link>
+                            <br>
+                            <span class="has-text-primary">
+                              Feature{{ project.features.length > 1 ? 's:' : ':' }}
+                            </span>
+                            {{ project.features.join(",") }}
+                            <br>
+                            <span
+                              v-if="project.description"
+                              class="has-text-primary"
+                            >Progress description:</span>
+                            {{ project.description }}
+                          </p>
+                        </div>
+                        <div class="level-right">
+                          <!-- If not followed, show follow icon -->
+                          <b-tooltip
+                            label="Follow Project"
+                            type="is-dark"
+                            v-if="!project.follow_status.id"
+                          >
+                            <a @click="confirmFollow(project.id, 'project')"><b-icon icon="mdil-bell" /></a>
+                          </b-tooltip>
+                          <!-- If pending, show pending status and unfollow-->
+                          <b-tooltip
+                            :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Project'"
+                            type="is-dark"
+                            v-else
+                          >
+                            <a @click="confirmUnfollow(project.follow_status.id, 'project')">
+                              <b-icon
+                                icon="mdil-bell-off"
+                                class="circle-icon"
+                                :class="{ 'has-background-warning': project.follow_status.status === 'pending', 'has-background-primary': project.follow_status.status === 'yes' }"
+                                :type="project.follow_status.status === 'yes' ? 'is-white' : 'is-dark'"
+                              />
+                            </a>
+                          </b-tooltip>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </b-collapse>
@@ -204,24 +226,29 @@
                     </router-link>
                     <!-- Followed status -->
                     <b-tag
-                      v-if="team.has_followed"
+                      v-if="team.follow_status.id"
                       size="is-medium"
-                      class="is-clickable has-background-primary"
-                      @click.native="confirmUnfollowTeam(team, props.row, props.index)"
+                      class="is-clickable"
+                      :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-primary': team.follow_status.status === 'yes' }"
+                      @click.native="confirmUnfollow(team.follow_status.id, 'team')"
                     >
-                      <b-icon
-                        type="is-white"
-                        custom-size="mdi-16px"
-                        pack="mdi"
-                        icon="bell"
-                      />
+                      <b-tooltip
+                        :label="team.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Team'"
+                        type="is-dark"
+                      >
+                        <b-icon
+                          :type="team.follow_status.status === 'yes' ? 'is-white' : ''"
+                          custom-size="mdi-16px"
+                          icon="mdil-bell-off"
+                        />
+                      </b-tooltip>
                     </b-tag>
                     <!-- Unfollowed status -->
                     <b-tag
                       v-else
                       size="is-medium"
-                      class="is-clickable has-background-grey-lighter"
-                      @click.native="confirmFollowTeam(team, props.row, props.index)"
+                      class="is-clickable has-background-white-bis"
+                      @click.native="confirmFollow(team.id, 'team')"
                     >
                       <b-icon
                         icon="mdil-bell"
@@ -236,6 +263,7 @@
             <b-table-column
               field="action"
               label="Action"
+              width="8vw"
             >
               <div class="action-button is-flex">
                 <b-tooltip
@@ -245,7 +273,7 @@
                 >
                   <b-button
                     icon-right="mdil-plus"
-                    @click="cleanupNewActivity(); prepareNewActivity(props.row); isNewActivityModalActive = true"
+                    @click="addProject(true)"
                   />
                 </b-tooltip>
                 <!-- Show MaveQuest for human genes -->
@@ -284,304 +312,52 @@
       </div>
 
       <!-- Follow up modal -->
-      <b-modal
+      <FollowModal
         :active.sync="isFollowModelActive"
-        has-modal-card
-        :can-cancel="['escape', 'outside']"
-        @close="cleanupFollow()"
-      >
-        <div
-          class="modal-card"
-          v-if="followProp"
-        >
-          <header class="modal-card-head">
-            <p class="modal-card-title">
-              <span class="is-capitalized">Follow {{ followProp.team.name }}</span>
-            </p>
-            <button
-              class="delete"
-              aria-label="close"
-              @click="isFollowModelActive = false; cleanupFollow();"
-            />
-          </header>
-          <section class="modal-card-body">
-            <div class="content">
-              <span class="is-size-5 has-text-weight-bold">
-                About the Target 
-              </span>
-
-              <div class="level is-mobile is-marginless project-content">
-                <div class="level-item">
-                  <span>
-                    <b>Name</b><br>
-                    {{ followProp.target.name }}
-                  </span>
-                </div>
-                <div class="level-item">
-                  <span>
-                    <b>Type</b><br>
-                    <span class="is-capitalized">{{ followProp.target.type }}</span>
-                  </span>
-                </div>
-                <div class="level-item">
-                  <span>
-                    <b>Organism</b><br>
-                    <span class="is-italic">{{ followProp.target.organism }}</span> 
-                  </span>
-                </div>
-              </div>
-
-              <hr>
-
-              <b-field label="Please briefly summarize your interest in following this target and team.">
-                <b-input
-                  v-model="followRequest"
-                  maxlength="300"
-                  type="textarea"
-                  placeholder="Maximum 300 characters."
-                  required
-                />
-              </b-field>
-            </div>
-          </section>
-          <footer class="modal-card-foot">
-            <b-button
-              expanded
-              :disabled="followRequest.length <= 0"
-              :loading="isLoading.follow_unfollow"
-              type="is-primary"
-              @click="followTeam(followProp.team, followProp.target, followProp.project_index, followRequest)"
-            >
-              Submit Request
-            </b-button>
-          </footer>
-        </div>
-      </b-modal>
+        :source="followProp.source"
+        :type="followProp.type"
+        @change="fetchTargets()"
+      />
 
       <!-- Unfollow modal -->
-      <b-modal
+      <UnfollowModal
         :active.sync="isUnfollowModelActive"
-        has-modal-card
-        :can-cancel="['escape', 'outside']"
-        @close="cleanupFollow()"
-      >
-        <div
-          class="modal-card"
-          v-if="followProp"
-        >
-          <header class="modal-card-head">
-            <p class="modal-card-title">
-              <span>Unfollow target?</span>
-            </p>
-            <button
-              class="delete"
-              aria-label="close"
-              @click="isUnfollowModelActive = false; cleanupFollow();"
-            />
-          </header>
-          <section class="modal-card-body">
-            <div class="container">
-              <div class="media">
-                <div class="media-left">
-                  <b-icon
-                    pack="mdi"
-                    icon="alert-circle"
-                    size="is-large"
-                    type="is-warning"
-                  />
-                </div>
-                <div class="media-content">
-                  <div class="content">
-                    <p>
-                      Are you sure you want to unfollow {{ followProp.team.name }} on {{ followProp.target.name }}? <br>
-                      Once unfollowed, you will need their permission to follow again.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-          <footer class="modal-card-foot has-hright">
-            <div class="buttons">
-              <b-button
-                @click="isUnfollowModelActive = false; cleanupFollow();"
-              >
-                Cancel
-              </b-button>
-              <b-button
-                :loading="isLoading.follow_unfollow"
-                type="is-primary"
-                outlined
-                @click="unfollowTeam(followProp.team, followProp.target, followProp.project_index)"
-              >
-                Unfollow
-              </b-button>
-            </div>
-          </footer>
-        </div>
-      </b-modal>
+        :follow="followProp.follow"
+        :type="followProp.type"
+        @change="fetchTargets()"
+      />
 
       <!-- New project modal -->
-      <b-modal
-        :active.sync="isNewActivityModalActive"
-        has-modal-card
-        :can-cancel="['escape', 'outside']"
-      >
-        <div class="modal-card">
-          <header class="modal-card-head">
-            <p class="modal-card-title">
-              <span>Add a New Project</span>
-            </p>
-            <button
-              class="delete"
-              aria-label="close"
-              @click="isNewActivityModalActive = false"
-            />
-          </header>
-          <ValidationObserver
-            ref="observer"
-            v-slot="{ passed }"
-          >
-            <section class="modal-card-body">
-              <div class="content">
-                <!-- Target name -->
-                <ValidationProvider
-                  rules="required"
-                  name="Name"
-                  v-slot="{ errors, valid }"
-                  :immediate="newProjectProp.name !== ''"
-                > 
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="Target name"
-                  >
-                    <b-input
-                      v-model="newProjectProp.name"
-                      placeholder="e.g. Gene Symbol, Domain Name"
-                      required
-                      expanded
-                    />
-                  </b-field>
-                </ValidationProvider>
-
-                <ValidationProvider
-                  rules="required|alpha"
-                  name="Type"
-                  v-slot="{ errors, valid }"
-                  :immediate="newProjectProp.type !== ''"
-                > 
-                  <!-- Target type -->
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="Type of target"
-                  >
-                    <b-select
-                      v-model="newProjectProp.type"
-                      placeholder="Select a target type"
-                      required
-                      expanded
-                    >
-                      <option
-                        v-for="(type, index) in types"
-                        :key="index"
-                        :value="type.id"
-                      >
-                        {{ type.name }}
-                      </option>
-                    </b-select>
-                  </b-field>
-                </ValidationProvider>
-
-                <!-- Target organism -->
-                <ValidationProvider
-                  rules="required"
-                  name="Organism"
-                  v-slot="{ errors, valid }"
-                  :immediate="newProjectProp.organism !== ''"
-                > 
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="Target organism"
-                  >
-                    <b-select
-                      v-model="newProjectProp.organism"
-                      placeholder="Select a target organism"
-                      required
-                      expanded
-                    >
-                      <option
-                        v-for="(organism, index) in organisms"
-                        :key="index"
-                        :value="organism"
-                      >
-                        {{ organism }}
-                      </option>
-                    </b-select>
-                  </b-field>
-                </ValidationProvider>
-                
-                <ValidationProvider
-                  :rules="'oneOf:' + features.join(',')"
-                  name="Features"
-                  v-slot="{ errors, valid }"
-                  immediate
-                > 
-                  <!-- Target features -->
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="Target features"
-                  >
-                    <b-taginput
-                      v-model="newProjectProp.features"
-                      :data="features"
-                      autocomplete
-                      append-to-body
-                      open-on-focus
-                      readonly
-                      icon="mdil-magnify"
-                      placeholder="Search for a genomic feature"
-                      @typing="getFilteredFeatures"
-                    />
-                  </b-field>
-                </ValidationProvider>
-              </div>
-            </section>
-            <footer class="modal-card-foot">
-              <b-button
-                expanded
-                :loading="isLoading.new_project"
-                :disabled="!passed"
-                type="is-primary"
-                @click="addProject(newProjectProp)"
-              >
-                Add Project
-              </b-button>
-            </footer>
-          </ValidationObserver>
-        </div>
-      </b-modal>
+      <NewProjectModal
+        :active.sync="isNewProjectModalActive"
+        :project="preFilledProject"
+        @update="prefillProject(undefined)"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import * as ProjectManage from "@/api/projectManage.js"
+import { handleError } from "@/api/errorHandler.js"
+import Error from '@/components/Error.vue'
+import FollowModal from '@/components/Modal/FollowModal.vue'
+import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
+import NewProjectModal from '@/components/Modal/NewProjectModal.vue'
 
-const variables = require("@/assets/variables.json")
+const variables = require("@/assets/script/variables.json")
 
 export default {
   components: {
-    ValidationProvider,
-    ValidationObserver
+    Error,
+    FollowModal,
+    UnfollowModal,
+    NewProjectModal
+  },
+  computed: {
+    hasLoggedIn() {
+      return this.$store.state.hasLoggedIn
+    }
   },
   data () {
     return {
@@ -589,166 +365,91 @@ export default {
       pagination: {
         count: 0,
         limit: 10,
-        skip: 0
+        current: 1
       },
-      features: variables.genomic_features,
-      types: variables.target_types,
-      organisms: variables.target_organisms,
       progressIcons: variables.progress_type_icons,
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
-      followProp: null,
-      followRequest: "",
+      followProp: {
+        source: "",
+        follow: "",
+        type: ""
+      },
+      preFilledProject: undefined,
       isUnfollowModelActive: false,
       // Register new activity related parameters
-      isNewActivityModalActive: false,
-      newProjectProp: {
-        type: "",
-        name: "",
-        organism: "",
-        features: []
-      },
+      isNewProjectModalActive: false,
       isLoading: {
         new_project: false,
         follow_unfollow: false,
         fetch_targets: false
-      }
+      },
+      errorMessage: ""
     }
   },
   async mounted () {
     await this.fetchTargets()
   },
   methods: {
-    confirmFollowTeam(team, target, index) {
+    confirmFollow(id, type) {
+      this.followProp.source = id
+      this.followProp.type = type
       this.isFollowModelActive = true
-      this.followProp = {
-        team: team,
-        target: target,
-        project_index: index
-      }
     },
-    async followTeam(team, target, index, request) {
-      // Loading
-      this.isLoading.follow_unfollow = true
-
-      //TODO: implement API to accept follow request
-
-      // Handle UI changes
-      this.isLoading.follow_unfollow = false
-      this.isFollowModelActive = false
-      this.cleanupFollow()
-
-      // Update team
-      // this.projects[index].teams = response.teams
-
-      // Show status update
-      this.$buefy.toast.open({
-        message: `Followed successfully.`,
-        type: "is-success",
-        duration: 5000
-      })
-
-      request
-    },
-    confirmUnfollowTeam(team, target, index) {
+    confirmUnfollow(id, type) {
+      this.followProp.follow = id
+      this.followProp.type = type
       this.isUnfollowModelActive = true
-      this.followProp = {
-        team: team,
-        target: target, 
-        project_index: index
-      }
     },
-    async unfollowTeam(team, target, index) {
-      // Loading
-      this.isLoading.follow_unfollow = true
-
-      // TODO: Implement API to accept unfollow request
-
-      //TODO: remove debug response
-      const response = {
-        status: "success",
-        teams: [
-          {
-            id: "team_1",
-            name: "Roth FP",
-            has_followed: false,
-          },
-          {
-            id: "team_2",
-            name: "Smith J",
-            has_followed: false,
-          },
-        ]
+    prefillProject(target) {
+      if (!target) {
+        this.preFilledProject = undefined
+        return
       }
 
-      // Handle UI changes
-      this.isLoading.follow_unfollow = false
-      this.isUnfollowModelActive = false
-      this.cleanupFollow()
-
-      // Update team
-      this.projects[index].teams = response.teams
-
-      // Show status update
-      this.$buefy.toast.open({
-        message: `Unfollowed successfully.`,
-        type: "is-success"
-      })
-    },
-    cleanupFollow() {
-      this.followProp = null
-      this.followRequest = ""
-    },
-    prepareNewActivity(target) {
-      this.newProjectProp.type = target.type
-      this.newProjectProp.name = target.name
-      this.newProjectProp.organism = target.organism
-    },
-    cleanupNewActivity() {
-      this.newProjectProp = {
-        type: "",
-        name: "",
-        organism: "",
-        features: []
+      this.preFilledProject = {
+        type: target.type,
+        name: target.name,
+        organism: target.organism
       }
     },
-    getFilteredFeatures(text) {
-      this.features = variables.genomic_features.filter(feature => {
-        return feature.toLowerCase().indexOf(text.toLowerCase()) >= 0
-      })
-    },
-    async fetchTargets(limit = 10, skip = 0) {
+    async fetchTargets() {
       // Loading
       this.isLoading.fetch_targets = true
 
+      // Calculate skip
+      const skip = (this.pagination.current - 1) * this.pagination.limit
+
       // Update targets
-      const targets = await ProjectManage.fetchTargets(limit, skip)
-      this.targets = targets.results
+      try {
+        const targets = await ProjectManage.fetchTargets(this.pagination.limit, skip)
+        this.targets = targets.results
 
-      // Update pagination
-      this.pagination.count = targets.count
-
-      this.isLoading.fetch_targets = false
+        // Update pagination
+        this.pagination.count = targets.count
+      } catch (error) {
+        this.errorMessage = await handleError(error)
+      } finally {
+        this.isLoading.fetch_targets = false
+      }
     },
-    async addProject() {
-      // Loading
-      this.isLoading.new_project = true
+    addProject(prefill = false) {
+      // If not logged in, show the login panel instead
+      if (!this.hasLoggedIn) {
+        this.$emit("login")
+        return
+      }
+      
+      if (prefill) this.prefillProject()
 
-      const projectId = await ProjectManage.addProject(this.newProjectProp)
-
-      // Handle UI changes
-      this.isLoading.new_project = false
-      this.isNewActivityModalActive = false
-
-      // Jump to new project registration page
-      this.$router.push({ name: 'Project Edit', params: { id: projectId, action: 'new' } })
+      this.isNewProjectModalActive = true
     }
   }
 }
 </script>
 
 <style lang="sass" scoped>
-@import "@/assets/variables.sass"
+@import "@/assets/style/variables.sass"
 
 .action-button
   justify-content: space-between
@@ -773,5 +474,4 @@ export default {
   &:first-child
     border-top-right-radius: 0
     border-bottom-right-radius: 0
-
 </style>

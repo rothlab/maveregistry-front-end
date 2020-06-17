@@ -93,9 +93,10 @@
 </template>
 
 <script>
-import * as UserManage from "../api/userManage"
+import * as UserManage from "@/api/userManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import Success from "../components/Success"
+import Success from "@/components/Success.vue"
+import { handleError } from "@/api/errorHandler.js"
 
 export default {
   props: {
@@ -129,7 +130,7 @@ export default {
         } catch (error) {
           this.$buefy.toast.open({
             duration: 5000,
-            message: error.message,
+            message: await handleError(error),
             type: 'is-danger',
             queue: false
           })

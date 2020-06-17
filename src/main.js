@@ -4,7 +4,7 @@ import App from './App.vue'
 import Buefy from 'buefy'
 
 // Import plugins
-import "@/assets/field_validation_rules.js"
+import "@/assets/script/field_validation_rules.js"
 import GAuth from 'vue-google-oauth2'
 import { VueReCaptcha } from 'vue-recaptcha-v3'
 import axios from 'axios'
@@ -13,11 +13,12 @@ import * as Sentry from '@sentry/browser';
 import { Vue as VueIntegration } from '@sentry/integrations';
 
 // Import stylesheets
+import "@/assets/style/bulma-customization.sass"
 import '@mdi/font/css/materialdesignicons.css'
 import '@mdi/light-font/css/materialdesignicons-light.css'
 import '@fortawesome/fontawesome-free/css/brands.css'
 import '@fortawesome/fontawesome-free/css/fontawesome.css'
-import '@/assets/styles.sass'
+import '@/assets/style/styles.sass'
 
 // Import custom scripts
 import router from './router'
@@ -38,11 +39,10 @@ Vue.config.productionTip = false
 
 // Initialize Sentry
 Sentry.init({
-  dsn: 'https://937e133d79854ca7a2301bbaa9aa8a36@o239664.ingest.sentry.io/5266396',
+  dsn: process.env.NODE_ENV === "development" ? '' : 'https://937e133d79854ca7a2301bbaa9aa8a36@o239664.ingest.sentry.io/5266396',
   integrations: [new VueIntegration({
     Vue,
-    attachProps: true,
-    logErrors: process.env.NODE_ENV === "development"
+    attachProps: true
   })],
 });
 

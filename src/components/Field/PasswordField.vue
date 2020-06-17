@@ -177,7 +177,3 @@ export default {
 .strength-meter
   margin: 0.25rem 0 0 0 !important
 </style>
-<style lang="sass" scoped>
-.field-margin
-  margin-bottom: 0.75rem
-</style>

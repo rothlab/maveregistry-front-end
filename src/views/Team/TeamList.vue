@@ -8,7 +8,7 @@
             <div class="level-left">
               <div class="content">
                 <p class="is-size-3 has-text-weight-medium">
-                  Team Progress
+                  Teams
                 </p>
               </div>
             </div>
@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="isNewTeamModalActive = true"
+                @click="addTeam"
               >
                 New Team
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="isNewTeamModalActive = true"
+                @click="addTeam"
               >
                 New
               </b-button>
@@ -43,7 +43,6 @@
     <div class="container has-fullheight has-top-padding has-touch-container-padding">
       <!-- Team table -->
       <div>
-        <!-- TODO: proper pagination -->
         <b-table
           :data="teams"
           :loading="isLoading.fetch_team"
@@ -52,6 +51,9 @@
           backend-pagination
           icon-pack="mdi"
           :per-page="pagination.limit"
+          :total="pagination.count"
+          :current-page="pagination.current"
+          @page-change="(change) => { pagination.current = change; fetchTeams() }"
         >
           <template slot-scope="props">
             <!-- Team ID -->
@@ -72,9 +74,30 @@
               field="principal_investigator"
               label="Principal Investigaor"
             >
-              <span class="is-capitalized">
-                {{ props.row.first_name + ' ' + props.row.last_name }}
-              </span>
+              <div class="level is-mobile is-paddingless">
+                <div class="level-left is-capitalized">
+                  {{ props.row.first_name + ' ' + props.row.last_name }}
+                </div>
+
+                <div class="level-right">
+                  <!-- Email link -->
+                  <a
+                    v-if="props.row.website"
+                    :href="props.row.website"
+                    target="_blank"
+                  >
+                    <b-icon icon="mdil-link" />
+                  </a>
+
+                  <!-- Website icon -->
+                  <a
+                    v-if="props.row.email"
+                    :href="`mailto:${props.row.email}`"
+                  >
+                    <b-icon icon="mdil-email" />
+                  </a>
+                </div>
+              </div>
             </b-table-column>
 
             <!-- Affiliation -->
@@ -88,7 +111,7 @@
             <!-- Project Progress -->
             <b-table-column
               field="progress"
-              label="Project Progress"
+              label="Project"
             >
               <div class="has-text-left">
                 <b-collapse
@@ -108,7 +131,8 @@
                         :to="{ path: `/project/${project.id}`}"
                         target="_blank"
                       >
-                        {{ project.name + ": " + project.type }}
+                        <b-icon icon="mdil-link" />
+                        {{ project.target.name }} ({{ project.target.type }}): {{ project.features.join(",") }}
                       </router-link>
                     </div>
                     
@@ -133,14 +157,34 @@
             <b-table-column
               field="action"
               label="Action"
-              width="8vw"
+              width="5vw"
             >
               <div class="action-button is-flex">
                 <b-button
-                  icon-left="mdil-rss"
-                  @click="prepareNewActivity(props.row); isNewActivityModalActive = true"
+                  v-if="props.row.follow_status.id"
+                  icon-left="mdil-bell-off"
+                  :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-primary'"
+                  @click="confirmUnfollow(props.row.follow_status.id)"
+                  @change="fetchTeams"
+                  expanded
                 >
-                  Follow Team
+                  <b-tooltip
+                    v-if="props.row.follow_status.status === 'pending'"
+                    label="Pending Approval"
+                    type="is-dark"
+                  >
+                    Unfollow
+                  </b-tooltip>
+                  <span v-else>Unfollow</span>
+                </b-button>
+                <b-button
+                  v-else
+                  icon-left="mdil-bell"
+                  @click="confirmFollow(props.row.id)"
+                  @change="fetchTeams"
+                  expanded
+                >
+                  Follow
                 </b-button>
               </div>
             </b-table-column>
@@ -154,50 +198,62 @@
       :active.sync="isNewTeamModalActive"
       @change="fetchTeams"
     />
+
+    <!-- Follow Team Modal -->
+    <FollowModal
+      :active.sync="isFollowModelActive"
+      :source="followProp.source"
+      :type="followProp.type"
+      @change="fetchTeams()"
+    />
+
+    <!-- Unfollow Team Modal -->
+    <UnfollowModal
+      :active.sync="isUnfollowModelActive"
+      :follow="followProp.follow"
+      :type="followProp.type"
+      @change="fetchTeams()"
+    />
   </div>
 </template>
 
 <script>
 import * as TeamManage from "@/api/teamManage.js"
-import NewTeamModal from "@/components/NewTeamModal.vue"
+import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
+import FollowModal from '@/components/Modal/FollowModal.vue'
+import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
+import { handleError } from "@/api/errorHandler.js"
 
 export default {
   components: {
-    NewTeamModal
+    NewTeamModal,
+    FollowModal,
+    UnfollowModal
+  },
+  computed: {
+    hasLoggedIn() {
+      return this.$store.state.hasLoggedIn
+    }
   },
   data() {
     return {
       isNewTeamModalActive: false,
+      isFollowModelActive: false,
+      isUnfollowModelActive: false,
       isLoading: {
         fetch_team: false,
         new_team: false
       },
-      teams: [
-        {
-          id: "123",
-          first_name: "Fritz",
-          last_name: "Roth",
-          affiliation: "University of Toronto",
-          projects: [
-            {
-              id: "123",
-              name: "CHEK2",
-              type: "kk",
-              open_for_funding: true
-            },
-            {
-              id: "1234",
-              name: "SDHB",
-              type: "kkk",
-              open_for_funding: false
-            }
-          ]
-        }
-      ],
+      teams: [],
       pagination: {
         count: 0,
         limit: 10,
-        skip: 0
+        current: 1
+      },
+      followProp: {
+        source: "",
+        follow: "",
+        type: "team"
       },
     }
   },
@@ -205,20 +261,43 @@ export default {
     await this.fetchTeams()
   },
   methods: {
-    async fetchTeams(limit = 10, skip = 0) {
+    confirmFollow(id) {
+      // If not logged in, show the login panel instead
+      if (!this.hasLoggedIn) {
+        this.$emit("login")
+        return
+      }
+
+      this.followProp.source = id
+      this.isFollowModelActive = true
+    },
+    confirmUnfollow(id) {
+      // If not logged in, show the login panel instead
+      if (!this.hasLoggedIn) {
+        this.$emit("login")
+        return
+      }
+
+      this.followProp.follow = id
+      this.isUnfollowModelActive = true
+    },
+    async fetchTeams() {
       // Loading
       this.isLoading.fetch_team = true
 
+      // Calculate skip
+      const skip = (this.pagination.current - 1) * this.pagination.limit
+      
       // Update targets
       try {
-        const teams = await TeamManage.fetchTeams(limit, skip)
+        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, true)
         this.teams = teams.results
 
         // Update pagination
         this.pagination.count = teams.count
       } catch (error) {
         this.$buefy.toast.open({
-          message: error.message,
+          message: await handleError(error),
           type: 'is-danger',
           queue: false,
           duration: 5000
@@ -226,6 +305,15 @@ export default {
       } finally {
         this.isLoading.fetch_team = false
       }
+    },
+    addTeam() {
+      // If not logged in, show the login panel instead
+      if (!this.hasLoggedIn) {
+        this.$emit("login")
+        return
+      }
+
+      this.isNewProjectModalActive = true
     }
   }
 }

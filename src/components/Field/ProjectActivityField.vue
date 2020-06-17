@@ -117,6 +117,7 @@
         label="Description"
         :message="errors"
         :type="{ 'is-danger': errors[0], '': valid }"
+        class="field-margin"
       >
         <b-input
           v-model="description"
@@ -127,13 +128,56 @@
         />
       </b-field>
     </ValidationProvider>
+
+    <!-- Reference -->
+    <label class="label">Links (Optional)</label>
+    <ValidationProvider
+      :rules="{ regex: 
+        /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/ 
+      }"
+      immediate
+      name="Link"
+      v-slot="{ errors, valid }"
+      v-for="(link, id) in links"
+      :key="id"
+    >
+      <b-field
+        :message="errors"
+        class="field-margin"
+        :type="{ 'is-danger': errors[0], '': valid }"
+      >
+        <div class="is-flex is-space-between">
+          <b-input
+            icon="mdil-link"
+            type="website"
+            placeholder="http:// or https://"
+            class="link-input"
+            v-model="links[id]"
+            @input="updateVal"
+            expanded
+          />
+          <b-button
+            v-if="(links.length - 1) === id"
+            icon-left="mdil-plus"
+            type="is-light"
+            @click="links.push('')"
+          />
+          <b-button
+            v-else
+            icon-left="mdil-delete"
+            type="is-light"
+            @click="links.splice(id, 1); updateVal()"
+          />
+        </div>
+      </b-field>
+    </ValidationProvider>
   </div>
 </template>
 
 <script>
 import { ValidationProvider } from 'vee-validate'
 
-const progressTypes = require("@/assets/variables.json").progress_type
+const progressTypes = require("@/assets/script/variables.json").progress_type
 
 export default {
   components: {
@@ -160,7 +204,8 @@ export default {
       type: "",
       startDate: new Date(),
       endDate: new Date(),
-      description: ""
+      description: "",
+      links: [""]
     }
   },
   methods: {
@@ -168,10 +213,14 @@ export default {
       let ret = {
         type: this.type,
         start_date: this.startDate,
-        description: this.description
+        description: this.description,
       }
 
       if (!this.isOngoing) ret.end_date = this.endDate
+
+      // Filter out empty links
+      const links = this.links.filter(e => e !== "")
+      if (links.length > 0) ret.links = links
 
       this.$emit("input", ret)
     },
@@ -182,6 +231,7 @@ export default {
       this.description = this.value.description
 
       if (!this.isOngoing) this.endDate = this.value.end_date
+      if (this.value.links.length > 0) this.links = this.value.links
     }
   },
   mounted() {
@@ -193,4 +243,6 @@ export default {
 <style lang="sass" scoped>
 .end-date, .has-addons
   display: block
+.link-input
+  width: 90%
 </style>

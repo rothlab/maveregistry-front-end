@@ -21,7 +21,6 @@
                 icon-left="mdil-pencil"
                 type="is-primary"
                 size="is-medium"
-                outlined
                 @click="editProject"
               >
                 Edit
@@ -37,7 +36,7 @@
         class="columns"
         v-if="showProfile"
       >
-        <div class="column is-9">
+        <div class="column is-7">
           <div
             class="content"
           >
@@ -82,7 +81,7 @@
               </p>
               <div
                 class="is-size-5"
-                v-if="userInfo.social && Object.keys(userInfo.social).length"
+                v-if="userInfo && userInfo.social && Object.keys(userInfo.social).length"
               >
                 <span><b>Social Media</b></span>
                 <br>
@@ -107,21 +106,36 @@
               </div>
             </div>
 
+            <hr>
+
             <div class="project-header">
               <p class="is-size-4 has-text-weight-bold">
-                Team
+                Project
               </p>
             </div>
 
             <div class="project-content">
-              Under Development
+              <p class="is-size-5">
+                <span v-if="userInfo.team">
+                  <b>Team</b> <br>
+                  <a
+                    :href="'mailto:' + userInfo.team.email"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <b-icon icon="mdil-email" />
+                  </a>
+                  <span class="is-capitalized">{{ userInfo.team.first_name + " " + userInfo.team.last_name }},</span>
+                  {{ userInfo.team.affiliation }}
+                </span>
+              </p>
             </div>
           </div>
         </div>
 
         <!-- Profile image and actions -->
         <div
-          class="column is-3"
+          class="column is-3 is-offset-2"
         >
           <!-- Profile image -->
           <div class="profile-image">
@@ -138,7 +152,10 @@
               </p>
             </div>
 
-            <div class="project-content">
+            <div
+              class="project-content"
+              v-if="userInfo.email"
+            >
               <UserProfileAction :email="userInfo.email" />
             </div>
           </div>
@@ -162,14 +179,15 @@
 
 <script>
 import * as UserManage from "@/api/userManage.js"
+import * as TeamManage from "@/api/teamManage.js"
+import { handleError } from "@/api/errorHandler.js"
 import Error from "@/components/Error.vue"
-import UserProfileAction from "@/components/UserProfileAction.vue"
+import UserProfileAction from "@/components/Action/UserProfileAction.vue"
 
 function initialState (){
   return {
     userInfo: {},
     showProfile: false,
-    isOwner: false,
     isLoading: {
       page: true,
       reset_pass: false,
@@ -188,11 +206,14 @@ export default {
   computed: {
     profileImageUrl() {
       // Set url as placeholder
-      let url = require("@/assets/blank-profile.png")
+      let url = require("@/assets/image/blank-profile.png")
 
       if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
 
       return url
+    },
+    isOwner() {
+      return this.$store.state.hasLoggedIn && (this.$route.params.username === this.$store.state.user.username)
     }
   },
   watch: {
@@ -203,7 +224,6 @@ export default {
       // Fetch and store user information
       const username = this.$route.params.username
       this.userInfo = await this.fetchUserInfo(username)
-      if (this.userInfo) this.userInfo.social = {}
     }
   },
   data () {
@@ -212,21 +232,22 @@ export default {
   async mounted () {
     const username = this.$route.params.username
     this.userInfo = await this.fetchUserInfo(username)
-
-    if (this.userInfo) {
-      this.userInfo.social = {}
-    }
   },
   methods: {
     async fetchUserInfo(username) {
       this.isLoading.page = true
       
       // Get user info using username
-      const res = await UserManage.fetchUserInfo(username)
+      let res
+      try {
+        res = await UserManage.fetchUserInfo(username)
 
-      // Handle error
-      if (res.error) {
-        this.errorMessage = res.error.message
+        if (res && res.team) {
+          // Fetch team
+          res.team = await TeamManage.queryById(res.team)
+        }
+      } catch (error) {
+        this.errorMessage = await handleError(error)
         this.isLoading.page = false
         return undefined
       }
@@ -234,9 +255,8 @@ export default {
       // Check if owning the account.
       // Only the owner can make changes
       this.showProfile = true
-      this.isOwner = this.$store.state.hasLoggedIn && (res.user.username === this.$store.state.user.username)
       this.isLoading.page = false
-      return res.user
+      return res
     },
     editProject() {
       this.$router.push({ name: 'User Profile Edit', params: { username: this.userInfo.username, action: 'edit' } })

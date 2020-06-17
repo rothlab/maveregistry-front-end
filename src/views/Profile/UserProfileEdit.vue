@@ -177,15 +177,10 @@
               </p>
             </div>
 
-            <div class="project-content">
-              <!-- TODO: Finish team setting -->
-              <b-button
-                type="is-light"
-                icon-left="mdil-pencil"
-                expanded
-              >
-                Edit Team Setting
-              </b-button>
+            <div
+              class="project-content"
+            >
+              <TeamInfoField v-model="team" />
             </div>
           </div>
         </div>
@@ -271,52 +266,55 @@ import * as UserManage from "@/api/userManage.js"
 import * as FileManage from "@/api/fileManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "@/components/Error.vue"
-
-function initialState (){
-  return {
-    userInfo: {},
-    showProfile: false,
-    isOwner: false,
-    isLoading: {
-      page: true,
-      reset_pass: false,
-      save_edit: false,
-      save_profile_pic: false
-    },
-    errorMessage: "",
-  }
-}
+import { handleError } from "@/api/errorHandler.js"
+import TeamInfoField from '@/components/Field/TeamInfoField.vue'
 
 export default {
   components: {
     ValidationProvider,
     ValidationObserver,
-    Error
+    Error,
+    TeamInfoField
   },
   computed: {
     profileImageUrl() {
       // Set url as placeholder
-      let url = require("@/assets/blank-profile.png")
+      let url = require("@/assets/image/blank-profile.png")
 
       if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
 
       return url
     },
-    isEditing() {
-      return this.$route.params.action && this.$route.params.action === "edit"
+    isEdit() {
+      return this.$route.params.action === "edit"
+    },
+    isOwner() {
+      return this.$store.state.hasLoggedIn && (this.$route.params.username === this.$store.state.user.username)
     }
   },
   data () {
-    return initialState()
+    return {
+      userInfo: {},
+      team: "",
+      showProfile: false,
+      isLoading: {
+        page: true,
+        reset_pass: false,
+        save_edit: false,
+        save_profile_pic: false
+      },
+      errorMessage: "",
+    }
   },
   async mounted () {
-    // If not a valid action, jump to view
-    if (!this.isEditing) {
-      this.$router.push({ name: 'User Profile View', params: { username: this.$route.params.username } })
+    const username = this.$route.params.username
+
+    // If not a valid action or not the owner, jump to view
+    if (!this.isEdit || !this.isOwner) {
+      this.$router.push({ name: 'User Profile View', params: { username: username } })
       return
     }
 
-    const username = this.$route.params.username
     this.userInfo = await this.fetchUserInfo(username)
 
     if (this.userInfo) {
@@ -328,32 +326,31 @@ export default {
       this.isLoading.page = true
       
       // Get user info using username
-      const res = await UserManage.fetchUserInfo(username)
-
-      // Handle error
-      if (res.error) {
-        this.errorMessage = res.error.message
+      let res
+      try {
+        res = await UserManage.fetchUserInfo(username)
+      } catch (error) {
+        this.errorMessage = await handleError(error)
         this.isLoading.page = false
         return undefined
       }
 
-      // Check if owning the account.
-      // Only the owner can make changes
+      // Handle UI changes
       this.showProfile = true
-      this.isOwner = this.$store.state.hasLoggedIn && (res.user.username === this.$store.state.user.username)
       this.isLoading.page = false
-      return res.user
+      return res
     },
     async saveProfile() {
       this.isLoading.save_edit = true
 
       // Update user
       try {
+        this.userInfo.team = this.team
         await this.$store.dispatch('updateUserProfile', this.userInfo)
       } catch (e) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: e.message,
+          message: await handleError(e),
           type: 'is-danger',
           queue: false
         })
@@ -423,7 +420,7 @@ export default {
       } catch (error) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: error.message,
+          message: await handleError(error),
           type: 'is-danger',
           queue: false
         })

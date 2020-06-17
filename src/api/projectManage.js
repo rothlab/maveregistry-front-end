@@ -1,5 +1,6 @@
 import { Parse } from "./parseConnect.js"
 import { Team } from "./teamManage.js"
+import { getFollowStatus } from "./followManage.js"
 
 // Helper function
 // Find unqiue entries
@@ -30,24 +31,28 @@ const Target = Parse.Object.extend("Target", {
   },
   format: async function () {
     // Fetch projects
-    const projects = await Promise.all(this.get("projects").map(e => e.fetch()))
+    const projects = this.get("projects")
 
     // Handle team object
-    const teamId = projects.map(e => e.get("team")).filter(Boolean).filter(uniqueById)
-    const teams = await Promise.all(teamId.map(e => e.fetch()))
+    const teams = projects.map(e => e.get("team")).filter(Boolean).filter(uniqueById)
+
+    // Get follow status for projects and teams
+    const projectFollowStatus = await getFollowStatus(projects.map(e => e.id), "project", Parse.User.current())
+    const teamFollowStatus = await getFollowStatus(teams.map(e => e.id), "team", Parse.User.current())
 
     return {
       id: this.id,
       name: this.get("name"),
       type: this.get("type"),
       organism: this.get("organism"),
-      projects: projects.map(e => {
+      projects: projects.map((e, i) => {
         const recentActivity = findRecentActivity(e.get("activities"))
         const funding = e.get("funding")
 
         let ret = {
           id: e.id,
-          features: e.get("features")
+          features: e.get("features"),
+          follow_status: projectFollowStatus[i]
         }
 
         if (funding && funding.open_for_funding) ret.funding = funding.open_for_funding
@@ -56,10 +61,11 @@ const Target = Parse.Object.extend("Target", {
 
         return ret
       }),
-      teams: teams.map(e => {
+      teams: teams.map((e, i) => {
         return {
           id: e.id,
-          name: e.get("first_name").substring(0, 1) + ' ' + e.get("last_name")
+          name: e.get("first_name").substring(0, 1) + ' ' + e.get("last_name"),
+          follow_status: teamFollowStatus[i]
         }
       })
     }
@@ -87,56 +93,84 @@ const Target = Parse.Object.extend("Target", {
 Parse.Object.registerSubclass('Target', Target);
 
 // Define Project object
-const variables = require("@/assets/variables.json")
-const Project = Parse.Object.extend("Project", {
+const variables = require("@/assets/script/variables.json")
+export const Project = Parse.Object.extend("Project", {
   initialize: function (attrs) {
     // Validate
     if (!attrs) return
     if (attrs.features && attrs.features.length > 0 && 
       attrs.features.some(val => variables.genomic_features.indexOf(val) === -1)) throw new Error("Some features are invalid")
   },
-  format: async function(detail = false) {
-    // Fetch target and user
-    const target = await this.get("target").fetch()
-    const user = await this.get("user").fetch()
-    
-    // Fetch collaborators
-    const collaborators = this.get("collaborators")
-
+  format: async function(detail = false, followers = false) {
     // Construct return object
     let ret = {
-      target: {
+      id: this.id,
+      features: this.get("features"),
+      update_date: this.get("updatedAt"),
+    }
+
+    // Format target
+    const target = this.get("target")
+    if (target.isDataAvailable()) {
+      ret.target = {
         id: target.id,
         name: target.get("name"),
         type: target.get("type"),
         organism: target.get("organism"),
-      },
-      features: this.get("features"),
-      user: {
+      }
+    }
+
+    // Format user
+    const user = this.get("user")
+    if (user.isDataAvailable()) {
+      ret.user = {
         username: user.get("username"),
         first_name: user.get("first_name"),
         last_name: user.get("last_name")
-      },
-      update_date: this.get("updatedAt")
+      }
     }
-
+    
+    // Access project progress detail
     if (detail) {
-      const team = this.get("team")
-
       ret.leads = this.get("leads")
-      if (team && team.id) ret.team = team.id
-      if (collaborators) ret.collaborators = collaborators.map(e => e.id)
+
+      // Format team
+      const team = this.get("team")
+      if (team && team.isDataAvailable()) ret.team = await team.format()
+
+      // Format collaborators
+      const collaborators = this.get("collaborators")
+      if (collaborators && collaborators.length > 0) ret.collaborators = await Promise.all(collaborators.map(e => e.format()))
+
       ret.funding = this.get("funding")
       ret.activities = this.get("activities")
+    }
+    
+    if (followers) {
+      // Check if followed by the current user
+      ret.follow_status = await getFollowStatus([this.id], "project", Parse.User.current())
+
+      // Add recemt activity
+      const recentActivity = findRecentActivity(this.get("activities"))
+      if (recentActivity) ret.activities = recentActivity
     }
 
     return ret
   }
 }, {
-  fetchById: async function(id) {
+  fetchById: async function(id, objects = []) {
+    // Set up basic query
     const query = new Parse.Query(Project)
+    query.equalTo("objectId", id)
 
-    return await query.get(id)
+    // Include additional objects
+    for (let index = 0; index < objects.length; index++) {
+      query.include(objects[index])
+    }
+
+    const res = await query.find()
+
+    return res[0]
   }
 })
 Parse.Object.registerSubclass('Project', Project);
@@ -180,6 +214,7 @@ export async function fetchTargets(limit, skip) {
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
+  query.include("projects.team") // Include projects and team objects on the return
   let targets = await query.find()
   targets.results = await Promise.all(targets.results.map(e => e.format())) // Format targets
   
@@ -191,10 +226,26 @@ export async function fetchProject(id, detail = false) {
   // TODO: enforce ACL
 
   // Fetch project by ID
-  const project = await new Project.fetchById(id)
+  const project = await new Project.fetchById(id, ["target", "user", "team", "collaborators"])
 
   // Format and return
   return project.format(detail)
+}
+
+export async function fetchProjectByTeamId(id, objects = []) {
+  const teamQuery = new Parse.Query(Team)
+  teamQuery.equalTo("objectId", id)
+  const query = new Parse.Query(Project)
+  query.matchesQuery("team", teamQuery)
+
+  // Include additional objects
+  for (let index = 0; index < objects.length; index++) {
+    query.include(objects[index])
+  }
+  const projects = await query.find()
+
+  // Format and return
+  return await Promise.all(projects.map(e => e.format()))
 }
 
 export async function updateProject(payload) {

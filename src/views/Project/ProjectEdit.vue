@@ -65,7 +65,7 @@
                     </b-button>
                   </div>
                   <div class="column is-9">
-                    <PersonalInfo
+                    <PersonalInfoField
                       v-model="leads[index]"
                     />
                   </div>
@@ -99,7 +99,7 @@
                       About
                     </div>
                     <div class="level is-mobile is-marginless">
-                      <div class="level-left">
+                      <div class="level-left is-capitalized">
                         <b-tooltip
                           label="Creator"
                           type="is-dark"
@@ -138,7 +138,7 @@
                       <b-icon icon="mdil-pin" />
                       Target
                     </div>
-                    <div class="level is-mobile">
+                    <div class="level is-mobile is-marginless">
                       <div class="level-item is-capitalized">
                         Type: {{ target.type }}
                       </div>
@@ -146,10 +146,21 @@
                         Name: {{ target.name }}
                       </div>
                       <div class="level-item">
-                        Organism: <i>{{ target.organism }}</i>
+                        <span>Organism: <i>{{ target.organism }}</i></span>
                       </div>
                     </div>
                   </div>
+                </div>
+
+                <div class="content has-text-right">
+                  <b-tooltip
+                    label="Sorry, please create a new project instead."
+                    type="is-dark"
+                  >
+                    <p class="has-text-primary">
+                      Can I edit this?
+                    </p>
+                  </b-tooltip>
                 </div>
               </b-notification>
             </div>
@@ -166,7 +177,7 @@
                     </span>
                   </div>
                   <div class="column is-9">
-                    <TeamInfo v-model="team" />
+                    <TeamInfoField v-model="team" />
                   </div>
                 </div>
               </div>
@@ -196,7 +207,7 @@
                     </b-button>
                   </div>
                   <div class="column is-9">
-                    <TeamInfo
+                    <TeamInfoField
                       v-model="collaborators[index]"
                       :is-required="false"
                       is-collaborator
@@ -297,7 +308,7 @@
                     </b-button>
                   </div>
                   <div class="column is-9">
-                    <ProjectActivity v-model="activities[index]" />
+                    <ProjectActivityField v-model="activities[index]" />
                   </div>
                 </div>
                 <!-- Add project lead -->
@@ -362,12 +373,12 @@
 </template>
 
 <script>
-import PersonalInfo from '@/components/PersonalInfo.vue'
-import TeamInfo from '@/components/TeamInfo.vue'
-import ProjectActivity from '@/components/ProjectActivity.vue'
+import PersonalInfoField from '@/components/Field/PersonalInfoField.vue'
+import TeamInfoField from '@/components/Field/TeamInfoField.vue'
+import ProjectActivityField from '@/components/Field/ProjectActivityField.vue'
 import Error from '@/components/Error.vue'
 import { ValidationObserver } from 'vee-validate'
-
+import { handleError } from "@/api/errorHandler.js"
 import * as ProjectManage from "@/api/projectManage.js"
 
 // Helper functions
@@ -378,9 +389,9 @@ function isNotEmptyPerson (person, emptyPerson) {
 
 export default {
   components: {
-    PersonalInfo,
-    TeamInfo,
-    ProjectActivity,
+    PersonalInfoField,
+    TeamInfoField,
+    ProjectActivityField,
     ValidationObserver,
     Error
   },
@@ -420,27 +431,36 @@ export default {
     isEdit() {
       return this.$route.params.action === 'edit'
     },
+    isOwner() {
+      return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
+    },
     projectId() {
       return this.$route.params.id
     },
   },
   async mounted() {
-    // If invalid actionm jump to view page
-    if (!this.isNew && !this.isEdit) {
+    this.isLoading.page = true
+
+    if (this.isEdit || this.isNew) {
+      const project = await this.fetchProject(this.projectId)
+
+      // Populate project details if editing
+      if (project) {
+        if (project.leads) this.leads = project.leads // Required, will always have value
+        if (project.team) this.team = project.team.id // Required, will always have value
+        if (project.collaborators && project.collaborators.length > 0) this.collaborators = project.collaborators.map(e => e.id)
+        if (project.funding && project.funding.open_for_funding) this.openForFunding = project.funding.open_for_funding
+        if (project.activities) this.activities = project.activities
+      }
+    }
+
+    // If not owner or invalid action jump to view page
+    if ((!this.isNew && !this.isEdit) || !this.isOwner) {
       this.$router.push({ name: 'Project View', params: { id: this.projectId } })
       return
     }
 
-    const project = await this.fetchProject(this.projectId)
-
-    // Populate project details if editing
-    if (this.isEdit && project) {
-      if (project.leads) this.leads = project.leads // Required, will always have value
-      if (project.team) this.team = project.team // Required, will always have value
-      if (project.collaborators && project.collaborators.length > 0) this.collaborators = project.collaborators
-      if (project.funding && project.funding.open_for_funding) this.openForFunding = project.funding.open_for_funding
-      if (project.activities) this.activities = project.activities
-    }
+    this.isLoading.page = false
   },
   methods: {
     newLead() {
@@ -460,8 +480,6 @@ export default {
       }
     },
     async fetchProject(id) {
-      this.isLoading.page = true
-
       // Error handling
       try {
         const project = await ProjectManage.fetchProject(id, true)
@@ -473,9 +491,7 @@ export default {
 
         return project
       } catch (error) {
-        this.errorMessage = error.message
-      } finally {
-        this.isLoading.page = false
+        this.errorMessage = await handleError(error)
       }
     },
     async updateProject() {
@@ -499,11 +515,10 @@ export default {
       } catch (e) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: e.message,
+          message: await handleError(e),
           type: 'is-danger',
           queue: false
         })
-        this.isLoading.submit = false
         return
       } finally {
         this.isLoading.submit = false
@@ -517,8 +532,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "@/assets/variables"
-
 .header-icon
   position: absolute
   right: 1.25rem
