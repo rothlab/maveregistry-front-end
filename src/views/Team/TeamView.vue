@@ -169,6 +169,7 @@
                   >
                     <b-icon icon="mdil-link" />
                   </router-link>
+                  
                   {{ project.activities.type }},
                   <i>
                     {{ project.activities.start_date.toLocaleDateString() }} -

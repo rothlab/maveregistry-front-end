@@ -144,15 +144,15 @@ export const Project = Parse.Object.extend("Project", {
 
       ret.funding = this.get("funding")
       ret.activities = this.get("activities")
+    } else {
+      // Add recemt activity
+      const recentActivity = findRecentActivity(this.get("activities"))
+      if (recentActivity) ret.activities = recentActivity
     }
     
     if (followers) {
       // Check if followed by the current user
       ret.follow_status = await getFollowStatus([this.id], "project", Parse.User.current())
-
-      // Add recemt activity
-      const recentActivity = findRecentActivity(this.get("activities"))
-      if (recentActivity) ret.activities = recentActivity
     }
 
     return ret

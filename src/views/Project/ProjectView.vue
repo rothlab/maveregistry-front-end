@@ -165,7 +165,7 @@
               v-if="hasActivity"
             >
               <div
-                class="is-size-5"
+                class="is-size-5 field-margin"
                 v-for="(activity, id) in activities"
                 :key="id"
               >
@@ -173,26 +173,36 @@
                   {{ activity.start_date.toLocaleDateString() }} -
                   {{ activity.end_date ? activity.end_date.toLocaleDateString() : "Present" }}
                 </b> | {{ activity.type }}
-
+                
                 <br>
-
-                <div class="is-size-6 has-text-grey">
-                  <b-icon icon="mdil-link" />
-                  Links:
-                  <span
-                    v-for="(link, linkId) in activity.links"
-                    :key="linkId"
-                  >
-                    <a
-                      :href="link"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >{{ linkId + 1 }}</a>
-                    <span v-if="activity.links.length > linkId + 1">, </span>
-                  </span>
-                </div>
-
                 {{ activity.description }}
+                
+                <br>
+                
+                <b-taglist
+                  size="is-small"
+                  v-if="activity.links && activity.links.length > 0"
+                  attached
+                >
+                  <b-tag type="is-light">
+                    <b-icon icon="mdil-link" />
+                    Links
+                  </b-tag>
+                  
+                  <b-tag class="has-background-white-bis">
+                    <span
+                      v-for="(link, linkId) in activity.links"
+                      :key="linkId"
+                    >
+                      <a
+                        :href="link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >{{ linkId + 1 }}</a>
+                      <span v-if="activity.links.length > linkId + 1">, </span>
+                    </span>
+                  </b-tag>
+                </b-taglist>
               </div>
             </div>
           </div>
