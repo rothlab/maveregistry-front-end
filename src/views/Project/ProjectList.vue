@@ -61,14 +61,6 @@
           @page-change="(change) => { pagination.current = change; fetchTargets() }"
         >
           <template slot-scope="props">
-            <!-- Target ID -->
-            <b-table-column
-              field="target_id"
-              label="Target ID"
-            >
-              {{ props.row.id }}
-            </b-table-column>
-
             <!-- Target name-->
             <b-table-column
               field="target_name"
@@ -98,7 +90,6 @@
             <b-table-column
               field="projects"
               label="Project Progress"
-              width="25vw"
             >
               <div class="has-text-left">
                 <b-collapse
@@ -272,6 +263,7 @@
             <b-table-column
               field="action"
               label="Action"
+              width="8vw"
             >
               <div class="action-button is-flex">
                 <b-tooltip
