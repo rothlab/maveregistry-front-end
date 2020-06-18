@@ -60,6 +60,13 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "team edit" */ '../views/Team/TeamEdit.vue')
   },
 
+  // Nomination related
+  {
+    path: '/nominations',
+    name: 'Nominations',
+    component: () => import(/* webpackChunkName: "nominations" */ '../views/Nomination/NominationList.vue')
+  },
+
   // Account related
   {
     path: '/reset_password',

@@ -35,7 +35,7 @@
           tag="router-link"
           :to="{ path: '/nominations' }"
         >
-          Nomination
+          Nominations
         </b-navbar-item>
         <b-navbar-dropdown label="Info">
           <b-navbar-item

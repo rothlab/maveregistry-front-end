@@ -53,6 +53,7 @@
           :loading="isLoading.fetch_targets"
           hoverable
           paginated
+          pagination-position="top"
           backend-pagination
           icon-pack="mdi"
           :per-page="pagination.limit"
@@ -60,6 +61,89 @@
           :current-page="pagination.current"
           @page-change="(change) => { pagination.current = change; fetchTargets() }"
         >
+          <!-- Filter -->
+          <template slot="top-left">
+            <!-- Filter by type -->
+            <b-dropdown
+              hoverable
+              v-model="filter.type"
+            >
+              <b-button
+                slot="trigger"
+                slot-scope="{ active }"
+                :type="filter.type ? 'is-info' : 'is-light'"
+              >
+                <b-icon
+                  pack="mdi"
+                  icon="filter-outline"
+                  size="is-small"
+                />
+                <span>Type</span>
+                <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+              </b-button>
+
+              <b-dropdown-item
+                v-if="filter.type !== ''"
+                value=""
+                class="has-text-info"
+              >
+                Clear Filter
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-for="(type, id) in types"
+                :key="id"
+                :value="type"
+              >
+                {{ type }}
+              </b-dropdown-item>
+            </b-dropdown>
+
+            <!-- Filter by organism -->
+            <b-dropdown
+              hoverable
+              v-model="filter.organism"
+            >
+              <b-button
+                slot="trigger"
+                slot-scope="{ active }"
+                :type="filter.organism ? 'is-info' : 'is-light'"
+              >
+                <b-icon
+                  pack="mdi"
+                  icon="filter-outline"
+                  size="is-small"
+                />
+                <span>Organism</span>
+                <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+              </b-button>
+
+              <b-dropdown-item
+                v-if="filter.organism !== ''"
+                value=""
+                class="has-text-info"
+              >
+                Clear Filter
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-for="(organism, id) in organisms"
+                :key="id"
+                :value="organism"
+              >
+                <i>{{ organism }}</i>
+              </b-dropdown-item>
+            </b-dropdown>
+
+            <!-- Filter by name -->
+            <b-field style="margin-left: 0.5em">
+              <b-input
+                v-model="filter.name"
+                placeholder="Search Name"
+                type="search"
+                icon="mdil-magnify"
+              />
+            </b-field>
+          </template>
+
           <template slot-scope="props">
             <!-- Target name-->
             <b-table-column
@@ -354,6 +438,14 @@ export default {
     UnfollowModal,
     NewProjectModal
   },
+  watch: {
+    filter: {
+      deep: true,
+      async handler() {
+        await this.fetchTargets()
+      }
+    }
+  },
   computed: {
     hasLoggedIn() {
       return this.$store.state.hasLoggedIn
@@ -368,6 +460,14 @@ export default {
         current: 1
       },
       progressIcons: variables.progress_type_icons,
+      types: variables.target_types,
+      organisms: variables.target_organisms,
+      // Filter
+      filter: {
+        type: "",
+        organism: "",
+        name: ""
+      },
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
       followProp: {
@@ -422,7 +522,7 @@ export default {
 
       // Update targets
       try {
-        const targets = await ProjectManage.fetchTargets(this.pagination.limit, skip)
+        const targets = await ProjectManage.fetchTargets(this.pagination.limit, skip, this.filter)
         this.targets = targets.results
 
         // Update pagination

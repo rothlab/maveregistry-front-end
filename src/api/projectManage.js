@@ -182,7 +182,7 @@ export async function addProject(projectInfo) {
   // Create a target object and check if a target exists
   const target = await Target.create({
     type: projectInfo.type,
-    name: projectInfo.name,
+    name: projectInfo.name.toLowerCase(),
     organism: projectInfo.organism
   })
 
@@ -206,11 +206,18 @@ export async function addProject(projectInfo) {
   return project.id
 }
 
-export async function fetchTargets(limit, skip) {
+export async function fetchTargets(limit, skip, filter) {
   // TODO: enforce ACL
   
-  // Fetch targets, applying pagination
+  // Fetch targets
   const query = new Parse.Query(Target)
+
+  // Apply filter when available
+  if (filter.type !== '') query.equalTo("type", filter.type)
+  if (filter.organism !== '') query.equalTo("organism", filter.organism)
+  if (filter.name !== '') query.startsWith("name", filter.name)
+
+  // Apply pagination
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
