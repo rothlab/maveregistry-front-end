@@ -159,7 +159,7 @@
                 :key="id"
               >
                 <b class="is-capitalized">
-                  {{ project.target.name }} ({{ project.target.type }}),
+                  {{ project.target.name.toUpperCase() }} ({{ project.target.type }}),
                   <i>{{ project.target.organism }}</i>
                 </b><br>
                 <span v-if="project.activities">

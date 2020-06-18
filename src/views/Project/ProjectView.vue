@@ -223,7 +223,7 @@
                   target="_blank"
                 >
                   <span class="is-capitalized">
-                    {{ target.name }} ({{ target.type }}),
+                    {{ target.name.toUpperCase() }} ({{ target.type }}),
                   </span>
                   <span class="is-italic">
                     {{ target.organism }}
