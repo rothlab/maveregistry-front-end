@@ -149,6 +149,7 @@
             <b-table-column
               field="target_name"
               label="Name"
+              class="is-uppercase"
             >
               {{ props.row.name }}
             </b-table-column>
@@ -347,49 +348,56 @@
             <b-table-column
               field="action"
               label="Action"
-              width="8vw"
+              width="5vw"
             >
-              <div class="action-button is-flex">
-                <b-tooltip
-                  label="Add new project"
-                  position="is-left"
-                  type="is-dark"
-                >
-                  <b-button
-                    icon-right="mdil-plus"
-                    @click="addProject(true)"
-                  />
-                </b-tooltip>
-                <!-- Show MaveQuest for human genes -->
-                <b-tooltip
-                  v-if="props.row.type == 'gene' && props.row.organism == 'H. sapiens'"
-                  label="Plan with MaveQuest"
-                  position="is-left"
-                  type="is-dark"
-                >
-                  <b-button
-                    tag="a"
-                    :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
-                    target="_blank"
-                    icon-right="mdil-lightbulb-on"
-                  />
-                </b-tooltip>
-                <!-- Show Google search for others -->
-                <b-tooltip
-                  v-else
-                  label="Look up"
-                  position="is-left"
-                  type="is-dark"
-                >
-                  <b-button
-                    tag="a"
-                    :href="'https://www.google.com/search?q=' + props.row.name"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    icon-right="mdil-magnify"
-                  />
-                </b-tooltip>
-              </div>
+              <b-field>
+                <p class="control">
+                  <b-tooltip
+                    label="Add new project"
+                    position="is-left"
+                    type="is-dark"
+                  >
+                    <b-button
+                      icon-right="mdil-plus"
+                      @click="addProject(true)"
+                      type="is-light"
+                    />
+                  </b-tooltip>
+                </p>
+                <p class="control">
+                  <!-- Show MaveQuest for human genes -->
+                  <b-tooltip
+                    v-if="props.row.type == 'gene' && props.row.organism == 'H. sapiens'"
+                    label="Plan with MaveQuest"
+                    position="is-left"
+                    type="is-dark"
+                  >
+                    <b-button
+                      tag="a"
+                      :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
+                      target="_blank"
+                      icon-right="mdil-lightbulb-on"
+                      type="is-light"
+                    />
+                  </b-tooltip>
+                  <!-- Show Google search for others -->
+                  <b-tooltip
+                    v-else
+                    label="Look up"
+                    position="is-left"
+                    type="is-dark"
+                  >
+                    <b-button
+                      tag="a"
+                      :href="'https://www.google.com/search?q=' + props.row.name"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      icon-right="mdil-magnify"
+                      type="is-light"
+                    />
+                  </b-tooltip>
+                </p>
+              </b-field>
             </b-table-column>
           </template>
         </b-table>
