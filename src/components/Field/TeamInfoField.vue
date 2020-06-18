@@ -178,7 +178,7 @@ export default {
           teams = await TeamManage.fetchTeams(this.pagination.limit, this.pagination.skip)
         } else {
           // Otherwise, search team with matching names
-          teams = await TeamManage.queryByName(query)
+          teams = await TeamManage.queryByName(query, this.pagination.limit, this.pagination.skip)
           this.pagination.skip = 0
         }
       } catch (error) {

@@ -23,7 +23,7 @@
           tag="router-link"
           :to="{ path: '/projects' }"
         >
-          MAVE Projects
+          Projects
         </b-navbar-item>
         <b-navbar-item
           tag="router-link"

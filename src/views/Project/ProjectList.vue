@@ -8,7 +8,7 @@
             <div class="level-left">
               <div class="content">
                 <p class="is-size-3 has-text-weight-medium">
-                  MAVE Projects
+                  Projects
                 </p>
               </div>
             </div>

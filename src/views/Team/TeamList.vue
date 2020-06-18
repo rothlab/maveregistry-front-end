@@ -48,6 +48,7 @@
           :loading="isLoading.fetch_team"
           hoverable
           paginated
+          pagination-position="top"
           backend-pagination
           icon-pack="mdi"
           :per-page="pagination.limit"
@@ -55,6 +56,28 @@
           :current-page="pagination.current"
           @page-change="(change) => { pagination.current = change; fetchTeams() }"
         >
+          <!-- Filter -->
+          <template slot="top-left">
+            <!-- Filter by PI -->
+            <b-field grouped>
+              <b-input
+                v-model="filter.principal_investigator"
+                placeholder="Search Investigator"
+                type="search"
+                icon="mdil-magnify"
+                @input="(query) => filterTeams(query, 'investigator')"
+              />
+
+              <!-- Filter by Affiliation -->
+              <!-- <b-input
+                v-model="filter.affiliation"
+                placeholder="Search Affiliation"
+                type="search"
+                icon="mdil-magnify"
+                @input="(query) => filterTeams(query, 'affiliation')"
+              /> -->
+            </b-field>
+          </template>
           <template slot-scope="props">
             <!-- Team ID -->
             <b-table-column
@@ -72,7 +95,7 @@
             <!-- Principal Investigator -->
             <b-table-column
               field="principal_investigator"
-              label="Principal Investigaor"
+              label="Principal Investigator"
             >
               <div class="level is-mobile is-paddingless">
                 <div class="level-left is-capitalized">
@@ -132,7 +155,7 @@
                         target="_blank"
                       >
                         <b-icon icon="mdil-link" />
-                        {{ project.target.name }} ({{ project.target.type }}): {{ project.features.join(",") }}
+                        {{ project.target.name.toUpperCase() }} ({{ project.target.type }}): {{ project.features.join(",") }}
                       </router-link>
                     </div>
                     
@@ -255,6 +278,10 @@ export default {
         follow: "",
         type: "team"
       },
+      filter: {
+        principal_investigator: "",
+        affiliation: ""
+      }
     }
   },
   async mounted() {
@@ -314,6 +341,39 @@ export default {
       }
 
       this.isNewTeamModalActive = true
+    },
+    async filterTeams(query, type) {
+      if (query === "") {
+        this.fetchTeams()
+        return
+      }
+
+      // Loading
+      this.isLoading.fetch_team = true
+
+      try {
+        let teams
+        switch (type) {
+          case "investigator":
+            teams = await TeamManage.queryByName(query, this.pagination.limit, 0, ["project", "follow"])
+            break
+          // case "affiliation":
+          //   teams = await TeamManage.queryByAffiliation(query, this.pagination.limit, 0, ["project", "follow"])
+          //   break
+        }
+
+        this.teams = teams.results
+        this.pagination.count = teams.count
+      } catch (error) {
+        this.$buefy.toast.open({
+          message: await handleError(error),
+          type: 'is-danger',
+          queue: false,
+          duration: 5000
+        })
+      } finally {
+        this.isLoading.fetch_team = false
+      }
     }
   }
 }
