@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="addProject"
+                @click="addProject()"
               >
                 New Project
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="addProject"
+                @click="addProject()"
               >
                 New
               </b-button>
@@ -359,7 +359,7 @@
                   >
                     <b-button
                       icon-right="mdil-plus"
-                      @click="addProject(true)"
+                      @click="addProject(props.row)"
                       type="is-light"
                     />
                   </b-tooltip>
@@ -509,18 +509,6 @@ export default {
       this.followProp.type = type
       this.isUnfollowModelActive = true
     },
-    prefillProject(target) {
-      if (!target) {
-        this.preFilledProject = undefined
-        return
-      }
-
-      this.preFilledProject = {
-        type: target.type,
-        name: target.name,
-        organism: target.organism
-      }
-    },
     async fetchTargets() {
       // Loading
       this.isLoading.fetch_targets = true
@@ -541,14 +529,20 @@ export default {
         this.isLoading.fetch_targets = false
       }
     },
-    addProject(prefill = false) {
+    addProject(prefill = undefined) {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {
         this.$emit("login")
         return
       }
       
-      if (prefill) this.prefillProject()
+      if (prefill) {
+        this.preFilledProject = {
+          type: prefill.type,
+          name: prefill.name,
+          organism: prefill.organism
+        }
+      }
 
       this.isNewProjectModalActive = true
     }

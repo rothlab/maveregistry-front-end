@@ -184,7 +184,7 @@ export default {
     project(val) {
       if (val) {
         this.type = val.type
-        this.name = val.name
+        if (val.name) this.name = val.name.toUpperCase()
         this.organism = val.organism
       }
     }
