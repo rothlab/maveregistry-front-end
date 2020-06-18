@@ -231,7 +231,7 @@ export default {
       this.description = this.value.description
 
       if (!this.isOngoing) this.endDate = this.value.end_date
-      if (this.value.links.length > 0) this.links = this.value.links
+      if (this.value.links && this.value.links.length > 0) this.links = this.value.links
     }
   },
   mounted() {

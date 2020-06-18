@@ -13,7 +13,7 @@ export const Team = Parse.Object.extend("Team", {
     if (attrs.email === "") throw new Error("Principal Investigator email is empty")
     if (attrs.affiliation === "") throw new Error("Principal Investigator affiliation is empty")
   },
-  format: async function (detail = false, follow = false) {
+  format: async function (detail = false, project = false, follow = false) {
     let ret = {
       id: this.id,
       first_name: this.get("first_name"),
@@ -27,26 +27,27 @@ export const Team = Parse.Object.extend("Team", {
     if (detail) {
       // Fetch creator
       const user = this.get("creator")
-      
-      ret.user = {
-        username: user.get("username"),
-        first_name: user.get("first_name"),
-        last_name: user.get("last_name")
+      if (user && user.isDataAvailable()) {
+        ret.user = {
+          username: user.get("username"),
+          first_name: user.get("first_name"),
+          last_name: user.get("last_name")
+        }
       }
 
       // Fetch members
       const members = await fetchUsersByTeamId(this.id)
       ret.members = members
+    }
 
-      // Fetch Project
+    // Fetch Project
+    if (project) {
       const projects = await fetchProjectByTeamId(this.id, ["target"])
-      ret.projects = projects
+      if (projects && projects.length > 0) ret.projects = projects
     }
 
-    if (follow) {
-      // Fetch follow status
-      ret.follow_status = await getFollowStatus([this.id], "team", Parse.User.current())
-    }
+    // Fetch follow status
+    if (follow) ret.follow_status = await getFollowStatus([this.id], "team", Parse.User.current())
 
     return ret
   }
@@ -133,14 +134,16 @@ export async function updateTeam(id, payload) {
   
   return await team.save()
 }
-export async function fetchTeams(limit, skip, follow = false) {
-  // Fetch teams, applying pagination
+export async function fetchTeams(limit, skip, objects = []) {
+  // Fetch teams
   const query = new Parse.Query(Team)
+
+  // Apply pagination
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
   let teams = await query.find()
-  teams.results = await Promise.all(teams.results.map(e => e.format(false, follow))) // Format targets
+  teams.results = await Promise.all(teams.results.map(e => e.format(false, objects.includes("project"), objects.includes("follow")))) // Format targets
   
   // Format and return
   return teams

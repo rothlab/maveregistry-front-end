@@ -111,7 +111,7 @@ export const Project = Parse.Object.extend("Project", {
 
     // Format target
     const target = this.get("target")
-    if (target.isDataAvailable()) {
+    if (target && target.isDataAvailable()) {
       ret.target = {
         id: target.id,
         name: target.get("name"),
@@ -122,14 +122,14 @@ export const Project = Parse.Object.extend("Project", {
 
     // Format user
     const user = this.get("user")
-    if (user.isDataAvailable()) {
+    if (user && user.isDataAvailable()) {
       ret.user = {
         username: user.get("username"),
         first_name: user.get("first_name"),
         last_name: user.get("last_name")
       }
     }
-    
+
     // Access project progress detail
     if (detail) {
       ret.leads = this.get("leads")

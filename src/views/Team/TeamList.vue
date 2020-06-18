@@ -290,7 +290,7 @@ export default {
       
       // Update targets
       try {
-        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, true)
+        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, ["project", "follow"])
         this.teams = teams.results
 
         // Update pagination
@@ -313,7 +313,7 @@ export default {
         return
       }
 
-      this.isNewProjectModalActive = true
+      this.isNewTeamModalActive = true
     }
   }
 }

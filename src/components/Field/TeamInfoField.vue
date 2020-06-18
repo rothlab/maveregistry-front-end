@@ -20,6 +20,7 @@
       @focus="fetchTeams()"
       :check-infinite-scroll="true"
       @infinite-scroll="fetchMoreTeams"
+      @blur="pagination.skip = 0"
     >
       <template slot="empty">
         <p class="has-text-centered has-text-grey-light">
