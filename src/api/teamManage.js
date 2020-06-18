@@ -169,20 +169,6 @@ export async function queryByName(name, limit, skip, objects = []) {
   return teams
 }
 
-export async function queryByAffiliation(affiliation, limit, skip, objects = []) {
-  const query = new Parse.Query(Team)
-  query.fullText("affiliation", affiliation)
-
-  // Apply pagination
-  query.limit(limit)
-  query.skip(skip)
-  query.withCount() // include total amount of targets in the DB
-  let teams = await query.find()
-  teams.results = await Promise.all(teams.results.map(e => e.format(false, objects.includes("project"), objects.includes("follow"))))
-
-  return teams
-}
-
 export async function queryById(id, detail = false, followers = false) {
   let objects = []
   if (detail) objects.push("creator")

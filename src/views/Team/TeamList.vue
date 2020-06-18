@@ -59,22 +59,13 @@
           <!-- Filter -->
           <template slot="top-left">
             <!-- Filter by PI -->
-            <b-field grouped>
+            <b-field>
               <b-input
                 v-model="filter.principal_investigator"
                 placeholder="Search Investigator"
                 type="search"
                 icon="mdil-magnify"
                 @input="(query) => filterTeams(query, 'investigator')"
-              />
-
-              <!-- Filter by Affiliation -->
-              <b-input
-                v-model="filter.affiliation"
-                placeholder="Search Affiliation"
-                type="search"
-                icon="mdil-magnify"
-                @input="(query) => filterTeams(query, 'affiliation')"
               />
             </b-field>
           </template>
