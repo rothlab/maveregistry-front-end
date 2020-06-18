@@ -69,13 +69,13 @@
               />
 
               <!-- Filter by Affiliation -->
-              <!-- <b-input
+              <b-input
                 v-model="filter.affiliation"
                 placeholder="Search Affiliation"
                 type="search"
                 icon="mdil-magnify"
                 @input="(query) => filterTeams(query, 'affiliation')"
-              /> -->
+              />
             </b-field>
           </template>
           <template slot-scope="props">
@@ -357,9 +357,9 @@ export default {
           case "investigator":
             teams = await TeamManage.queryByName(query, this.pagination.limit, 0, ["project", "follow"])
             break
-          // case "affiliation":
-          //   teams = await TeamManage.queryByAffiliation(query, this.pagination.limit, 0, ["project", "follow"])
-          //   break
+          case "affiliation":
+            teams = await TeamManage.queryByAffiliation(query, this.pagination.limit, 0, ["project", "follow"])
+            break
         }
 
         this.teams = teams.results
