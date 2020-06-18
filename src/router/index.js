@@ -61,11 +61,11 @@ Vue.use(VueRouter)
   },
 
   // Nomination related
-  {
-    path: '/nominations',
-    name: 'Nominations',
-    component: () => import(/* webpackChunkName: "nominations" */ '../views/Nomination/NominationList.vue')
-  },
+  // {
+  //   path: '/nominations',
+  //   name: 'Nominations',
+  //   component: () => import(/* webpackChunkName: "nominations" */ '../views/Nomination/NominationList.vue')
+  // },
 
   // Account related
   {
