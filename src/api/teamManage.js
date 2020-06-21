@@ -47,7 +47,10 @@ export const Team = Parse.Object.extend("Team", {
     }
 
     // Fetch follow status
-    if (follow) ret.follow_status = await getFollowStatus([this.id], "team", Parse.User.current())
+    if (follow) {
+      const follow = await getFollowStatus([this.id], "team", Parse.User.current())
+      if (follow && follow.length > 0) ret.follow_status = follow[0]
+    }
 
     return ret
   }
