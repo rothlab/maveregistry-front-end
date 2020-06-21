@@ -61,13 +61,59 @@
                 <b>Name</b> <br>
                 {{ userInfo.first_name }} {{ userInfo.last_name }}
               </p>
-              <p
+              <div
                 class="is-size-5"
                 v-if="userInfo.email"
               >
                 <b>Email</b> <br>
-                {{ userInfo.email }}
-              </p>
+                <div class="level is-paddingless">
+                  <div class="level-left">
+                    <span class="is-flex has-vcentered">
+                      {{ userInfo.email }}
+                      <b-tag
+                        type="is-success"
+                        style="margin: 0 0.5rem"
+                        v-if="userInfo.email_validated"
+                      >
+                        <b-icon
+                          icon="mdil-check"
+                          style="padding-right: 0.25rem"
+                        />
+                        Validated
+                      </b-tag>
+                      <b-tag
+                        type="is-danger"
+                        style="margin: 0 0.5rem"
+                        v-else
+                      >
+                        <b-icon
+                          icon="mdil-alert"
+                          style="padding-right: 0.25rem"
+                        />
+                        Not Validated
+                      </b-tag>
+                    </span>
+                  </div>
+                  <div
+                    class="level-right resend-email"
+                    v-if="!userInfo.email_validated"
+                  >
+                    <b-button
+                      class="is-capitalized has-text-info"
+                      icon-left="mdil-refresh"
+                      type="is-light"
+                      size="is-small"
+                      style="border-radius: 4px; height: 1.5rem"
+                      expanded
+                      :loading="isLoading.resend_email"
+                      :disabled="isDisabled.resend_email"
+                      @click="resendValidationEmail"
+                    >
+                      Resend validation Email
+                    </b-button>
+                  </div>
+                </div>
+              </div>
               <p
                 class="is-size-5"
                 v-if="userInfo.website"
@@ -192,7 +238,11 @@ function initialState (){
       page: true,
       reset_pass: false,
       save_edit: false,
-      save_profile_pic: false
+      save_profile_pic: false,
+      resend_email: false
+    },
+    isDisabled: {
+      resend_email: false
     },
     errorMessage: "",
   }
@@ -261,13 +311,42 @@ export default {
     editProject() {
       this.$router.push({ name: 'User Profile Edit', params: { username: this.userInfo.username, action: 'edit' } })
     },
+    async resendValidationEmail() {
+      this.isLoading.resend_email = true
+      try {
+        await UserManage.resendValidationEmail(this.userInfo.username)
+      } catch (error) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: await handleError(error),
+          type: 'is-danger',
+          queue: false
+        })
+        return
+      } finally {
+        this.isLoading.resend_email = false
+      }
+
+      this.$buefy.toast.open({
+        duration: 5000,
+        message: "Validation email sent",
+        type: 'is-success',
+        queue: false
+      })
+      this.isDisabled.resend_email = true
+    }
   }
 }
 </script>
 
 <style lang="sass" scoped>
+@import "@/assets/style/variables.sass"
+
 .profile-image
   margin-bottom: 1rem
 .social-media
   margin-top: 0.5rem
+.resend-email
+  @media screen and (max-width: $break-mobile)
+    margin-top: 0.5rem
 </style>

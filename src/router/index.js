@@ -85,6 +85,12 @@ Vue.use(VueRouter)
     props: { showSuccess: true }
   },
   {
+    path: '/validate_email_success',
+    name: 'Validate Email Successful',
+    component: () => import(/* webpackChunkName: "validate email success" */ '../views/Account/ValidateEmail.vue'),
+    props: { showSuccess: true }
+  },
+  {
     path: '/callback/:method/:action',
     name: 'Callback',
     meta: { hideNav: true, hideFooter: true },

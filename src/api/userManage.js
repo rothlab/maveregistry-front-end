@@ -10,6 +10,7 @@ function parseUserMetadata (user, includeTeam = true) {
     last_name: user.get("last_name"),
     website: user.get("website"),
     profile_image: user.get("profile_image"),
+    email_validated: user.get("emailVerified")
   }
 
   if (includeTeam) {
@@ -164,4 +165,14 @@ export async function fetchUsersByTeamId (id) {
   const members = await query.find()
 
   return members.map(e => parseUserMetadata(e, false))
+}
+
+// Resend validation email
+export async function resendValidationEmail (username) {
+  // Only the current user can resend validation email
+  const currentUser = Parse.User.current()
+  console.log(currentUser)
+  if (username !== currentUser.get("username")) throw new Error("Illegal operation: not owner")
+
+  return await Parse.Cloud.run("resendVerificationEmail", { username: username })
 }
