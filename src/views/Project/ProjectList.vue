@@ -351,7 +351,7 @@
               width="5vw"
             >
               <b-field>
-                <p class="control">
+                <p class="control action-button">
                   <b-tooltip
                     label="Add new project"
                     position="is-left"
@@ -364,7 +364,7 @@
                     />
                   </b-tooltip>
                 </p>
-                <p class="control">
+                <p class="control action-button">
                   <!-- Show MaveQuest for human genes -->
                   <b-tooltip
                     v-if="props.row.type == 'gene' && props.row.organism == 'H. sapiens'"
@@ -553,14 +553,6 @@ export default {
 <style lang="sass" scoped>
 @import "@/assets/style/variables.sass"
 
-.action-button
-  justify-content: space-between
-  button, a
-    height: 2rem
-    padding-left: 0.625rem
-    padding-right: 0.625rem
-    padding-top: calc( 0.3125rem - 1px )
-    padding-bottom: calc( 0.3125rem - 1px )
 @media screen and (max-width: $break-mobile)
   .team-control
     justify-content: flex-end

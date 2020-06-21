@@ -61,7 +61,7 @@
             <!-- Filter by PI -->
             <b-field>
               <b-input
-                v-model="filter.principal_investigator"
+                v-model="filter.pi"
                 placeholder="Search Investigator"
                 type="search"
                 icon="mdil-magnify"
@@ -89,8 +89,11 @@
               label="Principal Investigator"
             >
               <div class="level is-mobile is-paddingless">
-                <div class="level-left is-capitalized">
-                  {{ props.row.first_name + ' ' + props.row.last_name }}
+                <div class="level-left">
+                  <p>
+                    <b class="is-capitalized">{{ props.row.first_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.first_name, filter.pi) }}
+                    <b class="is-capitalized">{{ props.row.last_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.last_name, filter.pi) }}
+                  </p>
                 </div>
 
                 <div class="level-right">
@@ -180,6 +183,7 @@
                   :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-primary'"
                   @click="confirmUnfollow(props.row.follow_status.id)"
                   @change="fetchTeams"
+                  class=""
                   expanded
                 >
                   <b-tooltip
@@ -238,6 +242,11 @@ import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import { handleError } from "@/api/errorHandler.js"
 
+// Helper
+function capitalize(string) {
+  return string.slice(0,1).toUpperCase() + string.slice(1)
+}
+
 export default {
   components: {
     NewTeamModal,
@@ -270,8 +279,8 @@ export default {
         type: "team"
       },
       filter: {
-        principal_investigator: "",
-        affiliation: ""
+        pi: "",
+        // affiliation: ""
       }
     }
   },
@@ -349,7 +358,7 @@ export default {
             teams = await TeamManage.queryByName(query, this.pagination.limit, 0, ["project", "follow"])
             break
           case "affiliation":
-            teams = await TeamManage.queryByAffiliation(query, this.pagination.limit, 0, ["project", "follow"])
+            // teams = await TeamManage.queryByAffiliation(query, this.pagination.limit, 0, ["project", "follow"])
             break
         }
 
@@ -365,6 +374,10 @@ export default {
       } finally {
         this.isLoading.fetch_team = false
       }
+    },
+    trimKeyword(string, keyword) {
+      if (keyword.length <= 0 || !string.startsWith(keyword)) return capitalize(string)
+      return string.replace(keyword, '')
     }
   }
 }
