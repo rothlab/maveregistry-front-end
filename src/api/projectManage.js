@@ -21,7 +21,7 @@ function findRecentActivity(activities) {
 }
 
 // Define target object
-const Target = Parse.Object.extend("Target", {
+export const Target = Parse.Object.extend("Target", {
   initialize: function (attrs) {
     // Validate attrs
     if (!attrs) return
@@ -221,6 +221,7 @@ export async function fetchTargets(limit, skip, filter) {
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
+  query.exists("projects") // include only targets with projects associated
   query.include("projects.team") // Include projects and team objects on the return
   let targets = await query.find()
   targets.results = await Promise.all(targets.results.map(e => e.format())) // Format targets
