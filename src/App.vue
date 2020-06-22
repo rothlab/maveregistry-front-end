@@ -58,6 +58,15 @@
         slot="end"
         v-if="hasLoggedIn"
       >
+        <!-- Notification -->
+        <b-navbar-item class="notification-nav">
+          <b-icon
+            icon="mdil-bell"
+            class="circle-icon has-background-light has-text-centered"
+            custom-class="symbol"
+          />
+        </b-navbar-item>
+
         <b-navbar-dropdown
           hoverable
           right
@@ -146,13 +155,31 @@
   </div>
 </template>
 
+<style lang="sass">
+.symbol
+  width: 1.5rem
+</style>
+
 <style lang="sass" scoped>
+@import "@/assets/style/variables.sass"
+
 .footer
   padding: 3rem 1.5rem
 .navbar-brand .is-active // Remove active style for the logo
   background-color: transparent !important
 .icon-margin-right
   margin-right: 0.1rem !important
+.notification-nav
+  height: 2rem
+  width: 2rem
+  border-style: solid
+  border-color: $grey-lighter
+  border-width: 2px
+  border-radius: 50% !important
+  justify-content: center
+  align-items: center
+  display: flex
+  padding: 0
 </style>
 
 <script>
