@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="addProject()"
+                @click="handleNewTargetModal()"
               >
                 New Project
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="addProject()"
+                @click="handleNewTargetModal()"
               >
                 New
               </b-button>
@@ -359,7 +359,7 @@
                   >
                     <b-button
                       icon-right="mdil-plus"
-                      @click="addProject(props.row)"
+                      @click="handleNewTargetModal(props.row)"
                       type="is-light"
                     />
                   </b-tooltip>
@@ -420,10 +420,13 @@
       />
 
       <!-- New project modal -->
-      <NewProjectModal
-        :active.sync="isNewProjectModalActive"
+      <NewTargetModal
+        :active.sync="isNewTargetModalActive"
+        title="Add a New Project"
+        :submit="addProject"
+        submit-text="Add Project"
         :project="preFilledProject"
-        @update="prefillProject(undefined)"
+        has-feature
       />
     </div>
   </div>
@@ -435,7 +438,7 @@ import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
-import NewProjectModal from '@/components/Modal/NewProjectModal.vue'
+import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -444,7 +447,7 @@ export default {
     Error,
     FollowModal,
     UnfollowModal,
-    NewProjectModal
+    NewTargetModal
   },
   watch: {
     filter: {
@@ -486,7 +489,7 @@ export default {
       preFilledProject: undefined,
       isUnfollowModelActive: false,
       // Register new activity related parameters
-      isNewProjectModalActive: false,
+      isNewTargetModalActive: false,
       isLoading: {
         new_project: false,
         follow_unfollow: false,
@@ -529,7 +532,7 @@ export default {
         this.isLoading.fetch_targets = false
       }
     },
-    addProject(prefill = undefined) {
+    handleNewTargetModal(prefill = undefined) {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {
         this.$emit("login")
@@ -544,7 +547,13 @@ export default {
         }
       }
 
-      this.isNewProjectModalActive = true
+      this.isNewTargetModalActive = true
+    },
+    async addProject(attrs) {
+      const projectId = await ProjectManage.addProject(attrs)
+
+      // Jump to new project registration page
+      this.$router.push({ name: 'Project Edit', params: { id: projectId, action: 'new' } })
     }
   }
 }
