@@ -85,8 +85,17 @@ export const Nomination = Parse.Object.extend("Nomination", {
 })
 Parse.Object.registerSubclass('Nomination', Nomination);
 
-export async function fetchNominations(limit = 10, skip = 0) {
+export async function fetchNominations(limit = 10, skip = 0, filter) {
   const query = new Parse.Query(Nomination)
+
+  // Apply filter when available
+  if (filter.type + filter.organism + filter.name !== "") {
+    const targetQuery = new Parse.Query(Target)
+    if (filter.type !== '') targetQuery.equalTo("type", filter.type)
+    if (filter.organism !== '') targetQuery.equalTo("organism", filter.organism)
+    if (filter.name !== '') targetQuery.startsWith("name", filter.name)
+    query.matchesQuery("target", targetQuery)
+  }
 
   // Include objects
   query.include("target")

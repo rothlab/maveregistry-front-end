@@ -51,7 +51,98 @@
         <b-table
           :data="nominations"
           :loading="isLoading.page"
+          paginated
+          pagination-position="top"
+          backend-pagination
+          icon-pack="mdi"
+          :per-page="pagination.limit"
+          :total="pagination.count"
+          :current-page="pagination.current"
+          @page-change="(change) => { pagination.current = change; fetchNominations() }"
         >
+          <!-- Filter -->
+          <template slot="top-left">
+            <!-- Filter by type -->
+            <b-dropdown
+              hoverable
+              v-model="filter.type"
+            >
+              <b-button
+                slot="trigger"
+                slot-scope="{ active }"
+                :type="filter.type ? 'is-info' : 'is-light'"
+              >
+                <b-icon
+                  pack="mdi"
+                  icon="filter-outline"
+                  size="is-small"
+                />
+                <span>Type</span>
+                <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+              </b-button>
+
+              <b-dropdown-item
+                v-if="filter.type !== ''"
+                value=""
+                class="has-text-info"
+              >
+                Clear Filter
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-for="(type, id) in types"
+                :key="id"
+                :value="type"
+              >
+                {{ type }}
+              </b-dropdown-item>
+            </b-dropdown>
+
+            <!-- Filter by organism -->
+            <b-dropdown
+              hoverable
+              v-model="filter.organism"
+            >
+              <b-button
+                slot="trigger"
+                slot-scope="{ active }"
+                :type="filter.organism ? 'is-info' : 'is-light'"
+              >
+                <b-icon
+                  pack="mdi"
+                  icon="filter-outline"
+                  size="is-small"
+                />
+                <span>Organism</span>
+                <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+              </b-button>
+
+              <b-dropdown-item
+                v-if="filter.organism !== ''"
+                value=""
+                class="has-text-info"
+              >
+                Clear Filter
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-for="(organism, id) in organisms"
+                :key="id"
+                :value="organism"
+              >
+                <i>{{ organism }}</i>
+              </b-dropdown-item>
+            </b-dropdown>
+
+            <!-- Filter by name -->
+            <b-field style="margin-left: 0.5em">
+              <b-input
+                v-model="filter.name"
+                placeholder="Search Name"
+                type="search"
+                icon="mdil-magnify"
+              />
+            </b-field>
+          </template>
+
           <template slot-scope="props">
             <!-- Target name-->
             <b-table-column
@@ -183,10 +274,20 @@ import { handleError } from "@/api/errorHandler.js"
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import Error from '@/components/Error.vue'
 
+const variables = require("@/assets/script/variables.json")
+
 export default {
   components: {
     NewTargetModal,
     Error
+  },
+  watch: {
+    filter: {
+      deep: true,
+      async handler() {
+        await this.fetchNominations()
+      }
+    }
   },
   computed: {
     hasLoggedIn() {
@@ -205,6 +306,13 @@ export default {
         limit: 10,
         current: 1
       },
+      filter: {
+        type: "",
+        organism: "",
+        name: ""
+      },
+      types: variables.target_types,
+      organisms: variables.target_organisms,
       isNewTargetModalActive: false
     }
   },
@@ -219,7 +327,7 @@ export default {
       const skip = (this.pagination.current - 1) * this.pagination.limit
 
       try {
-        const nominations = await NominationManage.fetchNominations(this.pagination.limit, skip)
+        const nominations = await NominationManage.fetchNominations(this.pagination.limit, skip, this.filter)
         this.nominations = nominations.results
 
         // Update count
