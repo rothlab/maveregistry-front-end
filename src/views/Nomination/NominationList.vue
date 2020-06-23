@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="handleNewTargetModal"
+                @click="handleNewTargetModal()"
               >
                 New Target
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="handleNewTargetModal"
+                @click="handleNewTargetModal()"
               >
                 New
               </b-button>
@@ -51,6 +51,7 @@
         <b-table
           :data="nominations"
           :loading="isLoading.page"
+          hoverable
           paginated
           pagination-position="top"
           backend-pagination
@@ -174,6 +175,7 @@
             <b-table-column
               field="reason"
               label="Reason"
+              width="32vw"
             >
               {{ props.row.reason }}
             </b-table-column>
@@ -182,6 +184,7 @@
             <b-table-column
               field="nominator"
               label="Nominator"
+              width="5vw"
             >
               <router-link
                 :to="{ path: `/user/${props.row.by.username}`}"
@@ -200,11 +203,11 @@
               </router-link>
             </b-table-column>
 
-            <!-- Action -->
+            <!-- Vote -->
             <b-table-column
-              field="action"
-              label="Action"
-              width="9vw"
+              field="vote"
+              label="Vote"
+              width="5vw"
             >
               <b-field>
                 <p class="control action-button">
@@ -237,9 +240,20 @@
                     </b-button>
                   </b-tooltip>
                 </p>
+              </b-field>
+            </b-table-column>
+
+            <!-- Action -->
+            <b-table-column
+              field="action"
+              label="Action"
+              width="5vw"
+              v-if="hasLoggedIn"
+            >
+              <b-field>
                 <p class="control action-button">
                   <b-tooltip
-                    label="Add new project"
+                    label="Add New Project"
                     position="is-left"
                     type="is-dark"
                   >
@@ -247,6 +261,38 @@
                       icon-right="mdil-plus"
                       @click="handleNewTargetModal(props.row)"
                       type="is-light"
+                    />
+                  </b-tooltip>
+                </p>
+                <p
+                  class="control action-button"
+                  v-if="user && user.username === props.row.by.username"
+                >
+                  <b-tooltip
+                    label="Edit Nomination"
+                    position="is-left"
+                    type="is-dark"
+                  >
+                    <b-button
+                      icon-right="mdil-pencil"
+                      type="is-light"
+                      @click="handleNewTargetModal(props.row)"
+                    />
+                  </b-tooltip>
+                </p>
+                <p
+                  class="control action-button"
+                  v-if="user && user.username === props.row.by.username"
+                >
+                  <b-tooltip
+                    label="Delete Nomination"
+                    position="is-left"
+                    type="is-dark"
+                  >
+                    <b-button
+                      icon-right="mdil-delete"
+                      type="is-light"
+                      @click="handleNewTargetModal(props.row)"
                     />
                   </b-tooltip>
                 </p>
@@ -259,10 +305,12 @@
       <!-- New Target modal -->
       <NewTargetModal
         :active.sync="isNewTargetModalActive"
-        title="Nominate a New Target"
-        submit-text="Nominate Target"
-        :submit="addNomination"
+        :title="targetModalProps.title"
+        :submit-text="targetModalProps.submit_text"
+        :submit="targetModalProps.submit_function"
+        :target="targetModalProps.target"
         has-reason
+        @change="fetchNominations()"
       />
     </div>
   </div>
@@ -292,6 +340,9 @@ export default {
   computed: {
     hasLoggedIn() {
       return this.$store.state.hasLoggedIn
+    },
+    user() {
+      return this.$store.state.user
     }
   },
   data() {
@@ -313,7 +364,13 @@ export default {
       },
       types: variables.target_types,
       organisms: variables.target_organisms,
-      isNewTargetModalActive: false
+      isNewTargetModalActive: false,
+      targetModalProps: {
+        title: "Nominate a New Target",
+        submit_text: "Nominate Target",
+        target: undefined,
+        submit_function: () => undefined
+      }
     }
   },
   async mounted() {
@@ -338,17 +395,39 @@ export default {
         this.isLoading.page = false
       }
     },
-    handleNewTargetModal() {
+    handleNewTargetModal(prefilled = undefined) {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {
         this.$emit("login")
         return
       }
 
+      if (prefilled) {
+        this.targetModalProps.title = "Edit a Nomination"
+        this.targetModalProps.submit_text = "Edit Nomination"
+        this.targetModalProps.submit_function = this.updateNomination
+        this.targetModalProps.target = prefilled.target
+        this.targetModalProps.target.id = prefilled.id
+        this.targetModalProps.target.reason = prefilled.reason
+      } else {
+        this.targetModalProps.title = "Nominate a New Target"
+        this.targetModalProps.submit_text = "Nominate Target",
+        this.targetModalProps.submit_function = this.addNomination
+        this.targetModalProps.target = undefined
+      }
+
       this.isNewTargetModalActive = true
     },
     async addNomination(attrs) {
+      // No need to catch error because it will be handled in the modal
       await NominationManage.addNomination(attrs)
+    },
+    async updateNomination(attrs) {
+      // No need to catch error because it will be handled in the modal
+      await NominationManage.updateNomination(attrs)
+    },
+    async deleteNomination(attrs) {
+      return attrs
     },
     async vote(object, field, index) {
       // If not logged in, show the login panel instead

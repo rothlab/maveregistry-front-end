@@ -158,6 +158,19 @@ export async function addNomination(info) {
   await nomination.save()
 }
 
+export async function updateNomination(info) {
+  // Validate if logged in
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
+
+  // Fetch nomination object
+  const nomination = await new Nomination.fetchById(info.id)
+
+  // Update reason and save
+  nomination.set("reason", info.reason)
+  await nomination.save()
+}
+
 export async function voteNomination(id, action, voteId = "") {
   // Validate if logged in
   const currentUser = Parse.User.current()
@@ -186,8 +199,7 @@ export async function voteNomination(id, action, voteId = "") {
       await vote.save()
     }
 
-    await nomination.save()
-    return
+    return await nomination.save()
   }
 
   // Register vote
@@ -221,6 +233,5 @@ export async function queryVotes(id) {
     }
   }
 
-  console.log(votes)
   return votes
 }

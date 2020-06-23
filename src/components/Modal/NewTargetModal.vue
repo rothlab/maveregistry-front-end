@@ -21,6 +21,15 @@
       >
         <section class="modal-card-body">
           <div class="content">
+            <!-- Notification -->
+            <b-message
+              v-if="notificationMessage"
+              size="is-small"
+              type="is-warning"
+            >
+              <span class="is-size-6">{{ notificationMessage }}</span>
+            </b-message>
+
             <!-- Target name -->
             <ValidationProvider
               rules="required"
@@ -39,6 +48,7 @@
                   placeholder="e.g. Gene Symbol, Domain Name"
                   required
                   expanded
+                  :disabled="isModifyNomination"
                 />
               </b-field>
             </ValidationProvider>
@@ -61,6 +71,7 @@
                   placeholder="Select a target type"
                   required
                   expanded
+                  :disabled="isModifyNomination"
                 >
                   <option
                     v-for="(option, index) in selection.types"
@@ -91,6 +102,7 @@
                   placeholder="Select a target organism"
                   required
                   expanded
+                  :disabled="isModifyNomination"
                 >
                   <option
                     v-for="(option, index) in selection.organisms"
@@ -135,6 +147,7 @@
               name="Reason"
               v-slot="{ errors, valid }"
               v-if="hasReason"
+              :immediate="reason !== ''"
             > 
               <!-- Reason for adding this target -->
               <b-field
@@ -207,7 +220,7 @@ export default {
     target: {
       type: Object,
       default: undefined
-    },
+    }
   },
   watch: {
     isActive(val) {
@@ -215,25 +228,43 @@ export default {
         this.$emit("update:active", val)
       }
 
-      if (val) this.cleanup()
+      if (val && !this.target) {
+        this.cleanup()
+      }
     },
     active(val) {
       if (val != this.isActive) {
         this.isActive = val
       }
     },
-    target(val) {
-      if (val) {
-        this.type = val.type
-        if (val.name) this.name = val.name.toUpperCase()
-        this.organism = val.organism
+    target: {
+      deep: true,
+      handler (val) {
+        if (val) {
+          this.type = val.type
+          if (val.name) this.name = val.name.toUpperCase()
+          this.organism = val.organism
+          if (val.reason) this.reason = val.reason
+          if (val.id) this.id = val.id
+        }
       }
+    }
+  },
+  computed: {
+    isModifyNomination() {
+      return this.hasReason && this.target
+    },
+    notificationMessage() {
+      if (this.isModifyNomination) return "You may not change target. Please create another nomination instead."
+
+      return ""
     }
   },
   data() {
     return {
       isActive: false,
       isLoading: false,
+      id: "",
       type: "",
       name: "",
       organism: "",
@@ -266,9 +297,13 @@ export default {
         }
         if (this.hasFeature) attrs.features = this.features
         if (this.hasReason) attrs.reason = this.reason
+        if (this.isModifyNomination && this.id) attrs.id = this.id // Pass nomination when modifying it
 
         // Call submit function passed in as a prop
         await this.submit(attrs)
+        
+        // Emit update
+        this.$emit("change")
       } catch (error) {
         this.$buefy.toast.open({
           duration: 5000,
