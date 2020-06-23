@@ -98,7 +98,7 @@
               >
                 <b-tag
                   size="is-medium"
-                  class="is-capitalized"
+                  class="is-capitalized shadow"
                 >
                   <b-icon
                     icon="mdil-account"
@@ -124,7 +124,7 @@
                   >
                     <b-button
                       icon-left="mdil-thumb-up"
-                      @click="vote(props.row, 'up')"
+                      @click="vote(props.row, 'up', props.index)"
                       :type="props.row.vote.current_user && props.row.vote.current_user.action === 'up' ? 'is-success' : 'is-light' "
                     >
                       {{ props.row.vote.up }}
@@ -139,7 +139,7 @@
                   >
                     <b-button
                       icon-left="mdil-thumb-down"
-                      @click="vote(props.row, 'down')"
+                      @click="vote(props.row, 'down', props.index)"
                       :type="props.row.vote.current_user && props.row.vote.current_user.action === 'down' ? 'is-danger' : 'is-light' "
                     >
                       {{ props.row.vote.down }}
@@ -242,13 +242,14 @@ export default {
     async addNomination(attrs) {
       await NominationManage.addNomination(attrs)
     },
-    async vote(object, field) {
+    async vote(object, field, index) {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {
         this.$emit("login")
         return
       }
 
+      this.isLoading.page = true
 
       try {
         // If already voted, we just have to update it
@@ -265,10 +266,15 @@ export default {
           type: 'is-danger',
           queue: false
         })
+        this.isLoading.page = false
+        return
       }
 
-      // Refresh
-      await this.fetchNominations()
+      // Refresh vote status
+      // Here, we have to update each property separately as Vue does not track object replacement reactively
+      const votes = await NominationManage.queryVotes(object.id)
+      this.nominations[index].vote = votes
+      this.isLoading.page = false
     }
   }
 }

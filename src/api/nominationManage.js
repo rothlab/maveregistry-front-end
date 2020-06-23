@@ -152,7 +152,7 @@ export async function addNomination(info) {
 export async function voteNomination(id, action, voteId = "") {
   // Validate if logged in
   const currentUser = Parse.User.current()
-  if (!Parse.User.current()) throw new Error("Not logged in")
+  if (!currentUser) throw new Error("Not logged in")
 
   // Otherwise, we need to register vote
   // Fetch the nomination
@@ -192,4 +192,26 @@ export async function voteNomination(id, action, voteId = "") {
   // Update count and save
   nomination.increment(action + "_count")
   await nomination.save()
+}
+
+export async function queryVotes(id) {
+  // Extract votes from the nomination
+  const nomination = await new Nomination.fetchById(id)
+  let votes = {
+    up: nomination.get("up_count"),
+    down: nomination.get("down_count")
+  }
+
+  // If logged in, fetch current user's vote
+  const currentUser = Parse.User.current()
+  if (currentUser) {
+    const vote = await new Vote.query([nomination], currentUser)
+    if (vote && vote.length > 0) votes.current_user = {
+      id: vote[0].id,
+      action: vote[0].get("action")
+    }
+  }
+
+  console.log(votes)
+  return votes
 }
