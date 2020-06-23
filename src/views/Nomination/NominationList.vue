@@ -292,7 +292,7 @@
                     <b-button
                       icon-right="mdil-delete"
                       type="is-light"
-                      @click="handleNewTargetModal(props.row)"
+                      @click="deleteNomination(props.row)"
                     />
                   </b-tooltip>
                 </p>
@@ -427,7 +427,20 @@ export default {
       await NominationManage.updateNomination(attrs)
     },
     async deleteNomination(attrs) {
-      return attrs
+      this.$buefy.dialog.confirm({
+        title: "Delete Nomination",
+        message: "Are you sure you want to delete this nomination? This action cannot be undone.",
+        confirmText: "Delete",
+        type: "is-danger",
+        iconPack: "mdi",
+        hasIcon: true,
+        onConfirm: async () => {
+          // No need to catch error because it will be handled in the modal
+          await NominationManage.deleteNomination(attrs)
+
+          await this.fetchNominations()
+        }
+      })
     },
     async vote(object, field, index) {
       // If not logged in, show the login panel instead

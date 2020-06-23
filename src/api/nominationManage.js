@@ -171,6 +171,20 @@ export async function updateNomination(info) {
   await nomination.save()
 }
 
+export async function deleteNomination(info) {
+  // Validate if logged in
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
+
+  // Fetch nomination
+  // Note that we purposely do not delete associated votes here because it will be much slower
+  // Instead, we will have a scheduled worker to clean it up from the server end periodically
+  const nomination = await new Nomination.fetchById(info.id)
+
+  // Delete object
+  await nomination.destroy()
+}
+
 export async function voteNomination(id, action, voteId = "") {
   // Validate if logged in
   const currentUser = Parse.User.current()
