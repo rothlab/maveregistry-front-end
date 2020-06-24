@@ -55,7 +55,7 @@
                 {{ userInfo.username }}
               </p>
               <p
-                class="is-size-5"
+                class="is-size-5 is-capitalized"
                 v-if="userInfo.first_name && userInfo.last_name"
               >
                 <b>Name</b> <br>

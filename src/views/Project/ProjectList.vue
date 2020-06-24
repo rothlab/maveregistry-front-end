@@ -237,7 +237,7 @@
                             <span class="has-text-primary">
                               Feature{{ project.features.length > 1 ? 's:' : ':' }}
                             </span>
-                            {{ project.features.join(",") }}
+                            {{ project.features.join(", ") }}
                             <br>
                             <span
                               v-if="project.description"
