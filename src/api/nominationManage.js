@@ -178,7 +178,7 @@ export async function deleteNomination(info) {
 
   // Fetch nomination
   // Note that we purposely do not delete associated votes here because it will be much slower
-  // Instead, we will have a scheduled worker to clean it up from the server end periodically
+  // Instead, we use an afterDelete worker to clean it up from the server end
   const nomination = await new Nomination.fetchById(info.id)
 
   // Delete object

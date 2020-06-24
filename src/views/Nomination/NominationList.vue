@@ -259,7 +259,7 @@
                   >
                     <b-button
                       icon-right="mdil-plus"
-                      @click="handleNewTargetModal(props.row)"
+                      @click="addNewProject(props.row)"
                       type="is-light"
                     />
                   </b-tooltip>
@@ -309,7 +309,8 @@
         :submit-text="targetModalProps.submit_text"
         :submit="targetModalProps.submit_function"
         :target="targetModalProps.target"
-        has-reason
+        :has-reason="targetModalProps.field === 'reason'"
+        :has-feature="targetModalProps.field === 'feature'"
         @change="fetchNominations()"
       />
     </div>
@@ -318,6 +319,7 @@
 
 <script>
 import * as NominationManage from "@/api/nominationManage.js"
+import * as ProjectManage from "@/api/projectManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import Error from '@/components/Error.vue'
@@ -367,6 +369,7 @@ export default {
       isNewTargetModalActive: false,
       targetModalProps: {
         title: "Nominate a New Target",
+        field: "reason",
         submit_text: "Nominate Target",
         target: undefined,
         submit_function: () => undefined
@@ -415,8 +418,24 @@ export default {
         this.targetModalProps.submit_function = this.addNomination
         this.targetModalProps.target = undefined
       }
+      this.targetModalProps.field = "reason"
 
       this.isNewTargetModalActive = true
+    },
+    addNewProject(prefilled) {
+      this.targetModalProps.title = "Add a New Project"
+      this.targetModalProps.submit_text = "Add Project"
+      this.targetModalProps.target = prefilled.target
+      this.targetModalProps.field = "feature"
+      this.targetModalProps.submit_function = async (attrs) => {
+        const projectId = await ProjectManage.addProject(attrs)
+
+        // Jump to new project registration page
+        this.$router.push({ name: 'Project Edit', params: { id: projectId, action: 'new' } })
+      }
+
+      this.isNewTargetModalActive = true
+
     },
     async addNomination(attrs) {
       // No need to catch error because it will be handled in the modal
