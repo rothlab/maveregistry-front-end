@@ -304,6 +304,7 @@ export default {
         
         // Emit update
         this.$emit("change")
+        this.isActive = false
       } catch (error) {
         this.$buefy.toast.open({
           duration: 5000,
@@ -314,7 +315,6 @@ export default {
       } finally {
         // Handle UI changes
         this.isLoading = false
-        this.isActive = false
       }
     },
     getFilteredFeatures(text) {

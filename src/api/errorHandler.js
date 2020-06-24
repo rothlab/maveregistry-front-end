@@ -12,6 +12,8 @@ export async function handleError(err) {
       }
       
       return "Invalid user token. Please log in again."
+    case Parse.Error.OPERATION_FORBIDDEN:
+      return "Permission Denied. Please make sure you have access to this function."
     default:
       return err.message
   }

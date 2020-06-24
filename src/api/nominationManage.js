@@ -16,10 +16,14 @@ export const Vote = Parse.Object.extend("Vote", {
 
     return await query.get(id)
   },
-  async query(targets, by) {
+  async query(targets, by, select = []) {
     const query = new Parse.Query(Vote)
     query.containedIn("target", targets)
     query.equalTo("by", by)
+
+    // If select fields are defined, apply them
+    if (select && select.length > 0) query.select(select)
+
     return await query.find()
   }
 })
@@ -99,8 +103,13 @@ export async function fetchNominations(limit = 10, skip = 0, filter) {
 
   // Include objects
   query.include("target")
+  query.select(["target.name", "target.organism", "target.type"])
   query.include("by")
+  query.select(["by.first_name", "by.last_name", "by.username"])
   
+  // Add general fields
+  query.select(["reason", "up_count", "down_count"])
+
   // Apply pagination
   query.limit(limit)
   query.skip(skip)
@@ -114,7 +123,8 @@ export async function fetchNominations(limit = 10, skip = 0, filter) {
   if (currentUser) {
     const nominationIds = nominations.results.map(e => e.id)
     // Query multiple votes in one shot to reduce the number of connections
-    const vote = await new Vote.query(nominationIds, currentUser)
+    const select = ["action", "target"]
+    const vote = await new Vote.query(nominationIds, currentUser, select)
     if (vote && vote.length > 0) {
       nominations.results = nominations.results.map(e => {
         const found = vote.filter(v => v.get("target").id === e.id)
