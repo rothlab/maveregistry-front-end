@@ -337,12 +337,12 @@
                     MAVE Registry supports the following types:
                   </p>
                   <ol>
-                    <li>Literature search: no experiments performed yet</li>
-                    <li>Assay development: small-scale experiments</li>
-                    <li>MAVE data collection: full-scale MAVE experiments</li>
-                    <li>MAVE data analysis: computational analysis of MAVE data</li>
-                    <li>Publication in preparation</li>
-                    <li>Publication available</li>
+                    <li>Literature Search: no experiments performed yet</li>
+                    <li>Assay Development: small-scale experiments</li>
+                    <li>MAVE Data Collection: full-scale MAVE experiments</li>
+                    <li>MAVE Data Analysis: computational analysis of MAVE data</li>
+                    <li>Publication in Preparation</li>
+                    <li>Publication Available: <b>this activity is visible to the public</b></li>
                   </ol>
                 </div>
               </b-notification>
@@ -474,6 +474,7 @@ export default {
     },
     newActivity() {
       return {
+        id: "",
         type: "",
         start_date: new Date(),
         description: "",

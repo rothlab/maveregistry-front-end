@@ -149,7 +149,9 @@
                         target="_blank"
                       >
                         <b-icon icon="mdil-link" />
-                        {{ project.target.name.toUpperCase() }} ({{ project.target.type }}): {{ project.features.join(",") }}
+                        {{ project.target.name.toUpperCase() }}
+                        ({{ project.target.type }}, <i>{{ project.target.organism }}</i>):
+                        {{ project.features.join(",") }}
                       </router-link>
                     </div>
                     
