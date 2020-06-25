@@ -83,13 +83,11 @@ export async function getFollowStatus(targets, type, by) {
 }
 
 export async function follow(target, type, reason) {
-  const currentUser = Parse.User.current()
-  
   let follow = await new Follow.create({
     target: target,
     type: type,
     reason: reason,
-    by: currentUser
+    by: Parse.User.current()
   })
 
   // If not existing, save it

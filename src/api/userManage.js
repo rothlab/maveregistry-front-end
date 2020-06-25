@@ -170,9 +170,7 @@ export async function fetchUsersByTeamId (id) {
 // Resend validation email
 export async function resendValidationEmail (username) {
   // Only the current user can resend validation email
-  const currentUser = Parse.User.current()
-  console.log(currentUser)
-  if (username !== currentUser.get("username")) throw new Error("Illegal operation: not owner")
+  if (username !== Parse.User.current().get("username")) throw new Error("Illegal operation: not owner")
 
   return await Parse.Cloud.run("resendVerificationEmail", { username: username })
 }
