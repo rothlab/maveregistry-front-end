@@ -198,6 +198,7 @@
                 <b-button
                   v-else
                   icon-left="mdil-bell"
+                  type="is-light"
                   @click="confirmFollow(props.row.id)"
                   @change="fetchTeams"
                   expanded

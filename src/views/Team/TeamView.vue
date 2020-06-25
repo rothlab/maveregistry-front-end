@@ -135,7 +135,7 @@
               <div class="info-content">
                 <p class="has-text-grey">
                   <span class="is-size-5 has-text-grey-dark">No Projects Available</span><br>
-                  Add a project by visiting the "MAVE Projects" page.
+                  <span v-if="isOwner">Add a project by visiting the "MAVE Projects" page.</span>
                 </p>
               </div>
             </div>

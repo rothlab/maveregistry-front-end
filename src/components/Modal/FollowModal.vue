@@ -87,7 +87,7 @@ export default {
       this.isLoading = true
 
       try {
-        FollowManage.follow(this.source, this.type, this.request)
+        await FollowManage.follow(this.source, this.type, this.request)
       } catch (error) {
         this.$buefy.toast.open({
           message: await handleError(error),
