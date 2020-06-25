@@ -215,7 +215,10 @@
             </div>
             
             <div class="project-content">
-              <p class="is-size-5">
+              <p
+                class="is-size-5"
+                v-if="target"
+              >
                 <b>Target</b> <br>
                 <b-icon icon="mdil-pin" />
                 <router-link
@@ -264,7 +267,7 @@
               </p>
               <div
                 class="is-size-5"
-                v-if="(followerCount > 0 || requestCount > 0) && isOwner"
+                v-if="isOwner && (followerCount > 0 || requestCount > 0)"
               >
                 <b>Follower{{ followerCount > 1 ? 's' : '' }}</b> <br>
                 <div class="buttons">
@@ -325,7 +328,7 @@ export default {
       isManageFollowerModalActive: false,
       isRequest: false,
       errorMessage: "",
-      target: {},
+      target: undefined,
       features: [],
       user: undefined,
       updatedDate: new Date(),
@@ -367,7 +370,8 @@ export default {
     }
 
     // Fetch team follower and request count
-    await this.fetchFollowerAndRequestCount(this.projectId)
+    if (this.isOwner) await this.fetchFollowerAndRequestCount(this.projectId)
+
     this.isLoading.page = false
   },
   methods: {
