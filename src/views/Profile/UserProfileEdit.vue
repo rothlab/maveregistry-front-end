@@ -68,6 +68,7 @@
                         type="text"
                         placeholder="First Name"
                         v-model="userInfo.first_name"
+                        custom-class="is-capitalized"
                       />
                     </b-field>
                   </ValidationProvider>
@@ -86,6 +87,7 @@
                         type="text"
                         placeholder="Last Name"
                         v-model="userInfo.last_name"
+                        custom-class="is-capitalized"
                       />
                     </b-field>
                   </ValidationProvider>
@@ -319,6 +321,7 @@ export default {
 
     if (this.userInfo) {
       this.userInfo.social = {}
+      if (this.userInfo.team) this.team = this.userInfo.team
     }
   },
   methods: {
