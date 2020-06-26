@@ -135,21 +135,48 @@ export async function updateUserProfile (userInfo) {
   if (!user) return
 
   // Update user info
-  if (userInfo.username) user.set("username", userInfo.username)
-  if (userInfo.first_name) user.set("first_name", userInfo.first_name.toLowerCase())
-  if (userInfo.last_name) user.set("last_name", userInfo.last_name.toLowerCase())
+  let hasChanged = false
+  if (userInfo.username && userInfo.username !== user.get("username")) {
+    hasChanged = true
+    user.set("username", userInfo.username)
+  }
+  if (userInfo.first_name) {
+    userInfo.first_name = userInfo.first_name.toLowerCase()
+    if (userInfo.first_name !== user.get("first_name")) {
+      hasChanged = true
+      user.set("first_name", userInfo.first_name)
+    }
+  }
+  if (userInfo.last_name) {
+    userInfo.last_name = userInfo.last_name.toLowerCase()
+    if (userInfo.last_name !== user.get("last_name")) {
+      hasChanged = true
+      user.set("last_name", userInfo.last_name)
+    }
+  }
   // Only update user email if it's changed
   // Because every time it's updated, a new verification email will be sent
-  if (userInfo.email && userInfo.email !== user.get("email")) user.set("email", userInfo.email)
-  if (userInfo.website) user.set("website", userInfo.website)
-  if (userInfo.profile_image) user.set("profile_image", userInfo.profile_image)
-  if (userInfo.team) {
+  if (userInfo.email && userInfo.email !== user.get("email")) {
+    hasChanged = true
+    user.set("email", userInfo.email)
+  }
+  if (userInfo.website && userInfo.website !== user.get("website")) {
+    hasChanged = true
+    user.set("website", userInfo.website)
+  }
+  if (userInfo.profile_image && userInfo.profile_image !== user.get("profile_image")) {
+    hasChanged = true
+    user.set("profile_image", userInfo.profile_image)
+  }
+  if (userInfo.team && userInfo.team !== user.get("team").id) {
     const team = await new Team.fetchById(userInfo.team)
+    hasChanged = true
     user.set("team", team)
   }
 
-  // Save user info changes
-  const retUser = await user.save()
+  // Save user info changes only if anything is changed
+  let retUser = user
+  if (hasChanged) retUser = await user.save()
   return parseUserMetadata(retUser)
 }
 
