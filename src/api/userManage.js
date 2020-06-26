@@ -138,7 +138,9 @@ export async function updateUserProfile (userInfo) {
   if (userInfo.username) user.set("username", userInfo.username)
   if (userInfo.first_name) user.set("first_name", userInfo.first_name.toLowerCase())
   if (userInfo.last_name) user.set("last_name", userInfo.last_name.toLowerCase())
-  if (userInfo.email) user.set("email", userInfo.email)
+  // Only update user email if it's changed
+  // Because every time it's updated, a new verification email will be sent
+  if (userInfo.email && userInfo.email !== user.get("email")) user.set("email", userInfo.email)
   if (userInfo.website) user.set("website", userInfo.website)
   if (userInfo.profile_image) user.set("profile_image", userInfo.profile_image)
   if (userInfo.team) {
@@ -169,9 +171,6 @@ export async function fetchUsersByTeamId (id) {
 
 // Resend validation email
 export async function resendValidationEmail (username) {
-  // Only the current user can resend validation email
-  if (username !== Parse.User.current().get("username")) throw new Error("Illegal operation: not owner")
-
   return await Parse.Cloud.run("resendVerificationEmail", { username: username })
 }
 
