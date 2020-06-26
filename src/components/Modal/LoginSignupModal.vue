@@ -336,7 +336,7 @@ export default {
           id: googleUser.getId(),
           access_token: googleUser.getAuthResponse().access_token
         }
-      };
+      }
     },
     async signup(method) {
       // Sign up user
@@ -358,7 +358,7 @@ export default {
                 email: this.email,
                 password: this.password
               }
-            );
+            )
 
             this.isActive = false;
           } catch (e) {
@@ -368,12 +368,13 @@ export default {
               message: await handleError(e),
               type: "is-danger",
               queue: false
-            });
+            })
+            return
           } finally {
-            this.isLoading = false;
+            this.isLoading = false
           }
 
-          break;
+          break
         case "google":
           // With Google
           try {
@@ -396,9 +397,12 @@ export default {
               message: await handleError(e),
               type: "is-danger",
               queue: false
-            });
+            })
+            return
+          } finally {
+            this.isLoading = false
           }
-          break;
+          break
         case "orcid":
           // Bring up ORCID window
           window.open(
@@ -412,7 +416,7 @@ export default {
                resizable=yes,
                width=500px,
                height=600px`
-          );
+          )
 
           // Handle results
           timer = setInterval(() => {
@@ -420,11 +424,16 @@ export default {
               this.isActive = false;
               clearInterval(timer);
             }
-          }, 1000);
-          break;
+          }, 1000)
+
+          this.isLoading = false
+          break
         default:
-          break;
+          break
       }
+
+      // Get roles
+      await this.$store.dispatch("getRoles")
     },
     async login(method) {
       // Loading
@@ -457,6 +466,9 @@ export default {
               type: "is-danger",
               queue: false
             });
+            return
+          } finally {
+            this.isLoading = false;
           }
           break;
         case "google":
@@ -482,6 +494,9 @@ export default {
               type: "is-danger",
               queue: false
             });
+            return
+          } finally {
+            this.isLoading = false;
           }
           break;
         case "orcid":
@@ -506,12 +521,15 @@ export default {
               clearInterval(timer);
             }
           }, 1000);
+
+          this.isLoading = false;
           break;
         default:
           break;
       }
 
-      this.isLoading = false;
+      // Get roles
+      await this.$store.dispatch("getRoles")
     }
   }
 };

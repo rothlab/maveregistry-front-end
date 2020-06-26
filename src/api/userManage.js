@@ -174,3 +174,12 @@ export async function resendValidationEmail (username) {
 
   return await Parse.Cloud.run("resendVerificationEmail", { username: username })
 }
+
+// Get user roles
+export async function getRoles() {
+  // We can only get roles for the current user
+  let user = Parse.User.current()
+  if (!user) return
+
+  return await Parse.Cloud.run("getRoles")
+}

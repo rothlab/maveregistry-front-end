@@ -174,14 +174,15 @@ export default {
   async mounted () {
     // Check if an user has logged in, if so, use it
     try {
-      await this.$store.dispatch("loginUserCache");
+      await this.$store.dispatch("loginUserCache")
+      await this.$store.dispatch("getRoles")
     } catch (e) {
       this.$buefy.toast.open({
         duration: 5000,
         message: await handleError(e),
         type: "is-danger",
         queue: false
-      });
+      })
     }
   },
   data () {

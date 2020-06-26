@@ -10,7 +10,8 @@ import * as UserManage from "../api/userManage"
 export default new Vuex.Store({
   state: {
     user: undefined,
-    hasLoggedIn: false
+    hasLoggedIn: false,
+    roles: []
   },
   mutations: {
     logoutUser(state) {
@@ -22,6 +23,9 @@ export default new Vuex.Store({
         state.hasLoggedIn = true
         state.user = user
       }
+    },
+    setRoles(state, roles) {
+      state.roles = roles
     }
   },
   actions: {
@@ -70,13 +74,19 @@ export default new Vuex.Store({
 
       // Update user info if loggined in successfully
       commit('loginUser', user)
+    },
+    async getRoles ({ commit }) {
+      const roles = await UserManage.getRoles()
+
+      // Update user roles
+      commit('setRoles', roles)
     }
   },
   modules: {
   },
   plugins: [
     createMutationsSharer({
-      predicate: ['loginUser', 'logoutUser']
+      predicate: ['loginUser', 'logoutUser', 'setRoles']
     })
   ]
 })
