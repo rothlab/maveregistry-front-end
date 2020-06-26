@@ -201,7 +201,7 @@
               <div class="has-text-left">
                 <!-- If not member, show this panel to indicate that nothing is available -->
                 <div
-                  v-if="!isMember"
+                  v-if="props.row.projects < 1"
                   class="card project-card has-background-light"
                 >
                   <div class="card-header">
@@ -237,8 +237,8 @@
                       v-else
                       class="card-header-title is-capitalized"
                     >
-                      <b-icon icon="mdil-circle" />
-                      No Progress Description
+                      <b-icon icon="mdil-play" />
+                      Under Investigation
                     </p>
                     <a class="card-header-icon">
                       <b-tooltip

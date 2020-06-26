@@ -53,27 +53,6 @@
           <div
             class="column is-6"
           >
-            <!-- Add no project detail display -->
-            <div
-              class="no-project has-vcentered"
-              v-if="!hasPeople && !hasActivity"
-            >
-              <div class="info-icon">
-                <b-icon
-                  icon="mdil-flask-empty"
-                  custom-size="mdil-48px"
-                  type="is-grey-light"
-                />
-              </div>
-              <div class="info-content">
-                <p class="has-text-grey">
-                  <span class="is-size-5 has-text-grey-dark">No Project Detail</span><br>
-                  <span v-if="isOwner">Using the "Edit" function to add project detail.</span>
-                  <span v-else>You may contact the creator for more information.</span>
-                </p>
-              </div>
-            </div>
-
             <div
               class="project-header"
               v-if="hasPeople"
@@ -147,7 +126,28 @@
               </p>
             </div>
 
-            <hr v-if="hasPeople || hasActivity">
+            <hr v-if="hasPeople && hasActivity">
+
+            <!-- Add no project detail display -->
+            <div
+              class="no-project has-vcentered"
+              v-if="!hasPeople && !hasActivity"
+            >
+              <div class="info-icon">
+                <b-icon
+                  icon="mdil-flask-empty"
+                  custom-size="mdil-48px"
+                  type="is-grey-light"
+                />
+              </div>
+              <div class="info-content">
+                <p class="has-text-grey">
+                  <span class="is-size-5 has-text-grey-dark">No Project Detail</span><br>
+                  <span v-if="isOwner">Using the "Edit" function to add project detail.</span>
+                  <span v-else>You may contact the creator for more information.</span>
+                </p>
+              </div>
+            </div>
 
             <div
               class="project-header"
@@ -346,7 +346,7 @@ export default {
       return this.$route.params.id
     },
     hasPeople() {
-      return this.leads.length > 0 && this.team
+      return this.leads.length > 0 || this.team
     },
     hasActivity() {
       return this.activities.length > 0
