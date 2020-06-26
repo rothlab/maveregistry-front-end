@@ -16,8 +16,15 @@ function findRecentActivity(activities) {
   // If there's only one activity, there's no point to sort
   if (activities.length === 1) return activities[0]
 
-  const sorted = activities.sort((a, b) => b.start_date - a.start_date)
+  const sorted = activities.sort((a, b) => b.get("start_date") - a.get("start_date"))
   return sorted[0]
+}
+
+async function fetchActivityByProject(projects) {
+  const query = new Parse.Query(ProjectActivity)
+  query.containedIn("project", projects)
+
+  return await query.find()
 }
 
 // Define target object
@@ -45,8 +52,8 @@ export const Target = Parse.Object.extend("Target", {
       name: this.get("name"),
       type: this.get("type"),
       organism: this.get("organism"),
-      projects: projects.map((e, i) => {
-        const recentActivity = findRecentActivity(e.get("activities"))
+      projects: await Promise.all(projects.map(async (e, i) => {
+        const recentActivity = e.get("recent_activity")
         const funding = e.get("funding")
 
         let ret = {
@@ -55,12 +62,12 @@ export const Target = Parse.Object.extend("Target", {
           follow_status: projectFollowStatus[i]
         }
 
-        if (funding && funding.open_for_funding) ret.funding = funding.open_for_funding
-        if (recentActivity && recentActivity.type) ret.type = recentActivity.type
-        if (recentActivity && recentActivity.description) ret.description = recentActivity.description
+        if (funding && funding.open_for_funding) ret.open_for_funding = funding.open_for_funding
+        if (recentActivity && recentActivity.get("type")) ret.type = recentActivity.get("type")
+        if (recentActivity && recentActivity.get("description")) ret.description = recentActivity.get("description")
 
         return ret
-      }),
+      })),
       teams: teams.map((e, i) => {
         return {
           id: e.id,
@@ -144,12 +151,12 @@ export const Project = Parse.Object.extend("Project", {
       if (collaborators && collaborators.length > 0) ret.collaborators = await Promise.all(collaborators.map(e => e.format()))
 
       // Format activities
-      const activities = this.get("activities")
+      const activities = await fetchActivityByProject([this])
       if (activities && activities.length > 0) ret.activities = await Promise.all(activities.map(e => e.format()))
     } else {
-      // Add recemt activity
-      const recentActivity = findRecentActivity(this.get("activities"))
-      if (recentActivity) ret.activities = recentActivity
+      // // Add recemt activity
+      // const recentActivity = await fetchActivityByProject(this, true)
+      // if (recentActivity) ret.activities = recentActivity
     }
     
     if (followers) {
@@ -258,6 +265,15 @@ export async function fetchTargets(limit, skip, filter) {
   if (filter.name !== '') query.startsWith("name", filter.name)
   query.exists("projects") // include only targets with projects associated
   query.include("projects.team") // Include projects and team objects on the return
+  query.include("projects.recent_activity") // Include projects and team objects on the return
+
+  // Select fields
+  query.select(
+    [
+      "name", "type", "organism", 
+      "projects.features", "projects.funding", "projects.recent_activity", "projects.team",
+      "projects.recent_activity.type", "projects.recent_activity.description"
+    ])
 
   // Apply pagination
   query.limit(limit)
@@ -273,7 +289,7 @@ export async function fetchTargets(limit, skip, filter) {
 
 export async function fetchProject(id, detail = false) {
   // Fetch project by ID
-  const project = await new Project.fetchById(id, ["target", "user", "team", "collaborators", "activities"])
+  const project = await new Project.fetchById(id, ["target", "user", "team", "collaborators"])
 
   // Format and return
   return project.format(detail)
@@ -328,13 +344,15 @@ export async function updateProject(payload) {
 
     return activity
   }))
+  const savedActivities = await Parse.Object.saveAll(activities)
+  const recentActivity = findRecentActivity(activities)
 
   // Update project
   project.set("leads", payload.leads)
   project.set("team", team)
   project.set("collaborators", collaborators)
   project.set("funding", payload.funding)
-  project.set("activities", activities)
+  project.set("recent_activity", recentActivity)
 
   // Set publication status. If it's true, then the current project will be shown to everyone.
   // However, only the publication activity will be made available.
@@ -344,5 +362,6 @@ export async function updateProject(payload) {
   // Save project
   await project.save()
 
-  // TODO: Schedule a cloud job to remove no longer needed activities
+  // Use a cloud function to remove no longer needed activities
+  await Parse.Cloud.run("updateProjectActivities", { ids: savedActivities.map(e => e.id) })
 }

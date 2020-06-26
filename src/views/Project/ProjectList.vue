@@ -144,6 +144,27 @@
             </b-field>
           </template>
 
+          <!-- No results -->
+          <template slot="empty">
+            <div
+              class="no-project has-vcentered"
+              v-if="!isLoading.fetch_targets"
+            >
+              <div class="info-icon">
+                <b-icon
+                  icon="mdil-clipboard"
+                  custom-size="mdil-48px"
+                  type="is-grey-light"
+                />
+              </div>
+              <div class="info-content">
+                <p class="has-text-grey">
+                  <span class="is-size-5">Sorry, we couldn't find any results.</span>
+                </p>
+              </div>
+            </div>
+          </template>
+
           <template slot-scope="props">
             <!-- Target name-->
             <b-table-column
@@ -175,9 +196,24 @@
             <b-table-column
               field="projects"
               label="Project Progress"
+              width="30vw"
             >
               <div class="has-text-left">
+                <!-- If not member, show this panel to indicate that nothing is available -->
+                <div
+                  v-if="!isMember"
+                  class="card project-card has-background-light"
+                >
+                  <div class="card-header">
+                    <p class="card-header-title is-capitalized">
+                      <b-icon icon="mdil-play" />
+                      Under Investigation
+                    </p>
+                  </div>
+                </div>
+
                 <b-collapse
+                  v-else
                   class="card project-card has-background-light"
                   animation="slide"
                   v-for="(project, index) in props.row.projects"
@@ -206,7 +242,7 @@
                     </p>
                     <a class="card-header-icon">
                       <b-tooltip
-                        label="Seek Funding"
+                        label="Open for funding"
                         v-if="project.open_for_funding"
                         type="is-warning"
                         position="is-left"
@@ -283,10 +319,22 @@
               field="team"
               label="Team"
             >
+              <div
+                v-if="!isMember"
+                class="card project-card has-background-light"
+              >
+                <div class="card-header">
+                  <p class="card-header-title is-capitalized">
+                    <b-icon icon="mdil-information" />
+                    Details available to members
+                  </p>
+                </div>
+              </div>
               <b-field
                 grouped
                 group-multiline
                 class="team-control"
+                v-else
               >
                 <div
                   class="control"
@@ -460,6 +508,9 @@ export default {
   computed: {
     hasLoggedIn() {
       return this.$store.state.hasLoggedIn
+    },
+    isMember() {
+      return this.$store.state.roles.includes("member")
     }
   },
   data () {
