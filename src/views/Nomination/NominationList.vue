@@ -144,6 +144,27 @@
             </b-field>
           </template>
 
+          <!-- No results -->
+          <template slot="empty">
+            <div
+              class="no-project has-vcentered"
+              v-if="!isLoading.page"
+            >
+              <div class="info-icon">
+                <b-icon
+                  icon="mdil-clipboard"
+                  custom-size="mdil-48px"
+                  type="is-grey-light"
+                />
+              </div>
+              <div class="info-content">
+                <p class="has-text-grey">
+                  <span class="is-size-5">Sorry, we couldn't find any results.</span>
+                </p>
+              </div>
+            </div>
+          </template>
+
           <template slot-scope="props">
             <!-- Target name-->
             <b-table-column

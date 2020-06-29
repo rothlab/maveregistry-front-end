@@ -131,7 +131,20 @@
               label="Project"
             >
               <div class="has-text-left">
+                <!-- If not member, show this panel to indicate that nothing is available -->
+                <div
+                  v-if="!props.row.projects || props.row.projects < 1"
+                  class="card project-card has-background-light"
+                >
+                  <div class="card-header">
+                    <p class="card-header-title is-capitalized">
+                      <b-icon icon="mdil-play" />
+                      Under Investigation
+                    </p>
+                  </div>
+                </div>
                 <b-collapse
+                  v-else
                   class="card project-card has-background-light"
                   animation="slide"
                   v-for="(project, index) in props.row.projects"
