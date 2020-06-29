@@ -58,7 +58,7 @@ export async function queryFollowById(id) {
 }
 
 export async function getFollowStatus(targets, type, by) {
-  if (targets.length <= 0) return []
+  if (targets.length <= 0 || !by) return []
 
   // Fetch follow object
   const query = new Parse.Query(Follow)

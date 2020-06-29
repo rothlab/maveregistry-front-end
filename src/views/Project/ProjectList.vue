@@ -282,7 +282,10 @@
                             {{ project.description }}
                           </p>
                         </div>
-                        <div class="level-right">
+                        <div
+                          class="level-right"
+                          v-if="project.follow_status"
+                        >
                           <!-- If not followed, show follow icon -->
                           <b-tooltip
                             label="Follow Project"

@@ -193,7 +193,7 @@
             >
               <div class="action-button is-flex">
                 <b-button
-                  v-if="props.row.follow_status.id"
+                  v-if="props.row.follow_status && props.row.follow_status.id"
                   icon-left="mdil-bell-off"
                   :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-primary'"
                   @click="confirmUnfollow(props.row.follow_status.id)"

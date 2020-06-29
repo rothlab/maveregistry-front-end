@@ -55,13 +55,13 @@ export const Target = Parse.Object.extend("Target", {
       projects: await Promise.all(projects.map(async (e, i) => {
         const recentActivity = e.get("recent_activity")
         const funding = e.get("funding")
-
+        
         let ret = {
           id: e.id,
-          features: e.get("features"),
-          follow_status: projectFollowStatus[i]
+          features: e.get("features")
         }
 
+        if (projectFollowStatus.length > i) ret.follow_status = projectFollowStatus[i]
         if (funding && funding.open_for_funding) ret.open_for_funding = funding.open_for_funding
         if (recentActivity && recentActivity.get("type")) ret.type = recentActivity.get("type")
         if (recentActivity && recentActivity.get("description")) ret.description = recentActivity.get("description")
@@ -69,11 +69,14 @@ export const Target = Parse.Object.extend("Target", {
         return ret
       })),
       teams: teams.map((e, i) => {
-        return {
+        let ret = {
           id: e.id,
-          name: e.get("first_name").substring(0, 1) + ' ' + e.get("last_name"),
-          follow_status: teamFollowStatus[i]
+          name: e.get("first_name").substring(0, 1) + ' ' + e.get("last_name")
         }
+
+        if (teamFollowStatus.length > i) ret.follow_status = teamFollowStatus[i]
+
+        return ret
       })
     }
   }
