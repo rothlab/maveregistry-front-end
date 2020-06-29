@@ -104,7 +104,8 @@ Parse.Object.registerSubclass('Team', Team);
 
 export async function addTeam(teamInfo) {
   // Validate if logged in
-  if (!Parse.User.current()) throw new Error("Not logged in")
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
 
   // Initialize team
   // First, last and email are stored in lower case so that it can be queried in a case-insensitive way
@@ -120,9 +121,14 @@ export async function addTeam(teamInfo) {
   // Because existing team has an assigned ID, we use that to distinguish
   if (team.id) throw new Error("Team exists")
 
-  // Add creator and save
-  team.set("creator", Parse.User.current())
-  return await team.save()
+  // Set the current user as the creator of the team
+  // And add it to the team
+  team.set("creator", currentUser)
+  currentUser.set("team", team)
+
+  const ret = await Parse.Object.saveAll([team, currentUser])
+
+  return ret[0]
 }
 
 export async function updateTeam(id, payload) {

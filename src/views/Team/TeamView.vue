@@ -162,19 +162,24 @@
                   {{ project.target.name.toUpperCase() }} ({{ project.target.type }}),
                   <i>{{ project.target.organism }}</i>
                 </b><br>
-                <span v-if="project.activities">
+                <span>
                   <router-link
                     :to="{ name: 'Project View', params: { id: project.id } }"
                     target="_blank"
                   >
                     <b-icon icon="mdil-link" />
                   </router-link>
-                  
-                  {{ project.activities.type }},
-                  <i>
-                    {{ project.activities.start_date.toLocaleDateString() }} -
-                    {{ project.activities.end_date ? project.activities.end_date.toLocaleDateString() : "Present" }}
-                  </i>
+
+                  <span v-if="project.activities">
+                    {{ project.activities.type }},
+                    <i>
+                      {{ project.activities.start_date.toLocaleDateString() }} -
+                      {{ project.activities.end_date ? project.activities.end_date.toLocaleDateString() : "Present" }}
+                    </i>
+                  </span>
+                  <span v-else>
+                    Under Investigation
+                  </span>      
                 </span>
               </p>
             </div>
@@ -306,7 +311,7 @@ export default {
       // Fetch team
       let team
       try {
-        team = await TeamManage.queryById(this.teamId, true, false)
+        team = await TeamManage.queryById(this.teamId, true, true, false)
       } catch (error) {
         this.errorMessage = await handleError(error)
         return
