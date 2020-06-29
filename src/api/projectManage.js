@@ -254,8 +254,6 @@ export async function addProject(projectInfo) {
 }
 
 export async function fetchTargets(limit, skip, filter) {
-  // TODO: enforce ACL
-  
   // Fetch targets
   const query = new Parse.Query(Target)
 
@@ -316,8 +314,6 @@ export async function fetchProjectByTeamId(id, objects = []) {
 }
 
 export async function updateProject(payload) {
-  // TODO: enforce ACL
-
   // Fetch project by ID
   let project = await new Project.fetchById(payload.id)
 

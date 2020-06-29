@@ -143,7 +143,10 @@
                         Type: {{ target.type }}
                       </div>
                       <div class="level-item is-capitalized">
-                        Name: {{ target.name }}
+                        <span>
+                          Name:
+                          <span class="is-uppercase">{{ target.name }}</span>
+                        </span>
                       </div>
                       <div class="level-item">
                         <span>Organism: <i>{{ target.organism }}</i></span>

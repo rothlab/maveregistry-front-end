@@ -473,7 +473,7 @@
         title="Add a New Project"
         :submit="addProject"
         submit-text="Add Project"
-        :project="preFilledProject"
+        :target="preFilledProject"
         has-feature
       />
     </div>
