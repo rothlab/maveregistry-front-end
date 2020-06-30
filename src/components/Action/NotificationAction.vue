@@ -34,10 +34,17 @@
 
 <script>
 export default {
+  computed: {
+    count() {
+      return this.$store.getters.countNotifications
+    }
+  },
   data() {
     return {
-      count: 0
     }
+  },
+  async mounted() {
+    await this.$store.dispatch("subscribeToNotifications")
   }
 }
 </script>
