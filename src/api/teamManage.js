@@ -42,7 +42,7 @@ export const Team = Parse.Object.extend("Team", {
 
     // Fetch Project
     if (project) {
-      const projects = await fetchProjectByTeamId(this.id, ["target"])
+      const projects = await fetchProjectByTeamId(this.id, ["target", "recent_activity"])
       if (projects && projects.length > 0) ret.projects = projects
     }
 
@@ -185,7 +185,7 @@ export async function queryById(id, detail = false, followers = false) {
   const team = await new Team.fetchById(id, objects)
   if (!team) throw new Error("Invalid team ID")
 
-  return team.format(detail, followers)
+  return team.format(detail, true, followers)
 }
 
 export async function removeMember(teamId, username) {

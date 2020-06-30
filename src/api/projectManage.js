@@ -157,9 +157,9 @@ export const Project = Parse.Object.extend("Project", {
       const activities = await fetchActivityByProject([this])
       if (activities && activities.length > 0) ret.activities = await Promise.all(activities.map(e => e.format()))
     } else {
-      // // Add recemt activity
-      // const recentActivity = await fetchActivityByProject(this, true)
-      // if (recentActivity) ret.activities = recentActivity
+      // Add recemt activity
+      const recentActivity = this.get("recent_activity")
+      if (recentActivity) ret.activities = recentActivity.format()
     }
     
     if (followers) {
@@ -308,7 +308,7 @@ export async function fetchProjectByTeamId(id, objects = []) {
   }
 
   // Exlude fields
-  query.select(["target.type", "target.name", "target.organism", "features"])
+  query.select(["target.type", "target.name", "target.organism", "features", "recent_activity"])
 
   const projects = await query.find()
 

@@ -83,11 +83,14 @@ export async function getFollowStatus(targets, type, by) {
 }
 
 export async function follow(target, type, reason) {
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
+
   let follow = await new Follow.create({
     target: target,
     type: type,
     reason: reason,
-    by: Parse.User.current()
+    by: currentUser
   })
 
   // If not existing, save it

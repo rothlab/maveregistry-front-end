@@ -253,7 +253,7 @@ export default {
         })
         return
       } finally {
-        this.isLoading.submit = true
+        this.isLoading.submit = false
       }
 
       // Jump to view

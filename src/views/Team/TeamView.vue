@@ -272,7 +272,7 @@ export default {
       return this.$route.params.id
     },
     hasProject() {
-      return this.projects.length > 0
+      return this.projects && this.projects.length > 0
     },
     isOwner() {
       return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
@@ -311,7 +311,7 @@ export default {
       // Fetch team
       let team
       try {
-        team = await TeamManage.queryById(this.teamId, true, true, false)
+        team = await TeamManage.queryById(this.teamId, true, false)
       } catch (error) {
         this.errorMessage = await handleError(error)
         return
