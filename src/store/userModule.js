@@ -1,8 +1,7 @@
-import * as UserManage from "../api/userManage"
-import { handleError } from '../api/errorHandler';
+import * as UserManage from "@/api/userManage.js"
+import { handleError } from '@/api/errorHandler.js';
 import { SnackbarProgrammatic as Snackbar } from 'buefy'
 import { ToastProgrammatic as Toast } from 'buefy'
-import { resendValidationEmail } from "@/api/userManage.js"
 
 export const state = {
   user: undefined,
@@ -16,7 +15,7 @@ export const getters = {
   hasRole: (state) => (role) => {
     return state.roles.includes(role)
   },
-  user: state => {
+  getUser: state => {
     return state.user
   },
   isOwner: (state, getters) => (owner) => {
@@ -93,7 +92,7 @@ export const actions = {
           indefinite: true,
           onAction: async () => {
             try {
-              await resendValidationEmail(error.username)
+              await UserManage.resendValidationEmail(error.username)
             } catch (err) {
               Toast.open({
                 message: await handleError(err),

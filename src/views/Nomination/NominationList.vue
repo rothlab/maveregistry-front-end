@@ -365,7 +365,7 @@ export default {
       return this.$store.getters.hasLoggedIn
     },
     user() {
-      return this.$store.getters.user
+      return this.$store.getters.getUser
     }
   },
   data() {
