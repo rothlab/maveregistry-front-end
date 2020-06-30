@@ -280,7 +280,7 @@ export default {
   },
   computed: {
     hasLoggedIn() {
-      return this.$store.state.hasLoggedIn
+      return this.$store.getters.hasLoggedIn
     }
   },
   methods: {

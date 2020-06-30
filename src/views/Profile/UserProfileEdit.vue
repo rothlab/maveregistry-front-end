@@ -291,7 +291,7 @@ export default {
       return this.$route.params.action === "edit"
     },
     isOwner() {
-      return this.$store.state.hasLoggedIn && (this.$route.params.username === this.$store.state.user.username)
+      return this.$store.getters.isOwner(this.$route.params.username)
     }
   },
   data () {

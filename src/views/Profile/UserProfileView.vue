@@ -263,7 +263,7 @@ export default {
       return url
     },
     isOwner() {
-      return this.$store.state.hasLoggedIn && (this.$route.params.username === this.$store.state.user.username)
+      return this.$store.getters.isOwner(this.$route.params.username)
     }
   },
   watch: {

@@ -275,7 +275,7 @@ export default {
       return this.projects && this.projects.length > 0
     },
     isOwner() {
-      return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
+      return this.user && this.user.username && this.$store.getters.isOwner(this.user.username)
     }
   },
   data () {

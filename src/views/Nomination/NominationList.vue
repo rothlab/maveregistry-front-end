@@ -362,10 +362,10 @@ export default {
   },
   computed: {
     hasLoggedIn() {
-      return this.$store.state.hasLoggedIn
+      return this.$store.getters.hasLoggedIn
     },
     user() {
-      return this.$store.state.user
+      return this.$store.getters.user
     }
   },
   data() {
