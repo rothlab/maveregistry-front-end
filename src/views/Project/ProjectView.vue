@@ -53,27 +53,6 @@
           <div
             class="column is-6"
           >
-            <!-- Add no project detail display -->
-            <div
-              class="no-project has-vcentered"
-              v-if="!hasPeople && !hasActivity"
-            >
-              <div class="info-icon">
-                <b-icon
-                  icon="mdil-flask-empty"
-                  custom-size="mdil-48px"
-                  type="is-grey-light"
-                />
-              </div>
-              <div class="info-content">
-                <p class="has-text-grey">
-                  <span class="is-size-5 has-text-grey-dark">No Project Detail</span><br>
-                  <span v-if="isOwner">Using the "Edit" function to add project detail.</span>
-                  <span v-else>You may contact the creator for more information.</span>
-                </p>
-              </div>
-            </div>
-
             <div
               class="project-header"
               v-if="hasPeople"
@@ -147,7 +126,28 @@
               </p>
             </div>
 
-            <hr v-if="hasPeople || hasActivity">
+            <hr v-if="hasPeople && hasActivity">
+
+            <!-- Add no project detail display -->
+            <div
+              class="no-project has-vcentered"
+              v-if="!hasPeople && !hasActivity"
+            >
+              <div class="info-icon">
+                <b-icon
+                  icon="mdil-flask-empty"
+                  custom-size="mdil-48px"
+                  type="is-grey-light"
+                />
+              </div>
+              <div class="info-content">
+                <p class="has-text-grey">
+                  <span class="is-size-5 has-text-grey-dark">No Project Detail</span><br>
+                  <span v-if="isOwner">Using the "Edit" function to add project detail.</span>
+                  <span v-else>You may contact the creator for more information.</span>
+                </p>
+              </div>
+            </div>
 
             <div
               class="project-header"
@@ -165,7 +165,7 @@
               v-if="hasActivity"
             >
               <div
-                class="is-size-5"
+                class="is-size-5 field-margin"
                 v-for="(activity, id) in activities"
                 :key="id"
               >
@@ -173,26 +173,36 @@
                   {{ activity.start_date.toLocaleDateString() }} -
                   {{ activity.end_date ? activity.end_date.toLocaleDateString() : "Present" }}
                 </b> | {{ activity.type }}
-
+                
                 <br>
-
-                <div class="is-size-6 has-text-grey">
-                  <b-icon icon="mdil-link" />
-                  Links:
-                  <span
-                    v-for="(link, linkId) in activity.links"
-                    :key="linkId"
-                  >
-                    <a
-                      :href="link"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >{{ linkId + 1 }}</a>
-                    <span v-if="activity.links.length > linkId + 1">, </span>
-                  </span>
-                </div>
-
                 {{ activity.description }}
+                
+                <br>
+                
+                <b-taglist
+                  size="is-small"
+                  v-if="activity.links && activity.links.length > 0"
+                  attached
+                >
+                  <b-tag type="is-light">
+                    <b-icon icon="mdil-link" />
+                    Links
+                  </b-tag>
+                  
+                  <b-tag class="has-background-white-bis">
+                    <span
+                      v-for="(link, linkId) in activity.links"
+                      :key="linkId"
+                    >
+                      <a
+                        :href="link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >{{ linkId + 1 }}</a>
+                      <span v-if="activity.links.length > linkId + 1">, </span>
+                    </span>
+                  </b-tag>
+                </b-taglist>
               </div>
             </div>
           </div>
@@ -205,7 +215,10 @@
             </div>
             
             <div class="project-content">
-              <p class="is-size-5">
+              <p
+                class="is-size-5"
+                v-if="target"
+              >
                 <b>Target</b> <br>
                 <b-icon icon="mdil-pin" />
                 <router-link
@@ -213,7 +226,7 @@
                   target="_blank"
                 >
                   <span class="is-capitalized">
-                    {{ target.name }} ({{ target.type }}),
+                    {{ target.name.toUpperCase() }} ({{ target.type }}),
                   </span>
                   <span class="is-italic">
                     {{ target.organism }}
@@ -254,7 +267,7 @@
               </p>
               <div
                 class="is-size-5"
-                v-if="(followerCount > 0 || requestCount > 0) && isOwner"
+                v-if="isOwner && (followerCount > 0 || requestCount > 0)"
               >
                 <b>Follower{{ followerCount > 1 ? 's' : '' }}</b> <br>
                 <div class="buttons">
@@ -315,7 +328,7 @@ export default {
       isManageFollowerModalActive: false,
       isRequest: false,
       errorMessage: "",
-      target: {},
+      target: undefined,
       features: [],
       user: undefined,
       updatedDate: new Date(),
@@ -333,13 +346,13 @@ export default {
       return this.$route.params.id
     },
     hasPeople() {
-      return this.leads.length > 0 && this.team
+      return this.leads.length > 0 || this.team
     },
     hasActivity() {
       return this.activities.length > 0
     },
     isOwner() {
-      return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
+      return this.user && this.user.username && this.$store.getters.isOwner(this.user.username)
     }
   },
   async mounted() {
@@ -357,7 +370,8 @@ export default {
     }
 
     // Fetch team follower and request count
-    await this.fetchFollowerAndRequestCount(this.projectId)
+    if (this.isOwner) await this.fetchFollowerAndRequestCount(this.projectId)
+
     this.isLoading.page = false
   },
   methods: {

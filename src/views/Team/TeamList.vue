@@ -48,6 +48,7 @@
           :loading="isLoading.fetch_team"
           hoverable
           paginated
+          pagination-position="top"
           backend-pagination
           icon-pack="mdi"
           :per-page="pagination.limit"
@@ -55,6 +56,19 @@
           :current-page="pagination.current"
           @page-change="(change) => { pagination.current = change; fetchTeams() }"
         >
+          <!-- Filter -->
+          <template slot="top-left">
+            <!-- Filter by PI -->
+            <b-field>
+              <b-input
+                v-model="filter.pi"
+                placeholder="Search Investigator"
+                type="search"
+                icon="mdil-magnify"
+                @input="(query) => filterTeams(query, 'investigator')"
+              />
+            </b-field>
+          </template>
           <template slot-scope="props">
             <!-- Team ID -->
             <b-table-column
@@ -72,11 +86,14 @@
             <!-- Principal Investigator -->
             <b-table-column
               field="principal_investigator"
-              label="Principal Investigaor"
+              label="Principal Investigator"
             >
               <div class="level is-mobile is-paddingless">
-                <div class="level-left is-capitalized">
-                  {{ props.row.first_name + ' ' + props.row.last_name }}
+                <div class="level-left">
+                  <p>
+                    <b class="is-capitalized">{{ props.row.first_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.first_name, filter.pi) }}
+                    <b class="is-capitalized">{{ props.row.last_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.last_name, filter.pi) }}
+                  </p>
                 </div>
 
                 <div class="level-right">
@@ -114,7 +131,20 @@
               label="Project"
             >
               <div class="has-text-left">
+                <!-- If not member, show this panel to indicate that nothing is available -->
+                <div
+                  v-if="!props.row.projects || props.row.projects < 1"
+                  class="card project-card has-background-light"
+                >
+                  <div class="card-header">
+                    <p class="card-header-title is-capitalized">
+                      <b-icon icon="mdil-play" />
+                      Under Investigation
+                    </p>
+                  </div>
+                </div>
                 <b-collapse
+                  v-else
                   class="card project-card has-background-light"
                   animation="slide"
                   v-for="(project, index) in props.row.projects"
@@ -132,7 +162,9 @@
                         target="_blank"
                       >
                         <b-icon icon="mdil-link" />
-                        {{ project.target.name }} ({{ project.target.type }}): {{ project.features.join(",") }}
+                        {{ project.target.name.toUpperCase() }}
+                        ({{ project.target.type }}, <i>{{ project.target.organism }}</i>):
+                        {{ project.features.join(",") }}
                       </router-link>
                     </div>
                     
@@ -161,11 +193,12 @@
             >
               <div class="action-button is-flex">
                 <b-button
-                  v-if="props.row.follow_status.id"
+                  v-if="props.row.follow_status && props.row.follow_status.id"
                   icon-left="mdil-bell-off"
                   :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-primary'"
                   @click="confirmUnfollow(props.row.follow_status.id)"
                   @change="fetchTeams"
+                  class=""
                   expanded
                 >
                   <b-tooltip
@@ -180,6 +213,7 @@
                 <b-button
                   v-else
                   icon-left="mdil-bell"
+                  type="is-light"
                   @click="confirmFollow(props.row.id)"
                   @change="fetchTeams"
                   expanded
@@ -224,6 +258,11 @@ import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import { handleError } from "@/api/errorHandler.js"
 
+// Helper
+function capitalize(string) {
+  return string.slice(0,1).toUpperCase() + string.slice(1)
+}
+
 export default {
   components: {
     NewTeamModal,
@@ -232,7 +271,7 @@ export default {
   },
   computed: {
     hasLoggedIn() {
-      return this.$store.state.hasLoggedIn
+      return this.$store.getters.hasLoggedIn
     }
   },
   data() {
@@ -255,6 +294,10 @@ export default {
         follow: "",
         type: "team"
       },
+      filter: {
+        pi: "",
+        // affiliation: ""
+      }
     }
   },
   async mounted() {
@@ -290,7 +333,7 @@ export default {
       
       // Update targets
       try {
-        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, true)
+        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, ["project", "follow"])
         this.teams = teams.results
 
         // Update pagination
@@ -313,7 +356,44 @@ export default {
         return
       }
 
-      this.isNewProjectModalActive = true
+      this.isNewTeamModalActive = true
+    },
+    async filterTeams(query, type) {
+      if (query === "") {
+        this.fetchTeams()
+        return
+      }
+
+      // Loading
+      this.isLoading.fetch_team = true
+
+      try {
+        let teams
+        switch (type) {
+          case "investigator":
+            teams = await TeamManage.queryByName(query, this.pagination.limit, 0, ["project", "follow"])
+            break
+          case "affiliation":
+            // teams = await TeamManage.queryByAffiliation(query, this.pagination.limit, 0, ["project", "follow"])
+            break
+        }
+
+        this.teams = teams.results
+        this.pagination.count = teams.count
+      } catch (error) {
+        this.$buefy.toast.open({
+          message: await handleError(error),
+          type: 'is-danger',
+          queue: false,
+          duration: 5000
+        })
+      } finally {
+        this.isLoading.fetch_team = false
+      }
+    },
+    trimKeyword(string, keyword) {
+      if (keyword.length <= 0 || !string.startsWith(keyword)) return capitalize(string)
+      return string.replace(keyword, '')
     }
   }
 }

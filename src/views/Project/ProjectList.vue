@@ -8,7 +8,7 @@
             <div class="level-left">
               <div class="content">
                 <p class="is-size-3 has-text-weight-medium">
-                  MAVE Projects
+                  Projects
                 </p>
               </div>
             </div>
@@ -20,7 +20,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-mobile"
-                @click="addProject"
+                @click="handleNewTargetModal()"
               >
                 New Project
               </b-button>
@@ -30,7 +30,7 @@
                 type="is-primary"
                 size="is-medium"
                 class="is-hidden-tablet"
-                @click="addProject"
+                @click="handleNewTargetModal()"
               >
                 New
               </b-button>
@@ -53,6 +53,7 @@
           :loading="isLoading.fetch_targets"
           hoverable
           paginated
+          pagination-position="top"
           backend-pagination
           icon-pack="mdi"
           :per-page="pagination.limit"
@@ -60,11 +61,116 @@
           :current-page="pagination.current"
           @page-change="(change) => { pagination.current = change; fetchTargets() }"
         >
+          <!-- Filter -->
+          <template slot="top-left">
+            <!-- Filter by type -->
+            <b-dropdown
+              hoverable
+              v-model="filter.type"
+            >
+              <b-button
+                slot="trigger"
+                slot-scope="{ active }"
+                :type="filter.type ? 'is-info' : 'is-light'"
+              >
+                <b-icon
+                  pack="mdi"
+                  icon="filter-outline"
+                  size="is-small"
+                />
+                <span>Type</span>
+                <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+              </b-button>
+
+              <b-dropdown-item
+                v-if="filter.type !== ''"
+                value=""
+                class="has-text-info"
+              >
+                Clear Filter
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-for="(type, id) in types"
+                :key="id"
+                :value="type"
+              >
+                {{ type }}
+              </b-dropdown-item>
+            </b-dropdown>
+
+            <!-- Filter by organism -->
+            <b-dropdown
+              hoverable
+              v-model="filter.organism"
+            >
+              <b-button
+                slot="trigger"
+                slot-scope="{ active }"
+                :type="filter.organism ? 'is-info' : 'is-light'"
+              >
+                <b-icon
+                  pack="mdi"
+                  icon="filter-outline"
+                  size="is-small"
+                />
+                <span>Organism</span>
+                <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+              </b-button>
+
+              <b-dropdown-item
+                v-if="filter.organism !== ''"
+                value=""
+                class="has-text-info"
+              >
+                Clear Filter
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-for="(organism, id) in organisms"
+                :key="id"
+                :value="organism"
+              >
+                <i>{{ organism }}</i>
+              </b-dropdown-item>
+            </b-dropdown>
+
+            <!-- Filter by name -->
+            <b-field style="margin-left: 0.5em">
+              <b-input
+                v-model="filter.name"
+                placeholder="Search Name"
+                type="search"
+                icon="mdil-magnify"
+              />
+            </b-field>
+          </template>
+
+          <!-- No results -->
+          <template slot="empty">
+            <div
+              class="no-project has-vcentered"
+              v-if="!isLoading.fetch_targets"
+            >
+              <div class="info-icon">
+                <b-icon
+                  icon="mdil-clipboard"
+                  custom-size="mdil-48px"
+                  type="is-grey-light"
+                />
+              </div>
+              <div class="info-content">
+                <p class="has-text-grey">
+                  <span class="is-size-5">Sorry, we couldn't find any results.</span>
+                </p>
+              </div>
+            </div>
+          </template>
+
           <template slot-scope="props">
             <!-- Target name-->
             <b-table-column
               field="target_name"
               label="Name"
+              class="is-uppercase"
             >
               {{ props.row.name }}
             </b-table-column>
@@ -90,9 +196,24 @@
             <b-table-column
               field="projects"
               label="Project Progress"
+              width="30vw"
             >
               <div class="has-text-left">
+                <!-- If not member, show this panel to indicate that nothing is available -->
+                <div
+                  v-if="props.row.projects < 1"
+                  class="card project-card has-background-light"
+                >
+                  <div class="card-header">
+                    <p class="card-header-title is-capitalized">
+                      <b-icon icon="mdil-play" />
+                      Under Investigation
+                    </p>
+                  </div>
+                </div>
+
                 <b-collapse
+                  v-else
                   class="card project-card has-background-light"
                   animation="slide"
                   v-for="(project, index) in props.row.projects"
@@ -116,12 +237,12 @@
                       v-else
                       class="card-header-title is-capitalized"
                     >
-                      <b-icon icon="mdil-circle" />
-                      No Progress Description
+                      <b-icon icon="mdil-play" />
+                      Under Investigation
                     </p>
                     <a class="card-header-icon">
                       <b-tooltip
-                        label="Seek Funding"
+                        label="Open for funding"
                         v-if="project.open_for_funding"
                         type="is-warning"
                         position="is-left"
@@ -152,7 +273,7 @@
                             <span class="has-text-primary">
                               Feature{{ project.features.length > 1 ? 's:' : ':' }}
                             </span>
-                            {{ project.features.join(",") }}
+                            {{ project.features.join(", ") }}
                             <br>
                             <span
                               v-if="project.description"
@@ -161,7 +282,10 @@
                             {{ project.description }}
                           </p>
                         </div>
-                        <div class="level-right">
+                        <div
+                          class="level-right"
+                          v-if="project.follow_status"
+                        >
                           <!-- If not followed, show follow icon -->
                           <b-tooltip
                             label="Follow Project"
@@ -198,10 +322,22 @@
               field="team"
               label="Team"
             >
+              <div
+                v-if="!isMember"
+                class="card project-card has-background-light"
+              >
+                <div class="card-header">
+                  <p class="card-header-title is-capitalized">
+                    <b-icon icon="mdil-information" />
+                    Details available to members
+                  </p>
+                </div>
+              </div>
               <b-field
                 grouped
                 group-multiline
                 class="team-control"
+                v-else
               >
                 <div
                   class="control"
@@ -263,49 +399,56 @@
             <b-table-column
               field="action"
               label="Action"
-              width="8vw"
+              width="5vw"
             >
-              <div class="action-button is-flex">
-                <b-tooltip
-                  label="Add new project"
-                  position="is-left"
-                  type="is-dark"
-                >
-                  <b-button
-                    icon-right="mdil-plus"
-                    @click="addProject(true)"
-                  />
-                </b-tooltip>
-                <!-- Show MaveQuest for human genes -->
-                <b-tooltip
-                  v-if="props.row.type == 'gene' && props.row.organism == 'H. sapiens'"
-                  label="Plan with MaveQuest"
-                  position="is-left"
-                  type="is-dark"
-                >
-                  <b-button
-                    tag="a"
-                    :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
-                    target="_blank"
-                    icon-right="mdil-lightbulb-on"
-                  />
-                </b-tooltip>
-                <!-- Show Google search for others -->
-                <b-tooltip
-                  v-else
-                  label="Look up"
-                  position="is-left"
-                  type="is-dark"
-                >
-                  <b-button
-                    tag="a"
-                    :href="'https://www.google.com/search?q=' + props.row.name"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    icon-right="mdil-magnify"
-                  />
-                </b-tooltip>
-              </div>
+              <b-field>
+                <p class="control action-button">
+                  <b-tooltip
+                    label="Add new project"
+                    position="is-left"
+                    type="is-dark"
+                  >
+                    <b-button
+                      icon-right="mdil-plus"
+                      @click="handleNewTargetModal(props.row)"
+                      type="is-light"
+                    />
+                  </b-tooltip>
+                </p>
+                <p class="control action-button">
+                  <!-- Show MaveQuest for human genes -->
+                  <b-tooltip
+                    v-if="props.row.type == 'gene' && props.row.organism == 'H. sapiens'"
+                    label="Plan with MaveQuest"
+                    position="is-left"
+                    type="is-dark"
+                  >
+                    <b-button
+                      tag="a"
+                      :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
+                      target="_blank"
+                      icon-right="mdil-lightbulb-on"
+                      type="is-light"
+                    />
+                  </b-tooltip>
+                  <!-- Show Google search for others -->
+                  <b-tooltip
+                    v-else
+                    label="Look up"
+                    position="is-left"
+                    type="is-dark"
+                  >
+                    <b-button
+                      tag="a"
+                      :href="'https://www.google.com/search?q=' + props.row.name"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      icon-right="mdil-magnify"
+                      type="is-light"
+                    />
+                  </b-tooltip>
+                </p>
+              </b-field>
             </b-table-column>
           </template>
         </b-table>
@@ -328,10 +471,13 @@
       />
 
       <!-- New project modal -->
-      <NewProjectModal
-        :active.sync="isNewProjectModalActive"
-        :project="preFilledProject"
-        @update="prefillProject(undefined)"
+      <NewTargetModal
+        :active.sync="isNewTargetModalActive"
+        title="Add a New Project"
+        :submit="addProject"
+        submit-text="Add Project"
+        :target="preFilledProject"
+        has-feature
       />
     </div>
   </div>
@@ -343,7 +489,7 @@ import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
-import NewProjectModal from '@/components/Modal/NewProjectModal.vue'
+import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -352,11 +498,22 @@ export default {
     Error,
     FollowModal,
     UnfollowModal,
-    NewProjectModal
+    NewTargetModal
+  },
+  watch: {
+    filter: {
+      deep: true,
+      async handler() {
+        await this.fetchTargets()
+      }
+    }
   },
   computed: {
     hasLoggedIn() {
-      return this.$store.state.hasLoggedIn
+      return this.$store.getters.hasLoggedIn
+    },
+    isMember() {
+      return this.$store.getters.hasRole("member")
     }
   },
   data () {
@@ -368,6 +525,14 @@ export default {
         current: 1
       },
       progressIcons: variables.progress_type_icons,
+      types: variables.target_types,
+      organisms: variables.target_organisms,
+      // Filter
+      filter: {
+        type: "",
+        organism: "",
+        name: ""
+      },
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
       followProp: {
@@ -378,7 +543,7 @@ export default {
       preFilledProject: undefined,
       isUnfollowModelActive: false,
       // Register new activity related parameters
-      isNewProjectModalActive: false,
+      isNewTargetModalActive: false,
       isLoading: {
         new_project: false,
         follow_unfollow: false,
@@ -401,18 +566,6 @@ export default {
       this.followProp.type = type
       this.isUnfollowModelActive = true
     },
-    prefillProject(target) {
-      if (!target) {
-        this.preFilledProject = undefined
-        return
-      }
-
-      this.preFilledProject = {
-        type: target.type,
-        name: target.name,
-        organism: target.organism
-      }
-    },
     async fetchTargets() {
       // Loading
       this.isLoading.fetch_targets = true
@@ -422,7 +575,7 @@ export default {
 
       // Update targets
       try {
-        const targets = await ProjectManage.fetchTargets(this.pagination.limit, skip)
+        const targets = await ProjectManage.fetchTargets(this.pagination.limit, skip, this.filter)
         this.targets = targets.results
 
         // Update pagination
@@ -433,16 +586,30 @@ export default {
         this.isLoading.fetch_targets = false
       }
     },
-    addProject(prefill = false) {
+    handleNewTargetModal(prefill = undefined) {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {
         this.$emit("login")
         return
       }
       
-      if (prefill) this.prefillProject()
+      if (prefill) {
+        this.preFilledProject = {
+          type: prefill.type,
+          name: prefill.name,
+          organism: prefill.organism
+        }
+      } else {
+        this.preFilledProject = undefined
+      }
 
-      this.isNewProjectModalActive = true
+      this.isNewTargetModalActive = true
+    },
+    async addProject(attrs) {
+      const projectId = await ProjectManage.addProject(attrs)
+
+      // Jump to new project registration page
+      this.$router.push({ name: 'Project Edit', params: { id: projectId, action: 'new' } })
     }
   }
 }
@@ -451,14 +618,6 @@ export default {
 <style lang="sass" scoped>
 @import "@/assets/style/variables.sass"
 
-.action-button
-  justify-content: space-between
-  button, a
-    height: 2rem
-    padding-left: 0.625rem
-    padding-right: 0.625rem
-    padding-top: calc( 0.3125rem - 1px )
-    padding-bottom: calc( 0.3125rem - 1px )
 @media screen and (max-width: $break-mobile)
   .team-control
     justify-content: flex-end
@@ -466,9 +625,6 @@ export default {
       margin-right: 0 !important
     .control:not(:first-child)
       margin-left: 0.75rem
-.team-icon
-  margin-left: -0.375rem !important
-  margin-right: -0.2rem !important
 .team-control .tag
   box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
   &:first-child

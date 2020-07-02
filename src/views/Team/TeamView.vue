@@ -135,7 +135,7 @@
               <div class="info-content">
                 <p class="has-text-grey">
                   <span class="is-size-5 has-text-grey-dark">No Projects Available</span><br>
-                  Add a project by visiting the "MAVE Projects" page.
+                  <span v-if="isOwner">Add a project by visiting the "MAVE Projects" page.</span>
                 </p>
               </div>
             </div>
@@ -159,21 +159,27 @@
                 :key="id"
               >
                 <b class="is-capitalized">
-                  {{ project.target.name }} ({{ project.target.type }}),
+                  {{ project.target.name.toUpperCase() }} ({{ project.target.type }}),
                   <i>{{ project.target.organism }}</i>
                 </b><br>
-                <span v-if="project.activities">
+                <span>
                   <router-link
                     :to="{ name: 'Project View', params: { id: project.id } }"
                     target="_blank"
                   >
                     <b-icon icon="mdil-link" />
                   </router-link>
-                  {{ project.activities.type }},
-                  <i>
-                    {{ project.activities.start_date.toLocaleDateString() }} -
-                    {{ project.activities.end_date ? project.activities.end_date.toLocaleDateString() : "Present" }}
-                  </i>
+
+                  <span v-if="project.activities">
+                    {{ project.activities.type }},
+                    <i>
+                      {{ project.activities.start_date.toLocaleDateString() }} -
+                      {{ project.activities.end_date ? project.activities.end_date.toLocaleDateString() : "Present" }}
+                    </i>
+                  </span>
+                  <span v-else>
+                    Under Investigation
+                  </span>      
                 </span>
               </p>
             </div>
@@ -266,10 +272,10 @@ export default {
       return this.$route.params.id
     },
     hasProject() {
-      return this.projects.length > 0
+      return this.projects && this.projects.length > 0
     },
     isOwner() {
-      return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
+      return this.user && this.user.username && this.$store.getters.isOwner(this.user.username)
     }
   },
   data () {

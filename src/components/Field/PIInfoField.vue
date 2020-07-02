@@ -21,6 +21,7 @@
             placeholder="First Name"
             v-model="firstName"
             @input="updateVal"
+            custom-class="is-capitalized"
           />
         </b-field>
       </ValidationProvider>
@@ -41,6 +42,7 @@
             placeholder="Last Name"
             v-model="lastName"
             @input="updateVal"
+            custom-class="is-capitalized"
           />
         </b-field>
       </ValidationProvider>
@@ -121,10 +123,6 @@
 <script>
 import { ValidationProvider } from 'vee-validate'
 
-function capitalize(string) {
-  return string.slice(0, 1).toUpperCase() + string.slice(1)
-}
-
 export default {
   components: {
     ValidationProvider
@@ -138,8 +136,8 @@ export default {
   watch: {
     value: {
       handler (val) {
-        this.firstName = val.first_name.toLowerCase()
-        this.lastName = val.last_name.toLowerCase()
+        this.firstName = val.first_name
+        this.lastName = val.last_name
         this.email = val.email
         this.affiliation = val.affiliation
         if (val.website) this.website = val.website
@@ -148,8 +146,8 @@ export default {
     }
   },
   mounted() {
-    this.firstName = capitalize(this.value.first_name)
-    this.lastName = capitalize(this.value.last_name)
+    this.firstName = this.value.first_name
+    this.lastName = this.value.last_name
     this.email = this.value.email
     this.affiliation = this.value.affiliation
     if (this.value.website) this.website = this.value.website
@@ -166,8 +164,8 @@ export default {
   methods: {
     updateVal() {
       let ret = {
-        first_name: this.firstName.toLowerCase(),
-        last_name: this.lastName.toLowerCase(),
+        first_name: this.firstName,
+        last_name: this.lastName,
         email: this.email,
         affiliation: this.affiliation,
       }

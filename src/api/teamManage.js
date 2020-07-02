@@ -13,7 +13,7 @@ export const Team = Parse.Object.extend("Team", {
     if (attrs.email === "") throw new Error("Principal Investigator email is empty")
     if (attrs.affiliation === "") throw new Error("Principal Investigator affiliation is empty")
   },
-  format: async function (detail = false, follow = false) {
+  format: async function (detail = false, project = false, follow = false) {
     let ret = {
       id: this.id,
       first_name: this.get("first_name"),
@@ -27,25 +27,29 @@ export const Team = Parse.Object.extend("Team", {
     if (detail) {
       // Fetch creator
       const user = this.get("creator")
-      
-      ret.user = {
-        username: user.get("username"),
-        first_name: user.get("first_name"),
-        last_name: user.get("last_name")
+      if (user && user.isDataAvailable()) {
+        ret.user = {
+          username: user.get("username"),
+          first_name: user.get("first_name"),
+          last_name: user.get("last_name")
+        }
       }
 
       // Fetch members
       const members = await fetchUsersByTeamId(this.id)
       ret.members = members
-
-      // Fetch Project
-      const projects = await fetchProjectByTeamId(this.id, ["target"])
-      ret.projects = projects
     }
 
+    // Fetch Project
+    if (project) {
+      const projects = await fetchProjectByTeamId(this.id, ["target", "recent_activity"])
+      if (projects && projects.length > 0) ret.projects = projects
+    }
+
+    // Fetch follow status
     if (follow) {
-      // Fetch follow status
-      ret.follow_status = await getFollowStatus([this.id], "team", Parse.User.current())
+      const follow = await getFollowStatus([this.id], "team", Parse.User.current())
+      if (follow && follow.length > 0) ret.follow_status = follow[0]
     }
 
     return ret
@@ -100,7 +104,8 @@ Parse.Object.registerSubclass('Team', Team);
 
 export async function addTeam(teamInfo) {
   // Validate if logged in
-  if (!Parse.User.current()) throw new Error("Not logged in")
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
 
   // Initialize team
   // First, last and email are stored in lower case so that it can be queried in a case-insensitive way
@@ -116,9 +121,14 @@ export async function addTeam(teamInfo) {
   // Because existing team has an assigned ID, we use that to distinguish
   if (team.id) throw new Error("Team exists")
 
-  // Add creator and save
-  team.set("creator", Parse.User.current())
-  return await team.save()
+  // Set the current user as the creator of the team
+  // And add it to the team
+  team.set("creator", currentUser)
+  currentUser.set("team", team)
+
+  const ret = await Parse.Object.saveAll([team, currentUser])
+
+  return ret[0]
 }
 
 export async function updateTeam(id, payload) {
@@ -133,20 +143,22 @@ export async function updateTeam(id, payload) {
   
   return await team.save()
 }
-export async function fetchTeams(limit, skip, follow = false) {
-  // Fetch teams, applying pagination
+export async function fetchTeams(limit, skip, objects = []) {
+  // Fetch teams
   const query = new Parse.Query(Team)
+
+  // Apply pagination
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
   let teams = await query.find()
-  teams.results = await Promise.all(teams.results.map(e => e.format(false, follow))) // Format targets
+  teams.results = await Promise.all(teams.results.map(e => e.format(false, objects.includes("project"), objects.includes("follow")))) // Format targets
   
   // Format and return
   return teams
 }
 
-export async function queryByName(name) {
+export async function queryByName(name, limit, skip, objects = []) {
   // TODO: add pagination
   const firstNameQuery = new Parse.Query(Team)
   const lastNameQuery = new Parse.Query(Team)
@@ -155,9 +167,13 @@ export async function queryByName(name) {
 
   // Execute OR query
   const query = Parse.Query.or(firstNameQuery, lastNameQuery)
+
+  // Apply pagination
+  query.limit(limit)
+  query.skip(skip)
   query.withCount() // include total amount of targets in the DB
   let teams = await query.find()
-  teams.results = await Promise.all(teams.results.map(e => e.format(false, false)))
+  teams.results = await Promise.all(teams.results.map(e => e.format(false, objects.includes("project"), objects.includes("follow"))))
 
   return teams
 }
@@ -169,7 +185,7 @@ export async function queryById(id, detail = false, followers = false) {
   const team = await new Team.fetchById(id, objects)
   if (!team) throw new Error("Invalid team ID")
 
-  return team.format(detail, followers)
+  return team.format(detail, true, followers)
 }
 
 export async function removeMember(teamId, username) {

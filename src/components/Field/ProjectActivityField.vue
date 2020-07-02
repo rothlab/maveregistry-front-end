@@ -200,6 +200,7 @@ export default {
   data () {
     return {
       isOngoing: true,
+      activityId: "",
       types: progressTypes,
       type: "",
       startDate: new Date(),
@@ -217,6 +218,7 @@ export default {
       }
 
       if (!this.isOngoing) ret.end_date = this.endDate
+      if (this.activityId !== "") ret.id = this.activityId
 
       // Filter out empty links
       const links = this.links.filter(e => e !== "")
@@ -231,7 +233,8 @@ export default {
       this.description = this.value.description
 
       if (!this.isOngoing) this.endDate = this.value.end_date
-      if (this.value.links.length > 0) this.links = this.value.links
+      if (this.value.links && this.value.links.length > 0) this.links = this.value.links
+      if (this.value.id) this.activityId = this.value.id
     }
   },
   mounted() {

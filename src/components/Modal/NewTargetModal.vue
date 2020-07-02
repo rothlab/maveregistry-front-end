@@ -7,7 +7,7 @@
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">
-          <span>Add a New Project</span>
+          <span>{{ title }}</span>
         </p>
         <button
           class="delete"
@@ -21,6 +21,15 @@
       >
         <section class="modal-card-body">
           <div class="content">
+            <!-- Notification -->
+            <b-message
+              v-if="notificationMessage"
+              size="is-small"
+              type="is-warning"
+            >
+              <span class="is-size-6">{{ notificationMessage }}</span>
+            </b-message>
+
             <!-- Target name -->
             <ValidationProvider
               rules="required"
@@ -39,6 +48,7 @@
                   placeholder="e.g. Gene Symbol, Domain Name"
                   required
                   expanded
+                  :disabled="isModifyNomination"
                 />
               </b-field>
             </ValidationProvider>
@@ -61,6 +71,7 @@
                   placeholder="Select a target type"
                   required
                   expanded
+                  :disabled="isModifyNomination"
                 >
                   <option
                     v-for="(option, index) in selection.types"
@@ -91,6 +102,7 @@
                   placeholder="Select a target organism"
                   required
                   expanded
+                  :disabled="isModifyNomination"
                 >
                   <option
                     v-for="(option, index) in selection.organisms"
@@ -106,6 +118,7 @@
             <ValidationProvider
               name="Features"
               v-slot="{ errors, valid }"
+              v-if="hasFeature"
               immediate
             > 
               <!-- Target features -->
@@ -128,6 +141,28 @@
                 />
               </b-field>
             </ValidationProvider>
+
+            <ValidationProvider
+              rules="required"
+              name="Reason"
+              v-slot="{ errors, valid }"
+              v-if="hasReason"
+              :immediate="reason !== ''"
+            > 
+              <!-- Reason for adding this target -->
+              <b-field
+                :message="errors"
+                class="field-margin"
+                :type="{ 'is-danger': errors[0], '': valid }"
+                label="Reason"
+              >
+                <b-input
+                  v-model="reason"
+                  maxlength="300"
+                  type="textarea"
+                />
+              </b-field>
+            </ValidationProvider>
           </div>
         </section>
         <footer class="modal-card-foot">
@@ -136,9 +171,9 @@
             :loading="isLoading"
             :disabled="!passed"
             type="is-primary"
-            @click="addProject"
+            @click="callSubmit"
           >
-            Add Project
+            {{ submitText }}
           </b-button>
         </footer>
       </ValidationObserver>
@@ -148,7 +183,6 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import * as ProjectManage from "@/api/projectManage.js"
 import { handleError } from "@/api/errorHandler.js"
 
 const variables = require("@/assets/script/variables.json")
@@ -163,7 +197,27 @@ export default {
       type: Boolean,
       required: true
     },
-    project: {
+    hasFeature: {
+      type: Boolean,
+      default: false
+    },
+    hasReason: {
+      type: Boolean,
+      default: false
+    },
+    title: {
+      type: String,
+      required: true
+    },
+    submit: {
+      type: Function,
+      required: true
+    },
+    submitText: {
+      type: String,
+      required: true
+    },
+    target: {
       type: Object,
       default: undefined
     }
@@ -174,28 +228,47 @@ export default {
         this.$emit("update:active", val)
       }
 
-      if (val) this.cleanup()
+      if (val && !this.target) {
+        this.cleanup()
+      }
     },
     active(val) {
       if (val != this.isActive) {
         this.isActive = val
       }
     },
-    project(val) {
-      if (val) {
-        this.type = val.type
-        this.name = val.name
-        this.organism = val.organism
+    target: {
+      deep: true,
+      handler (val) {
+        if (val) {
+          this.type = val.type
+          if (val.name) this.name = val.name.toUpperCase()
+          this.organism = val.organism
+          if (val.reason) this.reason = val.reason
+          if (val.id) this.id = val.id
+        }
       }
+    }
+  },
+  computed: {
+    isModifyNomination() {
+      return this.hasReason && this.target
+    },
+    notificationMessage() {
+      if (this.isModifyNomination) return "You may not change target. Please create another nomination instead."
+
+      return ""
     }
   },
   data() {
     return {
       isActive: false,
       isLoading: false,
+      id: "",
       type: "",
       name: "",
       organism: "",
+      reason: "",
       features: [],
       selection: {
         features: variables.genomic_features,
@@ -209,28 +282,39 @@ export default {
       this.type = ""
       this.name = ""
       this.organism = ""
+      this.reason = ""
       this.features = []
     },
-    async addProject() {
+    async callSubmit() {
       // Loading
       this.isLoading = true
 
       try {
-        const projectId = await ProjectManage.addProject({
+        let attrs = {
           type: this.type,
           name: this.name,
-          organism: this.organism,
-          features: this.features
-        })
+          organism: this.organism
+        }
+        if (this.hasFeature) attrs.features = this.features
+        if (this.hasReason) attrs.reason = this.reason
+        if (this.isModifyNomination && this.id) attrs.id = this.id // Pass nomination when modifying it
 
-        // Jump to new project registration page
-        this.$router.push({ name: 'Project Edit', params: { id: projectId, action: 'new' } })
+        // Call submit function passed in as a prop
+        await this.submit(attrs)
+        
+        // Emit update
+        this.$emit("change")
+        this.isActive = false
       } catch (error) {
-        this.errorMessage = await handleError(error)
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: await handleError(error),
+          type: 'is-danger',
+          queue: false
+        })
       } finally {
         // Handle UI changes
         this.isLoading = false
-        this.isActive = false
       }
     },
     getFilteredFeatures(text) {

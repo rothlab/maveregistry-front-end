@@ -23,7 +23,7 @@
           tag="router-link"
           :to="{ path: '/projects' }"
         >
-          MAVE Projects
+          Projects
         </b-navbar-item>
         <b-navbar-item
           tag="router-link"
@@ -35,7 +35,7 @@
           tag="router-link"
           :to="{ path: '/nominations' }"
         >
-          Nomination
+          Nominations
         </b-navbar-item>
         <b-navbar-dropdown label="Info">
           <b-navbar-item
@@ -58,6 +58,11 @@
         slot="end"
         v-if="hasLoggedIn"
       >
+        <!-- Notification -->
+        <b-navbar-item tag="div">
+          <NotificationAction />
+        </b-navbar-item>
+
         <b-navbar-dropdown
           hoverable
           right
@@ -157,24 +162,28 @@
 
 <script>
 import { handleError } from "@/api/errorHandler.js";
+import NotificationAction from '@/components/Action/NotificationAction.vue'
 
 const LoginSignupModal = () => import('@/components/Modal/LoginSignupModal.vue')
 
 export default {
+  // title: "Mave Registry",
   components: {
-    LoginSignupModal
+    LoginSignupModal,
+    NotificationAction
   },
   async mounted () {
     // Check if an user has logged in, if so, use it
     try {
-      await this.$store.dispatch("loginUserCache");
+      await this.$store.dispatch("loginUserCache")
+      await this.$store.dispatch("getRoles")
     } catch (e) {
       this.$buefy.toast.open({
         duration: 5000,
         message: await handleError(e),
         type: "is-danger",
         queue: false
-      });
+      })
     }
   },
   data () {
@@ -185,10 +194,10 @@ export default {
   },
   computed: {
     hasLoggedIn() {
-      return this.$store.state.hasLoggedIn
+      return this.$store.getters.hasLoggedIn
     },
     user() {
-      return this.$store.state.user
+      return this.$store.getters.getUser
     },
     profileImageUrl() {
       // Set url as placeholder

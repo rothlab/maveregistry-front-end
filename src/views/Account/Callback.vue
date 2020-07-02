@@ -135,14 +135,15 @@ export default {
       let ret
       try {
         ret = await this.$store.dispatch('signupLoginUserOrcid', this.userInfo)
+
+        if (ret === "resend_email") return
       } catch (e) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: await handleError(e),
+          message: handleError(e),
           type: 'is-danger',
             queue: false
         })
-
         return
       } finally {
         this.isLoading = false
@@ -165,10 +166,10 @@ export default {
           window.close()
         } catch (e) {
           this.$buefy.toast.open({
-          duration: 5000,
-          message: await handleError(e),
-          type: 'is-danger',
-          queue: false
+            duration: 5000,
+            message: await handleError(e),
+            type: 'is-danger',
+            queue: false
           })
 
           return

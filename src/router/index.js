@@ -60,6 +60,13 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "team edit" */ '../views/Team/TeamEdit.vue')
   },
 
+  // Nomination related
+  {
+    path: '/nominations',
+    name: 'Nominations',
+    component: () => import(/* webpackChunkName: "nominations" */ '../views/Nomination/NominationList.vue')
+  },
+
   // Account related
   {
     path: '/reset_password',
@@ -75,6 +82,12 @@ Vue.use(VueRouter)
     path: '/reset_password_success',
     name: 'Reset Password Successful',
     component: () => import(/* webpackChunkName: "reset password success" */ '../views/Account/ResetPassword.vue'),
+    props: { showSuccess: true }
+  },
+  {
+    path: '/validate_email_success',
+    name: 'Validate Email Successful',
+    component: () => import(/* webpackChunkName: "validate email success" */ '../views/Account/ValidateEmail.vue'),
     props: { showSuccess: true }
   },
   {

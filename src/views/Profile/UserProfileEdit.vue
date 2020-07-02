@@ -68,6 +68,7 @@
                         type="text"
                         placeholder="First Name"
                         v-model="userInfo.first_name"
+                        custom-class="is-capitalized"
                       />
                     </b-field>
                   </ValidationProvider>
@@ -86,6 +87,7 @@
                         type="text"
                         placeholder="Last Name"
                         v-model="userInfo.last_name"
+                        custom-class="is-capitalized"
                       />
                     </b-field>
                   </ValidationProvider>
@@ -289,7 +291,7 @@ export default {
       return this.$route.params.action === "edit"
     },
     isOwner() {
-      return this.$store.state.hasLoggedIn && (this.$route.params.username === this.$store.state.user.username)
+      return this.$store.getters.isOwner(this.$route.params.username)
     }
   },
   data () {
@@ -319,6 +321,7 @@ export default {
 
     if (this.userInfo) {
       this.userInfo.social = {}
+      if (this.userInfo.team) this.team = this.userInfo.team
     }
   },
   methods: {

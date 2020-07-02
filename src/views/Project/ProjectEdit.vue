@@ -143,7 +143,10 @@
                         Type: {{ target.type }}
                       </div>
                       <div class="level-item is-capitalized">
-                        Name: {{ target.name }}
+                        <span>
+                          Name:
+                          <span class="is-uppercase">{{ target.name }}</span>
+                        </span>
                       </div>
                       <div class="level-item">
                         <span>Organism: <i>{{ target.organism }}</i></span>
@@ -337,12 +340,12 @@
                     MAVE Registry supports the following types:
                   </p>
                   <ol>
-                    <li>Literature search: no experiments performed yet</li>
-                    <li>Assay development: small-scale experiments</li>
-                    <li>MAVE data collection: full-scale MAVE experiments</li>
-                    <li>MAVE data analysis: computational analysis of MAVE data</li>
-                    <li>Publication in preparation</li>
-                    <li>Publication available</li>
+                    <li>Literature Search: no experiments performed yet</li>
+                    <li>Assay Development: small-scale experiments</li>
+                    <li>MAVE Data Collection: full-scale MAVE experiments</li>
+                    <li>MAVE Data Analysis: computational analysis of MAVE data</li>
+                    <li>Publication in Preparation</li>
+                    <li>Publication Available: <b>this activity is visible to the public</b></li>
                   </ol>
                 </div>
               </b-notification>
@@ -432,7 +435,7 @@ export default {
       return this.$route.params.action === 'edit'
     },
     isOwner() {
-      return this.$store.state.hasLoggedIn && this.user && this.user.username && (this.user.username === this.$store.state.user.username)
+      return this.user && this.user.username && this.$store.getters.isOwner(this.user.username)
     },
     projectId() {
       return this.$route.params.id
@@ -474,6 +477,7 @@ export default {
     },
     newActivity() {
       return {
+        id: "",
         type: "",
         start_date: new Date(),
         description: "",

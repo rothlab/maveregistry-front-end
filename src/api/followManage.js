@@ -58,7 +58,7 @@ export async function queryFollowById(id) {
 }
 
 export async function getFollowStatus(targets, type, by) {
-  if (targets.length <= 0) return []
+  if (targets.length <= 0 || !by) return []
 
   // Fetch follow object
   const query = new Parse.Query(Follow)
@@ -84,7 +84,8 @@ export async function getFollowStatus(targets, type, by) {
 
 export async function follow(target, type, reason) {
   const currentUser = Parse.User.current()
-  
+  if (!currentUser) throw new Error("Not logged in")
+
   let follow = await new Follow.create({
     target: target,
     type: type,

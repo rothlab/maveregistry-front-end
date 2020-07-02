@@ -1,23 +1,24 @@
 {
   "name": "maveregistry-front-end",
-  "version": "0.6.5",
+  "version": "0.8.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "deploy": "aws s3 sync ./dist s3://maveregistry-web-client"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.13.0",
+    "@fortawesome/fontawesome-free": "^5.13.1",
     "@mdi/font": "^5.3.45",
     "@mdi/light-font": "^0.2.63",
-    "@sentry/browser": "^5.17.0",
-    "@sentry/integrations": "^5.17.0",
+    "@sentry/browser": "^5.18.0",
+    "@sentry/integrations": "^5.18.0",
     "axios": "^0.19.2",
     "buefy": "^0.8.20",
     "core-js": "^3.6.5",
     "parse": "^2.13.0",
-    "vee-validate": "^3.3.3",
+    "vee-validate": "^3.3.5",
     "vue": "^2.6.11",
     "vue-axios": "^2.1.5",
     "vue-google-oauth2": "^1.5.4",
@@ -29,15 +30,15 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.4.4",
-    "@vue/cli-plugin-eslint": "^4.4.4",
-    "@vue/cli-plugin-router": "^4.4.4",
-    "@vue/cli-plugin-vuex": "^4.4.4",
-    "@vue/cli-service": "^4.4.4",
+    "@vue/cli-plugin-babel": "^4.4.5",
+    "@vue/cli-plugin-eslint": "^4.4.5",
+    "@vue/cli-plugin-router": "^4.4.5",
+    "@vue/cli-plugin-vuex": "^4.4.5",
+    "@vue/cli-service": "^4.4.5",
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.2.0",
+    "eslint": "^7.3.1",
     "eslint-plugin-vue": "^6.2.2",
-    "sass": "^1.26.8",
+    "sass": "^1.26.9",
     "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.11"
   },
