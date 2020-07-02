@@ -23,6 +23,7 @@ import '@/assets/style/styles.sass'
 // Import custom scripts
 import router from './router'
 import store from './store'
+import titleMixin from './mixins/titleMixin'
 
 // Initialize framework
 Vue.use(Buefy, {
@@ -56,6 +57,7 @@ Vue.use(VueReCaptcha, {
   }
 })
 Vue.use(VueAxios, axios)
+Vue.mixin(titleMixin)
 
 // Initialize a new Vue instance
 new Vue({

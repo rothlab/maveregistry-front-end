@@ -167,6 +167,7 @@ import NotificationAction from '@/components/Action/NotificationAction.vue'
 const LoginSignupModal = () => import('@/components/Modal/LoginSignupModal.vue')
 
 export default {
+  // title: "Mave Registry",
   components: {
     LoginSignupModal,
     NotificationAction
