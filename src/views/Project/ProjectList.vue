@@ -599,6 +599,8 @@ export default {
           name: prefill.name,
           organism: prefill.organism
         }
+      } else {
+        this.preFilledProject = undefined
       }
 
       this.isNewTargetModalActive = true
