@@ -304,6 +304,9 @@ export default {
     // Fetch team follower and request count
     if (team) await this.fetchFollowerAndRequestCount(team.id)
 
+    // Open follow request modal if needed
+    if (this.hasDeepLink("#manage-request")) this.openFollowerModal(true)
+    
     this.isLoading.page = false
   },
   methods: {
@@ -355,6 +358,9 @@ export default {
     },
     getProfileImage(url) {
       return url ? url : require("@/assets/image/blank-profile.png")
+    },
+    hasDeepLink(action) {
+      return this.$route.hash === action
     }
   }
 }
