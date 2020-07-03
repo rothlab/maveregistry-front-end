@@ -18,6 +18,7 @@ export const getters = {
 
 export const mutations = {
   addNotification(state, item) {
+    if (state.messages.some(e => e.id === item.id)) return
     state.messages.unshift(item)
   },
   removeNotification(state, id) {
@@ -55,5 +56,9 @@ export const actions = {
 
     await NotificationManage.markAs(ids, false)
     commit("setAsUnread", ids)
+  },
+  async removeNotification({ commit }, id) {
+    await NotificationManage.remove(id)
+    commit("removeNotification", id)
   }
 }

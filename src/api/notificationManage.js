@@ -62,16 +62,11 @@ export async function retrieveAndSubscribe(commit) {
   // Subscribe to live changes
   const subscription = await query.subscribe()
 
-  // Parse.LiveQuery.on('error', (error) => {
-  //   console.log(error);
-  // });
-
   subscription.on("create", async (object) => {
     commit("addNotification", object.format())
   })
 
   subscription.on("delete", (object) => {
-    console.log(object)
     commit("removeNotification", object.id)
   })
 }
@@ -82,4 +77,10 @@ export async function markAs(ids, asRead) {
   let notifications = await query.find()
   notifications = notifications.map(e => e.set("is_read", asRead))
   await Parse.Object.saveAll(notifications)
+}
+
+export async function remove(id) {
+  const query = new Parse.Query(Notification)
+  const notification = await query.get(id)
+  await notification.destroy()
 }

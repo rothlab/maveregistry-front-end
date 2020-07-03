@@ -4,6 +4,7 @@
       hoverable
       position="is-bottom-left"
       aria-role="menu"
+      @active-change="refreshTimeElapsed"
     >
       <a
         slot="trigger"
@@ -39,12 +40,19 @@
                 {{ `Notification${count > 1 ? 's' : ''}` }}
               </span>
             </div>
-            <div class="card-header-icon has-text-info">
+            <div
+              class="card-header-icon has-text-info"
+              v-if="unreadCount > 0"
+            >
               <span @click="markAllAsRead()">Mark all as read</span>
             </div>
           </div>
-          <div class="card-content">
+          <div
+            class="card-content"
+            v-if="count > 0"
+          >
             <div
+              class="item"
               v-for="(notification, id) in notifications"
               :key="id"
             >
@@ -92,7 +100,8 @@
                 </div>
                 <div class="column is-4 has-text-right">
                   <div class="has-text-grey">
-                    <span>{{ timeSince(notification.time) }}
+                    <span :key="`${notification.id}_${refreshIndex}`">{{ timeSince(notification.time) }}<br>
+                      <!-- Mark as read/unread -->
                       <b-tooltip
                         :label="`Mark as ${notification.is_read ? 'un' : ''}read`"
                         position="is-left"
@@ -105,24 +114,33 @@
                           type="is-info"
                         />
                       </b-tooltip>
+                      <!-- Delete notification -->
+                      <b-tooltip
+                        label="Delete"
+                        position="is-left"
+                        type="is-dark"
+                        @click.native="removeNotification(notification.id)"
+                        style="cursor: pointer; padding-left: 0.5rem"
+                      >
+                        <b-icon
+                          icon="mdil-delete"
+                          type="is-info"
+                        />
+                      </b-tooltip>
                     </span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </b-dropdown-item>
-
-      <b-dropdown-item
-        v-if="count < 1"
-        custom
-      >
-        <div
-          class="content has-text-grey"
-          style="width: 200px"
-        >
-          No notifications
+          <div
+            class="card-content"
+            v-else
+          >
+            <div class="content has-text-centered has-text-grey no-notification">
+              No notifications
+            </div>
+          </div>
         </div>
       </b-dropdown-item>
     </b-dropdown>
@@ -133,6 +151,17 @@
 const variables = require("@/assets/script/variables.json")
 
 export default {
+  props: {
+    isHover: {
+      type: Boolean,
+      required: true
+    }
+  },
+  watch: {
+    isHover(val) {
+      if (val) this.refreshTimeElapsed(val)
+    }
+  },
   computed: {
     count() {
       return this.$store.getters.countNotifications
@@ -146,6 +175,7 @@ export default {
   },
   data() {
     return {
+      refreshIndex: 0
     }
   },
   async mounted() {
@@ -161,9 +191,14 @@ export default {
     },
     timeSince(time) {
       const seconds = Math.floor((Date.now() - time) / 1000);
+      if (seconds < 1) return "right now"
+
       const interval = variables.intervals.find(i => i.seconds < seconds);
       const count = Math.floor(seconds / interval.seconds);
       return `${count} ${interval.label}${count !== 1 ? 's' : ''} ago`;
+    },
+    refreshTimeElapsed(isActive) {
+      this.refreshIndex += isActive
     },
     async markAs(id, asRead) {
       if (asRead) {
@@ -175,6 +210,9 @@ export default {
     async markAllAsRead() {
       const ids = this.notifications.map(e => e.id)
       await this.$store.dispatch("markAsRead", ids, true)
+    },
+    async removeNotification(id) {
+      await this.$store.dispatch("removeNotification", id)
     }
   }
 }
@@ -183,6 +221,12 @@ export default {
 <style lang="sass">
 .dropdown-content
   padding: 0 !important
+  .notification-center
+    .card-content
+      .columns
+        margin: 0
+        border-bottom-left-radius: 6px
+        border-bottom-right-radius: 6px
 </style>
 
 <style lang="sass" scoped>
@@ -210,7 +254,12 @@ export default {
   width: 28rem
   .card
     box-shadow: unset
-    border-radius: 4px
+    border-radius: 6px
   .card-content
-    padding: 1rem
+    padding: 0
+    border-radius: 4px
+    .item:not(:last-of-type)
+      border-bottom: 1px dashed $grey-lighter
+    .no-notification
+      padding: 1rem
 </style>
