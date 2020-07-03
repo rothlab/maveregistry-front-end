@@ -15,14 +15,16 @@ export const Notification = Parse.Object.extend("Notification", {
       id: this.id,
       time: this.get("createdAt").getTime(),
       message: this.get("message"),
-      is_read: this.get("is_read")
+      is_read: this.get("is_read"),
     }
-    const targetType = this.get("target_type")
-
+    
     // If the notification has a target, format it
+    const targetType = this.get("target_type")
     if (targetType) {
+      ret.type = targetType
       const targetBody = this.get("target_body")
       const by = targetBody.by
+
       switch (targetType) {
         case "follow":
           ret.by = {
@@ -35,10 +37,15 @@ export const Notification = Parse.Object.extend("Notification", {
             type: targetBody.type,
             id: targetBody.pointer.id
           }
-          break;
-      
+          break
+        case "update":
+          ret.target = {
+            type: targetBody.type,
+            id: targetBody.pointer.id
+          }
+          break
         default:
-          break;
+          break
       }
     }
 

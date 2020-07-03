@@ -61,11 +61,25 @@
                 :class="{ 'has-background-warning-light' : !notification.is_read}"
               >
                 <figure class="column is-1">
-                  <p class="image is-24x24">
+                  <p
+                    class="image is-24x24"
+                    v-if="notification.by"
+                  >
                     <img
                       class="is-rounded"
                       :src="profileImageUrl(notification.by.profile_image)"
                     >
+                  </p>
+                  <p
+                    class="has-text-centered"
+                    v-else
+                  >
+                    <b-icon
+                      type="is-white"
+                      icon="mdil-pencil"
+                      custom-size="mdil-18px"
+                      class="item-icon circle-icon has-background-grey"
+                    />
                   </p>
                 </figure>
                 <div class="column is-7">
@@ -227,6 +241,8 @@ export default {
         margin: 0
         border-bottom-left-radius: 6px
         border-bottom-right-radius: 6px
+.item-icon
+  margin-left: 0 !important
 </style>
 
 <style lang="sass" scoped>
@@ -261,5 +277,5 @@ export default {
     .item:not(:last-of-type)
       border-bottom: 1px dashed $grey-lighter
     .no-notification
-      padding: 1rem
+      padding: 1.5rem 0
 </style>
