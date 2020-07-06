@@ -15,14 +15,16 @@ export const Notification = Parse.Object.extend("Notification", {
       id: this.id,
       time: this.get("createdAt").getTime(),
       message: this.get("message"),
-      is_read: this.get("is_read")
+      is_read: this.get("is_read"),
     }
-    const targetType = this.get("target_type")
-
+    
     // If the notification has a target, format it
+    const targetType = this.get("target_type")
     if (targetType) {
+      ret.type = targetType
       const targetBody = this.get("target_body")
       const by = targetBody.by
+
       switch (targetType) {
         case "follow":
           ret.by = {
@@ -35,10 +37,15 @@ export const Notification = Parse.Object.extend("Notification", {
             type: targetBody.type,
             id: targetBody.pointer.id
           }
-          break;
-      
+          break
+        case "update":
+          ret.target = {
+            type: targetBody.type,
+            id: targetBody.pointer.id
+          }
+          break
         default:
-          break;
+          break
       }
     }
 
@@ -62,16 +69,11 @@ export async function retrieveAndSubscribe(commit) {
   // Subscribe to live changes
   const subscription = await query.subscribe()
 
-  // Parse.LiveQuery.on('error', (error) => {
-  //   console.log(error);
-  // });
-
   subscription.on("create", async (object) => {
     commit("addNotification", object.format())
   })
 
   subscription.on("delete", (object) => {
-    console.log(object)
     commit("removeNotification", object.id)
   })
 }
@@ -82,4 +84,10 @@ export async function markAs(ids, asRead) {
   let notifications = await query.find()
   notifications = notifications.map(e => e.set("is_read", asRead))
   await Parse.Object.saveAll(notifications)
+}
+
+export async function remove(id) {
+  const query = new Parse.Query(Notification)
+  const notification = await query.get(id)
+  await notification.destroy()
 }

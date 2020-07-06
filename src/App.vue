@@ -59,8 +59,12 @@
         v-if="hasLoggedIn"
       >
         <!-- Notification -->
-        <b-navbar-item tag="div">
-          <NotificationAction />
+        <b-navbar-item
+          tag="div"
+          @mouseover="isNotificationHoverActive = true"
+          @mouseleave="isNotificationHoverActive = false"
+        >
+          <NotificationAction :is-hover="isNotificationHoverActive" />
         </b-navbar-item>
 
         <b-navbar-dropdown
@@ -189,7 +193,8 @@ export default {
   data () {
     return {
       isLoginSignupModalActive: false,
-      appVersion: process.env.VUE_APP_VERSION
+      isNotificationHoverActive: false,
+      appVersion: process.env.VUE_APP_VERSION,
     }
   },
   computed: {
@@ -211,7 +216,7 @@ export default {
   methods: {
     logout() {
       this.$store.dispatch('logoutUser')
-    }
+    },
   }
 }
 </script>

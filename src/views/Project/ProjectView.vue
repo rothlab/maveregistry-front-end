@@ -353,7 +353,7 @@ export default {
     },
     isOwner() {
       return this.user && this.user.username && this.$store.getters.isOwner(this.user.username)
-    }
+    },
   },
   async mounted() {
     this.isLoading.page = true
@@ -371,6 +371,9 @@ export default {
 
     // Fetch team follower and request count
     if (this.isOwner) await this.fetchFollowerAndRequestCount(this.projectId)
+
+    // Open follow request modal if needed
+    if (this.hasDeepLink("#manage-request")) this.openFollowerModal(true)
 
     this.isLoading.page = false
   },
@@ -404,6 +407,9 @@ export default {
     openFollowerModal(request) {
       this.isManageFollowerModalActive = true
       this.isRequest = request
+    },
+    hasDeepLink(action) {
+      return this.$route.hash === action
     }
   }
 }
