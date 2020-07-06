@@ -208,3 +208,29 @@ export async function getRoles() {
 
   return await Parse.Cloud.run("getRoles")
 }
+
+// Get user email preferences
+export async function getEmailPreference(email) {
+  if (!Parse.User.current()) return
+
+  const userQuery = new Parse.Query(Parse.User)
+  userQuery.equalTo("email", email)
+  const query = new Parse.Query("UserSetting")
+  query.matchesQuery("user", userQuery)
+  const setting = await query.first()
+
+  let ret = setting.get("email_preference")
+  ret.id = setting.id
+  return ret
+}
+
+// Set user email preference
+export async function setEmailPreference(id, preference) {
+  if (!Parse.User.current()) return
+
+  const query = new Parse.Query("UserSetting")
+  const setting = await query.get(id)
+
+  setting.set("email_preference", preference)
+  return await setting.save()
+}
