@@ -6,6 +6,14 @@
     <div class="card">
       <div class="card-content">
         <div class="section">
+          <vue-hcaptcha
+            sitekey="57b34ff1-21ab-4eee-b0f1-a16071d64d34"
+            size="invisible"
+            ref="captcha"
+            @verify="onVerifyCaptcha"
+            @expired="onErrorCaptcha('Captcha Expired')"
+            @error="onErrorCaptcha"
+          />
           <!-- <div class="content has-text-centered">
             <h2 class="subtitle">
               MAVE Registry
@@ -53,6 +61,7 @@
                     expanded
                     :disabled="!passed"
                     class="is-primary"
+                    :loading="isLoading"
                     @click="login('password')"
                   >
                     Log in
@@ -190,7 +199,7 @@
                     class="is-primary"
                     :disabled="!passed"
                     :loading="isLoading"
-                    @click="signup('password')"
+                    @click="executeCaptcha"
                   >
                     Sign up
                   </b-button>
@@ -237,12 +246,13 @@
 import { handleError } from "@/api/errorHandler.js";
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import PasswordField from "@/components/Field/PasswordField.vue"
-
+import VueHcaptcha from '@hcaptcha/vue-hcaptcha'
 export default {
   components: {
     ValidationProvider,
     ValidationObserver,
-    PasswordField
+    PasswordField,
+    VueHcaptcha
   },
   props: {
     active: {
@@ -257,9 +267,6 @@ export default {
       }
 
       if (val) this.cleanup()
-
-      // Display recaptcha badge
-      this.recaptchaBadge(val)
     },
     active(val) {
       if (val != this.isActive) {
@@ -271,6 +278,7 @@ export default {
     return {
       isLoading: false,
       isActive: false,
+      captchaAction: "",
       firstName: "",
       lastName: "",
       username: "",
@@ -290,15 +298,6 @@ export default {
       this.username = "";
       this.email = "";
       this.password = "";
-    },
-    recaptchaBadge(active) {
-      const recaptcha = this.$recaptchaInstance
-      
-      if (active) {
-        recaptcha.showBadge()
-      } else {
-        recaptcha.hideBadge()
-      }
     },
     parseGoogleSigninError(e, authCode) {
       let message = "";
@@ -338,7 +337,22 @@ export default {
         }
       }
     },
-    async signup(method) {
+    async executeCaptcha() {
+      // Execute hCaptcha
+      this.$refs.captcha.execute()
+    },
+    async onVerifyCaptcha(response) {
+      await this.signup("password", response)
+    },
+    onErrorCaptcha(err) {
+      this.$buefy.toast.open({
+        duration: 5000,
+        message: err,
+        type: "is-danger",
+        queue: false
+      })
+    },
+    async signup(method, response = undefined) {
       // Sign up user
       let user = undefined
       let timer
@@ -356,7 +370,8 @@ export default {
                 last_name: this.lastName,
                 username: this.username,
                 email: this.email,
-                password: this.password
+                password: this.password,
+                captcha_token: response
               }
             )
 
@@ -449,10 +464,7 @@ export default {
             await this.$store.dispatch(
               "loginUserPassword",
               {
-                first_name: this.firstName,
-                last_name: this.lastName,
                 username: this.username,
-                email: this.email,
                 password: this.password
               }
             );
@@ -547,6 +559,4 @@ export default {
     margin-top: 1rem
 .forget-password
   padding: 0.25rem 0 1rem 0
-.grecaptcha-badge
-  z-index: 50
 </style>

@@ -6,7 +6,6 @@ import Buefy from 'buefy'
 // Import plugins
 import "@/assets/script/field_validation_rules.js"
 import GAuth from 'vue-google-oauth2'
-import { VueReCaptcha } from 'vue-recaptcha-v3'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import * as Sentry from '@sentry/browser';
@@ -49,13 +48,6 @@ Sentry.init({
 
 // Inject plugins
 Vue.use(GAuth, gauthOption)
-Vue.use(VueReCaptcha, {
-  siteKey: '6LeEHPwUAAAAABdzBkPKUmfsxsGPxBtddID97XWh',
-  loaderOptions: {
-    useRecaptchaNet: true,
-    autoHideBadge: true
-  }
-})
 Vue.use(VueAxios, axios)
 Vue.mixin(titleMixin)
 

@@ -39,14 +39,15 @@ export async function loginUserCache () {
 }
 
 // Sign up user with username, email and password
-export async function signupUserPassword (username, email, password, firstName, lastName) {
+export async function signupUserPassword (userInfo) {
   // Prepare new user
   let user = new Parse.User()
-  user.set("username", username)
-  user.set("email", email)
-  user.set("password", password)
-  user.set("first_name", firstName.toLowerCase())
-  user.set("last_name", lastName.toLowerCase())
+  user.set("username", userInfo.username)
+  user.set("email", userInfo.email)
+  user.set("password", userInfo.password)
+  user.set("first_name", userInfo.first_name.toLowerCase())
+  user.set("last_name", userInfo.last_name.toLowerCase())
+  user.set("captcha_token", userInfo.captcha_token)
 
   // Sign up
   const retUser = await user.signUp()
@@ -123,7 +124,8 @@ export async function fetchUserInfo (username, preference = false) {
   const user = await query.first()
   if (user) {
     let ret = parseUserMetadata(user)
-    if (preference) ret.notification_preference_id = user.get("notification_preference").id
+    const prefObject = user.get("notification_preference")
+    if (preference && prefObject) ret.notification_preference_id = prefObject.id
     return ret
   } else {
     throw new Error(`User does not exist`)
