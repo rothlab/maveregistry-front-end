@@ -113,16 +113,18 @@ export async function logoutUser () {
 }
 
 // Fetch user info with username
-export async function fetchUserInfo (username) {
+export async function fetchUserInfo (username, preference = false) {
   // Clear cache
   Parse.User._clearCache()
 
   // Query user info
   const query = new Parse.Query(Parse.User)
   query.equalTo("username", username)
-  const user = await query.find()
-  if (user.length > 0) {
-    return parseUserMetadata(user[0])
+  const user = await query.first()
+  if (user) {
+    let ret = parseUserMetadata(user)
+    if (preference) ret.notification_preference_id = user.get("notification_preference").id
+    return ret
   } else {
     throw new Error(`User does not exist`)
   }
@@ -210,27 +212,32 @@ export async function getRoles() {
 }
 
 // Get user email preferences
-export async function getEmailPreference(email) {
+export async function getEmailPreference(id) {
   if (!Parse.User.current()) return
 
-  const userQuery = new Parse.Query(Parse.User)
-  userQuery.equalTo("email", email)
-  const query = new Parse.Query("UserSetting")
-  query.matchesQuery("user", userQuery)
-  const setting = await query.first()
+  const query = new Parse.Query("NotificationPreference")
+  const setting = await query.get(id)
+  if (!setting) return
 
-  let ret = setting.get("email_preference")
-  ret.id = setting.id
-  return ret
+  return {
+    id: setting.id,
+    follow_request: setting.get("email_follow_request"),
+    project_update: setting.get("email_project_update"),
+    team_update: setting.get("email_team_update"),
+    newsletter: setting.get("email_newsletter")
+  }
 }
 
 // Set user email preference
 export async function setEmailPreference(id, preference) {
   if (!Parse.User.current()) return
 
-  const query = new Parse.Query("UserSetting")
+  const query = new Parse.Query("NotificationPreference")
   const setting = await query.get(id)
 
-  setting.set("email_preference", preference)
+  setting.set("email_follow_request", preference.follow_request)
+  setting.set("email_project_update", preference.project_update)
+  setting.set("email_team_update", preference.team_update)
+  setting.set("email_newsletter", preference.newsletter)
   return await setting.save()
 }

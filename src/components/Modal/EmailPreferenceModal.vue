@@ -163,7 +163,7 @@ export default {
       type: Boolean,
       required: true
     },
-    email: {
+    id: {
       type: String,
       required: true
     }
@@ -192,7 +192,6 @@ export default {
         page: false,
         submit: false
       },
-      id: "",
       follow_request: "",
       project_update: "",
       team_update: "",
@@ -205,7 +204,7 @@ export default {
       let preference
 
       try {
-        preference = await UserManage.getEmailPreference(this.email)
+        preference = await UserManage.getEmailPreference(this.id)
       } catch (error) {
         this.$buefy.toast.open({
           duration: 5000,
@@ -220,7 +219,6 @@ export default {
       }
 
       if (preference) {
-        this.id = preference.id
         this.follow_request = preference.follow_request
         this.project_update = preference.project_update
         this.team_update = preference.team_update

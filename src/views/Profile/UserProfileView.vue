@@ -200,9 +200,12 @@
 
             <div
               class="project-content"
-              v-if="userInfo.email"
+              v-if="userInfo.email && userInfo.notification_preference_id"
             >
-              <UserProfileAction :email="userInfo.email" />
+              <UserProfileAction
+                :email="userInfo.email"
+                :notification="userInfo.notification_preference_id"
+              />
             </div>
           </div>
         </div>
@@ -290,7 +293,7 @@ export default {
       // Get user info using username
       let res
       try {
-        res = await UserManage.fetchUserInfo(username)
+        res = await UserManage.fetchUserInfo(username, true)
 
         if (res && res.team) {
           // Fetch team

@@ -13,7 +13,7 @@
       icon-left="mdil-email"
       type="is-light"
       expanded
-      @click="isEmailPreferenceModalActive = true"
+      @click="isNotificationPreferenceIdModalActive = true"
       :loading="isLoading"
     >
       Set Email Preference
@@ -29,8 +29,8 @@
 
     <!-- Email frequency modal -->
     <EmailPreferenceModal
-      :email="email"
-      :active.sync="isEmailPreferenceModalActive"
+      :id="notification"
+      :active.sync="isNotificationPreferenceIdModalActive"
     />
   </div>
 </template>
@@ -48,12 +48,16 @@ export default {
     email: {
       type: String,
       required: true
+    },
+    notification: {
+      type: String,
+      required: true
     }
   },
   data () {
     return {
       isLoading: false,
-      isEmailPreferenceModalActive: false,
+      isNotificationPreferenceIdModalActive: false,
     }
   },
   methods: {
