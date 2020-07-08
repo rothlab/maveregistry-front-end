@@ -231,7 +231,10 @@
                 <b>Target</b> <br>
                 <b-icon icon="mdil-pin" />
                 <router-link
-                  :to="`/target/${target.id}`"
+                  :to="{ path: '/projects', query: { 
+                    type: target.type,
+                    name: target.name,
+                    organism: target.organism}}"
                   target="_blank"
                 >
                   <span class="is-capitalized">
