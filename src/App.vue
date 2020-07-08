@@ -26,6 +26,7 @@
           Projects
         </b-navbar-item>
         <b-navbar-item
+          v-if="hasLoggedIn"
           tag="router-link"
           :to="{ path: '/teams' }"
         >
@@ -36,6 +37,13 @@
           :to="{ path: '/nominations' }"
         >
           Nominations
+        </b-navbar-item>
+        <b-navbar-item
+          v-if="hasLoggedIn && isModerator"
+          tag="router-link"
+          :to="{ path: '/moderate' }"
+        >
+          Moderate
         </b-navbar-item>
         <b-navbar-dropdown label="Info">
           <b-navbar-item
@@ -200,6 +208,9 @@ export default {
   computed: {
     hasLoggedIn() {
       return this.$store.getters.hasLoggedIn
+    },
+    isModerator() {
+      return this.$store.getters.hasRole("moderator")
     },
     user() {
       return this.$store.getters.getUser
