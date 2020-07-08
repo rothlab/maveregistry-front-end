@@ -42,7 +42,7 @@
 
     <div class="container has-fullheight has-top-padding has-touch-container-padding">
       <!-- Team table -->
-      <div>
+      <div v-if="hasLoggedIn">
         <b-table
           :data="teams"
           :loading="isLoading.fetch_team"
@@ -69,6 +69,28 @@
               />
             </b-field>
           </template>
+
+          <!-- No results -->
+          <template slot="empty">
+            <div
+              class="no-project has-vcentered"
+              v-if="!isLoading.fetch_team"
+            >
+              <div class="info-icon">
+                <b-icon
+                  icon="mdil-clipboard"
+                  custom-size="mdil-48px"
+                  type="is-grey-light"
+                />
+              </div>
+              <div class="info-content">
+                <p class="has-text-grey">
+                  <span class="is-size-5">Sorry, we couldn't find any results.</span>
+                </p>
+              </div>
+            </div>
+          </template>
+
           <template slot-scope="props">
             <!-- Team ID -->
             <b-table-column
@@ -224,6 +246,26 @@
             </b-table-column>
           </template>
         </b-table>
+      </div>
+
+      <div v-else>
+        <div
+          class="no-project has-vcentered"
+        >
+          <div class="info-icon">
+            <b-icon
+              icon="mdil-alert-octagon"
+              custom-size="mdil-64px"
+              type="is-danger"
+            />
+          </div>
+          <div class="info-content">
+            <p class="has-text-danger">
+              <span class="is-size-5">Access Denied</span><br>
+              <span class="is-size-6">Please make sure you have permission to access this function.</span>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 

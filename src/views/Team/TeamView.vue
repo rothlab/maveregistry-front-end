@@ -52,13 +52,19 @@
           <div
             class="column is-6"
           >
-            <div class="project-header">
+            <div
+              class="project-header"
+              v-if="hasPeople"
+            >
               <p class="is-size-4 has-text-weight-bold">
                 People
               </p>
             </div>
 
-            <div class="project-content">
+            <div
+              class="project-content"
+              v-if="hasPeople"
+            >
               <p
                 class="is-size-5"
                 v-if="principalInvestigator"
@@ -117,7 +123,7 @@
               </div>
             </div>
 
-            <hr>
+            <hr v-if="hasPeople && hasProject">
 
             <!-- Add no project detail display -->
             <div
@@ -271,6 +277,9 @@ export default {
     teamId() {
       return this.$route.params.id
     },
+    hasPeople() {
+      return this.principalInvestigator && this.members && this.members.length > 0
+    },
     hasProject() {
       return this.projects && this.projects.length > 0
     },
@@ -320,6 +329,8 @@ export default {
         return
       }
       
+      if (!team) return
+
       // Format PI
       this.principalInvestigator = {
         first_name: team.first_name,
