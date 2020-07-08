@@ -179,9 +179,7 @@ export const Project = Parse.Object.extend("Project", {
     for (let index = 0; index < objects.length; index++) {
       query.include(objects[index])
     }  
-    const res = await query.find()
-
-    return res[0]
+    return await query.first()
   }
 })
 Parse.Object.registerSubclass('Project', Project);
@@ -296,6 +294,7 @@ export async function fetchProject(id, detail = false) {
   const project = await new Project.fetchById(id, ["target", "user", "team", "collaborators"])
 
   // Format and return
+  if (!project) return
   return project.format(detail)
 }
 

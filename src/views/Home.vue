@@ -35,9 +35,9 @@
                       <b-button
                         size="is-medium"
                         tag="router-link"
-                        to="/teams"
+                        to="/nominations"
                       >
-                        View Teams
+                        Nominate Targets
                       </b-button>
                     </div>
                   </div>

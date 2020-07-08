@@ -12,7 +12,10 @@
                 </p>
               </div>
             </div>
-            <div class="level-right">
+            <div
+              class="level-right"
+              v-if="hasLoggedIn"
+            >
               <!-- Register new team -->
               <!-- Non-mobile style -->
               <b-button
@@ -41,8 +44,13 @@
     </div>
 
     <div class="container has-fullheight has-top-padding has-touch-container-padding">
+      <Error
+        v-if="!isLoading.fetch_team && errorMessage !== ''"
+        :message="errorMessage"
+      />
+
       <!-- Team table -->
-      <div v-if="hasLoggedIn">
+      <div v-else>
         <b-table
           :data="teams"
           :loading="isLoading.fetch_team"
@@ -247,26 +255,6 @@
           </template>
         </b-table>
       </div>
-
-      <div v-else>
-        <div
-          class="no-project has-vcentered"
-        >
-          <div class="info-icon">
-            <b-icon
-              icon="mdil-alert-octagon"
-              custom-size="mdil-64px"
-              type="is-danger"
-            />
-          </div>
-          <div class="info-content">
-            <p class="has-text-danger">
-              <span class="is-size-5">Access Denied</span><br>
-              <span class="is-size-6">Please make sure you have permission to access this function.</span>
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- New Team Modal -->
@@ -299,6 +287,7 @@ import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import { handleError } from "@/api/errorHandler.js"
+import Error from '@/components/Error.vue'
 
 // Helper
 function capitalize(string) {
@@ -309,7 +298,8 @@ export default {
   components: {
     NewTeamModal,
     FollowModal,
-    UnfollowModal
+    UnfollowModal,
+    Error
   },
   computed: {
     hasLoggedIn() {
@@ -338,8 +328,8 @@ export default {
       },
       filter: {
         pi: "",
-        // affiliation: ""
-      }
+      },
+      errorMessage: ""
     }
   },
   async mounted() {
@@ -381,12 +371,7 @@ export default {
         // Update pagination
         this.pagination.count = teams.count
       } catch (error) {
-        this.$buefy.toast.open({
-          message: await handleError(error),
-          type: 'is-danger',
-          queue: false,
-          duration: 5000
-        })
+        this.errorMessage = await handleError(error)
       } finally {
         this.isLoading.fetch_team = false
       }
