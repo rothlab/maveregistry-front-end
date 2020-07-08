@@ -1,12 +1,24 @@
 <template>
-  <div>
+  <div class="field-margin">
     <label class="label">
       Find or Add a Principal Investigator
     </label>
 
+    <!-- Add this provider to stop user from saving edit when no team was provided (but required) -->
+    <ValidationProvider
+      v-if="isRequired"
+      rules="required"
+      name="Team"
+      immediate
+    >
+      <b-field v-show="false">
+        <b-input v-model="id" />
+      </b-field>
+    </ValidationProvider>
+
     <b-autocomplete
       v-model="existTeamDisplay"
-      class="field-margin"
+      ref="teamField"
       placeholder="Search by Name"
       open-on-focus
       icon-pack="mdi"
@@ -20,7 +32,7 @@
       @focus="fetchTeams()"
       :check-infinite-scroll="true"
       @infinite-scroll="fetchMoreTeams"
-      @blur="pagination.skip = 0"
+      @blur="handleBlur"
     >
       <template slot="empty">
         <p class="has-text-centered has-text-grey-light">
@@ -54,6 +66,13 @@
       </template>
     </b-autocomplete>
 
+    <p
+      class="help is-danger"
+      v-if="errorMessage"
+    >
+      {{ errorMessage }}
+    </p>
+
     <!-- New team modal -->
     <div class="container">
       <NewTeamModal
@@ -69,6 +88,7 @@
 import * as TeamManage from "@/api/teamManage.js"
 import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
 import { handleError } from "@/api/errorHandler.js"
+import { ValidationProvider } from 'vee-validate'
 
 // Helper
 function capitalize(string) {
@@ -91,7 +111,8 @@ export default {
     }
   },
   components: {
-    NewTeamModal
+    NewTeamModal,
+    ValidationProvider
   },
   watch: {
     async value () {
@@ -104,11 +125,6 @@ export default {
         this.id = ""
         this.$emit("input", this.id)
       }
-    }
-  },
-  computed: {
-    hasRequired() {
-      return this.isRequired ? 'required' : ''
     }
   },
   async mounted() {
@@ -132,8 +148,14 @@ export default {
   },
   methods: {
     updateVal(option) {
-      this.id = option.id
+      this.id = option && option.id ? option.id : ""
       this.$emit("input", this.id)
+
+      // Manually change error status
+      if (this.id !== "" && this.isRequired) {
+        this.errorMessage = ""
+        this.$refs.teamField.$children[0].$refs.input.classList.remove('is-danger')
+      }
     },
     formatTeam(team) {
       team.display = `${capitalize(team.first_name)} ${capitalize(team.last_name)}, ${team.affiliation}`
@@ -206,6 +228,15 @@ export default {
     trimKeyword(string, keyword) {
       if (keyword.length <= 0 || !string.startsWith(keyword)) return capitalize(string)
       return string.replace(keyword, '')
+    },
+    handleBlur() {
+      this.pagination.skip = 0
+
+      if (this.id === "" && this.isRequired) {
+        this.errorMessage = "This field is required"
+        // Due to the limitation of B-autocomplete, we have to change input border color manually
+        this.$refs.teamField.$children[0].$refs.input.classList.add('is-danger')
+      }
     }
   }
 }
