@@ -162,7 +162,7 @@
                   name="Twitter"
                   v-slot="{ errors, valid }"
                   v-if="userInfo.social"
-                  :immediate="userInfo.social"
+                  :immediate="!!userInfo.social"
                 > 
                   <b-field
                     :message="errors"

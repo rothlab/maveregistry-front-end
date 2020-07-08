@@ -62,7 +62,10 @@
               </p>
             </div>
 
-            <div class="project-content">
+            <div
+              class="project-content"
+              v-if="hasPeople"
+            >
               <p
                 class="is-size-5"
                 v-if="leads.length > 0"
