@@ -5,8 +5,6 @@ import Buefy from 'buefy'
 
 // Import plugins
 import "@/assets/script/field_validation_rules.js"
-import GAuth from 'vue-google-oauth2'
-import { VueReCaptcha } from 'vue-recaptcha-v3'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import * as Sentry from '@sentry/browser';
@@ -31,11 +29,6 @@ Vue.use(Buefy, {
 })
 
 // Initialize parameters
-const gauthOption = { // Google O-Auth
-  clientId: '637030175210-gdtjb7kd3kalhovg25sm3d2ns8mu67o5.apps.googleusercontent.com',
-  scope: 'profile email',
-  prompt: 'select_account'
-}
 Vue.config.productionTip = false
 
 // Initialize Sentry
@@ -48,14 +41,6 @@ Sentry.init({
 });
 
 // Inject plugins
-Vue.use(GAuth, gauthOption)
-Vue.use(VueReCaptcha, {
-  siteKey: '6LeEHPwUAAAAABdzBkPKUmfsxsGPxBtddID97XWh',
-  loaderOptions: {
-    useRecaptchaNet: true,
-    autoHideBadge: true
-  }
-})
 Vue.use(VueAxios, axios)
 Vue.mixin(titleMixin)
 

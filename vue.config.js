@@ -9,5 +9,8 @@ module.exports = {
         args[0].title = 'Mave Registry'
         return args
       })
+  },
+  devServer: {
+    disableHostCheck: true
   }
 }

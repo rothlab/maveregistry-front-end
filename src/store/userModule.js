@@ -54,8 +54,7 @@ export const actions = {
     commit('loginUser', user)
   },
   async signupUserPassword ({ commit }, userInfo) {
-    const user = await UserManage.signupUserPassword(userInfo.username, userInfo.email, userInfo.password, 
-      userInfo.first_name, userInfo.last_name)
+    const user = await UserManage.signupUserPassword(userInfo)
 
     // Update user info if loggined in successfully
     commit('loginUser', user)
