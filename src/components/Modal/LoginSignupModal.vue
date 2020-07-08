@@ -247,6 +247,30 @@ import { handleError } from "@/api/errorHandler.js";
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import PasswordField from "@/components/Field/PasswordField.vue"
 import VueHcaptcha from '@hcaptcha/vue-hcaptcha'
+
+function oauth(url, component) {
+  // Bring up OAuth window
+  window.open(url,
+    "targetWindow",
+    `toolbar=no,
+        location=no,
+        status=no,
+        menubar=no,
+        scrollbars=yes,
+        resizable=yes,
+        width=500px,
+        height=600px`
+  )
+
+  // Handle results
+  let timer = setInterval(() => {
+    if (component.hasLoggedIn) {
+      component.isActive = false;
+      clearInterval(timer);
+    }
+  }, 1000)
+}
+
 export default {
   components: {
     ValidationProvider,
@@ -299,44 +323,6 @@ export default {
       this.email = "";
       this.password = "";
     },
-    parseGoogleSigninError(e, authCode) {
-      let message = "";
-
-      if (e) return;
-
-      if (!e) {
-        message = "Something went wrong with Google Sign-in.";
-      } else if (!authCode) {
-        message = "Authentication failed.";
-      }
-
-      this.$buefy.toast.open({
-        duration: 5000,
-        message: message,
-        type: "is-danger",
-        queue: false
-      });
-    },
-    parseGoogleSigninRes(googleUser) {
-      const basicProfile = googleUser.getBasicProfile();
-
-      if (!googleUser) return;
-
-      // TODO: move profile image resizing to the backend
-      let imgUrl = basicProfile.getImageUrl();
-      if (imgUrl) imgUrl = imgUrl.substring(0, imgUrl.lastIndexOf("=")); // Get original size image
-
-      return {
-        email: basicProfile.getEmail(),
-        first_name: basicProfile.getGivenName(),
-        last_name: basicProfile.getFamilyName(),
-        profile_image: imgUrl,
-        auth: {
-          id: googleUser.getId(),
-          access_token: googleUser.getAuthResponse().access_token
-        }
-      }
-    },
     async executeCaptcha() {
       // Execute hCaptcha
       this.$refs.captcha.execute()
@@ -354,8 +340,7 @@ export default {
     },
     async signup(method, response = undefined) {
       // Sign up user
-      let user = undefined
-      let timer
+      let params
       switch (method) {
         // With password
         case "password":
@@ -392,55 +377,21 @@ export default {
           break
         case "google":
           // With Google
-          try {
-            // Bring up Google Sign-in
-            const googleUser = await this.$gAuth.signIn();
-            user = this.parseGoogleSigninRes(googleUser);
-          } catch (e) {
-            this.parseGoogleSigninError(e, user);
-            return;
+          params = {
+            id: "637030175210-gdtjb7kd3kalhovg25sm3d2ns8mu67o5.apps.googleusercontent.com",
+            url: "https://accounts.google.com/o/oauth2/v2/auth",
+            redirect_url: window.location.origin + "/callback/Google/login",
           }
-
-          // Handle Sign up in the backend
-          try {
-            await this.$store.dispatch("signupLoginUserGoogle", user);
-
-            this.isActive = false;
-          } catch (e) {
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: await handleError(e),
-              type: "is-danger",
-              queue: false
-            })
-            return
-          } finally {
-            this.isLoading = false
-          }
+          oauth(`${params.url}?client_id=${params.id}&response_type=token&scope=profile email&redirect_uri=${params.redirect_url}`, this)
+          this.isLoading = false;
           break
         case "orcid":
-          // Bring up ORCID window
-          window.open(
-            `https://orcid.org/oauth/authorize?client_id=APP-TNM3Y1CPZI5HS7WJ&response_type=token&scope=openid&redirect_uri=${window.location.origin}/callback/ORCID/signup`,
-            "targetWindow",
-            `toolbar=no,
-               location=no,
-               status=no,
-               menubar=no,
-               scrollbars=yes,
-               resizable=yes,
-               width=500px,
-               height=600px`
-          )
-
-          // Handle results
-          timer = setInterval(() => {
-            if (this.hasLoggedIn) {
-              this.isActive = false;
-              clearInterval(timer);
-            }
-          }, 1000)
-
+          params = {
+            id: "APP-TNM3Y1CPZI5HS7WJ",
+            url: "https://orcid.org/oauth/authorize",
+            redirect_url: window.location.origin + "/callback/ORCID/signup",
+          }
+          oauth(`${params.url}?client_id=${params.id}&response_type=token&scope=openid&redirect_uri=${params.redirect_url}`, this)
           this.isLoading = false
           break
         default:
@@ -455,8 +406,7 @@ export default {
       this.isLoading = true;
 
       // Authenticate user
-      let user = undefined;
-      let timer
+      let params
       switch (method) {
         case "password":
           // With password
@@ -485,55 +435,21 @@ export default {
           break;
         case "google":
           // With Google
-          try {
-            // Bring up Google Sign-in
-            const googleUser = await this.$gAuth.signIn();
-            user = this.parseGoogleSigninRes(googleUser);
-          } catch (e) {
-            this.parseGoogleSigninError(e, user);
-            return;
+          params = {
+            id: "637030175210-gdtjb7kd3kalhovg25sm3d2ns8mu67o5.apps.googleusercontent.com",
+            url: "https://accounts.google.com/o/oauth2/v2/auth",
+            redirect_url: window.location.origin + "/callback/Google/login",
           }
-
-          // Handle verification in the backend
-          try {
-            await this.$store.dispatch("signupLoginUserGoogle", user);
-
-            this.isActive = false;
-          } catch (e) {
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: await handleError(e),
-              type: "is-danger",
-              queue: false
-            });
-            return
-          } finally {
-            this.isLoading = false;
-          }
+          oauth(`${params.url}?client_id=${params.id}&response_type=token&scope=profile email&redirect_uri=${params.redirect_url}`, this)
+          this.isLoading = false;
           break;
         case "orcid":
-          // Bring up ORCID window
-          window.open(
-            `https://orcid.org/oauth/authorize?client_id=APP-TNM3Y1CPZI5HS7WJ&response_type=token&scope=openid&redirect_uri=${window.location.origin}/callback/ORCID/login`,
-            "targetWindow",
-            `toolbar=no,
-               location=no,
-               status=no,
-               menubar=no,
-               scrollbars=yes,
-               resizable=yes,
-               width=500px,
-               height=600px`
-          );
-
-          // Handle results
-          timer = setInterval(() => {
-            if (this.hasLoggedIn) {
-              this.isActive = false;
-              clearInterval(timer);
-            }
-          }, 1000);
-
+          params = {
+            id: "APP-TNM3Y1CPZI5HS7WJ",
+            url: "https://orcid.org/oauth/authorize",
+            redirect_url: window.location.origin + "/callback/ORCID/login",
+          }
+          oauth(`${params.url}?client_id=${params.id}&response_type=token&scope=openid&redirect_uri=${params.redirect_url}`, this)
           this.isLoading = false;
           break;
         default:

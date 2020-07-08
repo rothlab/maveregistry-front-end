@@ -177,15 +177,61 @@ export default {
       }
 
       window.close()
+    },
+    async validateGoogle() {
+      this.isLoading = true
+
+      // Get auth payload
+      const params = new URLSearchParams(this.$route.hash)
+      // eslint-disable-next-line no-unused-vars
+      const payload = {
+        access_token: params.get("#access_token"),
+        profile_url: "https://www.googleapis.com/oauth2/v2/userinfo"
+      }
+    
+      // Get user profile
+      try {
+        if (!payload.access_token) throw new Error("Missing Access Token.")
+
+        const response = await this.axios.get(payload.profile_url, {
+          params: {
+            access_token: payload.access_token
+          }
+        })
+
+        if (!response.data) throw new Error("Empty response.")
+        this.userInfo.first_name = response.data.given_name
+        this.userInfo.last_name = response.data.family_name
+        this.userInfo.email = response.data.email
+        this.userInfo.profile_image = response.data.picture
+        this.userInfo.auth = {
+          id: response.data.id,
+          access_token: payload.access_token
+        }
+        await this.$store.dispatch("signupLoginUserGoogle", this.userInfo)
+        window.close()
+      } catch (error) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: "Authentication failed with Google",
+          type: 'is-danger',
+          queue: false
+        })
+      } finally {
+        this.isLoading = false
+      }
     }
   },
   async mounted() {
     switch (this.authMethod) {
       case "ORCID":
         await this.validateOrcid()
-        break;
+        break
+      case "Google":
+        await this.validateGoogle()
+        break
       default:
-        break;
+        break
     }
   }
 }
