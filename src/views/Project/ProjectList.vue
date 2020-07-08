@@ -553,6 +553,12 @@ export default {
     }
   },
   async mounted () {
+    // If filter queries are supplied, process them
+    if (this.$route.query) {
+      if (this.$route.query.type) this.filter.type = this.$route.query.type
+      if (this.$route.query.name) this.filter.name = this.$route.query.name
+      if (this.$route.query.organism) this.filter.organism = this.$route.query.organism
+    }
     await this.fetchTargets()
   },
   methods: {

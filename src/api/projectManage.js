@@ -179,9 +179,7 @@ export const Project = Parse.Object.extend("Project", {
     for (let index = 0; index < objects.length; index++) {
       query.include(objects[index])
     }  
-    const res = await query.find()
-
-    return res[0]
+    return await query.first()
   }
 })
 Parse.Object.registerSubclass('Project', Project);
@@ -200,11 +198,14 @@ export const ProjectActivity = Parse.Object.extend("ProjectActivity", {
       id: this.id,
       type: this.get("type"),
       description: this.get("description"),
-      start_date: this.get("start_date")
+      start_date: this.get("start_date"),
     }
 
     const endDate = this.get("end_date")
     if (endDate) ret.end_date = endDate
+    
+    const links = this.get("links")
+    if (links) ret.links = links
     
     return ret
   }
@@ -293,6 +294,7 @@ export async function fetchProject(id, detail = false) {
   const project = await new Project.fetchById(id, ["target", "user", "team", "collaborators"])
 
   // Format and return
+  if (!project) return
   return project.format(detail)
 }
 
@@ -339,6 +341,7 @@ export async function updateProject(payload) {
       activity.set("description", e.description)
       activity.set("start_date", e.start_date)
       if (e.end_date) activity.set("end_date", e.end_date)
+      if (e.links) activity.set("links", e.links)
     }
 
     return activity

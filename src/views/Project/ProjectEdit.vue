@@ -108,6 +108,7 @@
                           <router-link
                             :to="{ name: 'User Profile View', params: { username: user.username } }"
                             target="_blank"
+                            v-if="user"
                           >
                             {{ user.first_name }} {{ user.last_name }}
                           </router-link>
@@ -501,6 +502,18 @@ export default {
     async updateProject() {
       this.isLoading.submit = true
 
+      // Filter activities to remove empty links
+      const activities = this.activities.map(e => {
+        if (e.links) {
+          const links = e.links.filter(e => e !== "")
+          if (links.length < 1) {
+            delete e.links
+          } else {
+            e.links = links
+          }
+        }
+        return e
+      })
       // Construct payload
       const project = {
         id: this.projectId,
@@ -510,7 +523,7 @@ export default {
         funding: {
           open_for_funding: this.openForFunding
         },
-        activities: this.activities
+        activities: activities
       }
 
       // Update project

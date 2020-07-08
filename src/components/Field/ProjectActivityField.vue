@@ -131,46 +131,50 @@
 
     <!-- Reference -->
     <label class="label">Links (Optional)</label>
-    <ValidationProvider
-      :rules="{ regex: 
-        /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/ 
-      }"
-      immediate
-      name="Link"
-      v-slot="{ errors, valid }"
+    <div
       v-for="(link, id) in links"
       :key="id"
     >
-      <b-field
-        :message="errors"
-        class="field-margin"
-        :type="{ 'is-danger': errors[0], '': valid }"
+      <ValidationProvider
+        :rules="{ regex: 
+          /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/ 
+        }"
+        immediate
+        name="Link"
+        :vid="`link-${id}-${activityId}`"
+        v-slot="{ errors, valid }"
       >
-        <div class="is-flex is-space-between">
-          <b-input
-            icon="mdil-link"
-            type="website"
-            placeholder="http:// or https://"
-            class="link-input"
-            v-model="links[id]"
-            @input="updateVal"
-            expanded
-          />
-          <b-button
-            v-if="(links.length - 1) === id"
-            icon-left="mdil-plus"
-            type="is-light"
-            @click="links.push('')"
-          />
-          <b-button
-            v-else
-            icon-left="mdil-delete"
-            type="is-light"
-            @click="links.splice(id, 1); updateVal()"
-          />
-        </div>
-      </b-field>
-    </ValidationProvider>
+        <b-field
+          :message="errors"
+          class="field-margin"
+          :type="{ 'is-danger': errors[0], '': valid }"
+        >
+          <div class="is-flex is-space-between">
+            <b-input
+              icon="mdil-link"
+              type="website"
+              placeholder="http:// or https://"
+              class="link-input"
+              v-model="links[id]"
+              @input="updateVal"
+              expanded
+            />
+            <b-button
+              v-if="(links.length - 1) === id"
+              icon-left="mdil-plus"
+              type="is-light"
+              @click="links.push('')"
+            />
+            <b-button
+              v-else
+              icon-left="mdil-delete"
+              type="is-light"
+              @click="links.splice(id, 1); updateVal()"
+            />
+          </div>
+        </b-field>
+      </ValidationProvider>
+    </div>
   </div>
 </template>
 
@@ -219,10 +223,7 @@ export default {
 
       if (!this.isOngoing) ret.end_date = this.endDate
       if (this.activityId !== "") ret.id = this.activityId
-
-      // Filter out empty links
-      const links = this.links.filter(e => e !== "")
-      if (links.length > 0) ret.links = links
+      if (this.links.length > 0) ret.links = this.links
 
       this.$emit("input", ret)
     },

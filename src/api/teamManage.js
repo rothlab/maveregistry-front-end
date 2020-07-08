@@ -183,7 +183,7 @@ export async function queryById(id, detail = false, followers = false) {
   if (detail) objects.push("creator")
   
   const team = await new Team.fetchById(id, objects)
-  if (!team) throw new Error("Invalid team ID")
+  if (!team) return
 
   return team.format(detail, true, followers)
 }

@@ -62,7 +62,10 @@
               </p>
             </div>
 
-            <div class="project-content">
+            <div
+              class="project-content"
+              v-if="hasPeople"
+            >
               <p
                 class="is-size-5"
                 v-if="leads.length > 0"
@@ -208,13 +211,19 @@
           </div>
 
           <div class="column is-4 is-offset-2">
-            <div class="project-header">
+            <div
+              class="project-header"
+              v-if="hasProject"
+            >
               <p class="is-size-4 has-text-weight-bold">
                 About Project
               </p>
             </div>
             
-            <div class="project-content">
+            <div
+              class="project-content"
+              v-if="hasProject"
+            >
               <p
                 class="is-size-5"
                 v-if="target"
@@ -222,7 +231,10 @@
                 <b>Target</b> <br>
                 <b-icon icon="mdil-pin" />
                 <router-link
-                  :to="`/target/${target.id}`"
+                  :to="{ path: '/projects', query: { 
+                    type: target.type,
+                    name: target.name,
+                    organism: target.organism}}"
                   target="_blank"
                 >
                   <span class="is-capitalized">
@@ -234,7 +246,10 @@
                 </router-link>
                 <br>
               </p>
-              <p class="is-size-5">
+              <p
+                class="is-size-5"
+                v-if="features && features.length > 0"
+              >
                 <b>Feature</b> <br>
                 <b-icon icon="mdil-tag" />
                 {{ features.join(",") }}
@@ -260,7 +275,10 @@
                   {{ user.first_name + ' ' + user.last_name }}
                 </router-link>
               </p>
-              <p class="is-size-5">
+              <p
+                class="is-size-5"
+                v-if="updatedDate"
+              >
                 <b>Last Update</b> <br>
                 <b-icon icon="mdil-clock" />
                 {{ updatedDate.toLocaleString() }}
@@ -325,13 +343,14 @@ export default {
       isLoading: {
         page: false
       },
+      hasProject: false,
       isManageFollowerModalActive: false,
       isRequest: false,
       errorMessage: "",
       target: undefined,
       features: [],
       user: undefined,
-      updatedDate: new Date(),
+      updatedDate: undefined,
       leads: [],
       team: undefined,
       collaborators: [],
@@ -361,12 +380,15 @@ export default {
     const project = await this.fetchProject(this.projectId)
 
     if (project) {
+      this.hasProject = true
       if (project.leads) this.leads = project.leads // Required, will always have value
       if (project.team) this.team = project.team // Required, will always have value
       if (project.collaborators)
         this.collaborators = project.collaborators
       if (project.funding) this.funding = project.funding
       if (project.activities) this.activities = project.activities
+    } else {
+      this.hasProject = false
     }
 
     // Fetch team follower and request count
@@ -382,6 +404,11 @@ export default {
       // Error handling
       try {
         const project = await ProjectManage.fetchProject(id, true)
+
+        if (!project) {
+          this.errorMessage = await handleError({ code: 119 })
+          return
+        }
 
         this.target = project.target
         this.features = project.features

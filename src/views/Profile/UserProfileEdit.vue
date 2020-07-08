@@ -22,6 +22,7 @@
                 type="is-primary"
                 size="is-medium"
                 :loading="isLoading.save_edit"
+                :disabled="isDisabled"
                 @click="saveProfile"
               >
                 Save
@@ -41,14 +42,14 @@
           <div
             class="content"
           >
-            <div class="project-header">
-              <p class="is-size-4 has-text-weight-bold">
-                Personal Information
-              </p>
-            </div>
+            <ValidationObserver ref="observer">
+              <div class="project-header">
+                <p class="is-size-4 has-text-weight-bold">
+                  Personal Information
+                </p>
+              </div>
 
-            <div class="project-content">
-              <ValidationObserver ref="observer">
+              <div class="project-content">
                 <b-field
                   grouped
                   class="field-margin is-space-between"
@@ -58,6 +59,7 @@
                     name="FirstName"
                     v-slot="{ errors, valid }"
                     class="name"
+                    immediate
                   >
                     <b-field
                       :message="errors"
@@ -77,6 +79,7 @@
                     name="LastName"
                     v-slot="{ errors, valid }"
                     class="name"
+                    immediate
                   >
                     <b-field
                       :message="errors"
@@ -96,6 +99,7 @@
                   rules="required|alpha_dash"
                   name="Username"
                   v-slot="{ errors, valid }"
+                  immediate
                 > 
                   <b-field
                     :message="errors"
@@ -115,6 +119,7 @@
                   rules="required|email"
                   name="Email"
                   v-slot="{ errors, valid }"
+                  immediate
                 > 
                   <b-field
                     :message="errors"
@@ -136,6 +141,7 @@
                   }"
                   name="Website"
                   v-slot="{ errors, valid }"
+                  :immediate="userInfo.website != ''"
                 > 
                   <b-field
                     :message="errors"
@@ -156,6 +162,7 @@
                   name="Twitter"
                   v-slot="{ errors, valid }"
                   v-if="userInfo.social"
+                  :immediate="!!userInfo.social"
                 > 
                   <b-field
                     :message="errors"
@@ -170,20 +177,20 @@
                     />
                   </b-field>
                 </ValidationProvider>
-              </ValidationObserver>
-            </div>
+              </div>
 
-            <div class="project-header">
-              <p class="is-size-4 has-text-weight-bold">
-                Team
-              </p>
-            </div>
+              <div class="project-header">
+                <p class="is-size-4 has-text-weight-bold">
+                  Team
+                </p>
+              </div>
 
-            <div
-              class="project-content"
-            >
-              <TeamInfoField v-model="team" />
-            </div>
+              <div
+                class="project-content"
+              >
+                <TeamInfoField v-model="team" />
+              </div>
+            </ValidationObserver>
           </div>
         </div>
 
@@ -306,6 +313,7 @@ export default {
         save_profile_pic: false
       },
       errorMessage: "",
+      isDisabled: false
     }
   },
   async mounted () {
@@ -323,6 +331,15 @@ export default {
       this.userInfo.social = {}
       if (this.userInfo.team) this.team = this.userInfo.team
     }
+
+    this.$watch(
+      () => {
+        return this.$refs.observer.flags.passed
+      },
+      (val) => {
+        this.isDisabled = !val
+      }
+    )
   },
   methods: {
     async fetchUserInfo(username) {
