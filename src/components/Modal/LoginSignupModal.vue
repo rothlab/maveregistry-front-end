@@ -263,10 +263,14 @@ function oauth(url, component) {
   )
 
   // Handle results
-  let timer = setInterval(() => {
+  let timer = setInterval(async () => {
     if (component.hasLoggedIn) {
       component.isActive = false;
       clearInterval(timer);
+
+      // Get roles and reload page
+      await component.$store.dispatch("getRoles")
+      component.$router.go(0)
     }
   }, 1000)
 }
@@ -361,6 +365,10 @@ export default {
             )
 
             this.isActive = false;
+
+            // Get roles and reload page
+            await this.$store.dispatch("getRoles")
+            this.$router.go(0)
           } catch (e) {
             // Handle error
             this.$buefy.toast.open({
@@ -397,9 +405,6 @@ export default {
         default:
           break
       }
-
-      // Get roles
-      await this.$store.dispatch("getRoles")
     },
     async login(method) {
       // Loading
@@ -420,6 +425,10 @@ export default {
             );
 
             this.isActive = false;
+
+            // Get roles and reload page
+            await this.$store.dispatch("getRoles")
+            this.$router.go(0)
           } catch (e) {
             // Handle error
             this.$buefy.toast.open({
@@ -455,9 +464,6 @@ export default {
         default:
           break;
       }
-
-      // Get roles
-      await this.$store.dispatch("getRoles")
     }
   }
 };

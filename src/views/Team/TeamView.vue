@@ -167,7 +167,10 @@
                 <b class="is-capitalized">
                   {{ project.target.name.toUpperCase() }} ({{ project.target.type }}),
                   <i>{{ project.target.organism }}</i>
-                </b><br>
+                </b>
+                <br>
+                <span class="has-text-grey is-size-6">Features: {{ project.features.join(", ") }}</span>
+                <br>
                 <span>
                   <router-link
                     :to="{ name: 'Project View', params: { id: project.id } }"

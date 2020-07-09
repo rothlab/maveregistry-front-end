@@ -54,6 +54,7 @@ export const Target = Parse.Object.extend("Target", {
       organism: this.get("organism"),
       projects: await Promise.all(projects.map(async (e, i) => {
         const recentActivity = e.get("recent_activity")
+        const publicActivity = e.get("public_activity")
         const funding = e.get("funding")
         
         let ret = {
@@ -63,8 +64,17 @@ export const Target = Parse.Object.extend("Target", {
 
         if (projectFollowStatus.length > i) ret.follow_status = projectFollowStatus[i]
         if (funding && funding.open_for_funding) ret.open_for_funding = funding.open_for_funding
-        if (recentActivity && recentActivity.get("type")) ret.type = recentActivity.get("type")
-        if (recentActivity && recentActivity.get("description")) ret.description = recentActivity.get("description")
+        if (recentActivity) {
+          // If having recent activity, meaning we have access to this project,
+          // we display the most recent activity
+          if (recentActivity.get("type")) ret.type = recentActivity.get("type")
+          if (recentActivity.get("description")) ret.description = recentActivity.get("description")
+        } else if (publicActivity) {
+          // If just having access to the public activity,
+          // we display that instead
+          if (publicActivity.get("type")) ret.type = publicActivity.get("type")
+          if (publicActivity.get("description")) ret.description = publicActivity.get("description")
+        }
 
         return ret
       })),
@@ -159,7 +169,12 @@ export const Project = Parse.Object.extend("Project", {
     } else {
       // Add recemt activity
       const recentActivity = this.get("recent_activity")
-      if (recentActivity) ret.activities = recentActivity.format()
+      const publicActivity = this.get("public_activity")
+      if (recentActivity) {
+        ret.activities = recentActivity.format()
+      } else if (publicActivity) {
+        ret.activities = publicActivity.format()
+      }
     }
     
     if (followers) {
@@ -267,14 +282,15 @@ export async function fetchTargets(limit, skip, filter) {
   if (filter.name !== '') query.startsWith("name", filter.name)
   query.exists("projects") // include only targets with projects associated
   query.include("projects.team") // Include projects and team objects on the return
-  query.include("projects.recent_activity") // Include projects and team objects on the return
+  query.include(["projects.recent_activity", "projects.public_activity"]) // Include projects and team objects on the return
 
   // Select fields
   query.select(
     [
       "name", "type", "organism", 
-      "projects.features", "projects.funding", "projects.recent_activity", "projects.team",
-      "projects.recent_activity.type", "projects.recent_activity.description"
+      "projects.features", "projects.funding", "projects.team",
+      "projects.recent_activity", "projects.recent_activity.type", "projects.recent_activity.description",
+      "projects.public_activity", "projects.public_activity.type", "projects.public_activity.description",
     ])
 
   // Apply pagination
@@ -310,7 +326,7 @@ export async function fetchProjectByTeamId(id, objects = []) {
   }
 
   // Exlude fields
-  query.select(["target.type", "target.name", "target.organism", "features", "recent_activity"])
+  query.select(["target.type", "target.name", "target.organism", "features", "recent_activity", "public_activity"])
 
   const projects = await query.find()
 
@@ -359,7 +375,11 @@ export async function updateProject(payload) {
   // Set publication status. If it's true, then the current project will be shown to everyone.
   // However, only the publication activity will be made available.
   // Other activities are only available to followers
-  project.set("has_publication", payload.activities.filter(e => e.type === "Publication Available").length > 0)
+  const publicActivities = savedActivities.filter(e => e.get("type") === "Publication Available")
+  if (publicActivities.length > 0) {
+    const recentPublicActivity = findRecentActivity(publicActivities)
+    project.set("public_activity", recentPublicActivity)
+  }
 
   // Save project
   await project.save()
