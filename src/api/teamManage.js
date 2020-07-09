@@ -42,7 +42,7 @@ export const Team = Parse.Object.extend("Team", {
 
     // Fetch Project
     if (project) {
-      const projects = await fetchProjectByTeamId(this.id, ["target", "recent_activity"])
+      const projects = await fetchProjectByTeamId(this.id, ["target", "recent_activity", "public_activity"])
       if (projects && projects.length > 0) ret.projects = projects
     }
 
