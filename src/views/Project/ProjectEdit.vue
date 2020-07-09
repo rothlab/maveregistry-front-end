@@ -93,7 +93,10 @@
                     icon="mdil-information"
                   />
 
-                  <div class="field-margin">
+                  <div
+                    class="field-margin"
+                    v-if="user"
+                  >
                     <div class="has-text-white has-round-title has-background-primary is-inline-block">
                       <b-icon icon="mdil-lightbulb" />
                       About
@@ -134,7 +137,7 @@
                     </div>
                   </div>
 
-                  <div>
+                  <div v-if="target">
                     <div class="has-text-white has-round-title has-background-primary is-inline-block">
                       <b-icon icon="mdil-pin" />
                       Target
@@ -401,7 +404,7 @@ export default {
   },
   data () {
     return {
-      target: {},
+      target: undefined,
       leads: [
         this.newLead()
       ],
@@ -419,7 +422,7 @@ export default {
         this.newActivity()
       ],
       features: [],
-      user: {},
+      user: undefined,
       updatedDate: new Date,
       isLoading: {
         page: false,
