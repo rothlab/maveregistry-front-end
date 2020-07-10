@@ -26,7 +26,7 @@
           Projects
         </b-navbar-item>
         <b-navbar-item
-          v-if="hasLoggedIn"
+          v-if="hasLoggedIn && isMember"
           tag="router-link"
           :to="{ path: '/teams' }"
         >
@@ -197,6 +197,23 @@ export default {
         queue: false
       })
     }
+
+    // If user has logged in but hasn't verified email,
+    // show notification
+    if (this.hasLoggedIn && this.user && !this.user.email_verified) {
+      const isInProfile = this.$route.name === "User Profile View"
+      this.$buefy.snackbar.open({
+        message: "Please verify your email address.<br>Access to the registry is limited until the email is verified.",
+        type: "is-danger",
+        position: "is-top",
+        actionText: isInProfile ? "Dismiss" : "Verify Email",
+        indefinite: true,
+        onAction: () => {
+          if (!isInProfile)
+            this.$router.push({ name: 'User Profile View', params: { username: this.user.username } })
+        }
+      })
+    }
   },
   data () {
     return {
@@ -211,6 +228,9 @@ export default {
     },
     isModerator() {
       return this.$store.getters.hasRole("moderator")
+    },
+    isMember() {
+      return this.$store.getters.hasRole("member")
     },
     user() {
       return this.$store.getters.getUser
