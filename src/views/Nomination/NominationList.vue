@@ -229,6 +229,7 @@
               field="vote"
               label="Vote"
               width="5vw"
+              v-if="isMember"
             >
               <b-field>
                 <p class="control action-button">
@@ -363,6 +364,9 @@ export default {
   computed: {
     hasLoggedIn() {
       return this.$store.getters.hasLoggedIn
+    },
+    isMember() {
+      return this.$store.getters.hasRole("member")
     },
     user() {
       return this.$store.getters.getUser
