@@ -34,6 +34,9 @@ export default {
       if (this.$route.query && this.$route.query.username) return this.$route.query.username
       return undefined
     }
+  },
+  async mounted() {
+    await this.$store.dispatch("syncUserProfile")
   }
 }
 </script>

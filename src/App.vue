@@ -200,9 +200,9 @@ export default {
 
     // If user has logged in but hasn't verified email,
     // show notification
-    if (this.hasLoggedIn && this.user && !this.user.email_verified) {
+    if (this.hasLoggedIn && this.user && !this.user.email_validated) {
       const isInProfile = this.$route.name === "User Profile View"
-      this.$buefy.snackbar.open({
+      this.snackBarComponent = this.$buefy.snackbar.open({
         message: "Please verify your email address.<br>Access to the registry is limited until the email is verified.",
         type: "is-danger",
         position: "is-top",
@@ -220,6 +220,7 @@ export default {
       isLoginSignupModalActive: false,
       isNotificationHoverActive: false,
       appVersion: process.env.VUE_APP_VERSION,
+      snackBarComponent: undefined
     }
   },
   computed: {
@@ -242,6 +243,16 @@ export default {
       if (this.user && this.user.profile_image) url = this.user.profile_image
 
       return url
+    }
+  },
+  watch: {
+    user: {
+      deep: true,
+      handler: function (val) {
+        if (this.snackBarComponent && val.email_validated) {
+          this.snackBarComponent.close()
+        }
+      }
     }
   },
   methods: {
