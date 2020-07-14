@@ -208,12 +208,12 @@
                   accept="image/png, image/jpeg"
                   @input="uploadProfileImg"
                 >
-                  <a class="button is-white">
-                    <b-icon
-                      icon="mdil-upload"
-                      type="is-primary"
-                    />
-                  </a>
+                  <b-button
+                    tag="a"
+                    :loading="isLoading.save_profile_pic"
+                    icon-left="mdil-upload"
+                    type="is-white"
+                  />
                 </b-upload>
               </div>
             </figure>
@@ -286,14 +286,6 @@ export default {
     TeamInfoField
   },
   computed: {
-    profileImageUrl() {
-      // Set url as placeholder
-      let url = require("@/assets/image/blank-profile.png")
-
-      if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
-
-      return url
-    },
     isEdit() {
       return this.$route.params.action === "edit"
     },
@@ -306,6 +298,7 @@ export default {
       userInfo: {},
       team: "",
       showProfile: false,
+      profileImageUrl: require("@/assets/image/blank-profile.png"),
       isLoading: {
         page: true,
         reset_pass: false,
@@ -403,22 +396,21 @@ export default {
       this.isLoading.save_profile_pic = true
 
       // TODO: Check file size in the backend
-      const res = await FileManage.uploadFile(file)
+      try {
+        const res = await FileManage.uploadFile(file)
 
-      if (res.error) {
+        this.userInfo.profile_image = res
+        this.profileImageUrl = res.url()
+      } catch (error) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: res.error.message,
+          message: await handleError(error),
           type: 'is-danger',
           queue: false
         })
-
+      } finally {
         this.isLoading.save_profile_pic = false
-        return
       }
-
-      this.userInfo.profile_image = res.file.url()
-      this.isLoading.save_profile_pic = false
     },
     async resetPassword() {
       if (!this.userInfo.email) {

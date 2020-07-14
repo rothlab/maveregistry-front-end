@@ -1,5 +1,6 @@
 import { Parse } from "./parseConnect.js"
 import { Team } from "./teamManage.js"
+import { uploadProfilePic } from "./fileManage.js"
 
 // Helper: parse user metadata
 function parseUserMetadata (user, includeTeam = true) {
@@ -9,10 +10,12 @@ function parseUserMetadata (user, includeTeam = true) {
     first_name: user.get("first_name"),
     last_name: user.get("last_name"),
     website: user.get("website"),
-    profile_image: user.get("profile_image"),
     email_validated: user.get("emailVerified")
   }
 
+  const profileImage = user.get("profile_image")
+  if (profileImage) ret.profile_image = profileImage.url()
+  
   if (includeTeam) {
     // Get team when available
     const team = user.get("team")
@@ -62,10 +65,18 @@ export async function signupLoginUserGoogle (userInfo) {
   user.set("email", userInfo.email)
   user.set("first_name", userInfo.first_name.toLowerCase())
   user.set("last_name", userInfo.last_name.toLowerCase())
-  user.set("profile_image", userInfo.profile_image)
-  await user.linkWith("google", {
+  user = await user.linkWith("google", {
     authData: userInfo.auth
   })
+
+  // If new user, store profile picture locally
+  if (!user.get("profile_image")) {
+    const profileImage = userInfo.profile_image
+    if (profileImage) {
+      const currentUser = await uploadProfilePic(profileImage, user.id)
+      if (currentUser) Parse.User.become(currentUser)
+    }
+  }
 
   return parseUserMetadata(Parse.User.current())
 }
@@ -96,7 +107,6 @@ export async function signupLoginUserOrcid (userInfo) {
   user.set("email", userInfo.email)
   user.set("first_name", userInfo.first_name.toLowerCase())
   user.set("last_name", userInfo.last_name.toLowerCase())
-  user.set("profile_image", userInfo.profile_image)
 
   // Check if current user has email
   // Because user might use the log in function to sign up
