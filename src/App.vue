@@ -4,7 +4,7 @@
       fixed-top
       spaced
       shadow
-      type="is-white"
+      type="is-primary"
       v-if="!$route.meta.hideNav"
     >
       <!-- Logo -->

@@ -4,6 +4,7 @@
       hoverable
       position="is-bottom-left"
       aria-role="menu"
+      animation="fadeInDown"
       @active-change="refreshTimeElapsed"
     >
       <a
@@ -233,6 +234,22 @@ export default {
 </script>
 
 <style lang="sass">
+.dropdown
+  .dropdown-menu
+    display: block !important
+    pointer-events: none
+    opacity: 0
+  &.is-hoverable:not(.is-active)
+    .dropdown-menu
+      transform: translateY(-5px)
+      transition-duration: 86ms
+      transition-property: opacity, transform
+  &.is-hoverable
+    &:hover, &.is-active
+      .dropdown-menu
+        transform: translateY(0)
+        opacity: 1
+        pointer-events: auto
 .dropdown-content
   padding: 0 !important
   .notification-center
@@ -270,6 +287,8 @@ export default {
   width: 28rem
   .card
     box-shadow: unset
+    border-radius: 6px
+  .card-header
     border-radius: 6px
   .card-content
     padding: 0
