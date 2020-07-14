@@ -55,8 +55,12 @@ export const Notification = Parse.Object.extend("Notification", {
 Parse.Object.registerSubclass("Notification", Notification);
 
 export async function retrieveAndSubscribe(commit) {
+  const currentUser = Parse.User.current()
+
+  if (!currentUser) return
+
   const query = new Parse.Query(Notification)
-  query.equalTo("for", Parse.User.current())
+  query.equalTo("for", currentUser)
   query.include("target_body.by")
 
   // Retrieve all existing notifications
