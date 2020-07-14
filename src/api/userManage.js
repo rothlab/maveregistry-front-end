@@ -36,9 +36,11 @@ export async function loginUserPassword (username, password) {
 // Log in user from cache
 export async function loginUserCache () {
   const currentUser = Parse.User.current()
-  if (currentUser) return parseUserMetadata(currentUser)
+  if (currentUser && currentUser.get("username")) {
+    return await fetchUserInfo(currentUser.get("username"))
+  }
 
-  return undefined
+  return
 }
 
 // Sign up user with username, email and password
