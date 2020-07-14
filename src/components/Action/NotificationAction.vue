@@ -199,7 +199,7 @@ export default {
     profileImageUrl(image) {
       // Set url as placeholder
       let url = require("@/assets/image/blank-profile.png")
-      if (image) url = image
+      if (image) url = image.url()
 
       return url
     },
