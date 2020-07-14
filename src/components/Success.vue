@@ -51,21 +51,28 @@ export default {
   },
   data () {
     return {
-      countDown: 0
+      countDown: 0,
+      timer: undefined
     }
   },
   mounted () {
     this.countDown = this.redirectTimer
 
     if (this.countDown > 0) {
-      const timer = setInterval(() => {
+      this.timer = setInterval(() => {
         this.countDown -= 1
         if (this.countDown < 1) {
           this.$router.push({ path: this.redirectLink })
-          clearInterval(timer)
+          clearInterval(this.timer)
         }
       }, 1000)
     }
+  },
+  beforeDestroy() {
+    // Clean up the timer
+    // Otherwise it will still fire even though we have left this page
+    console.log("here!")
+    clearInterval(this.timer)
   }
 }
 </script>
