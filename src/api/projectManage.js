@@ -56,12 +56,19 @@ export const Target = Parse.Object.extend("Target", {
         const recentActivity = e.get("recent_activity")
         const publicActivity = e.get("public_activity")
         const funding = e.get("funding")
+        const creator = e.get("user")
         
         let ret = {
           id: e.id,
           features: e.get("features")
         }
-
+        
+        if (creator) ret.creator = {
+          username: creator.get("username"),
+          first_name: creator.get("first_name"),
+          last_name: creator.get("last_name"),
+          profile_image: creator.get("profile_image")
+        }
         if (projectFollowStatus.length > i) ret.follow_status = projectFollowStatus[i]
         if (funding && funding.open_for_funding) ret.open_for_funding = funding.open_for_funding
         if (recentActivity) {
@@ -79,11 +86,19 @@ export const Target = Parse.Object.extend("Target", {
         return ret
       })),
       teams: teams.map((e, i) => {
+        const creator = e.get("creator")
+
         let ret = {
           id: e.id,
           name: e.get("first_name").substring(0, 1) + ' ' + e.get("last_name")
         }
 
+        if (creator) ret.creator = {
+          username: creator.get("username"),
+          first_name: creator.get("first_name"),
+          last_name: creator.get("last_name"),
+          profile_image: creator.get("profile_image")
+        }
         if (teamFollowStatus.length > i) ret.follow_status = teamFollowStatus[i]
 
         return ret
@@ -281,14 +296,16 @@ export async function fetchTargets(limit, skip, filter) {
   if (filter.organism !== '') query.equalTo("organism", filter.organism)
   if (filter.name !== '') query.startsWith("name", filter.name)
   query.exists("projects") // include only targets with projects associated
-  query.include("projects.team") // Include projects and team objects on the return
+  query.include(["projects.team", "projects.team.creator", "projects.user"]) // Include projects and team objects on the return
   query.include(["projects.recent_activity", "projects.public_activity"]) // Include projects and team objects on the return
 
   // Select fields
   query.select(
     [
       "name", "type", "organism", 
-      "projects.features", "projects.funding", "projects.team",
+      "projects.features", "projects.funding", "projects.user",
+      "projects.team", "projects.team.creator", "projects.team.first_name", "projects.team.last_name",
+      "projects.team.creator.username", "projects.team.creator.first_name", "projects.team.creator.last_name", "projects.team.creator.profile_image",
       "projects.recent_activity", "projects.recent_activity.type", "projects.recent_activity.description",
       "projects.public_activity", "projects.public_activity.type", "projects.public_activity.description",
     ])

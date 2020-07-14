@@ -17,6 +17,30 @@
       </header>
       <section class="modal-card-body">
         <div class="content">
+          <div class="is-inline-flex p-margin">
+            <span>Your request will be submitted to the {{ type }} creator</span>
+            <router-link
+              :to="{ name: 'User Profile View', params: { username: creator.username } }"
+              target="_blank"
+              class="is-inline-flex"
+              style="margin-right: 0.25rem"
+            >
+              <figure
+                class="image is-24x24 is-inline-block"
+                style="margin: 0 0.25rem"
+              >
+                <img
+                  class="is-rounded"
+                  :src="profileImageUrl"
+                  alt="Profile Image"
+                >
+              </figure>
+              <span class="is-capitalized">{{ creator.first_name }} {{ creator.last_name }}</span>
+            </router-link>
+            <span> for review.</span>
+          </div>
+
+
           <b-field :label="`Please briefly summarize your interest in following this ${type}.`">
             <b-input
               v-model="request"
@@ -57,6 +81,10 @@ export default {
       type: String,
       required: true
     },
+    creator: {
+      type: Object,
+      required: true
+    },
     active: {
       type: Boolean,
       required: true
@@ -66,6 +94,10 @@ export default {
     isActive(val) {
       if (val !== this.active) {
         this.$emit("update:active", val)
+      }
+
+      if (val && this.creator.profile_image) {
+        this.profileImageUrl = this.creator.profile_image.url()
       }
     },
     active(val) {
@@ -78,7 +110,8 @@ export default {
     return {
       isActive: false,
       isLoading: false,
-      request: ""
+      request: "",
+      profileImageUrl: require("@/assets/image/blank-profile.png")
     }
   },
   methods: {

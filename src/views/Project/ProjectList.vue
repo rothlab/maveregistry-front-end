@@ -292,7 +292,7 @@
                             type="is-dark"
                             v-if="!project.follow_status.id"
                           >
-                            <a @click="confirmFollow(project.id, 'project')"><b-icon icon="mdil-bell" /></a>
+                            <a @click="confirmFollow(project.id, 'project', project.creator)"><b-icon icon="mdil-bell" /></a>
                           </b-tooltip>
                           <!-- If pending, show pending status and unfollow-->
                           <b-tooltip
@@ -384,7 +384,7 @@
                       v-else
                       size="is-medium"
                       class="is-clickable has-background-white-bis"
-                      @click.native="confirmFollow(team.id, 'team')"
+                      @click.native="confirmFollow(team.id, 'team', team.creator)"
                     >
                       <b-icon
                         icon="mdil-bell"
@@ -458,6 +458,7 @@
       <FollowModal
         :active.sync="isFollowModelActive"
         :source="followProp.source"
+        :creator="followProp.creator"
         :type="followProp.type"
         @change="fetchTargets()"
       />
@@ -537,6 +538,7 @@ export default {
       isFollowModelActive: false,
       followProp: {
         source: "",
+        creator: {},
         follow: "",
         type: ""
       },
@@ -562,9 +564,10 @@ export default {
     await this.fetchTargets()
   },
   methods: {
-    confirmFollow(id, type) {
+    confirmFollow(id, type, creator) {
       this.followProp.source = id
       this.followProp.type = type
+      this.followProp.creator = creator
       this.isFollowModelActive = true
     },
     confirmUnfollow(id, type) {
