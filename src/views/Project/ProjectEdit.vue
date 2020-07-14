@@ -552,9 +552,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-.header-icon
-  position: absolute
-  right: 1.25rem
 .infocard-content
   margin-left: 1rem
 .input

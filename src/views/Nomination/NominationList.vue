@@ -48,6 +48,23 @@
 
       <!-- Nomination table -->
       <div v-else>
+        <!-- Tip -->
+        <b-notification :closable="false">
+          <div class="content">
+            <b-icon
+              class="header-icon"
+              type="is-primary"
+              custom-size="mdil-48px"
+              icon="mdil-lightbulb-on"
+            />
+            <span>
+              <b>What is a nomination?</b>
+              <br>
+              A nomination is a target of which variant effect maps we would love to see.
+            </span>
+          </div>
+        </b-notification>
+
         <b-table
           :data="nominations"
           :loading="isLoading.page"
