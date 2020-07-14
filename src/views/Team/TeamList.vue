@@ -100,19 +100,6 @@
           </template>
 
           <template slot-scope="props">
-            <!-- Team ID -->
-            <b-table-column
-              field="team_id"
-              label="Team ID"
-            >
-              <router-link
-                :to="{ path: `/team/${props.row.id}`}"
-                target="_blank"
-              >
-                {{ props.row.id }}
-              </router-link>
-            </b-table-column>
-
             <!-- Principal Investigator -->
             <b-table-column
               field="principal_investigator"
@@ -121,8 +108,13 @@
               <div class="level is-mobile is-paddingless">
                 <div class="level-left">
                   <p>
-                    <b class="is-capitalized">{{ props.row.first_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.first_name, filter.pi) }}
-                    <b class="is-capitalized">{{ props.row.last_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.last_name, filter.pi) }}
+                    <router-link
+                      :to="{ path: `/team/${props.row.id}`}"
+                      target="_blank"
+                    >
+                      <b class="is-capitalized">{{ props.row.first_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.first_name, filter.pi) }}
+                      <b class="is-capitalized">{{ props.row.last_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.last_name, filter.pi) }}
+                    </router-link>
                   </p>
                 </div>
 
