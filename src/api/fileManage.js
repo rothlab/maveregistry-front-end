@@ -1,7 +1,7 @@
 import { Parse } from "./parseConnect.js"
 
-export async function uploadFile(file) {
-  const parseFile = new Parse.File(file.name, file)
+export async function uploadFile(name, data) {
+  const parseFile = new Parse.File(name, data)
 
   return await parseFile.save()
 }

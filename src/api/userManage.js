@@ -5,6 +5,7 @@ import { uploadProfilePic } from "./fileManage.js"
 // Helper: parse user metadata
 function parseUserMetadata (user, includeTeam = true) {
   let ret = {
+    id: user.id,
     username: user.get("username"),
     email: user.get("email"),
     first_name: user.get("first_name"),

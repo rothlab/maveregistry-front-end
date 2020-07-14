@@ -162,15 +162,21 @@
               </div>
             </div>
 
-            <hr>
+            <hr v-if="hasProject">
 
-            <div class="project-header">
+            <div
+              class="project-header"
+              v-if="hasProject"
+            >
               <p class="is-size-4 has-text-weight-bold">
                 Project
               </p>
             </div>
 
-            <div class="project-content">
+            <div
+              class="project-content"
+              v-if="hasProject"
+            >
               <p class="is-size-5">
                 <span v-if="userInfo.team">
                   <b>Team</b> <br>
@@ -277,6 +283,9 @@ export default {
     },
     isOwner() {
       return this.$store.getters.isOwner(this.$route.params.username)
+    },
+    hasProject() {
+      return this.userInfo.team
     }
   },
   watch: {

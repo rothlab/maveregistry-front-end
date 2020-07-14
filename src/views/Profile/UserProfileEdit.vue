@@ -180,7 +180,10 @@
                 </ValidationProvider>
               </div>
 
-              <div class="project-header">
+              <div
+                class="project-header"
+                v-if="userInfo.email_validated"
+              >
                 <p class="is-size-4 has-text-weight-bold">
                   Team
                 </p>
@@ -188,6 +191,7 @@
 
               <div
                 class="project-content"
+                v-if="userInfo.email_validated"
               >
                 <TeamInfoField v-model="team" />
               </div>
@@ -205,17 +209,13 @@
             <figure class="image is-square is-marginless">
               <img :src="profileImageUrl">
               <div class="upload">
-                <b-upload
-                  accept="image/png, image/jpeg"
-                  @input="uploadProfileImg"
-                >
-                  <b-button
-                    tag="a"
-                    :loading="isLoading.save_profile_pic"
-                    icon-left="mdil-upload"
-                    type="is-white"
-                  />
-                </b-upload>
+                <b-button
+                  tag="a"
+                  id="pick-image"
+                  :loading="isLoading.save_profile_pic"
+                  icon-left="mdil-upload"
+                  type="is-white"
+                />
               </div>
             </figure>
             <div class="content">
@@ -223,6 +223,14 @@
                 Max file size: 2 MB. Format: jpg, png.
               </p>
             </div>
+            <AvatarCropper
+              trigger="#pick-image"
+              mimes="image/png, image/jpeg, image/gif"
+              :labels="{ submit: 'Submit', cancel: 'Cancel' }"
+              :upload-handler="uploadProfileImg"
+              output-mime="image/jpeg"
+              :output-quality="0.8"
+            />
           </div>
           <!-- Actions -->
           <div class="project-header">
@@ -272,19 +280,20 @@
 
 <script>
 import * as UserManage from "@/api/userManage.js"
-// eslint-disable-next-line no-unused-vars
 import * as FileManage from "@/api/fileManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "@/components/Error.vue"
 import { handleError } from "@/api/errorHandler.js"
 import TeamInfoField from '@/components/Field/TeamInfoField.vue'
+import AvatarCropper from "vue-avatar-cropper"
 
 export default {
   components: {
     ValidationProvider,
     ValidationObserver,
     Error,
-    TeamInfoField
+    TeamInfoField,
+    AvatarCropper
   },
   computed: {
     isEdit() {
@@ -383,26 +392,16 @@ export default {
       // Redirect to view layout
       this.$router.push({ name: 'User Profile View', params: { username: this.userInfo.username } })
     },
-    async uploadProfileImg(file) {
-      if (!file || file.length < 1) return
+    async uploadProfileImg(canvas) {
+      if (!canvas) return
 
-      // Check file size
-      if (file.size > 2048 * 1000) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: "File size exceeds limit of 2 MB",
-          type: 'is-danger',
-          queue: false
-        })
-
-        return
-      }
+      // Get base 64 image data
+      const croppedCanvasUrl = canvas.getCroppedCanvas({ width: 512, height: 512 }).toDataURL("image/jpeg")
+      if (!croppedCanvasUrl) return
 
       this.isLoading.save_profile_pic = true
-
-      // TODO: Check file size in the backend
       try {
-        const res = await FileManage.uploadFile(file)
+        const res = await FileManage.uploadFile(this.userInfo.id, { base64: croppedCanvasUrl })
 
         this.userInfo.profile_image = res
         this.profileImageUrl = res.url()
