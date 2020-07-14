@@ -322,7 +322,11 @@ export default {
     this.userInfo = await this.fetchUserInfo(username)
 
     if (this.userInfo) {
-      this.userInfo.social = {}
+      if (this.userInfo.profile_image) {
+        this.profileImageUrl = this.userInfo.profile_image
+        delete this.userInfo.profile_image // Remove the url as it will cause problem when saving
+      }
+      if (!this.userInfo.social) this.userInfo.social = {}
       if (this.userInfo.team) this.team = this.userInfo.team
     }
 

@@ -18,7 +18,7 @@ function parseUserMetadata (user, includeTeam = true) {
   
   const social = user.get("social")
   if (social) ret.social = social
-  
+
   if (includeTeam) {
     // Get team when available
     const team = user.get("team")
@@ -187,7 +187,7 @@ export async function updateUserProfile (userInfo) {
     hasChanged = true
     user.set("profile_image", userInfo.profile_image)
   }
-  if (userInfo.team && userInfo.team !== user.get("team").id) {
+  if (userInfo.team && (!user.get("team") || userInfo.team !== user.get("team").id)) {
     const team = await new Team.fetchById(userInfo.team)
     hasChanged = true
     user.set("team", team)
