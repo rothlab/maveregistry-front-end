@@ -16,6 +16,9 @@ function parseUserMetadata (user, includeTeam = true) {
   const profileImage = user.get("profile_image")
   if (profileImage) ret.profile_image = profileImage.url()
   
+  const social = user.get("social")
+  if (social) ret.social = social
+  
   if (includeTeam) {
     // Get team when available
     const team = user.get("team")
@@ -188,6 +191,14 @@ export async function updateUserProfile (userInfo) {
     const team = await new Team.fetchById(userInfo.team)
     hasChanged = true
     user.set("team", team)
+  }
+  if (userInfo.social && JSON.stringify(userInfo.social) !== JSON.stringify(user.get("social"))) {
+    // For twitter handle, if missing @, add
+    hasChanged = true
+    if (userInfo.social.twitter && !userInfo.social.twitter.startsWith("@")) {
+      userInfo.social.twitter = "@" + userInfo.social.twitter
+    }
+    user.set("social", userInfo.social)
   }
 
   // Save user info changes only if anything is changed

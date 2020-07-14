@@ -158,7 +158,7 @@
                   </b-field>
                 </ValidationProvider>
                 <ValidationProvider
-                  rules="alpha_num"
+                  rules="twitter"
                   name="Twitter"
                   v-slot="{ errors, valid }"
                   v-if="userInfo.social"
@@ -172,8 +172,9 @@
                   >
                     <b-input
                       type="text"
-                      placeholder="Twitter Handle without @"
+                      placeholder="Twitter handle with @"
                       v-model="userInfo.social.twitter"
+                      @input="addTwitterAt"
                     />
                   </b-field>
                 </ValidationProvider>
@@ -439,6 +440,13 @@ export default {
       }
 
       this.isLoading.reset_pass = false
+    },
+    addTwitterAt() {
+      if (!this.userInfo.social || !this.userInfo.social.twitter) return
+
+      if (!this.userInfo.social.twitter.startsWith("@")) {
+        this.userInfo.social.twitter = "@" + this.userInfo.social.twitter
+      }
     }
   }
 }
