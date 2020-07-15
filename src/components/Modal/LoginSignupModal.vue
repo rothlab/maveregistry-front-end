@@ -2,6 +2,7 @@
   <b-modal
     :active.sync="isActive"
     :width="500"
+    class="card-modal"
   >
     <div class="card">
       <div class="card-content">

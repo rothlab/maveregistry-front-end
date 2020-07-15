@@ -128,7 +128,7 @@
           tag="div"
         >
           <b-button
-            type="is-primary"
+            type="is-warning"
             @click="isLoginSignupModalActive = true"
           >
             Log in

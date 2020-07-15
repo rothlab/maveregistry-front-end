@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-card">
     <!-- Header -->
     <div class="hero is-light is-bold">
       <div class="hero-body has-page-header-padding">
@@ -17,7 +17,7 @@
               <!-- Non-mobile style -->
               <b-button
                 icon-left="mdil-plus"
-                type="is-primary"
+                type="is-primary is-bold small-shadow"
                 size="is-medium"
                 class="is-hidden-mobile"
                 @click="handleNewTargetModal()"
