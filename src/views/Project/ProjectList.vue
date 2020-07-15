@@ -654,22 +654,16 @@ export default {
       margin-right: 0 !important
     .control:not(:first-child)
       margin-left: 0.75rem
-.team-control .tag
-  box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
-  &:first-child
-    border-top-right-radius: 0
-    border-bottom-right-radius: 0
-  &:last-child
-    border-top-right-radius: 4px
-    border-bottom-right-radius: 4px
+.team-control .tags
+  border-radius: 4px
+  .tag
+    margin: 0
+    height: 2.5rem
+    box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
+    &:first-child
+      border-top-right-radius: 0
+      border-bottom-right-radius: 0
 .card-header-icon
   .b-tooltip:not(:last-child)
     margin-right: 0.25rem
-.top
-  .level-left
-    @media screen and (max-width: $break-mobile)
-      .dropdown:not(:first-child)
-        float: right
-      .field
-        margin: 1rem 0 0 0 !important
 </style>

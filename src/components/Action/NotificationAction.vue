@@ -68,7 +68,7 @@
                   >
                     <img
                       class="is-rounded"
-                      :src="profileImageUrl(notification.by.profile_image)"
+                      :src="profileImageUrl(notification.by)"
                     >
                   </p>
                   <p
@@ -197,13 +197,6 @@ export default {
     await this.$store.dispatch("subscribeToNotifications")
   },
   methods: {
-    profileImageUrl(image) {
-      // Set url as placeholder
-      let url = require("@/assets/image/blank-profile.png")
-      if (image) url = image.url()
-
-      return url
-    },
     timeSince(time) {
       const seconds = Math.floor((Date.now() - time) / 1000);
       if (seconds < 1) return "right now"

@@ -529,3 +529,10 @@ export default {
   }
 }
 </script>
+
+<style lang="sass">
+.b-table
+  .tag
+    height: 2.5rem !important
+    padding: 0 1rem
+</style>
