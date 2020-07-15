@@ -1,12 +1,20 @@
 // Colours
+$white: #ffffff
+$black: #000000
+$light: #F5F5F5
+$light-invert: findColorInvert($light)
 $dark: #1a1423
 $dark-invert: findColorInvert($dark)
 $primary: #540d6e
 $primary-invert: findColorInvert($primary)
+$info: #209cee
+$info-invert: findColorInvert($info)
 $link: #3e92cc
 $link-invert: findColorInvert($link)
 $twitter: #4099FF
 $twitter-invert: findColorInvert($twitter)
+$warning: #ffdd57
+$warning-invert: findColorInvert($warning)
 $danger: #EE6C4D
 $danger-invert: findColorInvert($danger)
 $success: #4ECDC4
@@ -17,6 +25,19 @@ $grey-lighter: #DBDBDB
 $grey-lighter-invert: findColorInvert($grey-lighter)
 $warning-light: #FFF5CC
 $warning-light-invert: findColorInvert($warning-light)
+
+// Configure colors
+$colors: ("white": ($white, $black))
+$colors: map-merge($colors, ("black": ($black, $white)))
+$colors: map-merge($colors, ("light": ($light, $light-invert)))
+$colors: map-merge($colors, ("dark": ($dark, $dark-invert)))
+$colors: map-merge($colors, ("primary": ($primary, $primary-invert)))
+$colors: map-merge($colors, ("info": ($info, $info-invert)))
+$colors: map-merge($colors, ("success": ($success, $success-invert)))
+$colors: map-merge($colors, ("warning": ($warning, $warning-invert)))
+$colors: map-merge($colors, ("danger": ($danger, $danger-invert)))
+$colors: map-merge($colors, ("twitter": ($twitter, $twitter-invert)))
+$colors: map-merge($colors, ("warning-light": ($warning-light, $warning-light-invert)))
 
 // Breaks
 $break-mobile: 768px

@@ -11,15 +11,15 @@
         slot="trigger"
         role="button"
       >
-        <span
-          class="badge"
-          v-if="unreadCount > 0"
-        >{{ unreadCount }}</span>
         <b-icon
           pack="mdi"
           icon="bell"
-          type="is-grey-light"
+          type="is-light"
         />
+        <span
+          class="badge is-danger is-bold"
+          v-show="unreadCount > 0"
+        >{{ unreadCount }}</span>
       </a>
 
       <b-dropdown-item
@@ -234,22 +234,6 @@ export default {
 </script>
 
 <style lang="sass">
-.dropdown
-  .dropdown-menu
-    display: block !important
-    pointer-events: none
-    opacity: 0
-  &.is-hoverable:not(.is-active)
-    .dropdown-menu
-      transform: translateY(-5px)
-      transition-duration: 86ms
-      transition-property: opacity, transform
-  &.is-hoverable
-    &:hover, &.is-active
-      .dropdown-menu
-        transform: translateY(0)
-        opacity: 1
-        pointer-events: auto
 .dropdown-content
   padding: 0 !important
   .notification-center
@@ -267,9 +251,9 @@ export default {
 
 .badge
   background-color: $danger
-  border: 2px solid transparent
+  border: 2px solid $danger
   border-radius: 14px
-  box-shadow: 0 0 0 2px #fff
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)
   color: #fff
   font-size: .65rem
   height: 14px
@@ -281,7 +265,7 @@ export default {
   right: 0
   text-overflow: ellipsis
   top: 0
-  transform: translate(50%,-50%)
+  transform: translate(25%,-25%)
   white-space: nowrap
 .notification-center
   width: 28rem

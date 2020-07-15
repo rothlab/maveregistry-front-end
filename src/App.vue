@@ -81,7 +81,7 @@
         >
           <template slot="label">
             <figure
-              class="image is-24x24"
+              class="image is-24x24 profile-image"
             >
               <img
                 class="is-rounded"
@@ -163,13 +163,37 @@
   </div>
 </template>
 
+<style lang="sass">
+.dropdown
+  .dropdown-menu
+    display: block !important
+    pointer-events: none
+    opacity: 0
+  &.is-hoverable:not(.is-active)
+    .dropdown-menu
+      transform: translateY(-5px)
+      transition-duration: 86ms
+      transition-property: opacity, transform
+  &.is-hoverable
+    &:hover, &.is-active
+      .dropdown-menu
+        transform: translateY(0)
+        opacity: 1
+        pointer-events: auto
+</style>
+
 <style lang="sass" scoped>
+@import "@/assets/style/variables.sass"
+
 .footer
   padding: 3rem 1.5rem
 .navbar-brand .is-active // Remove active style for the logo
   background-color: transparent !important
 .icon-margin-right
   margin-right: 0.1rem !important
+.profile-image
+  border-radius: 24px
+  border: 2px solid $light
 </style>
 
 <script>
