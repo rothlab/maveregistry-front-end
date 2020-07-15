@@ -58,7 +58,7 @@
               :key="id"
             >
               <div
-                class="columns"
+                class="columns is-mobile"
                 :class="{ 'has-background-warning-light' : !notification.is_read}"
               >
                 <figure class="column is-1">
@@ -261,7 +261,10 @@ export default {
   transform: translate(25%,-25%)
   white-space: nowrap
 .notification-center
-  width: 28rem
+  @media screen and (min-width: $break-mobile)
+    width: 28rem
+  @media screen and (max-width: $break-mobile)
+    width: 100vw
   .card
     box-shadow: unset
     border-radius: 6px
