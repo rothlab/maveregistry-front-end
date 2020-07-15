@@ -509,14 +509,6 @@ export default {
       }
     }
   },
-  computed: {
-    hasLoggedIn() {
-      return this.$store.getters.hasLoggedIn
-    },
-    isMember() {
-      return this.$store.getters.hasRole("member")
-    }
-  },
   data () {
     return {
       targets: [],

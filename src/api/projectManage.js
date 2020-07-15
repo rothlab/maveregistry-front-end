@@ -56,7 +56,7 @@ export const Target = Parse.Object.extend("Target", {
         const recentActivity = e.get("recent_activity")
         const publicActivity = e.get("public_activity")
         const funding = e.get("funding")
-        const creator = e.get("user")
+        const creator = e.get("creator")
         
         let ret = {
           id: e.id,
@@ -156,12 +156,12 @@ export const Project = Parse.Object.extend("Project", {
     }
 
     // Format user
-    const user = this.get("user")
-    if (user && user.isDataAvailable()) {
-      ret.user = {
-        username: user.get("username"),
-        first_name: user.get("first_name"),
-        last_name: user.get("last_name")
+    const creator = this.get("creator")
+    if (creator && creator.isDataAvailable()) {
+      ret.creator = {
+        username: creator.get("username"),
+        first_name: creator.get("first_name"),
+        last_name: creator.get("last_name")
       }
     }
 
@@ -296,14 +296,14 @@ export async function fetchTargets(limit, skip, filter) {
   if (filter.organism !== '') query.equalTo("organism", filter.organism)
   if (filter.name !== '') query.startsWith("name", filter.name)
   query.exists("projects") // include only targets with projects associated
-  query.include(["projects.team", "projects.team.creator", "projects.user"]) // Include projects and team objects on the return
+  query.include(["projects.team", "projects.team.creator", "projects.creator"]) // Include projects and team objects on the return
   query.include(["projects.recent_activity", "projects.public_activity"]) // Include projects and team objects on the return
 
   // Select fields
   query.select(
     [
       "name", "type", "organism", 
-      "projects.features", "projects.funding", "projects.user",
+      "projects.features", "projects.funding", "projects.creator",
       "projects.team", "projects.team.creator", "projects.team.first_name", "projects.team.last_name",
       "projects.team.creator.username", "projects.team.creator.first_name", "projects.team.creator.last_name", "projects.team.creator.profile_image",
       "projects.recent_activity", "projects.recent_activity.type", "projects.recent_activity.description",

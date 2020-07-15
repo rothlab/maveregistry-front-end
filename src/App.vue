@@ -85,7 +85,7 @@
             >
               <img
                 class="is-rounded"
-                :src="profileImageUrl"
+                :src="profileImageUrl(currentUser)"
                 alt="Profile Image"
               >
             </figure>
@@ -93,7 +93,7 @@
 
           <b-navbar-item
             tag="router-link"
-            :to="{ name: 'User Profile View', params: { username: user.username } }"
+            :to="{ name: 'User Profile View', params: { username: currentUser.username } }"
             :key="$route.path"
           >
             <div class="is-flex">
@@ -229,7 +229,7 @@ export default {
 
     // If user has logged in but hasn't verified email,
     // show notification
-    if (this.hasLoggedIn && this.user && !this.user.email_validated) {
+    if (this.hasLoggedIn && this.currentUser && !this.currentUser.email_validated) {
       const isInProfile = this.$route.name === "User Profile View"
       this.snackBarComponent = this.$buefy.snackbar.open({
         message: "Please verify your email address.<br>Access to the registry is limited until the email is verified.",
@@ -239,7 +239,7 @@ export default {
         indefinite: true,
         onAction: () => {
           if (!isInProfile)
-            this.$router.push({ name: 'User Profile View', params: { username: this.user.username } })
+            this.$router.push({ name: 'User Profile View', params: { username: this.currentUser.username } })
         }
       })
     }
@@ -253,30 +253,8 @@ export default {
       snackBarComponent: undefined
     }
   },
-  computed: {
-    hasLoggedIn() {
-      return this.$store.getters.hasLoggedIn
-    },
-    isModerator() {
-      return this.$store.getters.hasRole("moderator")
-    },
-    isMember() {
-      return this.$store.getters.hasRole("member")
-    },
-    user() {
-      return this.$store.getters.getUser
-    },
-    profileImageUrl() {
-      // Set url as placeholder
-      let url = require("@/assets/image/blank-profile.png")
-
-      if (this.user && this.user.profile_image) url = this.user.profile_image
-
-      return url
-    }
-  },
   watch: {
-    user: {
+    currentUser: {
       deep: true,
       handler: function (val) {
         if (this.snackBarComponent && val.email_validated) {

@@ -202,7 +202,7 @@
           <!-- Profile image -->
           <div class="profile-image">
             <figure class="image is-square is-marginless">
-              <img :src="profileImageUrl">
+              <img :src="profileImageUrl(userInfo)">
             </figure>
           </div>
 
@@ -273,16 +273,8 @@ export default {
     UserProfileAction
   },
   computed: {
-    profileImageUrl() {
-      // Set url as placeholder
-      let url = require("@/assets/image/blank-profile.png")
-
-      if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
-
-      return url
-    },
     isOwner() {
-      return this.$store.getters.isOwner(this.$route.params.username)
+      return this.userInfo && this.userInfo.username && this.$store.getters.isOwner(this.userInfo.username)
     },
     hasProject() {
       return this.userInfo.team

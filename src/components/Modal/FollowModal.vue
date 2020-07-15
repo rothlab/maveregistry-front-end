@@ -31,7 +31,7 @@
               >
                 <img
                   class="is-rounded"
-                  :src="profileImageUrl"
+                  :src="profileImageUrl(creator)"
                   alt="Profile Image"
                 >
               </figure>
@@ -95,10 +95,6 @@ export default {
       if (val !== this.active) {
         this.$emit("update:active", val)
       }
-
-      if (val && this.creator.profile_image) {
-        this.profileImageUrl = this.creator.profile_image.url()
-      }
     },
     active(val) {
       if (val != this.isActive) {
@@ -110,8 +106,7 @@ export default {
     return {
       isActive: false,
       isLoading: false,
-      request: "",
-      profileImageUrl: require("@/assets/image/blank-profile.png")
+      request: ""
     }
   },
   methods: {

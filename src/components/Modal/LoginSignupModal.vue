@@ -315,11 +315,6 @@ export default {
       password: ""
     };
   },
-  computed: {
-    hasLoggedIn() {
-      return this.$store.getters.hasLoggedIn
-    }
-  },
   methods: {
     cleanup() {
       this.firstName = "";

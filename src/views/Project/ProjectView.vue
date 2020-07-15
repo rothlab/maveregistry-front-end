@@ -264,15 +264,15 @@
               </p>
               <p
                 class="is-size-5 is-capitalized"
-                v-if="user"
+                v-if="creator"
               >
                 <b>Creator</b> <br>
                 <b-icon icon="mdil-account" />
                 <router-link
-                  :to="{ name: 'User Profile View', params: { username: user.username } }"
+                  :to="{ name: 'User Profile View', params: { username: creator.username } }"
                   target="_blank"
                 >
-                  {{ user.first_name + ' ' + user.last_name }}
+                  {{ creator.first_name + ' ' + creator.last_name }}
                 </router-link>
               </p>
               <p
@@ -349,7 +349,7 @@ export default {
       errorMessage: "",
       target: undefined,
       features: [],
-      user: undefined,
+      creator: undefined,
       updatedDate: undefined,
       leads: [],
       team: undefined,
@@ -371,7 +371,7 @@ export default {
       return this.activities.length > 0
     },
     isOwner() {
-      return this.user && this.user.username && this.$store.getters.isOwner(this.user.username)
+      return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     },
   },
   async mounted() {
@@ -412,7 +412,7 @@ export default {
 
         this.target = project.target
         this.features = project.features
-        this.user = project.user
+        this.creator = project.creator
         this.updatedDate = project.update_date
 
         return project

@@ -8,7 +8,7 @@
             <p
               class="is-size-3 has-text-weight-medium"
             >
-              {{ isNew ? 'Register New' : 'Edit' }} Project
+              {{ isAction('new') ? 'Register New' : 'Edit' }} Project
             </p>
           </div>
         </div>
@@ -95,7 +95,7 @@
 
                   <div
                     class="field-margin"
-                    v-if="user"
+                    v-if="creator"
                   >
                     <div class="has-text-white has-round-title has-background-primary is-inline-block">
                       <b-icon icon="mdil-lightbulb" />
@@ -109,11 +109,11 @@
                         >
                           <b-icon icon="mdil-account" />
                           <router-link
-                            :to="{ name: 'User Profile View', params: { username: user.username } }"
+                            :to="{ name: 'User Profile View', params: { username: creator.username } }"
                             target="_blank"
-                            v-if="user"
+                            v-if="creator"
                           >
-                            {{ user.first_name }} {{ user.last_name }}
+                            {{ creator.first_name }} {{ creator.last_name }}
                           </router-link>
                         </b-tooltip>
                       </div>
@@ -369,7 +369,7 @@
                 @click="updateProject"
                 :loading="isLoading.submit"
               >
-                {{ isNew ? 'Register' : 'Edit' }} Project
+                {{ isAction('new') ? 'Register' : 'Edit' }} Project
               </b-button>
             </div>
           </div>
@@ -422,7 +422,7 @@ export default {
         this.newActivity()
       ],
       features: [],
-      user: undefined,
+      creator: undefined,
       updatedDate: new Date,
       isLoading: {
         page: false,
@@ -432,14 +432,8 @@ export default {
     }
   },
   computed: {
-    isNew() {
-      return this.$route.params.action === 'new'
-    },
-    isEdit() {
-      return this.$route.params.action === 'edit'
-    },
     isOwner() {
-      return this.user && this.user.username && this.$store.getters.isOwner(this.user.username)
+      return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     },
     projectId() {
       return this.$route.params.id
@@ -448,7 +442,7 @@ export default {
   async mounted() {
     this.isLoading.page = true
 
-    if (this.isEdit || this.isNew) {
+    if (this.isAction('edit') || this.isAction('new')) {
       const project = await this.fetchProject(this.projectId)
 
       // Populate project details if editing
@@ -462,7 +456,7 @@ export default {
     }
 
     // If not owner or invalid action jump to view page
-    if ((!this.isNew && !this.isEdit) || !this.isOwner) {
+    if ((!this.isAction('new') && !this.isAction('edit')) || !this.isOwner) {
       this.$router.push({ name: 'Project View', params: { id: this.projectId } })
       return
     }
@@ -494,7 +488,7 @@ export default {
       
         this.target = project.target
         this.features = project.features
-        this.user = project.user
+        this.creator = project.creator
         this.updatedDate = project.update_date
 
         return project

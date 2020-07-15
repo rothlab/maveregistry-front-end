@@ -296,11 +296,8 @@ export default {
     AvatarCropper
   },
   computed: {
-    isEdit() {
-      return this.$route.params.action === "edit"
-    },
     isOwner() {
-      return this.$store.getters.isOwner(this.$route.params.username)
+      return this.userInfo && this.userInfo.username && this.$store.getters.isOwner(this.userInfo.username)
     }
   },
   data () {
@@ -323,7 +320,7 @@ export default {
     const username = this.$route.params.username
 
     // If not a valid action or not the owner, jump to view
-    if (!this.isEdit || !this.isOwner) {
+    if (!this.isAction('edit') || !this.isOwner) {
       this.$router.push({ name: 'User Profile View', params: { username: username } })
       return
     }

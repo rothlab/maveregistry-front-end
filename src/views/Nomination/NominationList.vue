@@ -305,7 +305,7 @@
                 </p>
                 <p
                   class="control action-button"
-                  v-if="user && user.username === props.row.by.username"
+                  v-if="currentUser && currentUser.username === props.row.by.username"
                 >
                   <b-tooltip
                     label="Edit Nomination"
@@ -321,7 +321,7 @@
                 </p>
                 <p
                   class="control action-button"
-                  v-if="user && user.username === props.row.by.username"
+                  v-if="currentUser && currentUser.username === props.row.by.username"
                 >
                   <b-tooltip
                     label="Delete Nomination"
@@ -376,17 +376,6 @@ export default {
       async handler() {
         await this.fetchNominations()
       }
-    }
-  },
-  computed: {
-    hasLoggedIn() {
-      return this.$store.getters.hasLoggedIn
-    },
-    isMember() {
-      return this.$store.getters.hasRole("member")
-    },
-    user() {
-      return this.$store.getters.getUser
     }
   },
   data() {

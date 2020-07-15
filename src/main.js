@@ -19,9 +19,10 @@ import '@fortawesome/fontawesome-free/css/fontawesome.css'
 import '@/assets/style/styles.sass'
 
 // Import custom scripts
-import router from './router'
-import store from './store'
-import titleMixin from './mixins/titleMixin'
+import router from '@/router'
+import store from '@/store'
+import pageMixins from '@/mixins/pageMixins'
+import userMixins from '@/mixins/userMixins'
 
 // Initialize framework
 Vue.use(Buefy, {
@@ -42,7 +43,8 @@ Sentry.init({
 
 // Inject plugins
 Vue.use(VueAxios, axios)
-Vue.mixin(titleMixin)
+Vue.mixin(pageMixins)
+Vue.mixin(userMixins)
 
 // Initialize a new Vue instance
 new Vue({

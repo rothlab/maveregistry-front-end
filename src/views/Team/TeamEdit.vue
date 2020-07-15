@@ -189,9 +189,6 @@ export default {
     teamId() {
       return this.$route.params.id
     },
-    isEdit() {
-      return this.$route.params.action === 'edit'
-    },
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     }
@@ -200,10 +197,10 @@ export default {
     this.isLoading.page = true
 
     // Fetch team
-    if (this.isEdit) await this.fetchTeam()
+    if (this.isAction('edit')) await this.fetchTeam()
 
     // If invalid action jump to view page
-    if (!this.isEdit || !this.isOwner) {
+    if (!this.isAction('edit') || !this.isOwner) {
       this.$router.push({ name: 'Team View', params: { id: this.teamId } })
       return
     }
