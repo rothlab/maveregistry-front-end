@@ -129,6 +129,7 @@
         >
           <b-button
             type="is-warning"
+            :loading="isLoading"
             @click="isLoginSignupModalActive = true"
           >
             Log in
@@ -209,6 +210,8 @@ export default {
     NotificationAction
   },
   async mounted () {
+    this.isLoading = true
+
     // Check if an user has logged in, if so, use it
     try {
       await this.$store.dispatch("loginUserCache")
@@ -220,6 +223,8 @@ export default {
         type: "is-danger",
         queue: false
       })
+    } finally {
+      this.isLoading = false
     }
 
     // If user has logged in but hasn't verified email,
@@ -243,6 +248,7 @@ export default {
     return {
       isLoginSignupModalActive: false,
       isNotificationHoverActive: false,
+      isLoading: false,
       appVersion: process.env.VUE_APP_VERSION,
       snackBarComponent: undefined
     }
