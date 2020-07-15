@@ -48,6 +48,23 @@
 
       <!-- Nomination table -->
       <div v-else>
+        <!-- Tip -->
+        <b-notification :closable="false">
+          <div class="content">
+            <b-icon
+              class="header-icon"
+              type="is-primary"
+              custom-size="mdil-48px"
+              icon="mdil-lightbulb-on"
+            />
+            <span>
+              <b>What is a nomination?</b>
+              <br>
+              A nomination is a target of which variant effect maps we would love to see.
+            </span>
+          </div>
+        </b-notification>
+
         <b-table
           :data="nominations"
           :loading="isLoading.page"
@@ -229,6 +246,7 @@
               field="vote"
               label="Vote"
               width="5vw"
+              v-if="isMember"
             >
               <b-field>
                 <p class="control action-button">
@@ -287,7 +305,7 @@
                 </p>
                 <p
                   class="control action-button"
-                  v-if="user && user.username === props.row.by.username"
+                  v-if="currentUser && currentUser.username === props.row.by.username"
                 >
                   <b-tooltip
                     label="Edit Nomination"
@@ -303,7 +321,7 @@
                 </p>
                 <p
                   class="control action-button"
-                  v-if="user && user.username === props.row.by.username"
+                  v-if="currentUser && currentUser.username === props.row.by.username"
                 >
                   <b-tooltip
                     label="Delete Nomination"
@@ -358,14 +376,6 @@ export default {
       async handler() {
         await this.fetchNominations()
       }
-    }
-  },
-  computed: {
-    hasLoggedIn() {
-      return this.$store.getters.hasLoggedIn
-    },
-    user() {
-      return this.$store.getters.getUser
     }
   },
   data() {
@@ -519,3 +529,10 @@ export default {
   }
 }
 </script>
+
+<style lang="sass">
+.b-table
+  .tag
+    height: 2.5rem !important
+    padding: 0 1rem
+</style>

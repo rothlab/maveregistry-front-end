@@ -56,7 +56,7 @@
               <p class="image is-48x48">
                 <img
                   class="is-rounded"
-                  :src="getProfileImage(follower.by.profile_image)"
+                  :src="profileImageUrl(follower.by)"
                 >
               </p>
             </figure>
@@ -185,9 +185,6 @@ export default {
     }
   },
   methods: {
-    getProfileImage(url) {
-      return url ? url : require("@/assets/image/blank-profile.png")
-    },
     async fetchFollowers() {
       this.isLoading = true
 

@@ -55,3 +55,12 @@ extend('end_date', {
   },
   message: 'End Date must be later than the Start Date.'
 })
+extend('twitter', {
+  validate(value) {
+    // Trim off the leading @ symbol, if there's any
+    const str = value.trim().replace(/^@/, '')
+    const regex = /[a-zA-Z0-9_]{1,15}/
+    return regex.test(str)
+  },
+  message: "Invalid twitter handle."
+})

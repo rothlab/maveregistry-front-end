@@ -158,7 +158,7 @@
                   </b-field>
                 </ValidationProvider>
                 <ValidationProvider
-                  rules="alpha_num"
+                  rules="twitter"
                   name="Twitter"
                   v-slot="{ errors, valid }"
                   v-if="userInfo.social"
@@ -172,14 +172,18 @@
                   >
                     <b-input
                       type="text"
-                      placeholder="Twitter Handle without @"
+                      placeholder="Twitter handle with @"
                       v-model="userInfo.social.twitter"
+                      @input="addTwitterAt"
                     />
                   </b-field>
                 </ValidationProvider>
               </div>
 
-              <div class="project-header">
+              <div
+                class="project-header"
+                v-if="userInfo.email_validated"
+              >
                 <p class="is-size-4 has-text-weight-bold">
                   Team
                 </p>
@@ -187,6 +191,7 @@
 
               <div
                 class="project-content"
+                v-if="userInfo.email_validated"
               >
                 <TeamInfoField v-model="team" />
               </div>
@@ -204,17 +209,13 @@
             <figure class="image is-square is-marginless">
               <img :src="profileImageUrl">
               <div class="upload">
-                <b-upload
-                  accept="image/png, image/jpeg"
-                  @input="uploadProfileImg"
-                >
-                  <a class="button is-white">
-                    <b-icon
-                      icon="mdil-upload"
-                      type="is-primary"
-                    />
-                  </a>
-                </b-upload>
+                <b-button
+                  tag="a"
+                  id="pick-image"
+                  :loading="isLoading.save_profile_pic"
+                  icon-left="mdil-upload"
+                  type="is-white"
+                />
               </div>
             </figure>
             <div class="content">
@@ -222,6 +223,14 @@
                 Max file size: 2 MB. Format: jpg, png.
               </p>
             </div>
+            <AvatarCropper
+              trigger="#pick-image"
+              mimes="image/png, image/jpeg, image/gif"
+              :labels="{ submit: 'Submit', cancel: 'Cancel' }"
+              :upload-handler="uploadProfileImg"
+              output-mime="image/jpeg"
+              :output-quality="0.8"
+            />
           </div>
           <!-- Actions -->
           <div class="project-header">
@@ -271,34 +280,24 @@
 
 <script>
 import * as UserManage from "@/api/userManage.js"
-// eslint-disable-next-line no-unused-vars
 import * as FileManage from "@/api/fileManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "@/components/Error.vue"
 import { handleError } from "@/api/errorHandler.js"
 import TeamInfoField from '@/components/Field/TeamInfoField.vue'
+import AvatarCropper from "vue-avatar-cropper"
 
 export default {
   components: {
     ValidationProvider,
     ValidationObserver,
     Error,
-    TeamInfoField
+    TeamInfoField,
+    AvatarCropper
   },
   computed: {
-    profileImageUrl() {
-      // Set url as placeholder
-      let url = require("@/assets/image/blank-profile.png")
-
-      if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
-
-      return url
-    },
-    isEdit() {
-      return this.$route.params.action === "edit"
-    },
     isOwner() {
-      return this.$store.getters.isOwner(this.$route.params.username)
+      return this.userInfo && this.userInfo.username && this.$store.getters.isOwner(this.userInfo.username)
     }
   },
   data () {
@@ -306,6 +305,7 @@ export default {
       userInfo: {},
       team: "",
       showProfile: false,
+      profileImageUrl: require("@/assets/image/blank-profile.png"),
       isLoading: {
         page: true,
         reset_pass: false,
@@ -320,7 +320,7 @@ export default {
     const username = this.$route.params.username
 
     // If not a valid action or not the owner, jump to view
-    if (!this.isEdit || !this.isOwner) {
+    if (!this.isAction('edit') || !this.isOwner) {
       this.$router.push({ name: 'User Profile View', params: { username: username } })
       return
     }
@@ -328,7 +328,11 @@ export default {
     this.userInfo = await this.fetchUserInfo(username)
 
     if (this.userInfo) {
-      this.userInfo.social = {}
+      if (this.userInfo.profile_image) {
+        this.profileImageUrl = this.userInfo.profile_image
+        delete this.userInfo.profile_image // Remove the url as it will cause problem when saving
+      }
+      if (!this.userInfo.social) this.userInfo.social = {}
       if (this.userInfo.team) this.team = this.userInfo.team
     }
 
@@ -385,40 +389,29 @@ export default {
       // Redirect to view layout
       this.$router.push({ name: 'User Profile View', params: { username: this.userInfo.username } })
     },
-    async uploadProfileImg(file) {
-      if (!file || file.length < 1) return
+    async uploadProfileImg(canvas) {
+      if (!canvas) return
 
-      // Check file size
-      if (file.size > 2048 * 1000) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: "File size exceeds limit of 2 MB",
-          type: 'is-danger',
-          queue: false
-        })
-
-        return
-      }
+      // Get base 64 image data
+      const croppedCanvasUrl = canvas.getCroppedCanvas({ width: 512, height: 512 }).toDataURL("image/jpeg")
+      if (!croppedCanvasUrl) return
 
       this.isLoading.save_profile_pic = true
+      try {
+        const res = await FileManage.uploadFile(this.userInfo.id, { base64: croppedCanvasUrl })
 
-      // TODO: Check file size in the backend
-      const res = await FileManage.uploadFile(file)
-
-      if (res.error) {
+        this.userInfo.profile_image = res
+        this.profileImageUrl = res.url()
+      } catch (error) {
         this.$buefy.toast.open({
           duration: 5000,
-          message: res.error.message,
+          message: await handleError(error),
           type: 'is-danger',
           queue: false
         })
-
+      } finally {
         this.isLoading.save_profile_pic = false
-        return
       }
-
-      this.userInfo.profile_image = res.file.url()
-      this.isLoading.save_profile_pic = false
     },
     async resetPassword() {
       if (!this.userInfo.email) {
@@ -447,6 +440,13 @@ export default {
       }
 
       this.isLoading.reset_pass = false
+    },
+    addTwitterAt() {
+      if (!this.userInfo.social || !this.userInfo.social.twitter) return
+
+      if (!this.userInfo.social.twitter.startsWith("@")) {
+        this.userInfo.social.twitter = "@" + this.userInfo.social.twitter
+      }
     }
   }
 }

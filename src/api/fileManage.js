@@ -1,14 +1,11 @@
 import { Parse } from "./parseConnect.js"
 
-export async function uploadFile(file) {
-  const parseFile = new Parse.File(file.name, file)
+export async function uploadFile(name, data) {
+  const parseFile = new Parse.File(name, data)
 
-  let res = new Object
-  try {
-    res.file = await parseFile.save()
-  } catch (e) {
-    res.error = e
-  }
+  return await parseFile.save()
+}
 
-  return res
+export async function uploadProfilePic(url, id) {
+  return await Parse.Cloud.run("uploadProfilePic", { url: url, id: id})
 }

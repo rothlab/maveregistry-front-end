@@ -2,6 +2,7 @@
   <b-modal
     :active.sync="isActive"
     :width="500"
+    class="card-modal"
   >
     <div class="card">
       <div class="card-content">
@@ -313,11 +314,6 @@ export default {
       email: "",
       password: ""
     };
-  },
-  computed: {
-    hasLoggedIn() {
-      return this.$store.getters.hasLoggedIn
-    }
   },
   methods: {
     cleanup() {

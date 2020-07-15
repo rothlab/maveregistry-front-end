@@ -204,16 +204,16 @@
             <div class="project-content">
               <p
                 class="is-size-5"
-                v-if="user && user.username"
+                v-if="creator && creator.username"
               >
                 <b>Creator</b> <br>
                 <b-icon icon="mdil-account" />
                 <router-link
-                  :to="{ name: 'User Profile View', params: { username: user.username } }"
+                  :to="{ name: 'User Profile View', params: { username: creator.username } }"
                   target="_blank"
                   class="is-capitalized"
                 >
-                  {{ user.first_name + ' ' + user.last_name }}
+                  {{ creator.first_name + ' ' + creator.last_name }}
                 </router-link>
               </p>
               <p class="is-size-5">
@@ -287,7 +287,7 @@ export default {
       return this.projects && this.projects.length > 0
     },
     isOwner() {
-      return this.user && this.user.username && this.$store.getters.isOwner(this.user.username)
+      return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     }
   },
   data () {
@@ -300,7 +300,7 @@ export default {
       members: [],
       projects: [],
       updatedDate: new Date(),
-      user: {},
+      creator: {},
       errorMessage: "",
       followerCount: 0,
       requestCount: 0,
@@ -347,7 +347,7 @@ export default {
       if (team.members) this.members = team.members
 
       // Format creator and update date
-      this.user = team.user
+      this.creator = team.creator
       this.updatedDate = team.update_date
 
       // Format projects

@@ -116,15 +116,15 @@
                     </div>
 
                     <p>
-                      <span v-if="user">
+                      <span v-if="creator">
                         <b-icon icon="mdil-account" />
                         Creator: 
                         <router-link
-                          :to="{ name: 'User Profile View', params: { username: user.username } }"
+                          :to="{ name: 'User Profile View', params: { username: creator.username } }"
                           target="_blank"
                           class="is-capitalized"
                         >
-                          {{ user.first_name }} {{ user.last_name }}
+                          {{ creator.first_name }} {{ creator.last_name }}
                         </router-link>
                       </span>
                       <br>
@@ -181,7 +181,7 @@ export default {
       errorMessage: "",
       principalInvestigator: undefined,
       members: [],
-      user: undefined,
+      creator: undefined,
       updatedDate: new Date()
     }
   },
@@ -189,21 +189,18 @@ export default {
     teamId() {
       return this.$route.params.id
     },
-    isEdit() {
-      return this.$route.params.action === 'edit'
-    },
     isOwner() {
-      return this.user && this.user.username && this.$store.getters.isOwner(this.user.username)
+      return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     }
   },
   async mounted() {
     this.isLoading.page = true
 
     // Fetch team
-    if (this.isEdit) await this.fetchTeam()
+    if (this.isAction('edit')) await this.fetchTeam()
 
     // If invalid action jump to view page
-    if (!this.isEdit || !this.isOwner) {
+    if (!this.isAction('edit') || !this.isOwner) {
       this.$router.push({ name: 'Team View', params: { id: this.teamId } })
       return
     }
@@ -234,7 +231,7 @@ export default {
       if (team.members) this.members = team.members
 
       // Format creator and update date
-      this.user = team.user
+      this.creator = team.creator
       this.updatedDate = team.update_date
       
       return team

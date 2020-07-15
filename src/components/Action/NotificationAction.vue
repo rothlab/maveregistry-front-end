@@ -4,21 +4,22 @@
       hoverable
       position="is-bottom-left"
       aria-role="menu"
+      animation="fadeInDown"
       @active-change="refreshTimeElapsed"
     >
       <a
         slot="trigger"
         role="button"
       >
-        <span
-          class="badge"
-          v-if="unreadCount > 0"
-        >{{ unreadCount }}</span>
         <b-icon
           pack="mdi"
           icon="bell"
-          type="is-grey-light"
+          type="is-light"
         />
+        <span
+          class="badge is-danger is-bold"
+          v-show="unreadCount > 0"
+        >{{ unreadCount }}</span>
       </a>
 
       <b-dropdown-item
@@ -57,7 +58,7 @@
               :key="id"
             >
               <div
-                class="columns"
+                class="columns is-mobile"
                 :class="{ 'has-background-warning-light' : !notification.is_read}"
               >
                 <figure class="column is-1">
@@ -67,7 +68,7 @@
                   >
                     <img
                       class="is-rounded"
-                      :src="profileImageUrl(notification.by.profile_image)"
+                      :src="profileImageUrl(notification.by)"
                     >
                   </p>
                   <p
@@ -196,13 +197,6 @@ export default {
     await this.$store.dispatch("subscribeToNotifications")
   },
   methods: {
-    profileImageUrl(image) {
-      // Set url as placeholder
-      let url = require("@/assets/image/blank-profile.png")
-      if (image) url = image
-
-      return url
-    },
     timeSince(time) {
       const seconds = Math.floor((Date.now() - time) / 1000);
       if (seconds < 1) return "right now"
@@ -250,9 +244,9 @@ export default {
 
 .badge
   background-color: $danger
-  border: 2px solid transparent
+  border: 2px solid $danger
   border-radius: 14px
-  box-shadow: 0 0 0 2px #fff
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)
   color: #fff
   font-size: .65rem
   height: 14px
@@ -264,12 +258,17 @@ export default {
   right: 0
   text-overflow: ellipsis
   top: 0
-  transform: translate(50%,-50%)
+  transform: translate(25%,-25%)
   white-space: nowrap
 .notification-center
-  width: 28rem
+  @media screen and (min-width: $break-mobile)
+    width: 28rem
+  @media screen and (max-width: $break-mobile)
+    width: 100vw
   .card
     box-shadow: unset
+    border-radius: 6px
+  .card-header
     border-radius: 6px
   .card-content
     padding: 0

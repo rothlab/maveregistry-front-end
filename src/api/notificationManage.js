@@ -19,13 +19,13 @@ export const Notification = Parse.Object.extend("Notification", {
     }
     
     // If the notification has a target, format it
-    const targetType = this.get("target_type")
-    if (targetType) {
-      ret.type = targetType
+    const type = this.get("type")
+    if (type) {
+      ret.type = type
       const targetBody = this.get("target_body")
       const by = targetBody.by
 
-      switch (targetType) {
+      switch (type) {
         case "follow":
           ret.by = {
             first_name: by.get("first_name"),
@@ -55,9 +55,17 @@ export const Notification = Parse.Object.extend("Notification", {
 Parse.Object.registerSubclass("Notification", Notification);
 
 export async function retrieveAndSubscribe(commit) {
+  const currentUser = Parse.User.current()
+
+  if (!currentUser) return
+
   const query = new Parse.Query(Notification)
-  query.equalTo("for", Parse.User.current())
-  query.include("target_body.by")
+  query.equalTo("for", currentUser)
+  query.include(["target_body.by", 'target_body.by.profile_image'])
+  query.select([
+    "message", "is_read", "type", "target_body", 
+    "target_body.by.first_name", "target_body.by.last_name", "target_body.by.username", "target_body.by.profile_image"
+  ])
 
   // Retrieve all existing notifications
   let notifications = await query.find()

@@ -38,8 +38,8 @@
                   <option value="off">
                     Off
                   </option>
-                  <option value="when available">
-                    When available
+                  <option value="immediately">
+                    Immediately
                   </option>
                   <option value="daily">
                     Daily
@@ -64,8 +64,8 @@
                   <option value="off">
                     Off
                   </option>
-                  <option value="when available">
-                    When available
+                  <option value="immediately">
+                    Immediately
                   </option>
                   <option value="daily">
                     Daily
@@ -90,8 +90,8 @@
                   <option value="off">
                     Off
                   </option>
-                  <option value="when available">
-                    When available
+                  <option value="immediately">
+                    Immediately
                   </option>
                   <option value="daily">
                     Daily
@@ -116,8 +116,8 @@
                   <option value="off">
                     Off
                   </option>
-                  <option value="when available">
-                    When available
+                  <option value="immediately">
+                    Immediately
                   </option>
                   <option value="quarterly">
                     Quarterly

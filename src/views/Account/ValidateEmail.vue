@@ -4,7 +4,11 @@
       <div class="columns is-centered has-vcentered-page">
         <div class="column is-5">
           <div>
-            <Success message="Your email has been validated" />
+            <Success
+              message="Your email has been validated"
+              :redirect-description="username ? 'User Profile' : undefined"
+              :redirect-link="username ? `/user/${username}` : undefined"
+            />
           </div>
         </div>
       </div>
@@ -25,12 +29,14 @@ export default {
   components: {
     Success
   },
-  data () {
-    return {
-      email: "",
-      isActionLoading: false,
-      hasReset: false
+  computed: {
+    username() {
+      if (this.$route.query && this.$route.query.username) return this.$route.query.username
+      return undefined
     }
+  },
+  async mounted() {
+    await this.$store.dispatch("syncUserProfile")
   }
 }
 </script>

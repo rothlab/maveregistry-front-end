@@ -16,7 +16,7 @@ export default new Vuex.Store({
   plugins: [
     createMutationsSharer({
       predicate: [
-        'loginUser', 'logoutUser', 'setRoles', 
+        'setUser', 'logoutUser', 'setRoles', 
         'addNotification', 'removeNotification', 'setNotifications', 'setAsRead', 'setAsUnread'
       ]
     })

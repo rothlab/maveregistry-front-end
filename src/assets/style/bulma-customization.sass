@@ -4,25 +4,16 @@
 // Import variables
 @import "@/assets/style/variables.sass"
 
-// Configure colors
-$colors: ("white": ($white,$black))
-$colors: map-merge($colors, ("black": ($black, $white)))
-$colors: map-merge($colors, ("light": ($light, $light-invert)))
-$colors: map-merge($colors, ("dark": ($dark, $dark-invert)))
-$colors: map-merge($colors, ("primary": ($primary, $primary-invert)))
-$colors: map-merge($colors, ("info": ($info, $info-invert)))
-$colors: map-merge($colors, ("success": ($success, $success-invert)))
-$colors: map-merge($colors, ("warning": ($warning, $warning-invert)))
-$colors: map-merge($colors, ("danger": ($danger, $danger-invert)))
-$colors: map-merge($colors, ("twitter": ($twitter, $twitter-invert)))
-$colors: map-merge($colors, ("warning-light": ($warning-light, $warning-light-invert)))
-
 // Component-spefic settings
 // Input
 $input-shadow: none
 // Dropdown
 $dropdown-content-radius: 6px
 $dropdown-content-shadow: 0 8px 8px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1)
+// Navbar
+$navbar-box-shadow-size: 0 0.5rem 1rem
+$navbar-box-shadow-color: rgba(0,0,0,.15)
+$navbar-dropdown-offset: -2px
 
 // Import Bulma and Buefy styles
 @import "~bulma"

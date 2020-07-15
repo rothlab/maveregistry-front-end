@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-card">
     <!-- Header -->
     <div class="hero is-light is-bold">
       <div class="hero-body has-page-header-padding">
@@ -17,7 +17,7 @@
               <!-- Non-mobile style -->
               <b-button
                 icon-left="mdil-plus"
-                type="is-primary"
+                type="is-primary is-bold small-shadow"
                 size="is-medium"
                 class="is-hidden-mobile"
                 @click="handleNewTargetModal()"
@@ -230,87 +230,112 @@
                       v-if="project.type"
                       class="card-header-title is-capitalized"
                     >
-                      <b-icon :icon="progressIcons[project.type]" />
-                      {{ project.type }}
+                      <b-icon
+                        :icon="progressIcons[project.type]"
+                        style="margin-right: 0.25rem"
+                      />
+                      <span>{{ project.type }}</span>
                     </p>
                     <p
                       v-else
                       class="card-header-title is-capitalized"
                     >
-                      <b-icon icon="mdil-play" />
-                      Under Investigation
+                      <b-icon
+                        icon="mdil-play"
+                        style="margin-right: 0.25rem"
+                      />
+                      <span>Under Investigation</span>
                     </p>
-                    <a class="card-header-icon">
+                    <div class="card-header-icon">
+                      <!-- Open for funding -->
                       <b-tooltip
                         label="Open for funding"
                         v-if="project.open_for_funding"
                         type="is-warning"
-                        position="is-left"
                       >
                         <b-icon
-                          class="circle-icon has-background-warning"
+                          class="circle-icon has-background-warning has-text-dark"
                           icon="mdil-currency-usd"
                         />
                       </b-tooltip>
+
+                      <!-- Owner -->
+                      <b-tooltip
+                        label="Project Owner"
+                        v-if="project.creator.username === currentUser.username"
+                        type="is-success"
+                      >
+                        <b-icon
+                          icon="mdil-account"
+                          class="circle-icon has-background-success has-text-light"
+                        />
+                      </b-tooltip>
+
+                      <!-- Follow bell -->
+                      <div
+                        v-if="project.creator.username !== currentUser.username && project.follow_status"
+                      >
+                        <!-- If not followed, show follow icon -->
+                        <b-tooltip
+                          label="Follow Project"
+                          type="is-white"
+                          v-if="!project.follow_status.id"
+                        >
+                          <a @click="confirmFollow(project.id, 'project', project.creator)">
+                            <b-icon
+                              icon="mdil-bell"
+                              class="circle-icon has-background-white-bis"
+                            />
+                          </a>
+                        </b-tooltip>
+                        <!-- If pending, show pending status and unfollow-->
+                        <b-tooltip
+                          :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Project'"
+                          :type="project.follow_status.status === 'pending' ? 'is-danger' : 'is-primary'"
+                          v-else
+                        >
+                          <a @click="confirmUnfollow(project.follow_status.id, 'project')">
+                            <b-icon
+                              icon="mdil-bell-off"
+                              class="circle-icon"
+                              :class="{ 'has-background-warning': project.follow_status.status === 'pending', 'has-background-primary': project.follow_status.status === 'yes' }"
+                              :type="project.follow_status.status === 'yes' ? 'is-white' : 'is-dark'"
+                            />
+                          </a>
+                        </b-tooltip>
+                      </div>
+
+                      <!-- Expand -->
                       <b-icon
                         :icon="innerProps.open ? 'mdil-chevron-up' : 'mdil-chevron-down'"
                       />
-                    </a>
+                    </div>
                   </div>
                   <div class="card-content">
-                    <div class="content">
-                      <div class="level is-mobile is-paddingless">
-                        <div class="level-left">
-                          <p>
-                            <span class="has-text-primary">Project ID:</span>
-                            <router-link
-                              :to="{ path: `/project/${project.id}`}"
-                              target="_blank"
-                            >
-                              {{ project.id }}
-                            </router-link>
-                            <br>
-                            <span class="has-text-primary">
-                              Feature{{ project.features.length > 1 ? 's:' : ':' }}
-                            </span>
-                            {{ project.features.join(", ") }}
-                            <br>
-                            <span
-                              v-if="project.description"
-                              class="has-text-primary"
-                            >Progress description:</span>
-                            {{ project.description }}
-                          </p>
-                        </div>
-                        <div
-                          class="level-right"
-                          v-if="project.follow_status"
+                    <div
+                      class="content"
+                      style="padding-bottom: 0.5rem"
+                    >
+                      <p class="is-size-6">
+                        <span class="has-text-primary">Project ID:</span>
+                        <router-link
+                          :to="{ path: `/project/${project.id}`}"
+                          target="_blank"
                         >
-                          <!-- If not followed, show follow icon -->
-                          <b-tooltip
-                            label="Follow Project"
-                            type="is-dark"
-                            v-if="!project.follow_status.id"
-                          >
-                            <a @click="confirmFollow(project.id, 'project')"><b-icon icon="mdil-bell" /></a>
-                          </b-tooltip>
-                          <!-- If pending, show pending status and unfollow-->
-                          <b-tooltip
-                            :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Project'"
-                            type="is-dark"
-                            v-else
-                          >
-                            <a @click="confirmUnfollow(project.follow_status.id, 'project')">
-                              <b-icon
-                                icon="mdil-bell-off"
-                                class="circle-icon"
-                                :class="{ 'has-background-warning': project.follow_status.status === 'pending', 'has-background-primary': project.follow_status.status === 'yes' }"
-                                :type="project.follow_status.status === 'yes' ? 'is-white' : 'is-dark'"
-                              />
-                            </a>
-                          </b-tooltip>
-                        </div>
-                      </div>
+                          {{ project.id }}
+                        </router-link>
+                        <br>
+                        <span class="has-text-primary">
+                          Feature{{ project.features.length > 1 ? 's:' : ':' }}
+                        </span>
+                        {{ project.features.join(", ") }}
+                        <br>
+                        <span
+                          v-if="project.description"
+                          class="has-text-primary"
+                        >Progress description:</span>
+                        {{ project.description }}
+                      </p>
                     </div>
                   </div>
                 </b-collapse>
@@ -362,7 +387,7 @@
                     </router-link>
                     <!-- Followed status -->
                     <b-tag
-                      v-if="team.follow_status.id"
+                      v-if="team.creator.username !== currentUser.username && team.follow_status.id"
                       size="is-medium"
                       class="is-clickable"
                       :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-primary': team.follow_status.status === 'yes' }"
@@ -381,14 +406,17 @@
                     </b-tag>
                     <!-- Unfollowed status -->
                     <b-tag
-                      v-else
+                      v-else-if="team.creator.username !== currentUser.username && !team.follow_status.id"
                       size="is-medium"
                       class="is-clickable has-background-white-bis"
-                      @click.native="confirmFollow(team.id, 'team')"
+                      @click.native="confirmFollow(team.id, 'team', team.creator)"
                     >
-                      <b-icon
-                        icon="mdil-bell"
-                      />
+                      <b-tooltip
+                        label="Follow Team"
+                        type="is-white"
+                      >
+                        <b-icon icon="mdil-bell" />
+                      </b-tooltip>
                     </b-tag>
                   </b-taglist>
                 </div>
@@ -458,6 +486,7 @@
       <FollowModal
         :active.sync="isFollowModelActive"
         :source="followProp.source"
+        :creator="followProp.creator"
         :type="followProp.type"
         @change="fetchTargets()"
       />
@@ -508,14 +537,6 @@ export default {
       }
     }
   },
-  computed: {
-    hasLoggedIn() {
-      return this.$store.getters.hasLoggedIn
-    },
-    isMember() {
-      return this.$store.getters.hasRole("member")
-    }
-  },
   data () {
     return {
       targets: [],
@@ -537,6 +558,7 @@ export default {
       isFollowModelActive: false,
       followProp: {
         source: "",
+        creator: {},
         follow: "",
         type: ""
       },
@@ -562,9 +584,10 @@ export default {
     await this.fetchTargets()
   },
   methods: {
-    confirmFollow(id, type) {
+    confirmFollow(id, type, creator) {
       this.followProp.source = id
       this.followProp.type = type
+      this.followProp.creator = creator
       this.isFollowModelActive = true
     },
     confirmUnfollow(id, type) {
@@ -631,9 +654,16 @@ export default {
       margin-right: 0 !important
     .control:not(:first-child)
       margin-left: 0.75rem
-.team-control .tag
-  box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
-  &:first-child
-    border-top-right-radius: 0
-    border-bottom-right-radius: 0
+.team-control .tags
+  border-radius: 4px
+  .tag
+    margin: 0
+    height: 2.5rem
+    box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
+    &:first-child
+      border-top-right-radius: 0
+      border-bottom-right-radius: 0
+.card-header-icon
+  .b-tooltip:not(:last-child)
+    margin-right: 0.25rem
 </style>

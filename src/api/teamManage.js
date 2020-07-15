@@ -24,17 +24,18 @@ export const Team = Parse.Object.extend("Team", {
       update_date: this.get("updatedAt")
     }
 
-    if (detail) {
-      // Fetch creator
-      const user = this.get("creator")
-      if (user && user.isDataAvailable()) {
-        ret.user = {
-          username: user.get("username"),
-          first_name: user.get("first_name"),
-          last_name: user.get("last_name")
-        }
+    // Fetch creator
+    const creator = this.get("creator")
+    if (creator && creator.isDataAvailable()) {
+      ret.creator = {
+        username: creator.get("username"),
+        first_name: creator.get("first_name"),
+        last_name: creator.get("last_name"),
+        profile_image: creator.get("profile_image")
       }
+    }
 
+    if (detail) {
       // Fetch members
       const members = await fetchUsersByTeamId(this.id)
       ret.members = members
@@ -146,13 +147,21 @@ export async function updateTeam(id, payload) {
 export async function fetchTeams(limit, skip, objects = []) {
   // Fetch teams
   const query = new Parse.Query(Team)
-
   // Apply pagination
+  if (objects.includes("creator")) {
+    query.include("creator")
+    query.select([
+      "first_name", "last_name", "email", "affiliation", "website", "updatedAt",
+      "creator.username", "creator.first_name", "creator.last_name", "creator.profile_image",
+    ])
+  }
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB
+  
   let teams = await query.find()
-  teams.results = await Promise.all(teams.results.map(e => e.format(false, objects.includes("project"), objects.includes("follow")))) // Format targets
+  teams.results = await Promise.all(teams.results.map(e => 
+    e.format(false, objects.includes("project"), objects.includes("follow")))) // Format targets
   
   // Format and return
   return teams
@@ -169,6 +178,7 @@ export async function queryByName(name, limit, skip, objects = []) {
   const query = Parse.Query.or(firstNameQuery, lastNameQuery)
 
   // Apply pagination
+  query.include("creator")
   query.limit(limit)
   query.skip(skip)
   query.withCount() // include total amount of targets in the DB

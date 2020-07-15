@@ -27,7 +27,7 @@ export const mutations = {
   logoutUser(state) {
     state.user = undefined
   },
-  loginUser(state, user) {
+  setUser(state, user) {
     if (user) state.user = user
   },
   setRoles(state, roles) {
@@ -45,25 +45,25 @@ export const actions = {
   async loginUserPassword ({ commit }, credential) {
     const user = await UserManage.loginUserPassword(credential.username, credential.password)
 
-    commit('loginUser', user)
+    commit('setUser', user)
   },
   async loginUserCache ({ commit }) {
     const user = await UserManage.loginUserCache()
 
     // Update user info if loggined in successfully
-    commit('loginUser', user)
+    commit('setUser', user)
   },
   async signupUserPassword ({ commit }, userInfo) {
     const user = await UserManage.signupUserPassword(userInfo)
 
     // Update user info if loggined in successfully
-    commit('loginUser', user)
+    commit('setUser', user)
   },
   async signupLoginUserGoogle ({ commit }, userInfo) {
     const user = await UserManage.signupLoginUserGoogle(userInfo)
     
     // Update user info if loggined in successfully
-    commit('loginUser', user)
+    commit('setUser', user)
   },
   async signupLoginUserOrcid ({ commit }, userInfo) {
     try {
@@ -71,7 +71,7 @@ export const actions = {
       
       if (user && user.email) {
         // Update user info if loggined in successfully
-        commit('loginUser', user)
+        commit('setUser', user)
       }
 
       return user
@@ -119,12 +119,21 @@ export const actions = {
     const user = await UserManage.updateUserProfile(userInfo)
 
     // Update user info if loggined in successfully
-    commit('loginUser', user)
+    commit('setUser', user)
   },
   async getRoles ({ commit }) {
     const roles = await UserManage.getRoles()
 
     // Update user roles
     commit('setRoles', roles)
+  },
+  async syncUserProfile ({ commit }) {
+    const user = this.getters.getUser
+    if (user && user.username) {
+      const userInfo = await UserManage.fetchUserInfo(user.username)
+
+      // Update user info
+      commit('setUser', userInfo)
+    }
   }
 }

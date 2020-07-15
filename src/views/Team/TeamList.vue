@@ -100,19 +100,6 @@
           </template>
 
           <template slot-scope="props">
-            <!-- Team ID -->
-            <b-table-column
-              field="team_id"
-              label="Team ID"
-            >
-              <router-link
-                :to="{ path: `/team/${props.row.id}`}"
-                target="_blank"
-              >
-                {{ props.row.id }}
-              </router-link>
-            </b-table-column>
-
             <!-- Principal Investigator -->
             <b-table-column
               field="principal_investigator"
@@ -121,8 +108,13 @@
               <div class="level is-mobile is-paddingless">
                 <div class="level-left">
                   <p>
-                    <b class="is-capitalized">{{ props.row.first_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.first_name, filter.pi) }}
-                    <b class="is-capitalized">{{ props.row.last_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.last_name, filter.pi) }}
+                    <router-link
+                      :to="{ path: `/team/${props.row.id}`}"
+                      target="_blank"
+                    >
+                      <b class="is-capitalized">{{ props.row.first_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.first_name, filter.pi) }}
+                      <b class="is-capitalized">{{ props.row.last_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.last_name, filter.pi) }}
+                    </router-link>
                   </p>
                 </div>
 
@@ -244,7 +236,7 @@
                   v-else
                   icon-left="mdil-bell"
                   type="is-light"
-                  @click="confirmFollow(props.row.id)"
+                  @click="confirmFollow(props.row.id, props.row.creator)"
                   @change="fetchTeams"
                   expanded
                 >
@@ -267,6 +259,7 @@
     <FollowModal
       :active.sync="isFollowModelActive"
       :source="followProp.source"
+      :creator="followProp.creator"
       :type="followProp.type"
       @change="fetchTeams()"
     />
@@ -324,6 +317,7 @@ export default {
       followProp: {
         source: "",
         follow: "",
+        creator: {},
         type: "team"
       },
       filter: {
@@ -336,7 +330,7 @@ export default {
     await this.fetchTeams()
   },
   methods: {
-    confirmFollow(id) {
+    confirmFollow(id, creator) {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {
         this.$emit("login")
@@ -344,6 +338,7 @@ export default {
       }
 
       this.followProp.source = id
+      this.followProp.creator = creator
       this.isFollowModelActive = true
     },
     confirmUnfollow(id) {
@@ -365,7 +360,7 @@ export default {
       
       // Update targets
       try {
-        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, ["project", "follow"])
+        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, ["project", "follow", "creator"])
         this.teams = teams.results
 
         // Update pagination

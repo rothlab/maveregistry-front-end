@@ -1,11 +1,14 @@
 <template>
   <section>
     <!-- Landing section-->
-    <section class="hero is-light is-bold">
+    <section class="hero is-primary is-bold full-height">
       <div class="hero-body landing">
         <div class="container is-fluid">
           <div class="columns is-vcentered">
-            <div class="column">
+            <div
+              class="column is-7"
+              style="z-index: 1"
+            >
               <div class="landing-left">
                 <!-- Intro -->
                 <h2 class="subtitle is-size-4">
@@ -24,11 +27,12 @@
                     <div class="level-left">
                       <b-button
                         size="is-medium"
-                        type="is-primary"
+                        type="is-warning"
                         tag="router-link"
                         to="/projects"
+                        class="med-shadow"
                       >
-                        Register Activity
+                        Register Project
                       </b-button>
                     </div>
                     <div class="level-right">
@@ -36,6 +40,7 @@
                         size="is-medium"
                         tag="router-link"
                         to="/nominations"
+                        class="med-shadow"
                       >
                         Nominate Targets
                       </b-button>
@@ -45,7 +50,7 @@
               </div>
             </div>
 
-            <div class="column is-hidden-mobile">
+            <div class="column is-10 is-hidden-mobile">
               <div class="demo-display" />
             </div>
           </div>
@@ -66,7 +71,7 @@
     </section>
 
     <!-- Onboarding section 1 -->
-    <section class="hero is-medium is-bold">
+    <section class="hero is-medium">
       <div class="hero-body">
         <!-- Question -->
         <div class="container has-text-centered">
@@ -79,8 +84,8 @@
             <div class="step-line is-hidden-mobile" />
             <div class="columns">
               <div class="column">
-                <div class="step-number is-inline-flex has-vcentered has-text-centered has-background-white">
-                  <p class="has-fullwidth has-text-primary">
+                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold">
+                  <p class="has-fullwidth has-text-light">
                     1
                   </p>
                 </div>
@@ -90,8 +95,8 @@
                 <p>See which targets have been registered with activities.</p>
               </div>
               <div class="column">
-                <div class="step-number is-inline-flex has-vcentered has-text-centered has-background-white">
-                  <p class="has-fullwidth has-text-primary">
+                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold">
+                  <p class="has-fullwidth has-text-light">
                     2
                   </p>
                 </div>
@@ -101,8 +106,8 @@
                 <p>Reguster activity on a target and see who is working on the same target.</p>
               </div>
               <div class="column">
-                <div class="step-number is-inline-flex has-vcentered has-text-centered has-background-white">
-                  <p class="has-fullwidth has-text-primary">
+                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold">
+                  <p class="has-fullwidth has-text-light">
                     3
                   </p>
                 </div>
@@ -130,7 +135,7 @@
     </section>
 
     <!-- Onboarding section 2 -->
-    <section class="hero is-medium is-light is-bold">
+    <section class="hero is-medium is-light">
       <div class="hero-body">
         <div class="container has-text-centered">
           <h1 class="title is-uppercase">
@@ -152,7 +157,7 @@
                   <div class="content has-text-centered">
                     <div
                       class="step-number is-inline-flex has-vcentered"
-                      :class="{ 'has-background-primary has-text-white': activeTab == index, 'has-text-primary': activeTab != index }"
+                      :class="{ 'is-primary is-bold has-text-white': activeTab == index, 'has-text-primary': activeTab != index }"
                     >
                       <p
                         class="has-fullwidth"
@@ -274,29 +279,42 @@ export default {
 @import "../assets/style/variables.sass"
 
 @media screen and (min-width: $break-desktop)
+  .full-height
+    height: calc( 100vh - 5rem )
   .landing
     padding-right: 0
     margin-right: 0
   .landing-left
     position: relative
-    float: right
-    max-width: 30rem
+    left: 25%
+    max-width: 35rem
+@media screen and (max-width: $break-desktop)
+  .full-height
+    height: calc( 100vh - 3rem )
 @media screen and (max-width: $break-mobile)
   .landing
     text-align: center
-
+    display: flex
+    align-items: center
+  .landing-left
+    display: inline-block
+    max-width: 80vw
 .landing-action-buttons
   margin-top: 2rem
   .button
     padding: 0rem 1.5rem
+    @media screen and (max-width: $break-mobile)
+      width: 80%
 .demo-display
   position: relative
-  right: -2rem
+  right: 22rem
   min-height: 20rem
   height: 70vh
-  background-image: url("../assets/image/laptop-wire.svg")
+  background-image: url("../assets/image/background.png")
   background-size: cover
   overflow-x: show
+  @media screen and (max-width: $break-desktop)
+    right: 15rem
 .tip
   margin: 1rem 0
 .tip span

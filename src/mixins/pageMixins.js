@@ -15,5 +15,10 @@ export default {
     if (title) {
       document.title = title
     }
+  },
+  methods: {
+    isAction(action) {
+      return this.$route.params && this.$route.params.action === action
+    }
   }
 }

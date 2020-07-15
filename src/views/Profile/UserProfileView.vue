@@ -54,6 +54,7 @@
                 <b>Username</b> <br>
                 {{ userInfo.username }}
               </p>
+
               <p
                 class="is-size-5 is-capitalized"
                 v-if="userInfo.first_name && userInfo.last_name"
@@ -61,8 +62,9 @@
                 <b>Name</b> <br>
                 {{ userInfo.first_name }} {{ userInfo.last_name }}
               </p>
+
               <div
-                class="is-size-5"
+                class="is-size-5 p-margin"
                 v-if="userInfo.email"
               >
                 <b>Email</b> <br>
@@ -114,6 +116,7 @@
                   </div>
                 </div>
               </div>
+
               <p
                 class="is-size-5"
                 v-if="userInfo.website"
@@ -125,21 +128,28 @@
                   rel="noopener noreferrer"
                 >{{ userInfo.website }}</a>
               </p>
+
               <div
                 class="is-size-5"
-                v-if="userInfo && userInfo.social && Object.keys(userInfo.social).length"
+                v-if="userInfo && userInfo.social"
               >
-                <span><b>Social Media</b></span>
-                <br>
+                <b>Social Media</b><br>
+
                 <div
                   class="buttons"
+                  style="margin-top: 0.25rem"
                 >
                   <b-button
+                    type="is-twitter"
+                    tag="a"
+                    :href="`https://twitter.com/${userInfo.social.twitter}`"
+                    target="_blank"
+                    rel="noreferrer"
                     icon-left="twitter"
                     icon-pack="mdi"
                     v-if="userInfo.social.twitter"
                   >
-                    @{{ userInfo.social.twitter }}
+                    {{ userInfo.social.twitter }}
                   </b-button>
                   <b-button
                     icon-left="twitter"
@@ -152,15 +162,21 @@
               </div>
             </div>
 
-            <hr>
+            <hr v-if="hasProject">
 
-            <div class="project-header">
+            <div
+              class="project-header"
+              v-if="hasProject"
+            >
               <p class="is-size-4 has-text-weight-bold">
                 Project
               </p>
             </div>
 
-            <div class="project-content">
+            <div
+              class="project-content"
+              v-if="hasProject"
+            >
               <p class="is-size-5">
                 <span v-if="userInfo.team">
                   <b>Team</b> <br>
@@ -186,7 +202,7 @@
           <!-- Profile image -->
           <div class="profile-image">
             <figure class="image is-square is-marginless">
-              <img :src="profileImageUrl">
+              <img :src="profileImageUrl(userInfo)">
             </figure>
           </div>
 
@@ -257,16 +273,11 @@ export default {
     UserProfileAction
   },
   computed: {
-    profileImageUrl() {
-      // Set url as placeholder
-      let url = require("@/assets/image/blank-profile.png")
-
-      if (this.userInfo && this.userInfo.profile_image) url = this.userInfo.profile_image
-
-      return url
-    },
     isOwner() {
-      return this.$store.getters.isOwner(this.$route.params.username)
+      return this.userInfo && this.userInfo.username && this.$store.getters.isOwner(this.userInfo.username)
+    },
+    hasProject() {
+      return this.userInfo.team
     }
   },
   watch: {

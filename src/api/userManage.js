@@ -1,17 +1,24 @@
 import { Parse } from "./parseConnect.js"
 import { Team } from "./teamManage.js"
+import { uploadProfilePic } from "./fileManage.js"
 
 // Helper: parse user metadata
 function parseUserMetadata (user, includeTeam = true) {
   let ret = {
+    id: user.id,
     username: user.get("username"),
     email: user.get("email"),
     first_name: user.get("first_name"),
     last_name: user.get("last_name"),
     website: user.get("website"),
-    profile_image: user.get("profile_image"),
     email_validated: user.get("emailVerified")
   }
+
+  const profileImage = user.get("profile_image")
+  if (profileImage) ret.profile_image = profileImage.url()
+  
+  const social = user.get("social")
+  if (social) ret.social = social
 
   if (includeTeam) {
     // Get team when available
@@ -33,9 +40,11 @@ export async function loginUserPassword (username, password) {
 // Log in user from cache
 export async function loginUserCache () {
   const currentUser = Parse.User.current()
-  if (currentUser) return parseUserMetadata(currentUser)
+  if (currentUser && currentUser.get("username")) {
+    return await fetchUserInfo(currentUser.get("username"))
+  }
 
-  return undefined
+  return
 }
 
 // Sign up user with username, email and password
@@ -62,10 +71,18 @@ export async function signupLoginUserGoogle (userInfo) {
   user.set("email", userInfo.email)
   user.set("first_name", userInfo.first_name.toLowerCase())
   user.set("last_name", userInfo.last_name.toLowerCase())
-  user.set("profile_image", userInfo.profile_image)
-  await user.linkWith("google", {
+  user = await user.linkWith("google", {
     authData: userInfo.auth
   })
+
+  // If new user, store profile picture locally
+  if (!user.get("profile_image")) {
+    const profileImage = userInfo.profile_image
+    if (profileImage) {
+      const currentUser = await uploadProfilePic(profileImage, user.id)
+      if (currentUser) Parse.User.become(currentUser)
+    }
+  }
 
   return parseUserMetadata(Parse.User.current())
 }
@@ -96,7 +113,6 @@ export async function signupLoginUserOrcid (userInfo) {
   user.set("email", userInfo.email)
   user.set("first_name", userInfo.first_name.toLowerCase())
   user.set("last_name", userInfo.last_name.toLowerCase())
-  user.set("profile_image", userInfo.profile_image)
 
   // Check if current user has email
   // Because user might use the log in function to sign up
@@ -172,10 +188,18 @@ export async function updateUserProfile (userInfo) {
     hasChanged = true
     user.set("profile_image", userInfo.profile_image)
   }
-  if (userInfo.team && userInfo.team !== user.get("team").id) {
+  if (userInfo.team && (!user.get("team") || userInfo.team !== user.get("team").id)) {
     const team = await new Team.fetchById(userInfo.team)
     hasChanged = true
     user.set("team", team)
+  }
+  if (userInfo.social && JSON.stringify(userInfo.social) !== JSON.stringify(user.get("social"))) {
+    // For twitter handle, if missing @, add
+    hasChanged = true
+    if (userInfo.social.twitter && !userInfo.social.twitter.startsWith("@")) {
+      userInfo.social.twitter = "@" + userInfo.social.twitter
+    }
+    user.set("social", userInfo.social)
   }
 
   // Save user info changes only if anything is changed
