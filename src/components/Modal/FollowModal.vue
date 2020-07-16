@@ -131,7 +131,7 @@ export default {
       this.isActive = false
       this.request = ""
       this.$buefy.toast.open({
-        message: `Followed successfully.`,
+        message: `Follow Request Sent`,
         type: "is-success",
         duration: 5000
       })

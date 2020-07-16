@@ -102,7 +102,7 @@ export const actions = {
             }
             
             Toast.open({
-              message: "Verification email sent",
+              message: "Verification Email Sent",
               duration: 5000,
               type: 'is-success'
             })

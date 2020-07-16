@@ -21,6 +21,7 @@
               placeholder="Password"
               v-model="password"
               expanded
+              @keyup.native.enter="emitSubmit"
             />
             <p class="control">
               <b-button
@@ -110,6 +111,7 @@
               placeholder="Confirm password"
               v-model="passwordConfirm"
               expanded
+              @keyup.native.enter="emitSubmit"
             />
             <p class="control">
               <b-button
@@ -149,6 +151,10 @@ export default {
     hasConfirm: {
       type: Boolean,
       default: false
+    },
+    enterToSubmit: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -168,6 +174,9 @@ export default {
     },
     storePassFeedback({suggestions}) {
       this.passFeedback = suggestions[0]
+    },
+    emitSubmit() {
+      if (this.enterToSubmit) this.$emit("submit")
     }
   }
 }

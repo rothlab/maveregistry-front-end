@@ -282,11 +282,6 @@ import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 
-// Helper
-function capitalize(string) {
-  return string.slice(0,1).toUpperCase() + string.slice(1)
-}
-
 export default {
   components: {
     NewTeamModal,
@@ -414,7 +409,7 @@ export default {
       }
     },
     trimKeyword(string, keyword) {
-      if (keyword.length <= 0 || !string.startsWith(keyword)) return capitalize(string)
+      if (keyword.length <= 0 || !string.startsWith(keyword)) return this.capitalize(string)
       return string.replace(keyword, '')
     }
   }

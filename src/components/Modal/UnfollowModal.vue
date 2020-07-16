@@ -118,7 +118,7 @@ export default {
       
       // Show status update
       this.$buefy.toast.open({
-        message: `Unfollowed successfully.`,
+        message: `${this.capitalize(this.type)} Unfollowed`,
         type: "is-success"
       })
 

@@ -39,6 +39,7 @@ Sentry.init({
     Vue,
     attachProps: true
   })],
+  release: 'mave-registry-frontend@' + process.env.VUE_APP_VERSION
 });
 
 // Inject plugins

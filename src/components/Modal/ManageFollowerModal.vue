@@ -231,7 +231,7 @@ export default {
 
             this.$buefy.toast.open({
               duration: 5000,
-              message: `Successfully removed ${this.classText}`,
+              message: `${this.capitalize(this.classText)} Removed`,
               type: 'is-success',
               queue: false
             })
@@ -255,7 +255,7 @@ export default {
 
         this.$buefy.toast.open({
           duration: 5000,
-          message: "Successfully approved request",
+          message: "Request Approved",
           type: 'is-success',
           queue: false
         })

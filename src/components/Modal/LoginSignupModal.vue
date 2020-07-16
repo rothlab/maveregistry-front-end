@@ -56,7 +56,11 @@
                     />
                   </b-field>
                 </ValidationProvider>
-                <PasswordField v-model="password" />
+                <PasswordField
+                  v-model="password"
+                  enter-to-submit
+                  @submit="login('password')"
+                />
                 <p class="control">
                   <b-button
                     expanded
@@ -193,6 +197,8 @@
                 <PasswordField
                   has-confirm
                   v-model="password"
+                  enter-to-submit
+                  @submit="executeCaptcha"
                 />
                 <p class="control">
                   <b-button
