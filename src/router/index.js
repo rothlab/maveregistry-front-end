@@ -67,6 +67,35 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "nominations" */ '../views/Nomination/NominationList.vue')
   },
 
+  // Moderation related
+  {
+    path: '/moderation',
+    name: 'Moderation',
+    component: () => import(/* webpackChunkName: "moderation" */ '../views/Moderation/ModerationHome.vue')
+  },
+
+  // Policy related
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Policy/PolicyAbout.vue')
+  },
+  {
+    path: '/contact',
+    name: 'Contact',
+    component: () => import(/* webpackChunkName: "contact" */ '../views/Policy/PolicyContact.vue')
+  },
+  {
+    path: '/policy/terms',
+    name: 'Terms',
+    component: () => import(/* webpackChunkName: "terms" */ '../views/Policy/PolicyTerms.vue')
+  },
+  {
+    path: '/policy/privacy',
+    name: 'Privacy',
+    component: () => import(/* webpackChunkName: "privacy" */ '../views/Policy/PolicyPrivacy.vue')
+  },
+
   // Account related
   {
     path: '/reset_password',

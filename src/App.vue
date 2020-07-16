@@ -42,27 +42,10 @@
         <b-navbar-item
           v-if="hasLoggedIn && isModerator"
           tag="router-link"
-          :to="{ path: '/moderate' }"
+          :to="{ path: '/moderation' }"
         >
-          Moderate
+          Moderation
         </b-navbar-item>
-        <b-navbar-dropdown
-          label="Info"
-          collapsible
-        >
-          <b-navbar-item
-            tag="router-link"
-            :to="{ path: '/about' }"
-          >
-            About
-          </b-navbar-item>
-          <b-navbar-item
-            tag="router-link"
-            :to="{ path: '/contact' }"
-          >
-            Contact
-          </b-navbar-item>
-        </b-navbar-dropdown>
       </template>
 
       <!-- Right side: user functions when logged in -->
@@ -178,7 +161,7 @@
     <router-view @login="isLoginSignupModalActive = true" />
 
     <footer
-      class="footer has-background-dark has-text-light"
+      class="footer is-dark is-bold has-text-light"
       v-if="!$route.meta.hideFooter"
     >
       <div class="container">
@@ -187,7 +170,39 @@
             <p>Copyright © 2020 MAVE Registry. All rights reserved. Ver. {{ appVersion }}.</p>
           </div>
           <div class="level-right">
-            <p>About | Contact Us | Terms | Privacy</p>
+            <p class="footer-links is-flex has-vcentered">
+              <router-link
+                :to="{ name: 'About' }"
+                target="_blank"
+                class="has-text-light"
+              >
+                About
+              </router-link>
+              <span class="divider" />
+              <router-link
+                :to="{ name: 'Contact' }"
+                target="_blank"
+                class="has-text-light"
+              >
+                Contact Us
+              </router-link>
+              <span class="divider" />
+              <router-link
+                :to="{ name: 'Terms' }"
+                target="_blank"
+                class="has-text-light"
+              >
+                Terms
+              </router-link>
+              <span class="divider" />
+              <router-link
+                :to="{ name: 'Privacy' }"
+                target="_blank"
+                class="has-text-light"
+              >
+                Privacy
+              </router-link>
+            </p>
           </div>
         </div>
       </div>
@@ -243,6 +258,13 @@
   margin-left: auto
   @media screen and (min-width: $break-mobile)
     display: none
+.footer-links
+  .divider
+    display: inline-block
+    margin: 0 1rem
+    border-left: 1px solid $grey-light
+    width: 0
+    height: 0.75rem
 </style>
 
 <script>
