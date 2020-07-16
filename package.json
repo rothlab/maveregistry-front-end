@@ -9,12 +9,12 @@
     "deploy": "aws s3 sync ./dist s3://maveregistry-web-client"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.13.1",
+    "@fortawesome/fontawesome-free": "^5.14.0",
     "@hcaptcha/vue-hcaptcha": "^0.2.2",
     "@mdi/font": "^5.3.45",
     "@mdi/light-font": "^0.2.63",
-    "@sentry/browser": "^5.19.1",
-    "@sentry/integrations": "^5.19.1",
+    "@sentry/browser": "^5.19.2",
+    "@sentry/integrations": "^5.19.2",
     "axios": "^0.19.2",
     "buefy": "^0.8.20",
     "core-js": "^3.6.5",
@@ -30,6 +30,7 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "@sentry/webpack-plugin": "^1.12.0",
     "@vue/cli-plugin-babel": "^4.4.6",
     "@vue/cli-plugin-eslint": "^4.4.6",
     "@vue/cli-plugin-router": "^4.4.6",
