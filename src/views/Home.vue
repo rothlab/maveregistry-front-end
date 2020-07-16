@@ -83,35 +83,35 @@
             <!-- Steps -->
             <div class="step-line is-hidden-mobile" />
             <div class="columns">
-              <div class="column">
-                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold">
+              <div class="column step-content">
+                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold large-shadow">
                   <p class="has-fullwidth has-text-light">
                     1
                   </p>
                 </div>
-                <h2 class="subtitle is-capitalized">
+                <h2 class="subtitle is-capitalized has-text-primary">
                   Browse project
                 </h2>
                 <p>See which targets have been registered with activities.</p>
               </div>
-              <div class="column">
-                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold">
+              <div class="column step-content">
+                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold large-shadow">
                   <p class="has-fullwidth has-text-light">
                     2
                   </p>
                 </div>
-                <h2 class="subtitle is-capitalized">
+                <h2 class="subtitle is-capitalized has-text-primary">
                   Register activity
                 </h2>
                 <p>Reguster activity on a target and see who is working on the same target.</p>
               </div>
-              <div class="column">
-                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold">
+              <div class="column step-content">
+                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold large-shadow">
                   <p class="has-fullwidth has-text-light">
                     3
                   </p>
                 </div>
-                <h2 class="subtitle is-capitalized">
+                <h2 class="subtitle is-capitalized has-text-primary">
                   Keep updated
                 </h2>
                 <p>Follow team and get notified when they register new activities.</p>
@@ -157,7 +157,7 @@
                   <div class="content has-text-centered">
                     <div
                       class="step-number is-inline-flex has-vcentered"
-                      :class="{ 'is-primary is-bold has-text-white': activeTab == index, 'has-text-primary': activeTab != index }"
+                      :class="{ 'is-primary is-bold has-text-white large-shadow': activeTab == index, 'has-text-primary': activeTab != index }"
                     >
                       <p
                         class="has-fullwidth"
@@ -275,6 +275,11 @@ export default {
 }
 </script>
 
+<style lang="sass">
+.tabs
+  overflow: visible
+</style>
+
 <style lang="sass" scoped>
 @import "../assets/style/variables.sass"
 
@@ -341,6 +346,12 @@ export default {
   border-radius: 50%
   border: 1px solid $primary
   margin-bottom: 0.5rem
+.step-content
+  h2
+    padding: 1rem
+  p
+    &:not(.has-fullwidth)
+      padding: 0 2rem
 .tab-title
   padding: 1rem
 @media screen and (min-width: $break-mobile)

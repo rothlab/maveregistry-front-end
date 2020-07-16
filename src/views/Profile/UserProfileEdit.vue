@@ -207,7 +207,7 @@
           <!-- Profile image -->
           <div class="profile-image">
             <figure class="image is-square is-marginless">
-              <img :src="profileImageUrl">
+              <img :src="profileImageUrl(userInfo)">
               <div class="upload">
                 <b-button
                   tag="a"
@@ -297,7 +297,8 @@ export default {
   },
   computed: {
     isOwner() {
-      return this.userInfo && this.userInfo.username && this.$store.getters.isOwner(this.userInfo.username)
+      const username = this.$route.params.username
+      return username && this.$store.getters.isOwner(username)
     }
   },
   data () {
@@ -305,7 +306,6 @@ export default {
       userInfo: {},
       team: "",
       showProfile: false,
-      profileImageUrl: require("@/assets/image/blank-profile.png"),
       isLoading: {
         page: true,
         reset_pass: false,
@@ -328,10 +328,6 @@ export default {
     this.userInfo = await this.fetchUserInfo(username)
 
     if (this.userInfo) {
-      if (this.userInfo.profile_image) {
-        this.profileImageUrl = this.userInfo.profile_image
-        delete this.userInfo.profile_image // Remove the url as it will cause problem when saving
-      }
       if (!this.userInfo.social) this.userInfo.social = {}
       if (this.userInfo.team) this.team = this.userInfo.team
     }
@@ -401,7 +397,6 @@ export default {
         const res = await FileManage.uploadFile(this.userInfo.id, { base64: croppedCanvasUrl })
 
         this.userInfo.profile_image = res
-        this.profileImageUrl = res.url()
       } catch (error) {
         this.$buefy.toast.open({
           duration: 5000,
@@ -426,7 +421,7 @@ export default {
         // Confirmation
         this.$buefy.toast.open({
           duration: 5000,
-          message: "A password reset email is sent. Please check your mailbox.",
+          message: "Password Reset Email Sent",
           type: 'is-success',
           queue: false
         })

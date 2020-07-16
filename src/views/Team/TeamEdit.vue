@@ -282,7 +282,7 @@ export default {
 
           this.$buefy.toast.open({
             duration: 5000,
-            message: "Member removed",
+            message: "Member Removed",
             type: 'is-success',
             queue: false
           })

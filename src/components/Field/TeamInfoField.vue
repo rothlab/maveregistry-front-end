@@ -90,11 +90,6 @@ import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
 import { handleError } from "@/api/errorHandler.js"
 import { ValidationProvider } from 'vee-validate'
 
-// Helper
-function capitalize(string) {
-  return string.slice(0,1).toUpperCase() + string.slice(1)
-}
-
 export default {
   props: {
     value: {
@@ -158,7 +153,7 @@ export default {
       }
     },
     formatTeam(team) {
-      team.display = `${capitalize(team.first_name)} ${capitalize(team.last_name)}, ${team.affiliation}`
+      team.display = `${this.capitalize(team.first_name)} ${this.capitalize(team.last_name)}, ${team.affiliation}`
 
       return team
     },
@@ -226,7 +221,7 @@ export default {
       this.teams = this.teams.concat(await this.fetchTeams(this.keyword, false))
     },
     trimKeyword(string, keyword) {
-      if (keyword.length <= 0 || !string.startsWith(keyword)) return capitalize(string)
+      if (keyword.length <= 0 || !string.startsWith(keyword)) return this.capitalize(string)
       return string.replace(keyword, '')
     },
     handleBlur() {

@@ -10,7 +10,7 @@ export const Notification = Parse.Object.extend("Notification", {
     if (!attrs.for) throw new Error("Notification is not addressed to a user")
     if (!attrs.message || attrs.message === "") throw new Error("Notification message is empty")
   },
-  format: function() {
+  format: async function() {
     let ret = {
       id: this.id,
       time: this.get("createdAt").getTime(),
@@ -23,10 +23,14 @@ export const Notification = Parse.Object.extend("Notification", {
     if (type) {
       ret.type = type
       const targetBody = this.get("target_body")
-      const by = targetBody.by
+      let by = targetBody.by
 
       switch (type) {
         case "follow":
+          // If data is not available, fetch
+          // This is because include is not implemented with LiveQuery
+          if (!by.isDataAvailable()) await by.fetch()
+
           ret.by = {
             first_name: by.get("first_name"),
             last_name: by.get("last_name"),
@@ -70,7 +74,7 @@ export async function retrieveAndSubscribe(commit) {
   // Retrieve all existing notifications
   let notifications = await query.find()
   if (notifications.length > 0) {
-    notifications = notifications.map(e => e.format())
+    notifications = await Promise.all(notifications.map(e => e.format()))
     commit("setNotifications", notifications)
   }
 
@@ -78,7 +82,7 @@ export async function retrieveAndSubscribe(commit) {
   const subscription = await query.subscribe()
 
   subscription.on("create", async (object) => {
-    commit("addNotification", object.format())
+    commit("addNotification", await object.format())
   })
 
   subscription.on("delete", (object) => {
