@@ -18,7 +18,7 @@
     "axios": "^0.19.2",
     "buefy": "^0.8.20",
     "core-js": "^3.6.5",
-    "parse": "^2.14.0",
+    "parse": "^2.15.0",
     "vee-validate": "^3.3.7",
     "vue": "^2.6.11",
     "vue-avatar-cropper": "^1.0.6",
