@@ -343,7 +343,7 @@ export default {
 
       this.$buefy.toast.open({
         duration: 5000,
-        message: "Validation email sent",
+        message: "Validation Email Sent",
         type: 'is-success',
         queue: false
       })

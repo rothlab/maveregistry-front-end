@@ -19,6 +19,9 @@ export default {
   methods: {
     isAction(action) {
       return this.$route.params && this.$route.params.action === action
+    },
+    capitalize(string) {
+      return string.slice(0,1).toUpperCase() + string.slice(1)
     }
   }
 }

@@ -421,7 +421,7 @@ export default {
         // Confirmation
         this.$buefy.toast.open({
           duration: 5000,
-          message: "A password reset email is sent. Please check your mailbox.",
+          message: "Password Reset Email Sent",
           type: 'is-success',
           queue: false
         })
