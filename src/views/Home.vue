@@ -62,6 +62,7 @@
           <p class="is-inline-flex has-vcentered">
             <b-icon
               custom-size="mdil-24px"
+              class="updown"
               icon="mdil-chevron-double-down"
             />
             <span>How does it work?</span>
@@ -81,9 +82,15 @@
 
           <div class="section">
             <!-- Steps -->
-            <div class="step-line is-hidden-mobile" />
+            <div
+              class="step-line is-hidden-mobile delay-1s"
+              v-animate="'showInX'"
+            />
             <div class="columns">
-              <div class="column step-content">
+              <div
+                class="column step-content"
+                v-animate="'flipInX'"
+              >
                 <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold large-shadow">
                   <p class="has-fullwidth has-text-light">
                     1
@@ -94,7 +101,10 @@
                 </h2>
                 <p>See which targets have been registered with activities.</p>
               </div>
-              <div class="column step-content">
+              <div
+                class="column step-content delay-500ms"
+                v-animate="'flipInX'"
+              >
                 <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold large-shadow">
                   <p class="has-fullwidth has-text-light">
                     2
@@ -105,7 +115,10 @@
                 </h2>
                 <p>Reguster activity on a target and see who is working on the same target.</p>
               </div>
-              <div class="column step-content">
+              <div
+                class="column step-content delay-1s"
+                v-animate="'flipInX'"
+              >
                 <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold large-shadow">
                   <p class="has-fullwidth has-text-light">
                     3
@@ -125,6 +138,7 @@
         <div class="tip has-text-centered">
           <p class="is-inline-flex has-vcentered">
             <b-icon
+              class="updown"
               custom-size="mdil-24px"
               icon="mdil-chevron-double-down"
             />
@@ -275,6 +289,7 @@ export default {
 }
 </script>
 
+
 <style lang="sass">
 .tabs
   overflow: visible
@@ -282,6 +297,55 @@ export default {
 
 <style lang="sass" scoped>
 @import "../assets/style/variables.sass"
+
+// Animation
+.animate
+  animation-duration: 1s
+  animation-fill-mode: both
+.delay-500ms
+  animation-delay: 500ms
+.delay-1s
+  animation-delay: 1s
+.delay-2s
+  animation-delay: 2s
+
+@keyframes flipInX
+  0%
+    transform: perspective(400px) rotateX(90deg)
+    opacity: 0
+  40%
+    transform: perspective(400px) rotateX(-10deg)
+  70%
+    transform: perspective(400px) rotateX(10deg)
+  100%
+    transform: perspective(400px) rotateX(0deg)
+    opacity: 1
+
+.flipInX.animate-active
+  backface-visibility: visible !important
+  animation-name: flipInX
+
+@keyframes showInX
+  0%
+    width: 0%
+  100%
+    width: 70%
+
+.showInX.animate-active
+  animation-name: showInX
+
+@keyframes upDown
+  0% 
+    transform: translateY(0%)
+  33%
+    transform: translateY(30%)
+  66%
+    transform: translateY(-30%)
+  100%
+    transform: translateY(0%)
+
+.updown
+  animation: upDown 1s ease-in-out infinite
 
 @media screen and (min-width: $break-desktop)
   .full-height

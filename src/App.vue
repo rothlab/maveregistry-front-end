@@ -2,8 +2,8 @@
   <div id="app">
     <b-navbar
       fixed-top
-      spaced
       shadow
+      spaced
       type="is-primary"
       :is-active.sync="isOpenedBurger"
       v-if="!$route.meta.hideNav"
