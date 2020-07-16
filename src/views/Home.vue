@@ -11,15 +11,20 @@
             >
               <div class="landing-left">
                 <!-- Intro -->
-                <h2 class="subtitle is-size-4">
-                  Amazing MAVE projects
-                </h2>
-                <h1 class="title is-uppercase is-size-2">
-                  Registered Here
-                </h1>
-                <p class="is-size-5">
-                  MAVE Registry is a database for activities on studying targets with Multiplexed Assays of Variant Effect (MAVE).
-                </p>
+                <div
+                  class="delay-500ms"
+                  v-animate="'fadeIn'"
+                >
+                  <h2 class="subtitle is-size-4">
+                    Amazing MAVE projects
+                  </h2>
+                  <h1 class="title is-uppercase is-size-2">
+                    Registered Here
+                  </h1>
+                  <p class="is-size-5">
+                    MAVE Registry is a database for activities on studying targets with Multiplexed Assays of Variant Effect (MAVE).
+                  </p>
+                </div>
 
                 <!-- Action buttons -->
                 <div class="landing-action-buttons">
@@ -30,7 +35,8 @@
                         type="is-warning"
                         tag="router-link"
                         to="/projects"
-                        class="med-shadow"
+                        class="med-shadow delay-1s"
+                        v-animate="'fadeIn'"
                       >
                         Register Project
                       </b-button>
@@ -40,7 +46,8 @@
                         size="is-medium"
                         tag="router-link"
                         to="/nominations"
-                        class="med-shadow"
+                        class="med-shadow delay-1500ms"
+                        v-animate="'fadeIn'"
                       >
                         Nominate Targets
                       </b-button>
@@ -306,6 +313,8 @@ export default {
   animation-delay: 500ms
 .delay-1s
   animation-delay: 1s
+.delay-1500ms
+  animation-delay: 1500ms
 .delay-2s
   animation-delay: 2s
 
@@ -320,7 +329,6 @@ export default {
   100%
     transform: perspective(400px) rotateX(0deg)
     opacity: 1
-
 .flipInX.animate-active
   backface-visibility: visible !important
   animation-name: flipInX
@@ -330,7 +338,6 @@ export default {
     width: 0%
   100%
     width: 70%
-
 .showInX.animate-active
   animation-name: showInX
 
@@ -343,9 +350,18 @@ export default {
     transform: translateY(-30%)
   100%
     transform: translateY(0%)
-
 .updown
   animation: upDown 1s ease-in-out infinite
+
+@keyframes fadeIn
+  0%
+    opacity: 0
+    transform: translate3d(0, -20%, 0)
+  100%
+    opacity: 1
+    transform: translate3d(0, 0, 0)
+.fadeIn.animate-active
+  animation-name: fadeIn
 
 @media screen and (min-width: $break-desktop)
   .full-height
