@@ -10,6 +10,7 @@ import VueAxios from 'vue-axios'
 import * as Sentry from '@sentry/browser';
 import { Vue as VueIntegration } from '@sentry/integrations';
 import VueAnimate from 'vue-animate-scroll'
+import VueScrollactive from 'vue-scrollactive'
 
 // Import stylesheets
 import "@/assets/style/bulma-customization.sass"
@@ -46,6 +47,7 @@ Sentry.init({
 // Inject plugins
 Vue.use(VueAxios, axios)
 Vue.use(VueAnimate)
+Vue.use(VueScrollactive)
 
 // Inject mixins
 Vue.mixin(pageMixins)

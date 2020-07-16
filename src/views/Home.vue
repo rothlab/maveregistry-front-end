@@ -1,7 +1,32 @@
 <template>
   <section>
+    <!-- Section indicator -->
+    <scrollactive
+      class="section-indicator"
+      active-class="is-active"
+      highlight-first-item
+      :modify-url="false"
+      :offset="400"
+      :scroll-offset="84"
+    >
+      <a
+        href="#main"
+        class="scrollactive-item"
+      />
+      <a
+        href="#landing-1"
+        class="scrollactive-item"
+      />
+      <a
+        href="#landing-2"
+        class="scrollactive-item"
+      />
+    </scrollactive>
     <!-- Landing section-->
-    <section class="hero is-primary is-bold full-height">
+    <section
+      id="main"
+      class="hero is-primary is-bold full-height"
+    >
       <div class="hero-body landing">
         <div class="container is-fluid">
           <div class="columns is-vcentered">
@@ -66,10 +91,13 @@
       <div class="hero-footer">
         <!-- Tip to the next section -->
         <div class="tip has-text-centered">
-          <p class="is-inline-flex has-vcentered">
+          <p
+            class="is-inline-flex has-vcentered delay-2s"
+            v-animate.repeat="'fadeIn'"
+          >
             <b-icon
               custom-size="mdil-24px"
-              class="updown"
+              class="dalay-2s updown"
               icon="mdil-chevron-double-down"
             />
             <span>How does it work?</span>
@@ -79,15 +107,18 @@
     </section>
 
     <!-- Onboarding section 1 -->
-    <section class="hero is-medium">
+    <section 
+      id="landing-1" 
+      class="hero is-medium"
+    >
       <div class="hero-body">
         <!-- Question -->
         <div class="container has-text-centered">
-          <h1 class="title is-uppercase">
+          <p class="section-header is-uppercase">
             How does it work?
-          </h1>
+          </p>
 
-          <div class="section">
+          <div>
             <!-- Steps -->
             <div
               class="step-line is-hidden-mobile delay-1s"
@@ -143,27 +174,33 @@
       <div class="hero-footer">
         <!-- Tip to the next section -->
         <div class="tip has-text-centered">
-          <p class="is-inline-flex has-vcentered">
+          <p 
+            class="is-inline-flex has-vcentered delay-2s"
+            v-animate.repeat="'fadeIn'"
+          >
             <b-icon
               class="updown"
               custom-size="mdil-24px"
               icon="mdil-chevron-double-down"
             />
-            <span>Why register your MAVE activity?</span>
+            <span>Why register?</span>
           </p>
         </div>
       </div>
     </section>
 
     <!-- Onboarding section 2 -->
-    <section class="hero is-medium is-light">
+    <section
+      id="landing-2"
+      class="hero is-medium is-light"
+    >
       <div class="hero-body">
         <div class="container has-text-centered">
-          <h1 class="title is-uppercase">
-            Why register your MAVE activity?
-          </h1>
+          <p class="section-header is-uppercase">
+            Why register?
+          </p>
 
-          <div class="section">
+          <div>
             <b-tabs
               v-model="activeTab"
               size="is-small"
@@ -292,6 +329,11 @@ export default {
         }
       ]
     }
+  },
+  computed: {
+    isMobile() {
+      return window.innerWidth < 768
+    }
   }
 }
 </script>
@@ -330,7 +372,6 @@ export default {
     transform: perspective(400px) rotateX(0deg)
     opacity: 1
 .flipInX.animate-active
-  backface-visibility: visible !important
   animation-name: flipInX
 
 @keyframes showInX
@@ -363,6 +404,25 @@ export default {
 .fadeIn.animate-active
   animation-name: fadeIn
 
+.section-indicator
+  position: fixed
+  top: 50vh
+  right: 1rem
+  z-index: 50
+  a
+    display: block
+    height: 0.5rem
+    width: 0.5rem
+    background-color: transparent
+    border: 1px solid $grey-light
+    border-radius: 0.5rem
+    transition: ease-in-out 200ms
+    &:hover
+      background-color: $grey-light
+    &:not(:first-child)
+      margin-top: 0.5rem
+    &.is-active
+      background-color: $warning
 @media screen and (min-width: $break-desktop)
   .full-height
     height: calc( 100vh - 5rem )
@@ -375,7 +435,7 @@ export default {
     max-width: 35rem
 @media screen and (max-width: $break-desktop)
   .full-height
-    height: calc( 100vh - 3rem )
+    height: calc( 100vh - 10rem )
 @media screen and (max-width: $break-mobile)
   .landing
     text-align: center
@@ -427,8 +487,12 @@ export default {
   border: 1px solid $primary
   margin-bottom: 0.5rem
 .step-content
+  opacity: 0
   h2
-    padding: 1rem
+    @media screen and (min-width: $break-mobile)
+      padding: 1rem
+    @media screen and (max-width: $break-mobile)
+      padding: 0.25rem
   p
     &:not(.has-fullwidth)
       padding: 0 2rem
@@ -439,4 +503,13 @@ export default {
     width: 50%
     position: absolute
     right: 0px
+.section-header
+  @media screen and (max-width: $break-mobile)
+    font-size: 1.5rem
+    padding-bottom: 2rem
+  @media screen and (min-width: $break-mobile)
+    font-size: 2.5rem
+    padding-bottom: 3rem
+.is-transparent
+  animation-direction: reverse
 </style>
