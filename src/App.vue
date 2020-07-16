@@ -64,20 +64,26 @@
         </b-navbar-item>
 
         <b-navbar-dropdown
-          hoverable
+          :hoverable="!isOpenedBurger"
           right
-          collapsible
+          :collapsible="isOpenedBurger"
         >
           <template slot="label">
-            <figure
-              class="image is-24x24 profile-image"
-            >
-              <img
-                class="is-rounded"
-                :src="profileImageUrl(currentUser)"
-                alt="Profile Image"
+            <div class="is-flex">
+              <figure
+                class="image is-24x24 profile-image is-inline-block"
               >
-            </figure>
+                <img
+                  class="is-rounded"
+                  :src="profileImageUrl(currentUser)"
+                  alt="Profile Image"
+                >
+              </figure>
+              <span
+                v-if="isOpenedBurger"
+                style="padding-left: 0.5rem"
+              >User</span>
+            </div>
           </template>
 
           <b-navbar-item
