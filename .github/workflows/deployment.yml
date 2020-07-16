@@ -13,6 +13,8 @@ jobs:
     - uses: actions/setup-node@master
     - run: npm install
     - run: npm run build
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     - uses: jakejarvis/s3-sync-action@master
       with:
         args: --follow-symlinks --delete
@@ -22,4 +24,3 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: 'ca-central-1'
         SOURCE_DIR: 'dist'
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
