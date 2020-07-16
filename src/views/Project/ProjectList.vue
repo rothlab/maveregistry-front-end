@@ -281,7 +281,7 @@
                           type="is-white"
                           v-if="!project.follow_status.id"
                         >
-                          <a @click="confirmFollow(project.id, 'project', project.creator)">
+                          <a @click.stop="confirmFollow(project.id, 'project', project.creator)">
                             <b-icon
                               icon="mdil-bell"
                               class="circle-icon has-background-white-bis"
@@ -294,7 +294,7 @@
                           :type="project.follow_status.status === 'pending' ? 'is-danger' : 'is-primary'"
                           v-else
                         >
-                          <a @click="confirmUnfollow(project.follow_status.id, 'project')">
+                          <a @click.stop="confirmUnfollow(project.follow_status.id, 'project')">
                             <b-icon
                               icon="mdil-bell-off"
                               class="circle-icon"
