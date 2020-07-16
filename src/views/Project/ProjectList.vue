@@ -262,7 +262,7 @@
                       <!-- Owner -->
                       <b-tooltip
                         label="Project Owner"
-                        v-if="project.creator.username === currentUser.username"
+                        v-if="currentUser && project.creator.username === currentUser.username"
                         type="is-success"
                       >
                         <b-icon
@@ -273,7 +273,7 @@
 
                       <!-- Follow bell -->
                       <div
-                        v-if="project.creator.username !== currentUser.username && project.follow_status"
+                        v-if="currentUser && project.creator.username !== currentUser.username && project.follow_status"
                       >
                         <!-- If not followed, show follow icon -->
                         <b-tooltip
@@ -387,7 +387,7 @@
                     </router-link>
                     <!-- Followed status -->
                     <b-tag
-                      v-if="team.creator.username !== currentUser.username && team.follow_status.id"
+                      v-if="currentUser && team.creator.username !== currentUser.username && team.follow_status.id"
                       size="is-medium"
                       class="is-clickable"
                       :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-primary': team.follow_status.status === 'yes' }"
@@ -406,7 +406,7 @@
                     </b-tag>
                     <!-- Unfollowed status -->
                     <b-tag
-                      v-else-if="team.creator.username !== currentUser.username && !team.follow_status.id"
+                      v-else-if="currentUser && team.creator.username !== currentUser.username && !team.follow_status.id"
                       size="is-medium"
                       class="is-clickable has-background-white-bis"
                       @click.native="confirmFollow(team.id, 'team', team.creator)"
