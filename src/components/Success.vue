@@ -71,7 +71,6 @@ export default {
   beforeDestroy() {
     // Clean up the timer
     // Otherwise it will still fire even though we have left this page
-    console.log("here!")
     clearInterval(this.timer)
   }
 }
