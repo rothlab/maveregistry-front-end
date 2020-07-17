@@ -2,8 +2,8 @@
   <div id="app">
     <b-navbar
       fixed-top
-      spaced
       shadow
+      spaced
       type="is-primary"
       :is-active.sync="isOpenedBurger"
       v-if="!$route.meta.hideNav"
@@ -134,7 +134,10 @@
       </template>
 
       <!-- If mobile burget is triggered, draw a separate notification bell -->
-      <template slot="burger">
+      <template
+        slot="burger"
+        v-if="hasLoggedIn"
+      >
         <b-navbar-item
           tag="div"
           class="navbar-notification"
