@@ -71,17 +71,18 @@ export async function signupLoginUserGoogle (userInfo) {
   user.set("email", userInfo.email)
   user.set("first_name", userInfo.first_name.toLowerCase())
   user.set("last_name", userInfo.last_name.toLowerCase())
+  user = await user.linkWith("google", {
+    authData: userInfo.auth
+  })
+
   // If new user, store profile picture locally
   if (!user.get("profile_image")) {
     const profileImage = userInfo.profile_image
     if (profileImage) {
-      const file = await uploadProfilePic(profileImage, user.id)
-      if (file) user.set("profile_image", file)
+      const currentUser = await uploadProfilePic(profileImage, user.id)
+      if (currentUser) Parse.User.become(currentUser)
     }
   }
-  user = await user.linkWith("google", {
-    authData: userInfo.auth
-  })
 
   return parseUserMetadata(Parse.User.current())
 }
