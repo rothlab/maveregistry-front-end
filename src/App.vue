@@ -134,7 +134,10 @@
       </template>
 
       <!-- If mobile burget is triggered, draw a separate notification bell -->
-      <template slot="burger">
+      <template
+        slot="burger"
+        v-if="hasLoggedIn"
+      >
         <b-navbar-item
           tag="div"
           class="navbar-notification"
