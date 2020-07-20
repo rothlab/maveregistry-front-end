@@ -238,6 +238,24 @@
         transform: translateY(0)
         opacity: 1
         pointer-events: auto
+
+// Fix datepicker because it is implemented with dropdown
+.datepicker
+  .dropdown
+    &.is-active
+      .dropdown-menu
+        display: block !important
+        opacity: unset
+        &.fade-enter
+          opacity: 0
+    .dropdown-menu
+      display: none !important
+      pointer-events: unset
+      opacity: unset
+      &.fade-leave-active
+        display: block !important
+        opacity: 0
+      
 .navbar-notification
   @media screen and (min-width: $break-mobile)
   .dropdown-menu
