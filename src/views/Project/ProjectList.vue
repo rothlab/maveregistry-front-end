@@ -49,6 +49,7 @@
       <!-- Project table -->
       <div v-else>
         <b-table
+          :key="JSON.stringify(currentUser)"
           :data="targets"
           :loading="isLoading.fetch_targets"
           hoverable
@@ -537,6 +538,9 @@ export default {
       async handler() {
         await this.fetchTargets()
       }
+    },
+    async currentUser() {
+      await this.fetchTargets()
     }
   },
   data () {
@@ -611,8 +615,10 @@ export default {
 
         // Update pagination
         this.pagination.count = targets.count
+      // eslint-disable-next-line no-useless-catch
       } catch (error) {
-        this.errorMessage = await handleError(error)
+        // this.errorMessage = await handleError(error)
+        throw error
       } finally {
         this.isLoading.fetch_targets = false
       }

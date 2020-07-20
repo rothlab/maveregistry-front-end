@@ -38,7 +38,7 @@ export const Target = Parse.Object.extend("Target", {
   },
   format: async function () {
     // Fetch projects
-    const projects = this.get("projects")
+    const projects = this.get("projects").filter(e => e instanceof Project)
 
     // Handle team object
     const teams = projects.map(e => e.get("team")).filter(Boolean).filter(uniqueById)

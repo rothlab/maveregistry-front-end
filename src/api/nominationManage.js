@@ -90,6 +90,8 @@ export const Nomination = Parse.Object.extend("Nomination", {
 Parse.Object.registerSubclass('Nomination', Nomination);
 
 export async function fetchNominations(limit = 10, skip = 0, filter) {
+  Parse.User._clearCache()
+  
   const query = new Parse.Query(Nomination)
 
   // Apply filter when available
