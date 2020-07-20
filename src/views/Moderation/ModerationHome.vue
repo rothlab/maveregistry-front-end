@@ -29,6 +29,10 @@ import UnderConstruction from "@/components/UnderConstruction.vue"
 export default {
   components: {
     UnderConstruction
+  },
+  mounted() {
+    // Throw error
+    throw new Error ("test error")
   }
 }
 </script>

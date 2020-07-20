@@ -274,7 +274,7 @@ export async function addProject(projectInfo) {
 
   // Associate to target and the current user
   project.set("target", target)
-  project.set("user", Parse.User.current())
+  project.set("creator", Parse.User.current())
 
   // Save project
   await project.save()
@@ -324,7 +324,7 @@ export async function fetchTargets(limit, skip, filter) {
 
 export async function fetchProject(id, detail = false) {
   // Fetch project by ID
-  const project = await new Project.fetchById(id, ["target", "user", "team", "collaborators"])
+  const project = await new Project.fetchById(id, ["target", "creator", "team", "collaborators"])
 
   // Format and return
   if (!project) return

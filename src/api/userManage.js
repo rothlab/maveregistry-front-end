@@ -17,8 +17,10 @@ function parseUserMetadata (user, includeTeam = true) {
   const profileImage = user.get("profile_image")
   if (profileImage) ret.profile_image = profileImage.url()
   
+  // Here, because social is an object,
+  // we have to make a deep copy as later we might want to change it
   const social = user.get("social")
-  if (social) ret.social = social
+  if (social) ret.social = JSON.parse(JSON.stringify(social))
 
   if (includeTeam) {
     // Get team when available
@@ -151,7 +153,7 @@ export async function fetchUserInfo (username, preference = false) {
 // Update user profile
 export async function updateUserProfile (userInfo) {
   // We can only change profile for the current logged in user
-  let user = Parse.User.current();
+  let user = Parse.User.current()
   if (!user) return
 
   // Update user info
@@ -184,7 +186,9 @@ export async function updateUserProfile (userInfo) {
     hasChanged = true
     user.set("website", userInfo.website)
   }
-  if (userInfo.profile_image && userInfo.profile_image !== user.get("profile_image")) {
+  // Here, we use the type of profile_image to determine if it has been changed
+  // When the type is string (image url), it means we haven't changed pic
+  if (userInfo.profile_image && typeof userInfo.profile_image !== "string") {
     hasChanged = true
     user.set("profile_image", userInfo.profile_image)
   }
@@ -193,13 +197,25 @@ export async function updateUserProfile (userInfo) {
     hasChanged = true
     user.set("team", team)
   }
-  if (userInfo.social && JSON.stringify(userInfo.social) !== JSON.stringify(user.get("social"))) {
-    // For twitter handle, if missing @, add
-    hasChanged = true
-    if (userInfo.social.twitter && !userInfo.social.twitter.startsWith("@")) {
-      userInfo.social.twitter = "@" + userInfo.social.twitter
+  if (userInfo.social) {
+    // Remove properties with empty string
+    let social = {} 
+    Object.keys(userInfo.social).forEach(e => {
+      if (userInfo.social[e]) social[e] = userInfo.social[e]
+    })
+
+    if (Object.keys(social).length < 1 && user.get("social")) {
+      // If the object is empty, unset the corresponding field
+      hasChanged = true
+      user.unset("social")
+    } else if (Object.keys(social).length > 0 && JSON.stringify(social) !== JSON.stringify(user.get("social"))) {
+      // For twitter handle, if missing @, add
+      hasChanged = true
+      if (social.twitter && !social.twitter.startsWith("@")) {
+        social.twitter = "@" + social.twitter
+      }
+      user.set("social", social)
     }
-    user.set("social", userInfo.social)
   }
 
   // Save user info changes only if anything is changed

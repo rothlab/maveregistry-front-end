@@ -1,10 +1,11 @@
 {
   "name": "maveregistry-front-end",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:serve": "serve -s dist -l 8080",
     "lint": "vue-cli-service lint",
     "deploy": "aws s3 sync ./dist s3://maveregistry-web-client"
   },

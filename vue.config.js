@@ -14,14 +14,16 @@ module.exports = {
   configureWebpack: {
     plugins: [
       new SentryWebpackPlugin({
-        include: '.',
+        include: './dist/',
         ignoreFile: '.sentrycliignore',
         ignore: ['node_modules', 'webpack.config.js'],
         configFile: 'sentry.properties',
+        validate: true,
         dryRun: process.env.NODE_ENV === "development",
         release: 'mave-registry-frontend@' + process.env.VUE_APP_VERSION
       })
-    ]
+    ],
+    devtool: 'source-map'
   },
   devServer: {
     disableHostCheck: true
