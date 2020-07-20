@@ -145,6 +145,8 @@ export async function updateTeam(id, payload) {
   return await team.save()
 }
 export async function fetchTeams(limit, skip, objects = []) {
+  Parse.User._clearCache()
+
   // Fetch teams
   const query = new Parse.Query(Team)
   // Apply pagination

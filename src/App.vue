@@ -320,6 +320,9 @@ export default {
         type: "is-danger",
         queue: false
       })
+
+      // Still throw the erro
+      throw e
     } finally {
       this.isLoading = false
     }
@@ -354,17 +357,18 @@ export default {
   watch: {
     currentUser: {
       deep: true,
-      handler: function (val) {
+      handler: async function (val) {
         if (this.snackBarComponent && val.email_validated) {
           this.snackBarComponent.close()
         }
+
+        await this.$store.dispatch("getRoles")
       }
     }
   },
   methods: {
     logout() {
       this.$store.dispatch('logoutUser')
-      this.$router.go(0)
     },
   }
 }

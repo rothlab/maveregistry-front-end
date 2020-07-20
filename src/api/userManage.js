@@ -247,6 +247,8 @@ export async function resendValidationEmail (username) {
 
 // Get user roles
 export async function getRoles() {
+  Parse.User._clearCache()
+  
   // We can only get roles for the current user
   if (!Parse.User.current()) return []
 

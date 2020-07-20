@@ -212,8 +212,12 @@
               field="action"
               label="Action"
               width="5vw"
+              v-if="currentUser && teams.some(e => e.creator && e.creator.username !== currentUser.username )"
             >
-              <div class="action-button is-flex">
+              <div
+                class="action-button is-flex"
+                v-if="props.row.creator.username !== currentUser.username"
+              >
                 <b-button
                   v-if="props.row.follow_status && props.row.follow_status.id"
                   icon-left="mdil-bell-off"
@@ -321,7 +325,21 @@ export default {
       errorMessage: ""
     }
   },
+  watch: {
+    async currentUser(val) {
+      if (val) {
+        this.errorMessage = ""
+        await this.fetchTeams()
+      } else {
+        this.errorMessage = "Access denied. This function is only available for logged-in users."
+      }
+    }
+  },
   async mounted() {
+    if (!this.currentUser) {
+      this.errorMessage = "Access denied. This function is only available for logged-in users."
+      return
+    }
     await this.fetchTeams()
   },
   methods: {
