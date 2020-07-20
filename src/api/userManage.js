@@ -184,7 +184,9 @@ export async function updateUserProfile (userInfo) {
     hasChanged = true
     user.set("website", userInfo.website)
   }
-  if (userInfo.profile_image && userInfo.profile_image !== user.get("profile_image")) {
+  // Here, we use the type of profile_image to determine if it has been changed
+  // When the type is string (image url), it means we haven't changed pic
+  if (userInfo.profile_image && typeof userInfo.profile_image !== "string") {
     hasChanged = true
     user.set("profile_image", userInfo.profile_image)
   }
