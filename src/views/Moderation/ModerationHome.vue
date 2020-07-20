@@ -25,14 +25,15 @@
 
 <script>
 import UnderConstruction from "@/components/UnderConstruction.vue"
+import { displayErrorToast } from "@/api/errorHandler.js"
 
 export default {
   components: {
     UnderConstruction
   },
-  mounted() {
-    // Throw error
-    throw new Error ("test error")
+  async mounted() {
+    // Throw a test error
+    await displayErrorToast(new Error("test error"))
   }
 }
 </script>

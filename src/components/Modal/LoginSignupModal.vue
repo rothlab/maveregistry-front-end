@@ -250,7 +250,7 @@
 </template>
 
 <script>
-import { handleError } from "@/api/errorHandler.js";
+import { displayErrorToast } from "@/api/errorHandler.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import PasswordField from "@/components/Field/PasswordField.vue"
 import VueHcaptcha from '@hcaptcha/vue-hcaptcha'
@@ -277,7 +277,6 @@ function oauth(url, component) {
 
       // Get roles and reload page
       await component.$store.dispatch("getRoles")
-      component.$router.go(0)
     }
   }, 1000)
 }
@@ -370,15 +369,9 @@ export default {
 
             // Get roles and reload page
             await this.$store.dispatch("getRoles")
-            this.$router.go(0)
           } catch (e) {
             // Handle error
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: await handleError(e),
-              type: "is-danger",
-              queue: false
-            })
+            await displayErrorToast(e)
             return
           } finally {
             this.isLoading = false
@@ -430,15 +423,9 @@ export default {
 
             // Get roles and reload page
             await this.$store.dispatch("getRoles")
-            this.$router.go(0)
           } catch (e) {
             // Handle error
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: await handleError(e),
-              type: "is-danger",
-              queue: false
-            });
+            await displayErrorToast(e)
             return
           } finally {
             this.isLoading = false;

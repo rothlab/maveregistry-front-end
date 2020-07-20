@@ -69,7 +69,7 @@
 
 <script>
 import * as FollowManage from "@/api/followManage.js"
-import { handleError } from "@/api/errorHandler.js"
+import { displayErrorToast } from "@/api/errorHandler.js"
 
 export default {
   props: {
@@ -117,11 +117,7 @@ export default {
       try {
         await FollowManage.follow(this.source, this.type, this.request)
       } catch (error) {
-        this.$buefy.toast.open({
-          message: await handleError(error),
-          type: "is-danger",
-          duration: 5000
-        })
+        await displayErrorToast(error)
         return
       } finally {
         this.isLoading = false

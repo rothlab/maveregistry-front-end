@@ -164,7 +164,7 @@
 <script>
 import * as TeamManage from "@/api/teamManage.js"
 import PIInfoField from '@/components/Field/PIInfoField.vue'
-import { handleError } from '@/api/errorHandler.js'
+import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import { ValidationObserver } from 'vee-validate'
 
 export default {
@@ -215,7 +215,7 @@ export default {
         team = await TeamManage.queryById(this.teamId, true, false)
       } catch (error) {
         this.errorMessage = await handleError(error)
-        return
+        throw error
       }
       
       // Format PI
@@ -242,12 +242,7 @@ export default {
       try {
         await TeamManage.updateTeam(this.teamId, this.principalInvestigator)
       } catch (error) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: await handleError(error),
-          type: 'is-danger',
-          queue: false
-        })
+        await displayErrorToast(error)
         return
       } finally {
         this.isLoading.submit = false
@@ -271,12 +266,7 @@ export default {
           try {
             await TeamManage.removeMember(this.teamId, username)
           } catch (error) {
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: await handleError(error),
-              type: 'is-danger',
-              queue: false
-            })
+            await displayErrorToast(error)
             return
           }
 

@@ -39,8 +39,7 @@ Sentry.init({
   dsn: process.env.NODE_ENV === "development" ? '' : 'https://937e133d79854ca7a2301bbaa9aa8a36@o239664.ingest.sentry.io/5266396',
   integrations: [new VueIntegration({
     Vue,
-    attachProps: true,
-    logErrors: true
+    attachProps: true
   })],
   release: 'mave-registry-frontend@' + process.env.VUE_APP_VERSION
 });

@@ -178,6 +178,7 @@ export default {
         return team
       } catch (error) {
         this.errorMessage = await handleError(error)
+        throw error
       } finally {
         this.isLoading = false
       }
@@ -200,7 +201,7 @@ export default {
         }
       } catch (error) {
         this.errorMessage = await handleError(error)
-        return
+        throw error
       } finally {
         this.isLoading = false
       }

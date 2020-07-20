@@ -245,7 +245,7 @@
 <script>
 import * as UserManage from "@/api/userManage.js"
 import * as TeamManage from "@/api/teamManage.js"
-import { handleError } from "@/api/errorHandler.js"
+import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import Error from "@/components/Error.vue"
 import UserProfileAction from "@/components/Action/UserProfileAction.vue"
 
@@ -288,6 +288,11 @@ export default {
       // Fetch and store user information
       const username = this.$route.params.username
       this.userInfo = await this.fetchUserInfo(username)
+    },
+    async currentUser() {
+      // Fetch and store user information
+      const username = this.$route.params.username
+      this.userInfo = await this.fetchUserInfo(username)
     }
   },
   data () {
@@ -311,9 +316,9 @@ export default {
           res.team = await TeamManage.queryById(res.team)
         }
       } catch (error) {
-        this.errorMessage = await handleError(error)
         this.isLoading.page = false
-        return undefined
+        this.errorMessage = await handleError(error)
+        throw error
       }
 
       // Check if owning the account.
@@ -330,12 +335,7 @@ export default {
       try {
         await UserManage.resendValidationEmail(this.userInfo.username)
       } catch (error) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: await handleError(error),
-          type: 'is-danger',
-          queue: false
-        })
+        await displayErrorToast(error)
         return
       } finally {
         this.isLoading.resend_email = false

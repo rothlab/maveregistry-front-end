@@ -65,7 +65,9 @@
           </div>
         </b-notification>
 
+        <!-- Add key here so that when user log in/out, the table columns will be refreshed -->
         <b-table
+          :key="JSON.stringify(currentUser)" 
           :data="nominations"
           :loading="isLoading.page"
           hoverable
@@ -246,7 +248,6 @@
               field="vote"
               label="Vote"
               width="5vw"
-              v-if="isMember"
             >
               <b-field>
                 <p class="control action-button">
@@ -376,6 +377,9 @@ export default {
       async handler() {
         await this.fetchNominations()
       }
+    },
+    async currentUser() {
+      await this.fetchNominations()
     }
   },
   data() {
@@ -425,6 +429,7 @@ export default {
         this.pagination.count = nominations.count
       } catch (error) {
         this.errorMessage = await handleError(error)
+        throw error
       } finally {
         this.isLoading.page = false
       }

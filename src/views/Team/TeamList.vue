@@ -212,8 +212,12 @@
               field="action"
               label="Action"
               width="5vw"
+              v-if="currentUser && teams.some(e => e.creator && e.creator.username !== currentUser.username )"
             >
-              <div class="action-button is-flex">
+              <div
+                class="action-button is-flex"
+                v-if="props.row.creator.username !== currentUser.username"
+              >
                 <b-button
                   v-if="props.row.follow_status && props.row.follow_status.id"
                   icon-left="mdil-bell-off"
@@ -279,7 +283,7 @@ import * as TeamManage from "@/api/teamManage.js"
 import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
-import { handleError } from "@/api/errorHandler.js"
+import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 
 export default {
@@ -321,7 +325,21 @@ export default {
       errorMessage: ""
     }
   },
+  watch: {
+    async currentUser(val) {
+      if (val) {
+        this.errorMessage = ""
+        await this.fetchTeams()
+      } else {
+        this.errorMessage = "Access denied. This function is only available for logged-in users."
+      }
+    }
+  },
   async mounted() {
+    if (!this.currentUser) {
+      this.errorMessage = "Access denied. This function is only available for logged-in users."
+      return
+    }
     await this.fetchTeams()
   },
   methods: {
@@ -362,6 +380,7 @@ export default {
         this.pagination.count = teams.count
       } catch (error) {
         this.errorMessage = await handleError(error)
+        throw error
       } finally {
         this.isLoading.fetch_team = false
       }
@@ -398,12 +417,7 @@ export default {
         this.teams = teams.results
         this.pagination.count = teams.count
       } catch (error) {
-        this.$buefy.toast.open({
-          message: await handleError(error),
-          type: 'is-danger',
-          queue: false,
-          duration: 5000
-        })
+        await displayErrorToast(error)
       } finally {
         this.isLoading.fetch_team = false
       }

@@ -283,7 +283,7 @@ import * as UserManage from "@/api/userManage.js"
 import * as FileManage from "@/api/fileManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "@/components/Error.vue"
-import { handleError } from "@/api/errorHandler.js"
+import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import TeamInfoField from '@/components/Field/TeamInfoField.vue'
 import AvatarCropper from "vue-avatar-cropper"
 
@@ -350,9 +350,9 @@ export default {
       try {
         res = await UserManage.fetchUserInfo(username)
       } catch (error) {
-        this.errorMessage = await handleError(error)
         this.isLoading.page = false
-        return undefined
+        this.errorMessage = await handleError(error)
+        throw error
       }
 
       // Handle UI changes
@@ -368,14 +368,8 @@ export default {
         this.userInfo.team = this.team
         await this.$store.dispatch('updateUserProfile', this.userInfo)
       } catch (e) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: await handleError(e),
-          type: 'is-danger',
-          queue: false
-        })
-
         this.isLoading.save_edit = false
+        await displayErrorToast(e)
         return
       }
 
@@ -398,12 +392,7 @@ export default {
 
         this.userInfo.profile_image = res
       } catch (error) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: await handleError(error),
-          type: 'is-danger',
-          queue: false
-        })
+        await displayErrorToast(error)
       } finally {
         this.isLoading.save_profile_pic = false
       }
@@ -426,12 +415,7 @@ export default {
           queue: false
         })
       } catch (error) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: await handleError(error),
-          type: 'is-danger',
-          queue: false
-        })
+        await displayErrorToast(error)
       }
 
       this.isLoading.reset_pass = false

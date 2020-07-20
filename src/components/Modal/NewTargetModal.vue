@@ -183,7 +183,7 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import { handleError } from "@/api/errorHandler.js"
+import { displayErrorToast } from "@/api/errorHandler.js"
 
 const variables = require("@/assets/script/variables.json")
 
@@ -306,12 +306,7 @@ export default {
         this.$emit("change")
         this.isActive = false
       } catch (error) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: await handleError(error),
-          type: 'is-danger',
-          queue: false
-        })
+        await displayErrorToast(error)
       } finally {
         // Handle UI changes
         this.isLoading = false

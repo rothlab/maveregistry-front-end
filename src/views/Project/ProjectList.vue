@@ -49,6 +49,7 @@
       <!-- Project table -->
       <div v-else>
         <b-table
+          :key="JSON.stringify(currentUser)"
           :data="targets"
           :loading="isLoading.fetch_targets"
           hoverable
@@ -370,21 +371,23 @@
                   :key="index"
                 >
                   <b-taglist attached>
-                    <router-link
-                      :to="{ path: `/team/${team.id}`}"
-                      target="_blank"
+                    <b-tag
+                      size="is-medium"
+                      class="is-capitalized"
                     >
-                      <b-tag
-                        size="is-medium"
-                        class="is-capitalized"
+                      <router-link
+                        :to="{ path: `/team/${team.id}`}"
+                        target="_blank"
+                        class="has-text-grey-darker"
                       >
                         <b-icon
                           icon="mdil-account"
                           class="team-icon"
                         />
                         {{ team.name }}
-                      </b-tag>
-                    </router-link>
+                      </router-link>
+                    </b-tag>
+                    
                     <!-- Followed status -->
                     <b-tag
                       v-if="currentUser && team.creator.username !== currentUser.username && team.follow_status.id"
@@ -446,7 +449,7 @@
                 <p class="control action-button">
                   <!-- Show MaveQuest for human genes -->
                   <b-tooltip
-                    v-if="props.row.type == 'gene' && props.row.organism == 'H. sapiens'"
+                    v-if="props.row.type == 'Gene' && props.row.organism == 'H. sapiens'"
                     label="Plan with MaveQuest"
                     position="is-left"
                     type="is-dark"
@@ -535,6 +538,9 @@ export default {
       async handler() {
         await this.fetchTargets()
       }
+    },
+    async currentUser() {
+      await this.fetchTargets()
     }
   },
   data () {
@@ -611,6 +617,7 @@ export default {
         this.pagination.count = targets.count
       } catch (error) {
         this.errorMessage = await handleError(error)
+        throw error
       } finally {
         this.isLoading.fetch_targets = false
       }
@@ -654,15 +661,19 @@ export default {
       margin-right: 0 !important
     .control:not(:first-child)
       margin-left: 0.75rem
-.team-control .tags
-  border-radius: 4px
-  .tag
-    margin: 0
-    height: 2.5rem
-    box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
-    &:first-child
-      border-top-right-radius: 0
-      border-bottom-right-radius: 0
+.team-control
+  .tags
+    border-radius: 4px
+    .tag
+      margin: 0
+      height: 2.5rem
+      box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
+      &:first-child
+        border-top-right-radius: 0
+        border-bottom-right-radius: 0
+      &:only-child
+        border-top-right-radius: 4px
+        border-bottom-right-radius: 4px
 .card-header-icon
   .b-tooltip:not(:last-child)
     margin-right: 0.25rem

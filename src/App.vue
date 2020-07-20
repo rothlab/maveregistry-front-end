@@ -238,6 +238,24 @@
         transform: translateY(0)
         opacity: 1
         pointer-events: auto
+
+// Fix datepicker because it is implemented with dropdown
+.datepicker
+  .dropdown
+    &.is-active
+      .dropdown-menu
+        display: block !important
+        opacity: unset
+        &.fade-enter
+          opacity: 0
+    .dropdown-menu
+      display: none !important
+      pointer-events: unset
+      opacity: unset
+      &.fade-leave-active
+        display: block !important
+        opacity: 0
+      
 .navbar-notification
   @media screen and (min-width: $break-mobile)
   .dropdown-menu
@@ -277,7 +295,7 @@
 </style>
 
 <script>
-import { handleError } from "@/api/errorHandler.js";
+import { displayErrorToast } from "@/api/errorHandler.js"
 import NotificationAction from '@/components/Action/NotificationAction.vue'
 
 const LoginSignupModal = () => import('@/components/Modal/LoginSignupModal.vue')
@@ -296,12 +314,7 @@ export default {
       await this.$store.dispatch("loginUserCache")
       await this.$store.dispatch("getRoles")
     } catch (e) {
-      this.$buefy.toast.open({
-        duration: 5000,
-        message: await handleError(e),
-        type: "is-danger",
-        queue: false
-      })
+      await displayErrorToast(e)
     } finally {
       this.isLoading = false
     }
@@ -336,17 +349,18 @@ export default {
   watch: {
     currentUser: {
       deep: true,
-      handler: function (val) {
+      handler: async function (val) {
         if (this.snackBarComponent && val.email_validated) {
           this.snackBarComponent.close()
         }
+
+        await this.$store.dispatch("getRoles")
       }
     }
   },
   methods: {
     logout() {
       this.$store.dispatch('logoutUser')
-      this.$router.go(0)
     },
   }
 }

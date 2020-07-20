@@ -63,7 +63,7 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import { handleError } from "@/api/errorHandler.js"
+import { displayErrorToast } from "@/api/errorHandler.js"
 
 export default {
   components: {
@@ -138,12 +138,7 @@ export default {
 
         if (ret === "resend_email") return
       } catch (e) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: handleError(e),
-          type: 'is-danger',
-            queue: false
-        })
+        await displayErrorToast(e)
         return
       } finally {
         this.isLoading = false
@@ -165,13 +160,7 @@ export default {
 
           window.close()
         } catch (e) {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: await handleError(e),
-            type: 'is-danger',
-            queue: false
-          })
-
+          await displayErrorToast(e)
           return
         }
       }
@@ -217,6 +206,7 @@ export default {
           type: 'is-danger',
           queue: false
         })
+        throw error
       } finally {
         this.isLoading = false
       }

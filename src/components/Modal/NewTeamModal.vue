@@ -49,7 +49,7 @@
 <script>
 import * as TeamManage from "@/api/teamManage.js"
 import { ValidationObserver } from 'vee-validate'
-import { handleError } from "@/api/errorHandler.js"
+import { displayErrorToast } from "@/api/errorHandler.js"
 import PIInfoField from '@/components/Field/PIInfoField.vue'
 
 function initTeam() {
@@ -109,12 +109,7 @@ export default {
         // Trigger change
         this.$emit("change", team.id)
       } catch (error) {
-        this.$buefy.toast.open({
-          message: await handleError(error),
-          type: 'is-danger',
-          queue: false,
-          duration: 5000
-        })
+        await displayErrorToast(error)
       } finally {
         this.isLoading = false
       }

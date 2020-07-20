@@ -1,5 +1,5 @@
 import * as UserManage from "@/api/userManage.js"
-import { handleError } from '@/api/errorHandler.js';
+import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import { SnackbarProgrammatic as Snackbar } from 'buefy'
 import { ToastProgrammatic as Toast } from 'buefy'
 
@@ -93,11 +93,7 @@ export const actions = {
             try {
               await UserManage.resendValidationEmail(error.username)
             } catch (err) {
-              Toast.open({
-                message: await handleError(err),
-                duration: 5000,
-                type: 'is-danger'
-              })
+              await displayErrorToast(err)
               return
             }
             

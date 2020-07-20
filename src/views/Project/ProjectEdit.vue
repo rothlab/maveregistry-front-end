@@ -385,7 +385,7 @@ import TeamInfoField from '@/components/Field/TeamInfoField.vue'
 import ProjectActivityField from '@/components/Field/ProjectActivityField.vue'
 import Error from '@/components/Error.vue'
 import { ValidationObserver } from 'vee-validate'
-import { handleError } from "@/api/errorHandler.js"
+import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import * as ProjectManage from "@/api/projectManage.js"
 
 // Helper functions
@@ -494,6 +494,7 @@ export default {
         return project
       } catch (error) {
         this.errorMessage = await handleError(error)
+        throw error
       }
     },
     async updateProject() {
@@ -527,12 +528,7 @@ export default {
       try {
         await ProjectManage.updateProject(project)
       } catch (e) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: await handleError(e),
-          type: 'is-danger',
-          queue: false
-        })
+        await displayErrorToast(e)
         return
       } finally {
         this.isLoading.submit = false
