@@ -277,7 +277,6 @@ function oauth(url, component) {
 
       // Get roles and reload page
       await component.$store.dispatch("getRoles")
-      component.$router.go(0)
     }
   }, 1000)
 }
@@ -370,7 +369,6 @@ export default {
 
             // Get roles and reload page
             await this.$store.dispatch("getRoles")
-            this.$router.go(0)
           } catch (e) {
             // Handle error
             this.$buefy.toast.open({
@@ -430,7 +428,6 @@ export default {
 
             // Get roles and reload page
             await this.$store.dispatch("getRoles")
-            this.$router.go(0)
           } catch (e) {
             // Handle error
             this.$buefy.toast.open({

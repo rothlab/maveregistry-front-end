@@ -288,6 +288,11 @@ export default {
       // Fetch and store user information
       const username = this.$route.params.username
       this.userInfo = await this.fetchUserInfo(username)
+    },
+    async currentUser() {
+      // Fetch and store user information
+      const username = this.$route.params.username
+      this.userInfo = await this.fetchUserInfo(username)
     }
   },
   data () {
