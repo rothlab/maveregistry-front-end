@@ -250,7 +250,7 @@
 </template>
 
 <script>
-import { handleError } from "@/api/errorHandler.js";
+import { displayErrorToast } from "@/api/errorHandler.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import PasswordField from "@/components/Field/PasswordField.vue"
 import VueHcaptcha from '@hcaptcha/vue-hcaptcha'
@@ -371,12 +371,7 @@ export default {
             await this.$store.dispatch("getRoles")
           } catch (e) {
             // Handle error
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: await handleError(e),
-              type: "is-danger",
-              queue: false
-            })
+            await displayErrorToast(e)
             return
           } finally {
             this.isLoading = false
@@ -430,12 +425,7 @@ export default {
             await this.$store.dispatch("getRoles")
           } catch (e) {
             // Handle error
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: await handleError(e),
-              type: "is-danger",
-              queue: false
-            });
+            await displayErrorToast(e)
             return
           } finally {
             this.isLoading = false;

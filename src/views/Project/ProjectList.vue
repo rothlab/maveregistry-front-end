@@ -615,9 +615,8 @@ export default {
 
         // Update pagination
         this.pagination.count = targets.count
-      // eslint-disable-next-line no-useless-catch
       } catch (error) {
-        // this.errorMessage = await handleError(error)
+        this.errorMessage = await handleError(error)
         throw error
       } finally {
         this.isLoading.fetch_targets = false

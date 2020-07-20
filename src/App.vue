@@ -295,7 +295,7 @@
 </style>
 
 <script>
-import { handleError } from "@/api/errorHandler.js";
+import { displayErrorToast } from "@/api/errorHandler.js"
 import NotificationAction from '@/components/Action/NotificationAction.vue'
 
 const LoginSignupModal = () => import('@/components/Modal/LoginSignupModal.vue')
@@ -314,15 +314,7 @@ export default {
       await this.$store.dispatch("loginUserCache")
       await this.$store.dispatch("getRoles")
     } catch (e) {
-      this.$buefy.toast.open({
-        duration: 5000,
-        message: await handleError(e),
-        type: "is-danger",
-        queue: false
-      })
-
-      // Still throw the erro
-      throw e
+      await displayErrorToast(e)
     } finally {
       this.isLoading = false
     }

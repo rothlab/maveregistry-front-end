@@ -418,6 +418,7 @@ export default {
         return project
       } catch (error) {
         this.errorMessage = await handleError(error)
+        throw error
       }
     },
     editProject() {
@@ -429,6 +430,7 @@ export default {
         this.requestCount = await FollowManage.countFollows(id, "project", true)
       } catch (error) {
         this.errorMessage = await handleError(error)
+        throw error
       }
     },
     openFollowerModal(request) {

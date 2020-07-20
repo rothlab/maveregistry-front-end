@@ -429,6 +429,7 @@ export default {
         this.pagination.count = nominations.count
       } catch (error) {
         this.errorMessage = await handleError(error)
+        throw error
       } finally {
         this.isLoading.page = false
       }

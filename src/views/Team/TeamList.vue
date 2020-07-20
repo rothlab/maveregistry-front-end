@@ -283,7 +283,7 @@ import * as TeamManage from "@/api/teamManage.js"
 import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
-import { handleError } from "@/api/errorHandler.js"
+import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 
 export default {
@@ -380,6 +380,7 @@ export default {
         this.pagination.count = teams.count
       } catch (error) {
         this.errorMessage = await handleError(error)
+        throw error
       } finally {
         this.isLoading.fetch_team = false
       }
@@ -416,12 +417,7 @@ export default {
         this.teams = teams.results
         this.pagination.count = teams.count
       } catch (error) {
-        this.$buefy.toast.open({
-          message: await handleError(error),
-          type: 'is-danger',
-          queue: false,
-          duration: 5000
-        })
+        await displayErrorToast(error)
       } finally {
         this.isLoading.fetch_team = false
       }

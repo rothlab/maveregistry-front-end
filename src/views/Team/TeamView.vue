@@ -329,7 +329,7 @@ export default {
         team = await TeamManage.queryById(this.teamId, true, false)
       } catch (error) {
         this.errorMessage = await handleError(error)
-        return
+        throw error
       }
       
       if (!team) return
@@ -361,6 +361,7 @@ export default {
         this.requestCount = await FollowManage.countFollows(teamId, "team", true)
       } catch (error) {
         this.errorMessage = await handleError(error)
+        throw error
       }
     },
     openFollowerModal(request) {

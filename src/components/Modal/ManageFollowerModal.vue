@@ -131,7 +131,7 @@
 
 <script>
 import * as FollowManage from "@/api/followManage.js"
-import { handleError } from "@/api/errorHandler.js"
+import { displayErrorToast } from "@/api/errorHandler.js"
 
 export default {
   props: {
@@ -236,12 +236,7 @@ export default {
               queue: false
             })
           } catch (error) {
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: await handleError(error),
-              type: 'is-danger',
-              queue: false
-            })
+            await displayErrorToast(error)
           }
         }
       })
@@ -260,12 +255,7 @@ export default {
           queue: false
         })
       } catch (error) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: await handleError(error),
-          type: 'is-danger',
-          queue: false
-        })
+        await displayErrorToast(error)
       }
     }
   }
