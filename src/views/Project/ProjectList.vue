@@ -448,7 +448,7 @@
                 <p class="control action-button">
                   <!-- Show MaveQuest for human genes -->
                   <b-tooltip
-                    v-if="props.row.type == 'gene' && props.row.organism == 'H. sapiens'"
+                    v-if="props.row.type == 'Gene' && props.row.organism == 'H. sapiens'"
                     label="Plan with MaveQuest"
                     position="is-left"
                     type="is-dark"
