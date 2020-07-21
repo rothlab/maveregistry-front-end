@@ -20,6 +20,7 @@
     "buefy": "^0.8.20",
     "core-js": "^3.6.5",
     "parse": "^2.15.0",
+    "prerender-spa-plugin": "^3.4.0",
     "vee-validate": "^3.3.7",
     "vue": "^2.6.11",
     "vue-animate-scroll": "^0.1.5",

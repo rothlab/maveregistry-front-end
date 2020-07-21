@@ -1059,6 +1059,9 @@ export default {
         }
       ]
     }
+  },
+  mounted() {
+    document.dispatchEvent(new Event('render-event'))
   }
 }
 </script>

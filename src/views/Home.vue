@@ -334,6 +334,9 @@ export default {
     isMobile() {
       return window.innerWidth < 768
     }
+  },
+  mounted() {
+    document.dispatchEvent(new Event('render-event'))
   }
 }
 </script>
