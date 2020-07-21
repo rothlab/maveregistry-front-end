@@ -151,7 +151,7 @@
                 <h2 class="subtitle is-capitalized has-text-primary">
                   Register activity
                 </h2>
-                <p>Reguster activity on a target and see who is working on the same target.</p>
+                <p>Register activity on a target and see who is working on the same target.</p>
               </div>
               <div
                 class="column step-content delay-1s"

@@ -176,7 +176,7 @@
       <div class="container">
         <div class="level">
           <div class="level-left">
-            <p>Copyright © 2020 MAVE Registry. All rights reserved. Ver. {{ appVersion }}.</p>
+            <p>Copyright © 2020 Roth Laboratory. All rights reserved. Ver. {{ appVersion }}.</p>
           </div>
           <div class="level-right">
             <p class="footer-links is-flex has-vcentered">
