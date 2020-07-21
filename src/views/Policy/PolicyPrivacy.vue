@@ -124,9 +124,7 @@
           </scrollactive>
         </div>
         <div class="column content">
-          <div
-            class="paragraph"
-          >
+          <div class="p-margin">
             <p class="is-size-5">
               <b>Last updated July 20, 2020</b>
             </p>
@@ -157,7 +155,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="info-collect"
           >
             <p class="is-size-4">
@@ -243,7 +241,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="info-use"
           >
             <p class="is-size-4">
@@ -331,7 +329,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="info-share"
           >
             <p class="is-size-4">
@@ -401,7 +399,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="who-share"
           >
             <p class="is-size-4">
@@ -448,7 +446,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="cookies"
           >
             <p class="is-size-4">
@@ -466,7 +464,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="social-logins"
           >
             <p class="is-size-4">
@@ -494,7 +492,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="init-transfers"
           >
             <p class="is-size-4">
@@ -522,7 +520,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="info-retain"
           >
             <p class="is-size-4">
@@ -546,7 +544,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="info-safe"
           >
             <p class="is-size-4">
@@ -568,7 +566,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="info-minors"
           >
             <p class="is-size-4">
@@ -590,7 +588,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="privacy-rights"
           >
             <p class="is-size-4">
@@ -665,7 +663,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="dnt"
           >
             <p class="is-size-4">
@@ -682,7 +680,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="ca-residents"
           >
             <p class="is-size-4">
@@ -949,7 +947,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="policy-updates"
           >
             <p class="is-size-4">
@@ -969,7 +967,7 @@
           </div>
 
           <div
-            class="paragraph"
+            class="p-margin"
             id="contact"
           >
             <p class="is-size-4">
@@ -980,14 +978,15 @@
               or by post to:
             </p>
             <p>
-              Roth Laboratory 
-              160 College Street, Rm 940
-              Toronto, Ontario M5S 3E1
-              Canada
+              Roth Laboratory<br>
+              160 College Street<br>
+              Rm 940<br>
+              Toronto, Ontario M5S 3E1<br>
+              Canada<br>
             </p>
           </div>
 
-          <div class="paragraph">
+          <div class="p-margin">
             <p class="is-size-4">
               HOW CAN YOU REVIEW, UPDATE, OR DELETE THE DATA WE COLLECT FROM YOU?
             </p>
@@ -1002,11 +1001,6 @@
     </div>
   </div>
 </template>
-
-<style lang="sass" scoped>
-.paragraph
-  padding-bottom: 2rem
-</style>
 
 <script>
 export default {
@@ -1068,13 +1062,3 @@ export default {
   }
 }
 </script>
-
-<style lang="sass" scoped>
-@import "@/assets/style/variables.sass"
-
-.is-sticky
-  position: sticky
-  top: calc( 5rem + 1.5rem )
-  @media screen and (max-width: $break-desktop)
-    top: calc( 3rem + 1.5rem )
-</style>
