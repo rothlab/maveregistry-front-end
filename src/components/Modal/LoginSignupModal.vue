@@ -200,7 +200,36 @@
                   enter-to-submit
                   @submit="executeCaptcha"
                 />
-                <p class="control">
+                <ValidationProvider
+                  :rules="{ required: { allowFalse: false } }"
+                  name="Consent"
+                  v-slot="{ valid }"
+                >
+                  <b-checkbox v-model="hasConsent">
+                    I agree to the 
+                    <a
+                      href="/policy/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >Terms</a> 
+                    and
+                    <a
+                      href="/policy/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >Privacy Policy</a>.
+                  </b-checkbox>
+                  <p
+                    class="has-text-danger is-size-7"
+                    v-if="!valid"
+                  >
+                    You have to agree to these linked agreements before signing up.
+                  </p>
+                </ValidationProvider>
+                <p
+                  class="control"
+                  style="padding-top: 0.5rem"
+                >
                   <b-button
                     expanded
                     class="is-primary"
@@ -317,7 +346,8 @@ export default {
       lastName: "",
       username: "",
       email: "",
-      password: ""
+      password: "",
+      hasConsent: false
     };
   },
   methods: {

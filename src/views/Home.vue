@@ -151,7 +151,7 @@
                 <h2 class="subtitle is-capitalized has-text-primary">
                   Register activity
                 </h2>
-                <p>Reguster activity on a target and see who is working on the same target.</p>
+                <p>Register activity on a target and see who is working on the same target.</p>
               </div>
               <div
                 class="column step-content delay-1s"
@@ -192,95 +192,88 @@
     <!-- Onboarding section 2 -->
     <section
       id="landing-2"
-      class="hero is-medium is-light"
+      class="hero is-medium has-background-white-bis"
     >
       <div class="hero-body">
         <div class="container has-text-centered">
           <p class="section-header is-uppercase">
             Why register?
           </p>
-
-          <div>
-            <b-tabs
-              v-model="activeTab"
-              size="is-small"
-              position="is-centered"
-            >
-              <b-tab-item
-                v-for="(tab, index) in tabs"
-                :key="index"
-              >
-                <!-- Custom tab header -->
-                <template slot="header">
-                  <div class="content has-text-centered">
-                    <div
-                      class="step-number is-inline-flex has-vcentered"
-                      :class="{ 'is-primary is-bold has-text-white large-shadow': activeTab == index, 'has-text-primary': activeTab != index }"
-                    >
-                      <p
-                        class="has-fullwidth"
-                      >
-                        <i
-                          class="mdil"
-                          :class="tab.icon"
-                        />
+          
+          <div class="columns">
+            <div class="column is-4">
+              <div class="tile is-ancestor">
+                <div class="tile is-parent is-vertical">
+                  <!-- First half of the tabs -->
+                  <div
+                    class="tile is-child panel selection"
+                    :class="{ 'is-active' : activeTab === id }"
+                    v-for="(tab, id) in tabs.slice(0, Math.ceil(tabs.length / 2))"
+                    :key="id"
+                    @click="activeTab = id"
+                  >
+                    <div class="content">
+                      <b-icon
+                        :icon="tab.icon"
+                        custom-size="mdil-64px"
+                      />
+                      <p class="is-size-5">
+                        {{ tab.title }}
                       </p>
-                    </div>
-                    <p
-                      v-if="tab.title"
-                      class="tab-title is-size-5 has-text-primary is-hidden-touch"
-                    >
-                      {{ tab.title }}
-                    </p>
-                  </div>
-                </template>
-
-                <!-- Tab content -->
-                <div class="container has-text-left is-flex has-vcentered">
-                  <div class="is-hidden-mobile">
-                    <img
-                      :src="tab.image"
-                      :alt="tab.image_alt_text"
-                    >
-                  </div>
-                  <div class="tab-description">
-                    <div class="card">
-                      <div class="card-content">
-                        <div class="content">
-                          <h2 class="subtitle has-text-primary">
-                            {{ tab.title }}
-                          </h2>
-                        </div>
-                        <div class="columns">
-                          <div class="column is-narrow is-hidden-mobile">
-                            <b-icon
-                              icon="mdil-check"
-                              custom-size="mdil-36px"
-                              type="is-primary"
-                            />
-                          </div>
-                          <div class="column">
-                            <p>{{ tab.description }}</p>
-                          </div>
-                        </div>
-                        <div>
-                          <b-button
-                            tag="router-link"
-                            :to="tab.action_link"
-                            size="is-medium"
-                            class="is-capitalized"
-                            type="is-primary"
-                            expanded
-                          >
-                            {{ tab.action_text }}
-                          </b-button>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
-              </b-tab-item>
-            </b-tabs>
+                <div class="tile is-parent is-vertical">
+                  <!-- Second half of the tabs -->
+                  <div
+                    class="tile is-child panel selection"
+                    :class="{ 'is-active' : activeTab === id + Math.ceil(tabs.length / 2)}"
+                    v-for="(tab, id) in tabs.slice(Math.ceil(tabs.length / 2), tabs.length)"
+                    :key="id + Math.ceil(tabs.length / 2)"
+                    @click="activeTab = id + Math.ceil(tabs.length / 2)"
+                  >
+                    <div class="content">
+                      <b-icon
+                        :icon="tab.icon"
+                        custom-size="mdil-64px"
+                      />
+                      <p class="is-size-5 sel-title">
+                        {{ tab.title }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="column is-offset-1">
+              <b-carousel
+                v-model="activeTab"
+                :indicator="false"
+                :autoplay="false"
+                :arrow="false"
+              >
+                <b-carousel-item
+                  v-for="(tab, id) in tabs"
+                  :key="id"
+                >
+                  <div class="content has-text-left">
+                    <lottie
+                      class="animation"
+                      :options="{ animationData: tab.animation }"
+                      :height="500"
+                      :width="500"
+                    />
+                    <div class="description">
+                      <p class="is-size-5">
+                        <span class="is-size-3">{{ tab.title }}</span><br>
+                        <span>{{ tab.description }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </b-carousel-item>
+              </b-carousel>
+            </div>
           </div>
         </div>
       </div>
@@ -289,7 +282,12 @@
 </template>
 
 <script>
+import Lottie from "vue-lottie"
+
 export default {
+  components: {
+    Lottie
+  },
   data () {
     return {
       activeTab: 0,
@@ -297,35 +295,27 @@ export default {
         {
           icon: "mdil-bell",
           title: "Stay in the Loop",
-          description: "Registered members can access other teams' and data (when available) on the targets you have followed.",
-          image: "https://bulma.io/images/placeholders/640x360.png",
-          image_alt_text: "Placeholder image",
-          action_text: "Register activity",
-          action_link: "/projects"
+          description: "Receive notifications for updates of projects and teams that you follow.",
+          animation: require("@/assets/animation/stay-in-the-loop.json"),
+          animation_alt_text: "Stay in the loop",
         },
         {
           icon: "mdil-vector-union",
-          title: "Foster Collaboration",
-          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vehicula quam ipsum, ut iaculis mi molestie elementum.",
-          image: "https://bulma.io/images/placeholders/640x360.png",
-          action_text: "Register activity",
-          action_link: "/projects"
+          title: "Foster Collaborations",
+          description: "Find teams with common interest and start a collaboration.",
+          animation: require("@/assets/animation/foster-collabs.json"),
         },
         {
           icon: "mdil-shuffle",
-          title: "Resolve Conflict",
-          description: "Morbi ut rhoncus augue. Sed nec dui a enim feugiat lacinia id et turpis. Mauris faucibus semper molestie.",
-          image: "https://bulma.io/images/placeholders/640x360.png",
-          action_text: "Register activity",
-          action_link: "/projects"
+          title: "Resolve Conflicts",
+          description: "Identify and resolve potential project conflicts.",
+          animation: require("@/assets/animation/resolve-conflicts.json"),
         },
         {
           icon: "mdil-currency-usd",
           title: "Seek Funding",
-          description: "In lobortis laoreet magna et sodales. Cras mi tellus, egestas ut pretium commodo,",
-          image: "https://bulma.io/images/placeholders/640x360.png",
-          action_text: "Register activity",
-          action_link: "/projects"
+          description: "Make your projects visible to potential funders.",
+          animation: require("@/assets/animation/seek-funding.json"),
         }
       ]
     }
@@ -334,6 +324,9 @@ export default {
     isMobile() {
       return window.innerWidth < 768
     }
+  },
+  mounted() {
+    document.dispatchEvent(new Event('render-event'))
   }
 }
 </script>
@@ -342,6 +335,8 @@ export default {
 <style lang="sass">
 .tabs
   overflow: visible
+.carousel-items
+  height: 100%
 </style>
 
 <style lang="sass" scoped>
@@ -496,13 +491,6 @@ export default {
   p
     &:not(.has-fullwidth)
       padding: 0 2rem
-.tab-title
-  padding: 1rem
-@media screen and (min-width: $break-mobile)
-  .tab-description
-    width: 50%
-    position: absolute
-    right: 0px
 .section-header
   @media screen and (max-width: $break-mobile)
     font-size: 1.5rem
@@ -510,6 +498,39 @@ export default {
   @media screen and (min-width: $break-mobile)
     font-size: 2.5rem
     padding-bottom: 3rem
-.is-transparent
-  animation-direction: reverse
+.panel
+  background-color: $white
+  border-radius: 6px
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.15)
+  color: $primary
+  transition: all ease-in-out 200ms
+  &.selection
+    display: flex
+    align-items: center
+    justify-content: center
+    padding: 1rem
+    cursor: pointer
+    &:hover, &.is-active
+      background-image: linear-gradient(141deg, #280444 0%, #540d6e 71%, #7c0c89 100%)
+      box-shadow: 0 1rem 3rem rgba(0,0,0,.175)
+      color: $white
+    .icon
+      height: unset
+      width: unset
+.carousel
+  height: 100%
+  .content
+    height: 100%
+    background-position: center
+    border-radius: 6px
+  .animation
+    margin: 0
+    right: 0
+    top: 0
+    position: relative
+  .description
+    padding: 0 3rem
+    color: $dark
+    position: relative
+    bottom: 3rem
 </style>
