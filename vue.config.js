@@ -25,7 +25,6 @@ module.exports = {
           ignore: ['node_modules', 'webpack.config.js'],
           configFile: 'sentry.properties',
           validate: true,
-          dryRun: process.env.NODE_ENV === "development",
           release: 'mave-registry-frontend@' + process.env.VUE_APP_VERSION
         }),
         new PrerenderSPAPlugin({
