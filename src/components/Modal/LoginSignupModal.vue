@@ -219,11 +219,17 @@
                       rel="noopener noreferrer"
                     >Privacy Policy</a>.
                   </b-checkbox>
-                  <p class="has-text-danger is-size-7" v-if="!valid">
+                  <p
+                    class="has-text-danger is-size-7"
+                    v-if="!valid"
+                  >
                     You have to agree to these linked agreements before signing up.
                   </p>
                 </ValidationProvider>
-                <p class="control" style="padding-top: 0.5rem">
+                <p
+                  class="control"
+                  style="padding-top: 0.5rem"
+                >
                   <b-button
                     expanded
                     class="is-primary"
