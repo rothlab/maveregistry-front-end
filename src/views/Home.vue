@@ -252,6 +252,7 @@
                 :indicator="false"
                 :autoplay="false"
                 :arrow="false"
+                :has-drag="false"
               >
                 <b-carousel-item
                   v-for="(tab, id) in tabs"
