@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import createMutationsSharer from "vuex-shared-mutations";
+import createMutationsSharer from "vuex-shared-mutations"
+import createPersistedState from "vuex-persistedstate"
 
 // Import modules
 import * as userModule from "./userModule.js"
@@ -17,7 +18,13 @@ export default new Vuex.Store({
     createMutationsSharer({
       predicate: [
         'setUser', 'logoutUser', 'setRoles', 
-        'addNotification', 'removeNotification', 'setNotifications', 'setAsRead', 'setAsUnread'
+        'addNotification', 'removeNotification', 'setNotifications', 'setAsRead', 'setAsUnread',
+        'setCookieConsent'
+      ]
+    }),
+    createPersistedState({
+      paths: [
+        'user.hasAcceptedCookieConsent'
       ]
     })
   ]

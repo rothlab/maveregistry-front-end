@@ -5,7 +5,8 @@ import { ToastProgrammatic as Toast } from 'buefy'
 
 export const state = {
   user: undefined,
-  roles: []
+  roles: [],
+  hasAcceptedCookieConsent: false
 }
 
 export const getters = {
@@ -20,6 +21,9 @@ export const getters = {
   },
   isOwner: (state, getters) => (owner) => {
     return getters.hasLoggedIn && state.user.username === owner
+  },
+  hasAcceptedCookieConsent: (state) => {
+    return state.hasAcceptedCookieConsent
   }
 }
 
@@ -32,6 +36,9 @@ export const mutations = {
   },
   setRoles(state, roles) {
     state.roles = roles
+  },
+  setCookieConsent(state) {
+    state.hasAcceptedCookieConsent = true
   }
 }
 
@@ -41,6 +48,9 @@ export const actions = {
     commit('logoutUser')
     
     await UserManage.logoutUser()
+  },
+  acceptCookieConsent({ commit }) {
+    commit('setCookieConsent')
   },
   async loginUserPassword ({ commit }, credential) {
     const user = await UserManage.loginUserPassword(credential.username, credential.password)
