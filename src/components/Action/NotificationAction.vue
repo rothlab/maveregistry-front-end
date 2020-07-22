@@ -199,7 +199,7 @@ export default {
   methods: {
     timeSince(time) {
       const seconds = Math.floor((Date.now() - time) / 1000);
-      if (seconds < 1) return "right now"
+      if (seconds <= 1) return "right now"
 
       const interval = variables.intervals.find(i => i.seconds < seconds);
       const count = Math.floor(seconds / interval.seconds);
