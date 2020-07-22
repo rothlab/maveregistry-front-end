@@ -1,0 +1,56 @@
+// Animation
+.animate
+  animation-duration: 1s
+  animation-fill-mode: both
+.delay-500ms
+  animation-delay: 500ms
+.delay-1s
+  animation-delay: 1s
+.delay-1500ms
+  animation-delay: 1500ms
+.delay-2s
+  animation-delay: 2s
+
+@keyframes flipInX
+  0%
+    transform: perspective(400px) rotateX(90deg)
+    opacity: 0
+  40%
+    transform: perspective(400px) rotateX(-10deg)
+  70%
+    transform: perspective(400px) rotateX(10deg)
+  100%
+    transform: perspective(400px) rotateX(0deg)
+    opacity: 1
+.flipInX.animate-active
+  animation-name: flipInX
+
+@keyframes showInX
+  0%
+    width: 0%
+  100%
+    width: 70%
+.showInX.animate-active
+  animation-name: showInX
+
+@keyframes upDown
+  0% 
+    transform: translateY(0%)
+  33%
+    transform: translateY(30%)
+  66%
+    transform: translateY(-30%)
+  100%
+    transform: translateY(0%)
+.updown
+  animation: upDown 1s ease-in-out infinite
+
+@keyframes fadeIn
+  0%
+    opacity: 0
+    transform: translate3d(0, -20%, 0)
+  100%
+    opacity: 1
+    transform: translate3d(0, 0, 0)
+.fadeIn.animate-active
+  animation-name: fadeIn
