@@ -195,13 +195,12 @@
                 About
               </router-link>
               <span class="divider" />
-              <router-link
-                :to="{ name: 'Contact' }"
-                target="_blank"
+              <a
+                href="mailto:maveregistry@gmail.com"
                 class="has-text-light"
               >
                 Contact Us
-              </router-link>
+              </a>
               <span class="divider" />
               <router-link
                 :to="{ name: 'Terms' }"
