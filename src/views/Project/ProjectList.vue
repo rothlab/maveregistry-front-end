@@ -675,6 +675,7 @@ export default {
         border-top-right-radius: 4px
         border-bottom-right-radius: 4px
 .card-header-icon
-  .b-tooltip:not(:last-child)
-    margin-right: 0.25rem
+  .b-tooltip
+    &:not(:last-child), &:only-child
+      margin-right: 0.25rem
 </style>

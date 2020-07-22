@@ -135,9 +135,9 @@
                   </p>
                 </div>
                 <h2 class="subtitle is-capitalized has-text-primary">
-                  Browse project
+                  Nominate targets
                 </h2>
-                <p>See which targets have been registered with activities.</p>
+                <p>Propose MAVE targets of which a systematic variant effect map you would like to see.</p>
               </div>
               <div
                 class="column step-content delay-500ms"
@@ -149,9 +149,9 @@
                   </p>
                 </div>
                 <h2 class="subtitle is-capitalized has-text-primary">
-                  Register activity
+                  Register projects
                 </h2>
-                <p>Register activity on a target and see who is working on the same target.</p>
+                <p>Register projects that your team is working on.</p>
               </div>
               <div
                 class="column step-content delay-1s"
@@ -165,7 +165,7 @@
                 <h2 class="subtitle is-capitalized has-text-primary">
                   Keep updated
                 </h2>
-                <p>Follow team and get notified when they register new activities.</p>
+                <p>Get updates for teams and projects that you follow.</p>
               </div>
             </div>
           </div>
@@ -200,44 +200,26 @@
             Why register?
           </p>
           
-          <div class="columns">
-            <div class="column is-4">
-              <div class="tile is-ancestor">
-                <div class="tile is-parent is-vertical">
-                  <!-- First half of the tabs -->
+          <!-- Desktop view -->
+          <div class="columns is-hidden-touch">
+            <div class="column is-3 is-offset-1">
+              <div class="columns is-multiline">
+                <div
+                  class="column is-narrow"
+                  v-for="(tab, id) in tabs"
+                  :key="id"
+                  @click="activeTab = id"
+                >
                   <div
-                    class="tile is-child panel selection"
+                    class="panel selection"
                     :class="{ 'is-active' : activeTab === id }"
-                    v-for="(tab, id) in tabs.slice(0, Math.ceil(tabs.length / 2))"
-                    :key="id"
-                    @click="activeTab = id"
                   >
-                    <div class="content">
+                    <div>
                       <b-icon
                         :icon="tab.icon"
-                        custom-size="mdil-64px"
+                        custom-size="mdil-48px"
                       />
-                      <p class="is-size-5">
-                        {{ tab.title }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="tile is-parent is-vertical">
-                  <!-- Second half of the tabs -->
-                  <div
-                    class="tile is-child panel selection"
-                    :class="{ 'is-active' : activeTab === id + Math.ceil(tabs.length / 2)}"
-                    v-for="(tab, id) in tabs.slice(Math.ceil(tabs.length / 2), tabs.length)"
-                    :key="id + Math.ceil(tabs.length / 2)"
-                    @click="activeTab = id + Math.ceil(tabs.length / 2)"
-                  >
-                    <div class="content">
-                      <b-icon
-                        :icon="tab.icon"
-                        custom-size="mdil-64px"
-                      />
-                      <p class="is-size-5 sel-title">
+                      <p class="is-size-6">
                         {{ tab.title }}
                       </p>
                     </div>
@@ -246,12 +228,13 @@
               </div>
             </div>
 
-            <div class="column is-offset-1">
+            <div class="column">
               <b-carousel
                 v-model="activeTab"
                 :indicator="false"
                 :autoplay="false"
                 :arrow="false"
+                :has-drag="false"
               >
                 <b-carousel-item
                   v-for="(tab, id) in tabs"
@@ -263,6 +246,7 @@
                       :options="{ animationData: tab.animation }"
                       :height="500"
                       :width="500"
+                      :autoplay="false"
                     />
                     <div class="description">
                       <p class="is-size-5">
@@ -273,6 +257,30 @@
                   </div>
                 </b-carousel-item>
               </b-carousel>
+            </div>
+          </div>
+
+          <!-- Mobile view -->
+          <div class="content has-text-left is-hidden-desktop">
+            <div
+              style="margin: 0 1rem"
+              v-for="(tab, id) in tabs"
+              :key="id"
+            >
+              <div class="p-margin">
+                <div class="is-flex has-vcentered field-margin">
+                  <b-icon
+                    :icon="tab.icon"
+                    custom-size="mdil-24px"
+                    type="is-primary"
+                    style="margin-right: 0.25rem"
+                  />
+                  <span class="is-size-5 has-text-primary">{{ tab.title }}</span>
+                </div>
+                <div style="padding-left: 1.75rem">
+                  {{ tab.description }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -340,64 +348,8 @@ export default {
 </style>
 
 <style lang="sass" scoped>
-@import "../assets/style/variables.sass"
-
-// Animation
-.animate
-  animation-duration: 1s
-  animation-fill-mode: both
-.delay-500ms
-  animation-delay: 500ms
-.delay-1s
-  animation-delay: 1s
-.delay-1500ms
-  animation-delay: 1500ms
-.delay-2s
-  animation-delay: 2s
-
-@keyframes flipInX
-  0%
-    transform: perspective(400px) rotateX(90deg)
-    opacity: 0
-  40%
-    transform: perspective(400px) rotateX(-10deg)
-  70%
-    transform: perspective(400px) rotateX(10deg)
-  100%
-    transform: perspective(400px) rotateX(0deg)
-    opacity: 1
-.flipInX.animate-active
-  animation-name: flipInX
-
-@keyframes showInX
-  0%
-    width: 0%
-  100%
-    width: 70%
-.showInX.animate-active
-  animation-name: showInX
-
-@keyframes upDown
-  0% 
-    transform: translateY(0%)
-  33%
-    transform: translateY(30%)
-  66%
-    transform: translateY(-30%)
-  100%
-    transform: translateY(0%)
-.updown
-  animation: upDown 1s ease-in-out infinite
-
-@keyframes fadeIn
-  0%
-    opacity: 0
-    transform: translate3d(0, -20%, 0)
-  100%
-    opacity: 1
-    transform: translate3d(0, 0, 0)
-.fadeIn.animate-active
-  animation-name: fadeIn
+@import "@/assets/style/variables.sass"
+@import "@/assets/style/animations.sass"
 
 .section-indicator
   position: fixed
@@ -505,20 +457,21 @@ export default {
   color: $primary
   transition: all ease-in-out 200ms
   &.selection
-    display: flex
+    display: inline-flex
     align-items: center
     justify-content: center
     padding: 1rem
     cursor: pointer
+    height: 9rem
+    width: 9rem
     &:hover, &.is-active
       background-image: linear-gradient(141deg, #280444 0%, #540d6e 71%, #7c0c89 100%)
       box-shadow: 0 1rem 3rem rgba(0,0,0,.175)
       color: $white
     .icon
-      height: unset
-      width: unset
+      height: 48px
+      width: 48px
 .carousel
-  height: 100%
   .content
     height: 100%
     background-position: center
@@ -531,6 +484,4 @@ export default {
   .description
     padding: 0 3rem
     color: $dark
-    position: relative
-    bottom: 3rem
 </style>
