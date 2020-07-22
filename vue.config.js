@@ -29,7 +29,7 @@ module.exports = {
         }),
         new PrerenderSPAPlugin({
           staticDir: path.join(__dirname, 'dist'),
-          routes: [ '/', '/policy/terms', '/policy/privacy'],
+          routes: [ '/', '/policy/terms', '/policy/privacy', '/about'],
           renderer: new Renderer({
             headless: true,
             renderAfterDocumentEvent: 'render-event'
