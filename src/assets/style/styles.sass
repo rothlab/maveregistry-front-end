@@ -54,7 +54,6 @@
   .columns
     margin-bottom: 0
 .project-card
-  padding: 0.25rem 0
   box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
   &:first-child
     border-radius: 0.4rem 0.4rem 0 0
@@ -63,12 +62,25 @@
   &:only-child
     border-radius: 0.4rem
   .card-header
+    padding: 0.25rem 0
     box-shadow: none
   .card-header-title, .card-header-icon
     font-weight: normal
     padding: 0.25rem 0.5rem
   .card-content
-    padding: 0.25rem 0.5rem 0.25rem 0.9rem
+    padding: 0 0.5rem 0.5rem 0.9rem
+  .card-footer
+    border-top: unset
+    border-bottom: 1px solid $grey-lighter
+    &:last-child
+      border-bottom-left-radius: 0.4rem
+      border-bottom-right-radius: 0.4rem
+      .card-footer-item
+        border-bottom-left-radius: 0.4rem
+        border-bottom-right-radius: 0.4rem
+    .card-footer-item
+      padding: 0.25rem 0
+      border-right: unset
 .project-header
   margin-bottom: 0.5rem
 .no-project

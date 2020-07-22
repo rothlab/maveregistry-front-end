@@ -183,7 +183,19 @@
       <div class="container">
         <div class="level">
           <div class="level-left">
-            <p>Copyright © 2020 Roth Laboratory. All rights reserved. Ver. {{ appVersion }}.</p>
+            <p>
+              Copyright © 2020 Mave Registry. Ver. {{ appVersion }}. <br>
+              Made with
+              <b-icon
+                icon="mdil-heart"
+                class="has-background-danger"
+              /> at
+              <a
+                href="http://llama.mshri.on.ca/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >Roth Lab</a>.
+            </p>
           </div>
           <div class="level-right">
             <p class="footer-links is-flex has-vcentered">
@@ -230,10 +242,11 @@
 
 .navbar-brand
   .navbar-item
-    background-color: $white
-    @media screen and (min-width: $break-mobile)
-      border-radius: 6px
-      margin-right: 0.5rem
+    &:first-child
+      background-color: $white
+      @media screen and (min-width: $break-desktop)
+        border-radius: 6px
+        margin-right: 0.5rem
 .dropdown
   .dropdown-menu
     display: block !important
@@ -284,6 +297,10 @@
 
 .footer
   padding: 3rem 1.5rem
+  p
+    @media screen and (max-width: $break-mobile)
+      text-align: center
+      justify-content: center
 .navbar-brand .is-active // Remove active style for the logo
   background-color: transparent !important
 .icon-margin-right

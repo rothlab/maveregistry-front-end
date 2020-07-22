@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="hero is-light is-bold">
+    <div class="hero is-light">
       <div class="hero-body has-page-header-padding">
         <div class="container">
           <div class="level is-mobile">
@@ -20,7 +20,7 @@
               <!-- Edit project -->
               <b-button
                 icon-left="mdil-pencil"
-                type="is-primary"
+                type="is-warning"
                 size="is-medium"
                 @click="editTeam"
               >
