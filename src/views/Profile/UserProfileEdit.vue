@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="hero is-light is-bold">
+    <div class="hero is-light">
       <div class="hero-body has-page-header-padding">
         <div class="container">
           <div class="level is-mobile">
@@ -19,7 +19,7 @@
               <!-- Edit project -->
               <b-button
                 icon-left="mdil-content-save"
-                type="is-primary"
+                type="is-warning small-shadow"
                 size="is-medium"
                 :loading="isLoading.save_edit"
                 :disabled="isDisabled"

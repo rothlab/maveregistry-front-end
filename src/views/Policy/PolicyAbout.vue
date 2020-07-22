@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="hero is-light is-bold">
+    <div class="hero is-light">
       <div class="hero-body has-page-header-padding">
         <div class="container">
           <div class="level is-mobile">
@@ -166,7 +166,7 @@
               </ul>
             </p>
             <p>
-              A complete list of Open Source projects used and their licenses is listed below.
+              A complete list of Open Source projects used and their license is listed below.
             </p>
             <b-table
               :data="openSourceProjects"
@@ -192,7 +192,7 @@
                 </b-table-column>
                 <b-table-column
                   field="team"
-                  label="Team"
+                  label="Team/Authors"
                   sortable
                 >
                   {{ props.row.team }}

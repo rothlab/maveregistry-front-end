@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="hero is-light is-bold">
+    <div class="hero is-light">
       <div class="hero-body has-page-header-padding">
         <div class="container">
           <div class="level is-mobile">
@@ -20,7 +20,7 @@
               <!-- Non-mobile style -->
               <b-button
                 icon-left="mdil-plus"
-                type="is-primary"
+                type="is-warning small-shadow"
                 size="is-medium"
                 class="is-hidden-mobile"
                 @click="addTeam"
@@ -30,7 +30,7 @@
               <!-- Mobile style -->
               <b-button
                 icon-left="mdil-plus"
-                type="is-primary"
+                type="is-warning small-shadow"
                 size="is-medium"
                 class="is-hidden-tablet"
                 @click="addTeam"
