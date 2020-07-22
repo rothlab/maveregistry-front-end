@@ -319,22 +319,7 @@ export default {
       this.isLoading = false
     }
 
-    // If user has logged in but hasn't verified email,
-    // show notification
-    if (this.hasLoggedIn && this.currentUser && !this.currentUser.email_validated) {
-      const isInProfile = this.$route.name === "User Profile View"
-      this.snackBarComponent = this.$buefy.snackbar.open({
-        message: "Please verify your email address.<br>Access to the registry is limited until the email is verified.",
-        type: "is-danger",
-        position: "is-top",
-        actionText: isInProfile ? "Dismiss" : "Verify Email",
-        indefinite: true,
-        onAction: () => {
-          if (!isInProfile)
-            this.$router.push({ name: 'User Profile View', params: { username: this.currentUser.username } })
-        }
-      })
-    }
+    this.checkEmail()
   },
   data () {
     return {
@@ -354,7 +339,12 @@ export default {
           this.snackBarComponent.close()
         }
 
-        await this.$store.dispatch("getRoles")
+        try {
+          await this.$store.dispatch("getRoles")
+          this.checkEmail()
+        } catch (error) {
+          await displayErrorToast(error)
+        }
       }
     }
   },
@@ -362,6 +352,24 @@ export default {
     logout() {
       this.$store.dispatch('logoutUser')
     },
+    checkEmail() {
+      // If user has logged in but hasn't verified email,
+      // show notification
+      if (this.hasLoggedIn && this.currentUser && !this.currentUser.email_validated) {
+        const isInProfile = this.$route.name === "User Profile View"
+        this.snackBarComponent = this.$buefy.snackbar.open({
+          message: "Please verify your email address.<br>Access to the registry is limited until the email is verified.",
+          type: "is-danger",
+          position: "is-top",
+          actionText: isInProfile ? "Dismiss" : "Verify Email",
+          indefinite: true,
+          onAction: () => {
+            if (!isInProfile)
+              this.$router.push({ name: 'User Profile View', params: { username: this.currentUser.username } })
+          }
+        })
+      }
+    }
   }
 }
 </script>
