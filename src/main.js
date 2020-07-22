@@ -44,6 +44,10 @@ Sentry.init({
   })],
   release: 'mave-registry-frontend@' + process.env.VUE_APP_VERSION
 });
+// Report vuex states
+Sentry.configureScope(scope => {
+  scope.setExtra(store.state)
+})
 
 // Inject plugins
 Vue.use(VueAxios, axios)

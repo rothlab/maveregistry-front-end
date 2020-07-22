@@ -81,11 +81,6 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "about" */ '../views/Policy/PolicyAbout.vue')
   },
   {
-    path: '/contact',
-    name: 'Contact',
-    component: () => import(/* webpackChunkName: "contact" */ '../views/Policy/PolicyContact.vue')
-  },
-  {
     path: '/policy/terms',
     name: 'Terms',
     component: () => import(/* webpackChunkName: "terms" */ '../views/Policy/PolicyTerms.vue')

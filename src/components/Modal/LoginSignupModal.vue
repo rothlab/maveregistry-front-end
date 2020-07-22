@@ -15,11 +15,13 @@
             @expired="onErrorCaptcha('Captcha Expired')"
             @error="onErrorCaptcha"
           />
-          <!-- <div class="content has-text-centered">
-            <h2 class="subtitle">
-              MAVE Registry
-            </h2>
-          </div> -->
+          <div class="content has-text-centered">
+            <img
+              width="200"
+              src="@/assets/image/logo.png"
+              alt="Mave Registry Logo"
+            >
+          </div>
 
           <!-- Log in/Sign up tab -->
           <b-tabs

@@ -11,10 +11,17 @@
       <!-- Logo -->
       <template slot="brand">
         <b-navbar-item
-          tag="router-link"
-          :to="{ path: '/' }"
+          tag="div"
         >
-          MAVE Registry
+          <router-link
+            to="/"
+            class="is-flex"
+          >
+            <img
+              src="./assets/image/logo.png"
+              alt="Mave Registry Logo"
+            >
+          </router-link>
         </b-navbar-item>
       </template>
 
@@ -188,13 +195,12 @@
                 About
               </router-link>
               <span class="divider" />
-              <router-link
-                :to="{ name: 'Contact' }"
-                target="_blank"
+              <a
+                href="mailto:maveregistry@gmail.com"
                 class="has-text-light"
               >
                 Contact Us
-              </router-link>
+              </a>
               <span class="divider" />
               <router-link
                 :to="{ name: 'Terms' }"
@@ -222,6 +228,12 @@
 <style lang="sass">
 @import "@/assets/style/variables.sass"
 
+.navbar-brand
+  .navbar-item
+    background-color: $white
+    @media screen and (min-width: $break-mobile)
+      border-radius: 6px
+      margin-right: 0.5rem
 .dropdown
   .dropdown-menu
     display: block !important
