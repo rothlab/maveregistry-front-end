@@ -205,7 +205,7 @@
                 <ValidationProvider
                   :rules="{ required: { allowFalse: false } }"
                   name="Consent"
-                  v-slot="{ valid }"
+                  v-slot="{ errors }"
                 >
                   <b-checkbox v-model="hasConsent">
                     I agree to the 
@@ -223,7 +223,7 @@
                   </b-checkbox>
                   <p
                     class="has-text-danger is-size-7"
-                    v-if="!valid"
+                    v-if="errors[0]"
                   >
                     You have to agree to these linked agreements before signing up.
                   </p>
