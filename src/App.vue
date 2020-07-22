@@ -11,10 +11,17 @@
       <!-- Logo -->
       <template slot="brand">
         <b-navbar-item
-          tag="router-link"
-          :to="{ path: '/' }"
+          tag="div"
         >
-          MAVE Registry
+          <router-link
+            to="/"
+            class="is-flex"
+          >
+            <img
+              src="./assets/image/logo.png"
+              alt="Mave Registry Logo"
+            >
+          </router-link>
         </b-navbar-item>
       </template>
 
@@ -222,6 +229,12 @@
 <style lang="sass">
 @import "@/assets/style/variables.sass"
 
+.navbar-brand
+  .navbar-item
+    background-color: $white
+    @media screen and (min-width: $break-mobile)
+      border-radius: 6px
+      margin-right: 0.5rem
 .dropdown
   .dropdown-menu
     display: block !important
