@@ -206,9 +206,25 @@
                   class="card project-card has-background-light"
                 >
                   <div class="card-header">
-                    <p class="card-header-title is-capitalized">
-                      <b-icon icon="mdil-play" />
-                      Under Investigation
+                    <p
+                      class="card-header-title is-capitalized"
+                      v-if="hasLoggedIn"
+                    >
+                      <b-icon
+                        icon="mdil-play"
+                        style="margin-right: 0.25rem"
+                      />
+                      Under Investigation (No project details)
+                    </p>
+                    <p
+                      class="card-header-title is-capitalized"
+                      v-else
+                    >
+                      <b-icon
+                        icon="mdil-lock"
+                        style="margin-right: 0.25rem"
+                      />
+                      Login For Details
                     </p>
                   </div>
                 </div>
@@ -229,23 +245,31 @@
                   >
                     <p
                       v-if="project.type"
-                      class="card-header-title is-capitalized"
+                      class="card-header-title"
                     >
                       <b-icon
                         :icon="progressIcons[project.type]"
                         style="margin-right: 0.25rem"
                       />
-                      <span>{{ project.type }}</span>
+                      <span class="is-capitalized">{{ project.type }}</span>
+                      <span
+                        class="is-size-7 has-text-info"
+                        style="margin-left: 0.5rem"
+                      >(Click to {{ innerProps.open ? 'collapse' : 'expand' }})</span>
                     </p>
                     <p
                       v-else
-                      class="card-header-title is-capitalized"
+                      class="card-header-title"
                     >
                       <b-icon
                         icon="mdil-play"
                         style="margin-right: 0.25rem"
                       />
-                      <span>Under Investigation</span>
+                      <span class="is-capitalized">Under Investigation</span>
+                      <span
+                        class="is-size-7 has-text-info"
+                        style="margin-left: 0.5rem"
+                      >(Click to {{ innerProps.open ? 'collapse' : 'expand' }})</span>
                     </p>
                     <div class="card-header-icon">
                       <!-- Open for funding -->
@@ -315,28 +339,50 @@
                   <div class="card-content">
                     <div
                       class="content"
-                      style="padding-bottom: 0.5rem"
                     >
                       <p class="is-size-6">
-                        <span class="has-text-primary">Project ID:</span>
-                        <router-link
-                          :to="{ path: `/project/${project.id}`}"
-                          target="_blank"
-                        >
-                          {{ project.id }}
-                        </router-link>
-                        <br>
                         <span class="has-text-primary">
                           Feature{{ project.features.length > 1 ? 's:' : ':' }}
+                          {{ project.features.join(", ") }}
                         </span>
-                        {{ project.features.join(", ") }}
                         <br>
-                        <span
+                        <v-clamp
                           v-if="project.description"
-                          class="has-text-primary"
-                        >Progress description:</span>
-                        {{ project.description }}
+                          autoresize
+                          :max-lines="4"
+                        >
+                          {{ project.description }}
+                          <template
+                            slot="after"
+                            slot-scope="clampProps"
+                          >
+                            <a
+                              class="is-size-7 is-block has-text-centered"
+                              @click="clampProps.toggle()"
+                            >
+                              <b-icon :icon="clampProps.expanded ? 'mdil-chevron-double-up' : 'mdil-chevron-double-down'" />
+                              {{ clampProps.expanded ? "Hide" : "Show all" }}
+                            </a>
+                          </template>
+                        </v-clamp>
                       </p>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <div class="card-footer-item has-background-white-bis">
+                      <router-link
+                        :to="{ path: `/project/${project.id}`}"
+                        target="_blank"
+                      >
+                        <b-icon icon="mdil-magnify" />
+                        View details
+                      </router-link>
+                    </div>
+                    <div class="card-footer-item has-background-white-bis">
+                      <a>
+                        <b-icon icon="mdil-bell" />
+                        Follow Project
+                      </a>
                     </div>
                   </div>
                 </b-collapse>
@@ -522,6 +568,7 @@ import Error from '@/components/Error.vue'
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
+import VClamp from 'vue-clamp'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -530,7 +577,8 @@ export default {
     Error,
     FollowModal,
     UnfollowModal,
-    NewTargetModal
+    NewTargetModal,
+    VClamp
   },
   watch: {
     filter: {

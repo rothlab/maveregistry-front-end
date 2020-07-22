@@ -81,6 +81,9 @@ export const Target = Parse.Object.extend("Target", {
           // we display that instead
           if (publicActivity.get("type")) ret.type = publicActivity.get("type")
           if (publicActivity.get("description")) ret.description = publicActivity.get("description")
+        } else if (!Parse.User.current()) {
+          // If not logged in, don't return projects without recent or public activity
+          return undefined
         }
 
         return ret
@@ -317,6 +320,7 @@ export async function fetchTargets(limit, skip, filter) {
 
   let targets = await query.find()
   targets.results = await Promise.all(targets.results.map(e => e.format())) // Format targets
+  targets.results = targets.results.filter(Boolean)
   
   // Format and return
   return targets
