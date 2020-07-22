@@ -17,7 +17,7 @@
               <!-- Non-mobile style -->
               <b-button
                 icon-left="mdil-plus"
-                type="is-warning small-shadow"
+                type="is-warning"
                 size="is-medium"
                 class="is-hidden-mobile"
                 @click="handleNewTargetModal()"
@@ -27,7 +27,7 @@
               <!-- Mobile style -->
               <b-button
                 icon-left="mdil-plus"
-                type="is-warning small-shadow"
+                type="is-warning"
                 size="is-medium"
                 class="is-hidden-tablet"
                 @click="handleNewTargetModal()"

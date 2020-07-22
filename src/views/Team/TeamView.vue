@@ -20,7 +20,7 @@
               <!-- Edit project -->
               <b-button
                 icon-left="mdil-pencil"
-                type="is-warning small-shadow"
+                type="is-warning"
                 size="is-medium"
                 @click="editTeam"
               >

@@ -19,7 +19,7 @@
               <!-- Edit project -->
               <b-button
                 icon-left="mdil-content-save"
-                type="is-warning small-shadow"
+                type="is-warning"
                 size="is-medium"
                 :loading="isLoading.save_edit"
                 :disabled="isDisabled"
