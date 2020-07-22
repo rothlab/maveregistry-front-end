@@ -507,6 +507,13 @@ export default {
           license_url: "https://github.com/mozilla/nunjucks/blob/master/LICENSE",
           link: "https://mozilla.github.io/nunjucks/"
         },
+        {
+          project: "vuex-persistedstate",
+          team: "Robin van der Vleuten",
+          license: "MIT",
+          license_url: "https://github.com/robinvdvleuten/vuex-persistedstate/blob/master/LICENSE",
+          link: "https://github.com/robinvdvleuten/vuex-persistedstate"
+        }
       ]
     }
   }
