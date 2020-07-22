@@ -17,7 +17,7 @@ export default {
     profileImageUrl(user) {
       // Set url as placeholder
       let url
-      if (!user || !user.profile_image) url = require("@/assets/image/blank-profile.png")
+      if (!user || !user.profile_image) return require("@/assets/image/blank-profile.png")
 
       if (typeof user.profile_image === "string") {
         url = user.profile_image
