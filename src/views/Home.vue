@@ -63,7 +63,7 @@
                         class="med-shadow delay-1s"
                         v-animate="'fadeIn'"
                       >
-                        Register Project
+                        Browse Project
                       </b-button>
                     </div>
                     <div class="level-right">
@@ -93,14 +93,20 @@
         <div class="tip has-text-centered">
           <p
             class="is-inline-flex has-vcentered delay-2s"
-            v-animate.repeat="'fadeIn'"
+            v-animate="'fadeIn'"
           >
-            <b-icon
-              custom-size="mdil-24px"
-              class="dalay-2s updown"
-              icon="mdil-chevron-double-down"
-            />
-            <span>How does it work?</span>
+            <a
+              href="#landing-1"
+              v-scroll-to="'#landing-1'"
+              class="has-text-white"
+            >
+              <b-icon
+                custom-size="mdil-24px"
+                class="dalay-2s updown"
+                icon="mdil-chevron-double-down"
+              />
+              <span>How does Mave Registry work?</span>
+            </a>
           </p>
         </div>
       </div>
@@ -114,8 +120,9 @@
       <div class="hero-body">
         <!-- Question -->
         <div class="container has-text-centered">
-          <p class="section-header is-uppercase">
-            How does it work?
+          <p class="section-header">
+            How does 
+            <span class="has-text-primary">Mave Registry</span> work?
           </p>
 
           <div>
@@ -131,7 +138,27 @@
               >
                 <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold large-shadow">
                   <p class="has-fullwidth has-text-light">
-                    1
+                    <b-icon
+                      icon="mdil-rss"
+                      aria-label="icon"
+                    />
+                  </p>
+                </div>
+                <h2 class="subtitle is-capitalized has-text-primary">
+                  Keep updated
+                </h2>
+                <p>Get updates for teams and projects that you follow.</p>
+              </div>
+              <div
+                class="column step-content delay-500ms"
+                v-animate="'flipInX'"
+              >
+                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold large-shadow">
+                  <p class="has-fullwidth has-text-light">
+                    <b-icon
+                      icon="mdil-clipboard-plus"
+                      aria-label="icon"
+                    />
                   </p>
                 </div>
                 <h2 class="subtitle is-capitalized has-text-primary">
@@ -140,32 +167,21 @@
                 <p>Propose MAVE targets of which a systematic variant effect map you would like to see.</p>
               </div>
               <div
-                class="column step-content delay-500ms"
+                class="column step-content delay-1s"
                 v-animate="'flipInX'"
               >
                 <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold large-shadow">
                   <p class="has-fullwidth has-text-light">
-                    2
+                    <b-icon
+                      icon="mdil-pencil"
+                      aria-label="icon"
+                    />
                   </p>
                 </div>
                 <h2 class="subtitle is-capitalized has-text-primary">
                   Register projects
                 </h2>
                 <p>Register projects that your team is working on.</p>
-              </div>
-              <div
-                class="column step-content delay-1s"
-                v-animate="'flipInX'"
-              >
-                <div class="step-number is-inline-flex has-vcentered has-text-centered is-primary is-bold large-shadow">
-                  <p class="has-fullwidth has-text-light">
-                    3
-                  </p>
-                </div>
-                <h2 class="subtitle is-capitalized has-text-primary">
-                  Keep updated
-                </h2>
-                <p>Get updates for teams and projects that you follow.</p>
               </div>
             </div>
           </div>
@@ -176,14 +192,19 @@
         <div class="tip has-text-centered">
           <p 
             class="is-inline-flex has-vcentered delay-2s"
-            v-animate.repeat="'fadeIn'"
+            v-animate="'fadeIn'"
           >
-            <b-icon
-              class="updown"
-              custom-size="mdil-24px"
-              icon="mdil-chevron-double-down"
-            />
-            <span>Why register?</span>
+            <a
+              v-scroll-to="'#landing-2'"
+              class="has-text-dark"
+            >
+              <b-icon
+                class="updown"
+                custom-size="mdil-24px"
+                icon="mdil-chevron-double-down"
+              />
+              <span>What can Mave Registry do for you?</span>
+            </a>
           </p>
         </div>
       </div>
@@ -196,8 +217,11 @@
     >
       <div class="hero-body">
         <div class="container has-text-centered">
-          <p class="section-header is-uppercase">
-            Why register?
+          <p class="section-header">
+            What can
+            <span class="has-text-primary">Mave Registry</span>
+            do
+            <span class="has-text-success">for you</span>?
           </p>
           
           <!-- Desktop view -->
@@ -355,13 +379,15 @@ export default {
   position: fixed
   top: 50vh
   right: 1rem
-  z-index: 50
+  z-index: 5
+  padding: 0.5rem 0.25rem
+  background-color: $grey-lighter
+  border-radius: 10px
   a
     display: block
     height: 0.5rem
     width: 0.5rem
-    background-color: transparent
-    border: 1px solid $grey-light
+    background-color: $light
     border-radius: 0.5rem
     transition: ease-in-out 200ms
     &:hover
