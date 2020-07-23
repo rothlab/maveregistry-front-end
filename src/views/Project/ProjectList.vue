@@ -48,6 +48,42 @@
 
       <!-- Project table -->
       <div v-else>
+        <!-- Tip -->
+        <b-notification :closable="false">
+          <div class="content">
+            <b-icon
+              class="header-icon"
+              type="is-primary"
+              custom-size="mdil-48px"
+              icon="mdil-lightbulb-on"
+            />
+            <span>
+              <b>
+                What do I get by
+                <span class="has-text-info">following a project</span>
+                ?
+              </b>
+              <br>
+              Once your request to follow a project is apporved by the project owner, you will be able to:
+              <br>
+              <p style="margin: 0.5rem 0 0.75rem 0">
+                <b-icon
+                  icon="mdil-check"
+                  class="circle-icon has-background-success has-text-white"
+                />
+                Access sensitive project details such as activities
+              </p>
+              <p>
+                <b-icon
+                  icon="mdil-check"
+                  class="circle-icon has-background-success has-text-white"
+                />
+                Receive on-site and email notifications of project update
+              </p>
+            </span>
+          </div>
+        </b-notification>
+
         <b-table
           :key="JSON.stringify(currentUser)"
           :data="targets"
@@ -296,40 +332,6 @@
                         />
                       </b-tooltip>
 
-                      <!-- Follow bell -->
-                      <div
-                        v-if="currentUser && project.creator.username !== currentUser.username && project.follow_status"
-                      >
-                        <!-- If not followed, show follow icon -->
-                        <b-tooltip
-                          label="Follow Project"
-                          type="is-white"
-                          v-if="!project.follow_status.id"
-                        >
-                          <a @click.stop="confirmFollow(project.id, 'project', project.creator)">
-                            <b-icon
-                              icon="mdil-bell"
-                              class="circle-icon has-background-white-bis"
-                            />
-                          </a>
-                        </b-tooltip>
-                        <!-- If pending, show pending status and unfollow-->
-                        <b-tooltip
-                          :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Project'"
-                          :type="project.follow_status.status === 'pending' ? 'is-danger' : 'is-primary'"
-                          v-else
-                        >
-                          <a @click.stop="confirmUnfollow(project.follow_status.id, 'project')">
-                            <b-icon
-                              icon="mdil-bell-off"
-                              class="circle-icon"
-                              :class="{ 'has-background-warning': project.follow_status.status === 'pending', 'has-background-primary': project.follow_status.status === 'yes' }"
-                              :type="project.follow_status.status === 'yes' ? 'is-white' : 'is-dark'"
-                            />
-                          </a>
-                        </b-tooltip>
-                      </div>
-
                       <!-- Expand -->
                       <b-icon
                         :icon="innerProps.open ? 'mdil-chevron-up' : 'mdil-chevron-down'"
@@ -350,6 +352,25 @@
                           v-if="project.description"
                           :value="project.description"
                         />
+                        <p
+                          v-else-if="!project.follow_status.id && project.creator.username !== currentUser.username"
+                          class="has-text-danger"
+                        >
+                          Click "Follow Project" to request access to project details and receive project update alerts.
+                        </p>
+                        <p
+                          v-else-if="project.follow_status.status === 'pending'"
+                          class="has-text-danger"
+                        >
+                          Your follow request is pending approval. Once approved, 
+                          you will gain access to project details and receive project update alerts.
+                        </p>
+                        <p
+                          v-else-if="project.follow_status.status === 'yes' || project.creator.username === currentUser.username"
+                          class="has-text-danger"
+                        >
+                          No details available for this project.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -360,14 +381,53 @@
                         target="_blank"
                       >
                         <b-icon icon="mdil-magnify" />
-                        View details
+                        View Details
                       </router-link>
                     </div>
-                    <div class="card-footer-item has-background-white-bis">
-                      <a>
-                        <b-icon icon="mdil-bell" />
-                        Follow Project
-                      </a>
+                    <div
+                      class="card-footer-item" 
+                      :class="{ 
+                        'has-background-white-bis': !project.follow_status.id, 
+                        'has-background-warning': project.follow_status.status === 'pending',
+                        'has-background-danger': project.follow_status.status === 'yes'
+                      }"
+                    >
+                      <div
+                        v-if="currentUser && project.creator.username !== currentUser.username && project.follow_status"
+                      >
+                        <!-- If not followed, show follow icon -->
+                        <div v-if="!project.follow_status.id">
+                          <a @click="confirmFollow(project.id, 'project', project.creator)">
+                            <b-icon icon="mdil-bell" />
+                            Follow Project
+                          </a>
+                        </div>
+                        <!-- If pending, show pending status and unfollow-->
+                        <b-tooltip
+                          :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Project'"
+                          type="is-dark"
+                          v-else
+                        >
+                          <a @click="confirmUnfollow(project.follow_status.id, 'project')">
+                            <b-icon icon="mdil-bell-off" />
+                            Unfollow Project
+                          </a>
+                        </b-tooltip>
+                      </div>
+                      <div v-else>
+                        <b-tooltip
+                          label="Sorry, you cannot follow your own project"
+                          type="is-dark"
+                        >
+                          <span
+                            class="has-text-grey"
+                            style="cursor: not-allowed"
+                          >
+                            <b-icon icon="mdil-bell" />
+                            Follow Project
+                          </span>
+                        </b-tooltip>
+                      </div>
                     </div>
                   </div>
                 </b-collapse>

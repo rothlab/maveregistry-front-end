@@ -58,7 +58,11 @@
               icon="mdil-lightbulb-on"
             />
             <span>
-              <b>What is a nomination?</b>
+              <b>
+                What is a
+                <span class="has-text-info">nomination</span>
+                ?
+              </b>
               <br>
               A nomination is a target of which variant effect maps we would love to see.
             </span>

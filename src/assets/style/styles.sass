@@ -59,6 +59,12 @@
     border-radius: 0.4rem 0.4rem 0 0
   &:last-child
     border-radius: 0rem 0rem 0.4rem 0.4rem
+    .card-footer
+      border-bottom-left-radius: 0.4rem
+      border-bottom-right-radius: 0.4rem
+      .card-footer-item
+        border-bottom-left-radius: 0.4rem
+        border-bottom-right-radius: 0.4rem
   &:only-child
     border-radius: 0.4rem
   .card-header
@@ -72,12 +78,6 @@
   .card-footer
     border-top: unset
     border-bottom: 1px solid $grey-lighter
-    &:last-child
-      border-bottom-left-radius: 0.4rem
-      border-bottom-right-radius: 0.4rem
-      .card-footer-item
-        border-bottom-left-radius: 0.4rem
-        border-bottom-right-radius: 0.4rem
     .card-footer-item
       padding: 0.25rem 0
       border-right: unset
