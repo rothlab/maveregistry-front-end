@@ -340,32 +340,17 @@
                     <div
                       class="content"
                     >
-                      <p class="is-size-6">
+                      <div class="is-size-6">
                         <span class="has-text-primary">
                           Feature{{ project.features.length > 1 ? 's:' : ':' }}
                           {{ project.features.join(", ") }}
                         </span>
                         <br>
-                        <v-clamp
+                        <ShowMoreField
                           v-if="project.description"
-                          autoresize
-                          :max-lines="4"
-                        >
-                          {{ project.description }}
-                          <template
-                            slot="after"
-                            slot-scope="clampProps"
-                          >
-                            <a
-                              class="is-size-7 is-block has-text-centered"
-                              @click="clampProps.toggle()"
-                            >
-                              <b-icon :icon="clampProps.expanded ? 'mdil-chevron-double-up' : 'mdil-chevron-double-down'" />
-                              {{ clampProps.expanded ? "Hide" : "Show all" }}
-                            </a>
-                          </template>
-                        </v-clamp>
-                      </p>
+                          :value="project.description"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div class="card-footer">
@@ -568,7 +553,7 @@ import Error from '@/components/Error.vue'
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
-import VClamp from 'vue-clamp'
+import ShowMoreField from '@/components/Field/ShowMoreField.vue'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -578,7 +563,7 @@ export default {
     FollowModal,
     UnfollowModal,
     NewTargetModal,
-    VClamp
+    ShowMoreField
   },
   watch: {
     filter: {
