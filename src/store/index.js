@@ -6,25 +6,27 @@ import createPersistedState from "vuex-persistedstate"
 // Import modules
 import * as userModule from "./userModule.js"
 import * as notificationModule from "./notificationModule.js"
+import * as preferenceModule from "./preferenceModule.js"
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   modules: {
     user: userModule,
-    notifications: notificationModule
+    notifications: notificationModule,
+    preference: preferenceModule
   },
   plugins: [
     createMutationsSharer({
       predicate: [
         'setUser', 'logoutUser', 'setRoles', 
         'addNotification', 'removeNotification', 'setNotifications', 'setAsRead', 'setAsUnread',
-        'setCookieConsent'
+        'setCookieConsent', 'hideTip'
       ]
     }),
     createPersistedState({
       paths: [
-        'user.hasAcceptedCookieConsent'
+        'preference'
       ]
     })
   ]

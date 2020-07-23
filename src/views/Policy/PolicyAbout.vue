@@ -513,7 +513,14 @@ export default {
           license: "MIT",
           license_url: "https://github.com/robinvdvleuten/vuex-persistedstate/blob/master/LICENSE",
           link: "https://github.com/robinvdvleuten/vuex-persistedstate"
-        }
+        },
+        {
+          project: "vue-resize",
+          team: "Guillaume Chau",
+          license: "MIT",
+          license_url: "https://opensource.org/licenses/MIT",
+          link: "https://github.com/Akryum/vue-resize"
+        },
       ]
     }
   }
