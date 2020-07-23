@@ -49,40 +49,29 @@
       <!-- Project table -->
       <div v-else>
         <!-- Tip -->
-        <b-notification :closable="false">
-          <div class="content">
+        <!-- Make sure you added the tip to the preferenceModule store -->
+        <TipAction tip="why_follow">
+          <p class="has-text-weight-bold field-margin">
+            What do I get by
+            <span class="has-text-info">following a project</span>
+            ?
+          </p>
+          Once your request to follow a project is apporved by the project owner, you will be able to:
+          <p style="margin: 0.5rem 0 0.75rem 0">
             <b-icon
-              class="header-icon"
-              type="is-primary"
-              custom-size="mdil-48px"
-              icon="mdil-lightbulb-on"
+              icon="mdil-check"
+              class="circle-icon has-background-success has-text-white"
             />
-            <span>
-              <b>
-                What do I get by
-                <span class="has-text-info">following a project</span>
-                ?
-              </b>
-              <br>
-              Once your request to follow a project is apporved by the project owner, you will be able to:
-              <br>
-              <p style="margin: 0.5rem 0 0.75rem 0">
-                <b-icon
-                  icon="mdil-check"
-                  class="circle-icon has-background-success has-text-white"
-                />
-                Access sensitive project details such as activities
-              </p>
-              <p>
-                <b-icon
-                  icon="mdil-check"
-                  class="circle-icon has-background-success has-text-white"
-                />
-                Receive on-site and email notifications of project update
-              </p>
-            </span>
-          </div>
-        </b-notification>
+            Access sensitive project details such as activities
+          </p>
+          <p>
+            <b-icon
+              icon="mdil-check"
+              class="circle-icon has-background-success has-text-white"
+            />
+            Receive on-site and email notifications of project update
+          </p>
+        </TipAction>
 
         <b-table
           :key="JSON.stringify(currentUser)"
@@ -614,6 +603,7 @@ import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import ShowMoreField from '@/components/Field/ShowMoreField.vue'
+import TipAction from '@/components/Action/TipAction.vue'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -623,7 +613,8 @@ export default {
     FollowModal,
     UnfollowModal,
     NewTargetModal,
-    ShowMoreField
+    ShowMoreField,
+    TipAction
   },
   watch: {
     filter: {

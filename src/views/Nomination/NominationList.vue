@@ -49,25 +49,14 @@
       <!-- Nomination table -->
       <div v-else>
         <!-- Tip -->
-        <b-notification :closable="false">
-          <div class="content">
-            <b-icon
-              class="header-icon"
-              type="is-primary"
-              custom-size="mdil-48px"
-              icon="mdil-lightbulb-on"
-            />
-            <span>
-              <b>
-                What is a
-                <span class="has-text-info">nomination</span>
-                ?
-              </b>
-              <br>
-              A nomination is a target of which variant effect maps we would love to see.
-            </span>
-          </div>
-        </b-notification>
+        <TipAction tip="nomination">
+          <p class="has-text-weight-bold field-margin">
+            What is a
+            <span class="has-text-info">nomination</span>
+            ?
+          </p>
+          A nomination is a target of which variant effect maps we would love to see.
+        </TipAction>
 
         <!-- Add key here so that when user log in/out, the table columns will be refreshed -->
         <b-table
@@ -367,13 +356,15 @@ import * as ProjectManage from "@/api/projectManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import Error from '@/components/Error.vue'
+import TipAction from '@/components/Action/TipAction.vue'
 
 const variables = require("@/assets/script/variables.json")
 
 export default {
   components: {
     NewTargetModal,
-    Error
+    Error,
+    TipAction
   },
   watch: {
     filter: {
