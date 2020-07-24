@@ -173,6 +173,9 @@
       :active.sync="isLoginSignupModalActive"
     />
 
+    <!-- Cookie consent -->
+    <CookieConsentAction />
+
     <!-- Component injection -->
     <router-view @login="isLoginSignupModalActive = true" />
 
@@ -326,6 +329,7 @@
 <script>
 import { displayErrorToast } from "@/api/errorHandler.js"
 import NotificationAction from '@/components/Action/NotificationAction.vue'
+import CookieConsentAction from '@/components/Action/CookieConsentAction.vue'
 
 const LoginSignupModal = () => import('@/components/Modal/LoginSignupModal.vue')
 
@@ -333,7 +337,8 @@ export default {
   // title: "Mave Registry",
   components: {
     LoginSignupModal,
-    NotificationAction
+    NotificationAction,
+    CookieConsentAction
   },
   async mounted () {
     this.isLoading = true
@@ -347,25 +352,6 @@ export default {
     } finally {
       this.isLoading = false
     }
-
-    this.checkEmail()
-
-    // // Cookie consent notification
-    // if (!this.hasAcceptedCookieConsent) {
-    //   this.cookieConsentSnackBar = this.$buefy.snackbar.open({
-    //     message: 
-    //       "We use cookies to offer you a better experience.<br>By using the Service, you agree to our " + 
-    //       "<a href='/policy/terms' target='_blank' class='has-text-warning'>Terms</a> and " + 
-    //       "<a href='/policy/privacy' target='_blank' class='has-text-warning'>Privacy Policy</a>.",
-    //     type: "is-warning",
-    //     position: "is-bottom-right",
-    //     actionText: "I agree",
-    //     indefinite: true,
-    //     onAction: () => {
-    //       this.$store.dispatch("acceptCookieConsent")
-    //     }
-    //   })
-    // }
   },
   data () {
     return {
@@ -375,32 +361,25 @@ export default {
       isOpenedBurger: false,
       appVersion: process.env.VUE_APP_VERSION,
       emailVerificationSnackBar: undefined,
-      cookieConsentSnackBar: undefined
     }
   },
   watch: {
     currentUser: {
       deep: true,
       handler: async function (val) {
-        if (this.emailVerificationSnackBar && val.email_validated) {
+        // If logged out or if snackbar is there and email is validated disable the email snackbar
+        if (!val || (this.emailVerificationSnackBar && val.email_validated)) {
           this.emailVerificationSnackBar.close()
+          this.emailVerificationSnackBar = undefined
         }
 
         try {
-          await this.$store.dispatch("getRoles")
           this.checkEmail()
+          await this.$store.dispatch("getRoles")
         } catch (error) {
           await displayErrorToast(error)
         }
       }
-    },
-    hasAcceptedCookieConsent(val) {
-      if (val) this.cookieConsentSnackBar.close()
-    }
-  },
-  computed: {
-    hasAcceptedCookieConsent() {
-      return this.$store.getters.hasAcceptedCookieConsent
     }
   },
   methods: {
@@ -418,6 +397,7 @@ export default {
           position: "is-top",
           actionText: isInProfile ? "Dismiss" : "Verify Email",
           indefinite: true,
+          queue: false,
           onAction: () => {
             if (!isInProfile)
               this.$router.push({ name: 'User Profile View', params: { username: this.currentUser.username } })

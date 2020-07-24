@@ -6,7 +6,6 @@ import { ToastProgrammatic as Toast } from 'buefy'
 export const state = {
   user: undefined,
   roles: [],
-  hasAcceptedCookieConsent: false
 }
 
 export const getters = {

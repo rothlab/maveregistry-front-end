@@ -21,10 +21,11 @@ export default new Vuex.Store({
       predicate: [
         'setUser', 'logoutUser', 'setRoles', 
         'addNotification', 'removeNotification', 'setNotifications', 'setAsRead', 'setAsUnread',
-        'setCookieConsent', 'hideTip'
+        'setCookieConsent'
       ]
     }),
     createPersistedState({
+      key: 'preference',
       paths: [
         'preference'
       ]
