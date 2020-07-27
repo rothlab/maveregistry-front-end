@@ -86,27 +86,25 @@
               <div class="level">
                 <div class="level-left">
                   <p class="has-text-weight-medium has-text-centered">
-                    Log in with
+                    Sign in with
                   </p>
                 </div>
                 <div class="level-right oauth">
                   <div class="buttons is-space-between">
-                    <b-button
-                      icon-pack="mdi"
-                      icon-left="google"
-                      type="is-light"
+                    <button
+                      class="button google-signin"
                       @click="login('google')"
-                    >
-                      Google
-                    </b-button>
-                    <b-button
-                      icon-pack="fab"
-                      icon-left="orcid"
-                      type="is-light"
+                    />
+                    <button
+                      class="button orcid-signin"
                       @click="login('orcid')"
                     >
-                      ORCID
-                    </b-button>
+                      <img
+                        src="@/assets/image/orcid_logo.png"
+                        alt="ORCID logo"
+                      >
+                      <span class="has-text-grey">ORCID</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -253,22 +251,20 @@
                 </div>
                 <div class="level-right oauth">
                   <div class="buttons is-space-between">
-                    <b-button
-                      icon-pack="mdi"
-                      icon-left="google"
-                      type="is-light"
-                      @click="signup('google')"
+                    <button
+                      class="button google-signin"
+                      @click="login('google')"
+                    />
+                    <button
+                      class="button orcid-signin"
+                      @click="login('orcid')"
                     >
-                      Google
-                    </b-button>
-                    <b-button
-                      icon-pack="fab"
-                      icon-left="orcid"
-                      type="is-light"
-                      @click="signup('orcid')"
-                    >
-                      ORCID
-                    </b-button>
+                      <img
+                        src="@/assets/image/orcid_logo.png"
+                        alt="ORCID logo"
+                      >
+                      <span class="has-text-grey">ORCID</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -512,4 +508,31 @@ export default {
     margin-top: 1rem
 .forget-password
   padding: 0.25rem 0 1rem 0
+button
+  &.google-signin
+    background-image: url("../../assets/image/google_signin_normal.png")
+    &:focus
+      background-image: url("../../assets/image/google_signin_focus.png")
+      box-shadow: unset
+    &:active
+      background-image: url("../../assets/image/google_signin_active.png")
+    background-size: auto 40px
+    padding: 0
+    border: unset
+    height: 40px
+    width: 167px
+  &.orcid-signin
+    border: unset
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.25)
+    border-radius: 2px
+    &:active
+      background-color: #eeeeee
+    &:focus
+      box-shadow: 0 0 0 0.25em rgba(62, 146, 204, 0.25) !important
+    img
+      height: 18px
+      padding-right: 18px
+    span
+      font-size: 12px
+      font-weight: bold
 </style>
