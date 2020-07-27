@@ -359,19 +359,12 @@ export default {
       isLoading: false,
       isOpenedBurger: false,
       appVersion: process.env.VUE_APP_VERSION,
-      emailVerificationSnackBar: undefined,
     }
   },
   watch: {
     currentUser: {
       deep: true,
-      handler: async function (val) {
-        // If logged out or if snackbar is there and email is validated disable the email snackbar
-        if (!val || (this.emailVerificationSnackBar && val.email_validated)) {
-          this.emailVerificationSnackBar.close()
-          this.emailVerificationSnackBar = undefined
-        }
-
+      handler: async function () {
         try {
           this.checkEmail()
           await this.$store.dispatch("getRoles")
@@ -390,13 +383,12 @@ export default {
       // show notification
       if (this.hasLoggedIn && this.currentUser && !this.currentUser.email_validated) {
         const isInProfile = this.$route.name === "User Profile View"
-        this.emailVerificationSnackBar = this.$buefy.snackbar.open({
+        this.$buefy.snackbar.open({
           message: "Please verify your email address.<br>Access to the registry is limited until the email is verified.",
           type: "is-danger",
           position: "is-top",
           actionText: isInProfile ? "Dismiss" : "Verify Email",
           indefinite: true,
-          queue: false,
           onAction: () => {
             if (!isInProfile)
               this.$router.push({ name: 'User Profile View', params: { username: this.currentUser.username } })
