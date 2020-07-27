@@ -278,13 +278,6 @@ export default {
           link: "https://expressjs.com/"
         },
         {
-          project: "Font Awesome Free",
-          team: "Fonticons, Inc.",
-          license: "Font Awesome Free License",
-          license_url: "https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt",
-          link: "https://github.com/FortAwesome/Font-Awesome"
-        },
-        {
           project: "Vue.js hCaptcha",
           team: "Intuition Machines, Inc.",
           license: "MIT",
