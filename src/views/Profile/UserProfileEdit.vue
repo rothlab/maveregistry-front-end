@@ -69,7 +69,7 @@
                       <b-input
                         type="text"
                         placeholder="First Name"
-                        v-model="userInfo.first_name"
+                        v-model.trim="userInfo.first_name"
                         custom-class="is-capitalized"
                       />
                     </b-field>
@@ -89,7 +89,7 @@
                       <b-input
                         type="text"
                         placeholder="Last Name"
-                        v-model="userInfo.last_name"
+                        v-model.trim="userInfo.last_name"
                         custom-class="is-capitalized"
                       />
                     </b-field>
@@ -111,7 +111,7 @@
                       icon="mdil-account"
                       type="text"
                       placeholder="Username"
-                      v-model="userInfo.username"
+                      v-model.trim="userInfo.username"
                     />
                   </b-field>
                 </ValidationProvider>
@@ -131,7 +131,7 @@
                       icon="mdil-email"
                       type="email"
                       placeholder="Email"
-                      v-model="userInfo.email"
+                      v-model.trim="userInfo.email"
                     />
                   </b-field>
                 </ValidationProvider>
@@ -153,7 +153,7 @@
                       icon="mdil-link"
                       type="website"
                       placeholder="http:// or https://"
-                      v-model="userInfo.website"
+                      v-model.trim="userInfo.website"
                     />
                   </b-field>
                 </ValidationProvider>
@@ -173,7 +173,7 @@
                     <b-input
                       type="text"
                       placeholder="Twitter handle with @"
-                      v-model="userInfo.social.twitter"
+                      v-model.trim="userInfo.social.twitter"
                       @input="addTwitterAt"
                     />
                   </b-field>

@@ -41,7 +41,7 @@
                 icon="mdil-email"
                 type="email"
                 placeholder="Email"
-                v-model="userInfo.email"
+                v-model.trim="userInfo.email"
               />
             </b-field>
           </ValidationProvider>

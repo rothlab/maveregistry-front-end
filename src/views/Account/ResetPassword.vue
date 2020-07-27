@@ -43,7 +43,7 @@
                           icon="mdil-email"
                           type="email"
                           placeholder="Email"
-                          v-model="email"
+                          v-model.trim="email"
                         />
                       </b-field>
                     </ValidationProvider>

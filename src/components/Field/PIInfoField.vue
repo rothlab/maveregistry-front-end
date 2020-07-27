@@ -19,7 +19,7 @@
           <b-input
             type="text"
             placeholder="First Name"
-            v-model="firstName"
+            v-model.trim="firstName"
             @input="updateVal"
             custom-class="is-capitalized"
           />
@@ -40,7 +40,7 @@
           <b-input
             type="text"
             placeholder="Last Name"
-            v-model="lastName"
+            v-model.trim="lastName"
             @input="updateVal"
             custom-class="is-capitalized"
           />
@@ -65,7 +65,7 @@
           icon="mdil-email"
           type="email"
           placeholder="Email"
-          v-model="email"
+          v-model.trim="email"
           @input="updateVal"
         />
       </b-field>
@@ -86,7 +86,7 @@
       >
         <b-input
           icon="mdil-factory"
-          v-model="affiliation"
+          v-model.trim="affiliation"
           type="affiliation"
           placeholder="Affiliation"
           @input="updateVal"
@@ -112,7 +112,7 @@
           icon="mdil-link"
           type="website"
           placeholder="http:// or https://"
-          v-model="website"
+          v-model.trim="website"
           @input="updateVal"
         />
       </b-field>

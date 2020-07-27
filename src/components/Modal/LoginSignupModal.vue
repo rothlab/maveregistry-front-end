@@ -54,7 +54,7 @@
                     <b-input
                       icon="mdil-account"
                       placeholder="Username/Email"
-                      v-model="username"
+                      v-model.trim="username"
                     />
                   </b-field>
                 </ValidationProvider>
@@ -138,7 +138,7 @@
                       <b-input
                         type="text"
                         placeholder="First Name"
-                        v-model="firstName"
+                        v-model.trim="firstName"
                       />
                     </b-field>
                   </ValidationProvider>
@@ -155,7 +155,7 @@
                       <b-input
                         type="text"
                         placeholder="Last Name"
-                        v-model="lastName"
+                        v-model.trim="lastName"
                       />
                     </b-field>
                   </ValidationProvider>
@@ -174,7 +174,7 @@
                       icon="mdil-account"
                       type="text"
                       placeholder="Username"
-                      v-model="username"
+                      v-model.trim="username"
                     />
                   </b-field>
                 </ValidationProvider>
@@ -192,7 +192,7 @@
                       icon="mdil-email"
                       type="email"
                       placeholder="Email"
-                      v-model="email"
+                      v-model.trim="email"
                     />
                   </b-field>
                 </ValidationProvider>
