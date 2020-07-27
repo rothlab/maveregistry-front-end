@@ -412,17 +412,20 @@ export default {
           break
         case "google":
           // With Google
+          await this.$store.dispatch("generateNonce")
+
           params = {
-            id: "637030175210-gdtjb7kd3kalhovg25sm3d2ns8mu67o5.apps.googleusercontent.com",
+            id: process.env.VUE_APP_GOOGLE_CLIENT_ID,
             url: "https://accounts.google.com/o/oauth2/v2/auth",
             redirect_url: window.location.origin + "/callback/Google/login",
+            nonce: this.$store.getters.getNonce
           }
-          oauth(`${params.url}?client_id=${params.id}&response_type=token&scope=profile email&redirect_uri=${params.redirect_url}`, this)
+          oauth(`${params.url}?client_id=${params.id}&nonce=${params.nonce}&response_type=id_token&scope=profile email&redirect_uri=${params.redirect_url}`, this)
           this.isLoading = false;
           break
         case "orcid":
           params = {
-            id: "APP-TNM3Y1CPZI5HS7WJ",
+            id: process.env.VUE_APP_ORCID_CLIENT_ID,
             url: "https://orcid.org/oauth/authorize",
             redirect_url: window.location.origin + "/callback/ORCID/signup",
           }
@@ -465,17 +468,20 @@ export default {
           break;
         case "google":
           // With Google
+          await this.$store.dispatch("generateNonce")
+
           params = {
-            id: "637030175210-gdtjb7kd3kalhovg25sm3d2ns8mu67o5.apps.googleusercontent.com",
+            id: process.env.VUE_APP_GOOGLE_CLIENT_ID,
             url: "https://accounts.google.com/o/oauth2/v2/auth",
             redirect_url: window.location.origin + "/callback/Google/login",
+            nonce: this.$store.getters.getNonce
           }
-          oauth(`${params.url}?client_id=${params.id}&response_type=token&scope=profile email&redirect_uri=${params.redirect_url}`, this)
+          oauth(`${params.url}?client_id=${params.id}&nonce=${params.nonce}&response_type=id_token&scope=profile email&redirect_uri=${params.redirect_url}`, this)
           this.isLoading = false;
           break;
         case "orcid":
           params = {
-            id: "APP-TNM3Y1CPZI5HS7WJ",
+            id: process.env.VUE_APP_ORCID_CLIENT_ID,
             url: "https://orcid.org/oauth/authorize",
             redirect_url: window.location.origin + "/callback/ORCID/login",
           }

@@ -26,7 +26,6 @@ export const mutations = {
 
 export const actions = {
   acceptCookieConsent({ commit }) {
-    console.log("change consent state")
     commit('setCookieConsent')
   },
   hideTip({ commit }, tip) {
