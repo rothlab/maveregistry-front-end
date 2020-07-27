@@ -522,6 +522,13 @@ export default {
           license_url: "https://opensource.org/licenses/MIT",
           link: "https://github.com/Akryum/vue-resize"
         },
+        {
+          project: "nanoid",
+          team: "Andrey Sitnik",
+          license: "MIT",
+          license_url: "https://github.com/ai/nanoid/blob/master/LICENSE",
+          link: "https://zelark.github.io/nano-id-cc/"
+        },
       ]
     }
   }
