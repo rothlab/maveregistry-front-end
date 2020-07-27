@@ -221,6 +221,7 @@
 
 <script>
 export default {
+  title: "About",
   mounted() {
     document.dispatchEvent(new Event('render-event'))
   },
@@ -520,6 +521,13 @@ export default {
           license: "MIT",
           license_url: "https://opensource.org/licenses/MIT",
           link: "https://github.com/Akryum/vue-resize"
+        },
+        {
+          project: "nanoid",
+          team: "Andrey Sitnik",
+          license: "MIT",
+          license_url: "https://github.com/ai/nanoid/blob/master/LICENSE",
+          link: "https://zelark.github.io/nano-id-cc/"
         },
       ]
     }

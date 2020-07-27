@@ -19,7 +19,7 @@
           <b-input
             type="text"
             placeholder="First Name"
-            v-model="first_name"
+            v-model.trim="first_name"
             @input="updateVal"
           />
         </b-field>
@@ -38,7 +38,7 @@
           <b-input
             type="text"
             placeholder="Last Name"
-            v-model="last_name"
+            v-model.trim="last_name"
             @input="updateVal"
           />
         </b-field>
@@ -60,7 +60,7 @@
           icon="mdil-email"
           type="email"
           placeholder="Email"
-          v-model="email"
+          v-model.trim="email"
           @input="updateVal"
         />
       </b-field>
@@ -84,7 +84,7 @@
           <b-select
             placeholder="Position"
             icon="mdil-briefcase"
-            v-model="position"
+            v-model.trim="position"
             @input="updateVal"
           >
             <option
@@ -111,7 +111,7 @@
           :type="{ 'is-danger': errors[0], '': valid }"
         >
           <b-input
-            v-model="custom_position"
+            v-model.trim="custom_position"
             type="position"
             placeholder="Please specify your position"
             @input="updateVal"

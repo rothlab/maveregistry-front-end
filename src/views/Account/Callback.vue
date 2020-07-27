@@ -41,7 +41,7 @@
                 icon="mdil-email"
                 type="email"
                 placeholder="Email"
-                v-model="userInfo.email"
+                v-model.trim="userInfo.email"
               />
             </b-field>
           </ValidationProvider>
@@ -64,6 +64,17 @@
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import { displayErrorToast } from "@/api/errorHandler.js"
+
+function getFullSize(url) {
+  // Cover these two types of links:
+  // 1) https://lh3.googleusercontent.com/a-/imageid-tUc=s96
+  // 2) https://lh3.googleusercontent.com/imageid/imageid/imageid/imageid/s96-c/photo.jpg
+  return url.replace(/(=.+|\/s96-c)/, "")
+}
+
+function getInfoFromToken(token) {
+  return JSON.parse(atob(token.split('.')[1]))
+}
 
 export default {
   components: {
@@ -100,9 +111,6 @@ export default {
     }
   },
   methods: {
-    getInfoFromToken(token) {
-      return JSON.parse(atob(token.split('.')[1]))
-    },
     async validateOrcid(email) {
       this.isLoading = true
 
@@ -114,7 +122,7 @@ export default {
       }
 
       // Get user information from ID token
-      const info = this.getInfoFromToken(payload.id_token)
+      const info = getInfoFromToken(payload.id_token)
       this.userInfo.first_name = info.given_name
       this.userInfo.last_name = info.family_name
 
@@ -134,6 +142,10 @@ export default {
       // Now, sign up user
       let ret
       try {
+        // Check nonce
+        const nonce = this.$store.getters.getNonce
+        if (!info.nonce || nonce !== info.nonce) throw new Error("ID token is compromised.")
+
         ret = await this.$store.dispatch('signupLoginUserOrcid', this.userInfo)
 
         if (ret === "resend_email") return
@@ -157,8 +169,6 @@ export default {
 
         try {
           await this.$store.dispatch('updateUserProfile', userUpdate)
-
-          window.close()
         } catch (e) {
           await displayErrorToast(e)
           return
@@ -172,30 +182,25 @@ export default {
 
       // Get auth payload
       const params = new URLSearchParams(this.$route.hash)
-      // eslint-disable-next-line no-unused-vars
-      const payload = {
-        access_token: params.get("#access_token"),
-        profile_url: "https://www.googleapis.com/oauth2/v2/userinfo"
-      }
-    
+      const token = params.get("#id_token")
       // Get user profile
       try {
-        if (!payload.access_token) throw new Error("Missing Access Token.")
+        if (!token) throw new Error("Missing ID Token.")
 
-        const response = await this.axios.get(payload.profile_url, {
-          params: {
-            access_token: payload.access_token
-          }
-        })
+        const response = getInfoFromToken(token)
 
-        if (!response.data) throw new Error("Empty response.")
-        this.userInfo.first_name = response.data.given_name
-        this.userInfo.last_name = response.data.family_name
-        this.userInfo.email = response.data.email
-        this.userInfo.profile_image = response.data.picture
+        // Check nonce
+        const nonce = this.$store.getters.getNonce
+        if (!response.nonce || nonce !== response.nonce) throw new Error("ID token is compromised.")
+
+        if (!response) throw new Error("Empty response.")
+        this.userInfo.first_name = response.given_name
+        this.userInfo.last_name = response.family_name
+        this.userInfo.email = response.email
+        this.userInfo.profile_image = getFullSize(response.picture)
         this.userInfo.auth = {
-          id: response.data.id,
-          access_token: payload.access_token
+          id: response.sub,
+          id_token: token,
         }
         await this.$store.dispatch("signupLoginUserGoogle", this.userInfo)
         window.close()

@@ -2,11 +2,12 @@ import * as UserManage from "@/api/userManage.js"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import { SnackbarProgrammatic as Snackbar } from 'buefy'
 import { ToastProgrammatic as Toast } from 'buefy'
+import { nanoid } from 'nanoid'
 
 export const state = {
   user: undefined,
   roles: [],
-  hasAcceptedCookieConsent: false
+  nonce: ""
 }
 
 export const getters = {
@@ -21,7 +22,10 @@ export const getters = {
   },
   isOwner: (state, getters) => (owner) => {
     return getters.hasLoggedIn && state.user.username === owner
-  }
+  },
+  getNonce: (state) => {
+    return state.nonce
+  } 
 }
 
 export const mutations = {
@@ -33,6 +37,9 @@ export const mutations = {
   },
   setRoles(state, roles) {
     state.roles = roles
+  },
+  setNonce(state, nonce) {
+    state.nonce = nonce
   }
 }
 
@@ -132,5 +139,11 @@ export const actions = {
       // Update user info
       commit('setUser', userInfo)
     }
+  },
+  async generateNonce ({ commit }) {
+    const nonce = nanoid()
+    commit('setNonce', nonce)
+
+    return nonce
   }
 }

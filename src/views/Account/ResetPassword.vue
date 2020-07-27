@@ -43,7 +43,7 @@
                           icon="mdil-email"
                           type="email"
                           placeholder="Email"
-                          v-model="email"
+                          v-model.trim="email"
                         />
                       </b-field>
                     </ValidationProvider>
@@ -99,6 +99,7 @@ import Success from "@/components/Success.vue"
 import { displayErrorToast } from "@/api/errorHandler.js"
 
 export default {
+  title: "Reset Password",
   props: {
     showSuccess: {
       type: Boolean,

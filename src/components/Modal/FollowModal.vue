@@ -43,7 +43,7 @@
 
           <b-field :label="`Please briefly summarize your interest in following this ${type}.`">
             <b-input
-              v-model="request"
+              v-model.trim="request"
               maxlength="300"
               type="textarea"
               placeholder="Maximum 300 characters."

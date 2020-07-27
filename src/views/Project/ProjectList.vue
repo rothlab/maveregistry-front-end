@@ -232,14 +232,14 @@
                 >
                   <div class="card-header">
                     <p
-                      class="card-header-title is-capitalized"
+                      class="card-header-title"
                       v-if="hasLoggedIn"
                     >
                       <b-icon
                         icon="mdil-play"
                         style="margin-right: 0.25rem"
                       />
-                      Under Investigation (No project details)
+                      Under Investigation
                     </p>
                     <p
                       class="card-header-title is-capitalized"
@@ -429,7 +429,7 @@
               label="Team"
             >
               <div
-                v-if="!isMember"
+                v-if="!hasLoggedIn"
                 class="card project-card has-background-light"
               >
                 <div class="card-header">
@@ -470,7 +470,7 @@
                     
                     <!-- Followed status -->
                     <b-tag
-                      v-if="currentUser && team.creator.username !== currentUser.username && team.follow_status.id"
+                      v-if="currentUser && team.creator && team.creator.username !== currentUser.username && team.follow_status.id"
                       size="is-medium"
                       class="is-clickable"
                       :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-primary': team.follow_status.status === 'yes' }"
@@ -489,7 +489,7 @@
                     </b-tag>
                     <!-- Unfollowed status -->
                     <b-tag
-                      v-else-if="currentUser && team.creator.username !== currentUser.username && !team.follow_status.id"
+                      v-else-if="currentUser && team.creator && team.creator.username !== currentUser.username && !team.follow_status.id"
                       size="is-medium"
                       class="is-clickable has-background-white-bis"
                       @click.native="confirmFollow(team.id, 'team', team.creator)"
@@ -608,6 +608,7 @@ import TipAction from '@/components/Action/TipAction.vue'
 const variables = require("@/assets/script/variables.json")
 
 export default {
+  title: "Projects",
   components: {
     Error,
     FollowModal,

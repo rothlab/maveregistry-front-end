@@ -334,6 +334,7 @@ import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 
 export default {
+  title: "View Project",
   components: {
     Error,
     ManageFollowerModal

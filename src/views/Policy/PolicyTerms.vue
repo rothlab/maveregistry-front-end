@@ -589,6 +589,7 @@
 
 <script>
 export default {
+  title: "Terms and Conditions",
   mounted() {
     document.dispatchEvent(new Event('render-event'))
   }

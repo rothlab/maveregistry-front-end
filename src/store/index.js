@@ -19,14 +19,15 @@ export default new Vuex.Store({
   plugins: [
     createMutationsSharer({
       predicate: [
-        'setUser', 'logoutUser', 'setRoles', 
+        'setUser', 'logoutUser', 'setRoles', 'setNonce',
         'addNotification', 'removeNotification', 'setNotifications', 'setAsRead', 'setAsUnread',
-        'setCookieConsent', 'hideTip'
+        'setCookieConsent'
       ]
     }),
     createPersistedState({
+      key: 'preference',
       paths: [
-        'preference'
+        'preference', 'user.nonce'
       ]
     })
   ]

@@ -81,6 +81,7 @@ import PasswordField from '@/components/Field/PasswordField.vue'
 import { Parse } from "@/api/parseConnect.js"
 
 export default {
+  title: "Change Password",
   components: {
     ValidationObserver,
     PasswordField

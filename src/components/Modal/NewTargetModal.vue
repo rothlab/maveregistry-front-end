@@ -44,7 +44,7 @@
                 label="Target name"
               >
                 <b-input
-                  v-model="name"
+                  v-model.trim="name"
                   placeholder="e.g. Gene Symbol, Domain Name"
                   required
                   expanded
@@ -157,7 +157,7 @@
                 label="Reason"
               >
                 <b-input
-                  v-model="reason"
+                  v-model.trim="reason"
                   maxlength="300"
                   type="textarea"
                 />

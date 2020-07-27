@@ -395,6 +395,7 @@ function isNotEmptyPerson (person, emptyPerson) {
 }
 
 export default {
+  title: "Edit Project",
   components: {
     PersonalInfoField,
     TeamInfoField,

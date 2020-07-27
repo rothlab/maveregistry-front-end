@@ -120,7 +120,7 @@
         class="field-margin"
       >
         <b-input
-          v-model="description"
+          v-model.trim="description"
           maxlength="3000"
           type="textarea"
           placeholder="Max. 3000 characters"
@@ -155,7 +155,7 @@
               type="website"
               placeholder="http:// or https://"
               class="link-input"
-              v-model="links[id]"
+              v-model.trim="links[id]"
               @input="updateVal"
               expanded
             />
