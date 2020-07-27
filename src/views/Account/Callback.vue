@@ -142,6 +142,10 @@ export default {
       // Now, sign up user
       let ret
       try {
+        // Check nonce
+        const nonce = this.$store.getters.getNonce
+        if (!info.nonce || nonce !== info.nonce) throw new Error("ID token is compromised.")
+
         ret = await this.$store.dispatch('signupLoginUserOrcid', this.userInfo)
 
         if (ret === "resend_email") return
@@ -165,8 +169,6 @@ export default {
 
         try {
           await this.$store.dispatch('updateUserProfile', userUpdate)
-
-          window.close()
         } catch (e) {
           await displayErrorToast(e)
           return

@@ -411,7 +411,6 @@ export default {
 
           break
         case "google":
-          // With Google
           await this.$store.dispatch("generateNonce")
 
           params = {
@@ -424,12 +423,15 @@ export default {
           this.isLoading = false;
           break
         case "orcid":
+          await this.$store.dispatch("generateNonce")
+
           params = {
             id: process.env.VUE_APP_ORCID_CLIENT_ID,
             url: "https://orcid.org/oauth/authorize",
             redirect_url: window.location.origin + "/callback/ORCID/signup",
+            nonce: this.$store.getters.getNonce
           }
-          oauth(`${params.url}?client_id=${params.id}&response_type=token&scope=openid&redirect_uri=${params.redirect_url}`, this)
+          oauth(`${params.url}?client_id=${params.id}&nonce=${params.nonce}&response_type=token&scope=openid&redirect_uri=${params.redirect_url}`, this)
           this.isLoading = false
           break
         default:
@@ -467,7 +469,6 @@ export default {
           }
           break;
         case "google":
-          // With Google
           await this.$store.dispatch("generateNonce")
 
           params = {
@@ -480,12 +481,15 @@ export default {
           this.isLoading = false;
           break;
         case "orcid":
+          await this.$store.dispatch("generateNonce")
+
           params = {
             id: process.env.VUE_APP_ORCID_CLIENT_ID,
             url: "https://orcid.org/oauth/authorize",
             redirect_url: window.location.origin + "/callback/ORCID/login",
+            nonce: this.$store.getters.getNonce
           }
-          oauth(`${params.url}?client_id=${params.id}&response_type=token&scope=openid&redirect_uri=${params.redirect_url}`, this)
+          oauth(`${params.url}?client_id=${params.id}&nonce=${params.nonce}&response_type=token&scope=openid&redirect_uri=${params.redirect_url}`, this)
           this.isLoading = false;
           break;
         default:
