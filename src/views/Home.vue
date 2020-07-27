@@ -47,7 +47,7 @@
                     Registered Here
                   </h1>
                   <p class="is-size-5">
-                    MAVE Registry is a database for activities on studying targets with Multiplexed Assays of Variant Effect (MAVE).
+                    Mave Registry is a collaborative resource for sharing progress on Multiplexed Assays of Variant Effect (MAVE).
                   </p>
                 </div>
 
@@ -63,7 +63,7 @@
                         class="med-shadow delay-1s"
                         v-animate="'fadeIn'"
                       >
-                        Browse Project
+                        Browse Projects
                       </b-button>
                     </div>
                     <div class="level-right">
