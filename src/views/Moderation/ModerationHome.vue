@@ -28,6 +28,7 @@ import UnderConstruction from "@/components/UnderConstruction.vue"
 import { displayErrorToast } from "@/api/errorHandler.js"
 
 export default {
+  title: "Moderation",
   components: {
     UnderConstruction
   },

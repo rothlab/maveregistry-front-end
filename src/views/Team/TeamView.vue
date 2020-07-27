@@ -272,6 +272,7 @@ import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import { handleError } from '@/api/errorHandler.js'
 
 export default {
+  title: "View Team",
   components: {
     Error,
     ManageFollowerModal

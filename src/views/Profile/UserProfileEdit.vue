@@ -288,6 +288,7 @@ import TeamInfoField from '@/components/Field/TeamInfoField.vue'
 import AvatarCropper from "vue-avatar-cropper"
 
 export default {
+  title: "Edit User Profile",
   components: {
     ValidationProvider,
     ValidationObserver,

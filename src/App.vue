@@ -334,7 +334,6 @@ import CookieConsentAction from '@/components/Action/CookieConsentAction.vue'
 const LoginSignupModal = () => import('@/components/Modal/LoginSignupModal.vue')
 
 export default {
-  // title: "Mave Registry",
   components: {
     LoginSignupModal,
     NotificationAction,

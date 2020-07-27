@@ -268,6 +268,7 @@ function initialState (){
 }
 
 export default {
+  title: "View User Profile",
   components: {
     Error,
     UserProfileAction

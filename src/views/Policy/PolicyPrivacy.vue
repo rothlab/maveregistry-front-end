@@ -1004,6 +1004,7 @@
 
 <script>
 export default {
+  title: "Privacy Policy",
   data() {
     return {
       ccpaInfoCollected: [

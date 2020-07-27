@@ -221,6 +221,7 @@
 
 <script>
 export default {
+  title: "About",
   mounted() {
     document.dispatchEvent(new Event('render-event'))
   },

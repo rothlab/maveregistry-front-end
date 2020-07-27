@@ -20,6 +20,7 @@
 import Success from "@/components/Success.vue"
 
 export default {
+  title: "Validate Email",
   props: {
     showSuccess: {
       type: Boolean,

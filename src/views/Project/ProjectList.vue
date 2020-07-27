@@ -608,6 +608,7 @@ import TipAction from '@/components/Action/TipAction.vue'
 const variables = require("@/assets/script/variables.json")
 
 export default {
+  title: "Projects",
   components: {
     Error,
     FollowModal,

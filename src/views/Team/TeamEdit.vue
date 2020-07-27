@@ -168,6 +168,7 @@ import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import { ValidationObserver } from 'vee-validate'
 
 export default {
+  title: "Edit Team",
   components: {
     PIInfoField,
     ValidationObserver

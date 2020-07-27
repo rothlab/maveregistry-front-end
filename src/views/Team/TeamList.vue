@@ -287,6 +287,7 @@ import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 
 export default {
+  title: "Teams",
   components: {
     NewTeamModal,
     FollowModal,
