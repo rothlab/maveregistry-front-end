@@ -341,25 +341,27 @@
                           v-if="project.description"
                           :value="project.description"
                         />
-                        <p
-                          v-else-if="!project.follow_status.id && project.creator.username !== currentUser.username"
-                          class="has-text-danger"
-                        >
-                          Click "Follow Project" to request access to project details and receive project update alerts.
-                        </p>
-                        <p
-                          v-else-if="project.follow_status.status === 'pending'"
-                          class="has-text-danger"
-                        >
-                          Your follow request is pending approval. Once approved, 
-                          you will gain access to project details and receive project update alerts.
-                        </p>
-                        <p
-                          v-else-if="project.follow_status.status === 'yes' || project.creator.username === currentUser.username"
-                          class="has-text-danger"
-                        >
-                          No details available for this project.
-                        </p>
+                        <div v-else-if="project.follow_status">
+                          <p
+                            v-if="!project.follow_status.id && project.creator.username !== currentUser.username"
+                            class="has-text-danger"
+                          >
+                            Click "Follow Project" to request access to project details and receive project update alerts.
+                          </p>
+                          <p
+                            v-else-if="project.follow_status.status === 'pending'"
+                            class="has-text-danger"
+                          >
+                            Your follow request is pending approval. Once approved, 
+                            you will gain access to project details and receive project update alerts.
+                          </p>
+                          <p
+                            v-else-if="project.follow_status.status === 'yes' || project.creator.username === currentUser.username"
+                            class="has-text-danger"
+                          >
+                            No details available for this project.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -374,6 +376,7 @@
                       </router-link>
                     </div>
                     <div
+                      v-if="project.follow_status"
                       class="card-footer-item" 
                       :class="{ 
                         'has-background-white-bis': !project.follow_status.id, 
