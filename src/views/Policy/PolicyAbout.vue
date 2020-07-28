@@ -522,6 +522,13 @@ export default {
           license_url: "https://github.com/ai/nanoid/blob/master/LICENSE",
           link: "https://zelark.github.io/nano-id-cc/"
         },
+        {
+          project: "Vue Material Design Icon Components",
+          team: "Rob Cresswell",
+          license: "MIT",
+          license_url: "https://github.com/robcresswell/vue-material-design-icons/blob/dev/LICENSE",
+          link: "https://github.com/robcresswell/vue-material-design-icons"
+        },
       ]
     }
   }
