@@ -22,10 +22,23 @@
                 icon-left="mdil-pencil"
                 type="is-warning"
                 size="is-medium"
+                class="small-shadow"
                 @click="editTeam"
               >
                 Edit
               </b-button>
+            </div>
+            <div
+              class="level-right"
+              v-else-if="hasLoggedIn && isMember && followStatus" 
+            >
+              <FollowButtonAction
+                :follow-status="followStatus"
+                type="team"
+                :target-id="teamId"
+                :creator="creator"
+                @change="fetchTeam()"
+              />
             </div>
           </div>
         </div>
@@ -270,12 +283,14 @@ import * as FollowManage from "@/api/followManage.js"
 import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import { handleError } from '@/api/errorHandler.js'
+import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
 
 export default {
   title: "View Team",
   components: {
     Error,
-    ManageFollowerModal
+    ManageFollowerModal,
+    FollowButtonAction
   },
   computed: {
     teamId() {
@@ -297,6 +312,7 @@ export default {
         page: false
       },
       isManageFollowerModalActive: false,
+      followStatus: undefined,
       principalInvestigator: {},
       members: [],
       projects: [],
@@ -315,7 +331,7 @@ export default {
     const team = await this.fetchTeam()
 
     // Fetch team follower and request count
-    if (team) await this.fetchFollowerAndRequestCount(team.id)
+    if (team && this.isOwner) await this.fetchFollowerAndRequestCount(team.id)
 
     // Open follow request modal if needed
     if (this.hasDeepLink("#manage-request")) this.openFollowerModal(true)
@@ -327,7 +343,7 @@ export default {
       // Fetch team
       let team
       try {
-        team = await TeamManage.queryById(this.teamId, true, false)
+        team = await TeamManage.queryById(this.teamId, true, true)
       } catch (error) {
         this.errorMessage = await handleError(error)
         throw error
@@ -353,6 +369,9 @@ export default {
 
       // Format projects
       if (team.projects) this.projects = team.projects
+
+      // Format follow status
+      if (team.follow_status) this.followStatus = team.follow_status
       
       return team
     },

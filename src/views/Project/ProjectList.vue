@@ -340,20 +340,20 @@
                         <div v-else-if="project.follow_status">
                           <p
                             v-if="!project.follow_status.id && project.creator.username !== currentUser.username"
-                            class="has-text-danger"
+                            class="has-text-danger font-14px"
                           >
-                            Click "Follow Project" to request access to project details and receive project update alerts.
+                            Click "Follow Project" to request access to project details and receive update alerts.
                           </p>
                           <p
                             v-else-if="project.follow_status.status === 'pending'"
-                            class="has-text-danger"
+                            class="has-text-danger font-14px"
                           >
                             Your follow request is pending approval. Once approved, 
-                            you will gain access to project details and receive project update alerts.
+                            you will gain access to project details and receive update alerts.
                           </p>
                           <p
                             v-else-if="project.follow_status.status === 'yes' || project.creator.username === currentUser.username"
-                            class="has-text-danger"
+                            class="has-text-danger font-14px"
                           >
                             No details available for this project.
                           </p>
@@ -396,7 +396,14 @@
                           type="is-dark"
                           v-else
                         >
-                          <a @click="confirmUnfollow(project.follow_status.id, 'project')">
+                          <a
+                            @click="confirmUnfollow(project.follow_status.id, 'project')"
+                            :class="{ 
+                              'has-text-info': !project.follow_status.id, 
+                              'has-text-dark': project.follow_status.status === 'pending',
+                              'has-text-light': project.follow_status.status === 'yes'
+                            }"
+                          >
                             <b-icon icon="mdil-bell-off" />
                             Unfollow Project
                           </a>
@@ -472,18 +479,21 @@
                       v-if="currentUser && team.creator && team.creator.username !== currentUser.username && team.follow_status.id"
                       size="is-medium"
                       class="is-clickable"
-                      :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-primary': team.follow_status.status === 'yes' }"
+                      :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-danger': team.follow_status.status === 'yes' }"
                       @click.native="confirmUnfollow(team.follow_status.id, 'team')"
                     >
                       <b-tooltip
                         :label="team.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Team'"
                         type="is-dark"
                       >
-                        <b-icon
-                          :type="team.follow_status.status === 'yes' ? 'is-white' : ''"
-                          custom-size="mdi-16px"
-                          icon="mdil-bell-off"
-                        />
+                        <span 
+                          :class="{ 
+                            'has-text-dark': team.follow_status.status === 'pending',
+                            'has-text-light': team.follow_status.status === 'yes'
+                          }"
+                        >
+                          {{ team.follow_status.status === 'pending' ? "Pending" : "Unfollow" }}
+                        </span>
                       </b-tooltip>
                     </b-tag>
                     <!-- Unfollowed status -->
@@ -497,7 +507,7 @@
                         label="Follow Team"
                         type="is-white"
                       >
-                        <b-icon icon="mdil-bell" />
+                        <span class="has-text-info">Follow</span>
                       </b-tooltip>
                     </b-tag>
                   </b-taglist>

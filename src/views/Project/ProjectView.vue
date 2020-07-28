@@ -20,12 +20,25 @@
               <!-- Edit project -->
               <b-button
                 icon-left="mdil-pencil"
-                type="is-primary"
+                type="is-warning"
                 size="is-medium"
+                class="small-shadow"
                 @click="editProject"
               >
                 Edit
               </b-button>
+            </div>
+            <div
+              class="level-right"
+              v-else-if="hasLoggedIn && isMember && followStatus" 
+            >
+              <FollowButtonAction
+                :follow-status="followStatus"
+                type="project"
+                :target-id="projectId"
+                :creator="creator"
+                @change="fetchProject(projectId)"
+              />
             </div>
           </div>
         </div>
@@ -332,12 +345,14 @@ import * as FollowManage from "@/api/followManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
+import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
 
 export default {
   title: "View Project",
   components: {
     Error,
-    ManageFollowerModal
+    ManageFollowerModal,
+    FollowButtonAction
   },
   data() {
     return {
@@ -346,6 +361,7 @@ export default {
       },
       hasProject: false,
       isManageFollowerModalActive: false,
+      followStatus: undefined,
       isRequest: false,
       errorMessage: "",
       target: undefined,
@@ -404,7 +420,7 @@ export default {
     async fetchProject(id) {
       // Error handling
       try {
-        const project = await ProjectManage.fetchProject(id, true)
+        const project = await ProjectManage.fetchProject(id, true, true)
 
         if (!project) {
           this.errorMessage = await handleError({ code: 119 })
@@ -415,6 +431,7 @@ export default {
         this.features = project.features
         this.creator = project.creator
         this.updatedDate = project.update_date
+        if (project.follow_status && project.follow_status.length > 0) this.followStatus = project.follow_status[0]
 
         return project
       } catch (error) {

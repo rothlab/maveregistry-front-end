@@ -38,7 +38,7 @@
           <div class="level-right">
             <b-pagination
               :total="filteredFollowers.count ? filteredFollowers.count : 0"
-              icon-pack="mdi"
+              icon-pack="mdil"
               icon-prev="chevron-left"
               order="is-right"
               simple
