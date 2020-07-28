@@ -145,7 +145,8 @@
               <b-button
                 :disabled="!passed"
                 expanded
-                type="is-primary"
+                class="small-shadow"
+                type="is-warning"
                 size="is-medium"
                 icon-left="mdil-content-save"
                 :loading="isLoading.submit"

@@ -164,7 +164,8 @@ export const Project = Parse.Object.extend("Project", {
       ret.creator = {
         username: creator.get("username"),
         first_name: creator.get("first_name"),
-        last_name: creator.get("last_name")
+        last_name: creator.get("last_name"),
+        profile_image: creator.get("profile_image")
       }
     }
 
@@ -326,13 +327,13 @@ export async function fetchTargets(limit, skip, filter) {
   return targets
 }
 
-export async function fetchProject(id, detail = false) {
+export async function fetchProject(id, detail = false, follower = false) {
   // Fetch project by ID
   const project = await new Project.fetchById(id, ["target", "creator", "team", "collaborators"])
 
   // Format and return
   if (!project) return
-  return project.format(detail)
+  return project.format(detail, follower)
 }
 
 export async function fetchProjectByTeamId(id, objects = []) {

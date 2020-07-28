@@ -22,7 +22,7 @@
                 icon-left="mdil-plus"
                 type="is-warning"
                 size="is-medium"
-                class="is-hidden-mobile"
+                class="is-hidden-mobile small-shadow"
                 @click="addTeam"
               >
                 New Team
@@ -32,7 +32,7 @@
                 icon-left="mdil-plus"
                 type="is-warning"
                 size="is-medium"
-                class="is-hidden-tablet"
+                class="is-hidden-tablet small-shadow"
                 @click="addTeam"
               >
                 New
@@ -58,7 +58,7 @@
           paginated
           pagination-position="top"
           backend-pagination
-          icon-pack="mdi"
+          icon-pack="mdil"
           :per-page="pagination.limit"
           :total="pagination.count"
           :current-page="pagination.current"
@@ -337,11 +337,11 @@ export default {
     }
   },
   async mounted() {
-    if (!this.currentUser) {
+    if (!this.hasLoggedIn) {
       this.errorMessage = "Access denied. This function is only available for logged-in users."
-      return
+    } else {
+      await this.fetchTeams()
     }
-    await this.fetchTeams()
   },
   methods: {
     confirmFollow(id, creator) {

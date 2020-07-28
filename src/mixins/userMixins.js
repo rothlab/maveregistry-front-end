@@ -21,6 +21,8 @@ export default {
 
       if (typeof user.profile_image === "string") {
         url = user.profile_image
+      } else if (typeof user.profile_image.url === "string") {
+        url = user.profile_image.url
       } else {
         url = user.profile_image.url()
       }

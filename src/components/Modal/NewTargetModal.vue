@@ -1,25 +1,32 @@
 <template>
   <b-modal
     :active.sync="isActive"
-    has-modal-card
+    :width="500"
     :can-cancel="['escape', 'outside']"
+    class="card-modal"
   >
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">
-          <span>{{ title }}</span>
-        </p>
-        <button
-          class="delete"
-          aria-label="close"
-          @click="isActive = false"
-        />
-      </header>
-      <ValidationObserver
-        ref="observer"
-        v-slot="{ passed }"
-      >
-        <section class="modal-card-body">
+    <div class="card">
+      <div class="card-content">
+        <!-- Header -->
+        <div class="level is-mobile">
+          <div class="level-left">
+            <p class="is-size-5 has-text-primary">
+              {{ title }}
+            </p>
+          </div>
+          <div class="level-right">
+            <button
+              class="delete"
+              aria-label="close"
+              @click="isActive = false"
+            />
+          </div>
+        </div>
+
+        <ValidationObserver
+          ref="observer"
+          v-slot="{ passed }"
+        >
           <div class="content">
             <!-- Notification -->
             <b-message
@@ -114,7 +121,7 @@
                 </b-select>
               </b-field>
             </ValidationProvider>
-                
+              
             <ValidationProvider
               name="Features"
               v-slot="{ errors, valid }"
@@ -164,8 +171,7 @@
               </b-field>
             </ValidationProvider>
           </div>
-        </section>
-        <footer class="modal-card-foot">
+
           <b-button
             expanded
             :loading="isLoading"
@@ -175,8 +181,8 @@
           >
             {{ submitText }}
           </b-button>
-        </footer>
-      </ValidationObserver>
+        </ValidationObserver>
+      </div>
     </div>
   </b-modal>
 </template>

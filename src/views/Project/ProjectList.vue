@@ -19,7 +19,7 @@
                 icon-left="mdil-plus"
                 type="is-warning"
                 size="is-medium"
-                class="is-hidden-mobile"
+                class="is-hidden-mobile small-shadow"
                 @click="handleNewTargetModal()"
               >
                 New Project
@@ -29,7 +29,7 @@
                 icon-left="mdil-plus"
                 type="is-danger"
                 size="is-medium"
-                class="is-hidden-tablet"
+                class="is-hidden-tablet small-shadow"
                 @click="handleNewTargetModal()"
               >
                 New
@@ -81,7 +81,7 @@
           paginated
           pagination-position="top"
           backend-pagination
-          icon-pack="mdi"
+          icon-pack="mdil"
           :per-page="pagination.limit"
           :total="pagination.count"
           :current-page="pagination.current"
@@ -99,12 +99,10 @@
                 slot-scope="{ active }"
                 :type="filter.type ? 'is-info' : 'is-light'"
               >
-                <b-icon
-                  pack="mdi"
-                  icon="filter-outline"
-                  size="is-small"
+                <FilterOutline
+                  class="filter-icon icon-18px"
                 />
-                <span>Type</span>
+                <span style="margin-left: 0.25rem">Type</span>
                 <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
               </b-button>
 
@@ -134,12 +132,10 @@
                 slot-scope="{ active }"
                 :type="filter.organism ? 'is-info' : 'is-light'"
               >
-                <b-icon
-                  pack="mdi"
-                  icon="filter-outline"
-                  size="is-small"
+                <FilterOutline
+                  class="filter-icon icon-18px"
                 />
-                <span>Organism</span>
+                <span style="margin-left: 0.25rem">Organism</span>
                 <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
               </b-button>
 
@@ -344,20 +340,20 @@
                         <div v-else-if="project.follow_status">
                           <p
                             v-if="!project.follow_status.id && project.creator.username !== currentUser.username"
-                            class="has-text-danger"
+                            class="has-text-danger font-14px"
                           >
-                            Click "Follow Project" to request access to project details and receive project update alerts.
+                            Click "Follow Project" to request access to project details and receive update alerts.
                           </p>
                           <p
                             v-else-if="project.follow_status.status === 'pending'"
-                            class="has-text-danger"
+                            class="has-text-danger font-14px"
                           >
                             Your follow request is pending approval. Once approved, 
-                            you will gain access to project details and receive project update alerts.
+                            you will gain access to project details and receive update alerts.
                           </p>
                           <p
                             v-else-if="project.follow_status.status === 'yes' || project.creator.username === currentUser.username"
-                            class="has-text-danger"
+                            class="has-text-danger font-14px"
                           >
                             No details available for this project.
                           </p>
@@ -400,7 +396,14 @@
                           type="is-dark"
                           v-else
                         >
-                          <a @click="confirmUnfollow(project.follow_status.id, 'project')">
+                          <a
+                            @click="confirmUnfollow(project.follow_status.id, 'project')"
+                            :class="{ 
+                              'has-text-info': !project.follow_status.id, 
+                              'has-text-dark': project.follow_status.status === 'pending',
+                              'has-text-light': project.follow_status.status === 'yes'
+                            }"
+                          >
                             <b-icon icon="mdil-bell-off" />
                             Unfollow Project
                           </a>
@@ -476,18 +479,21 @@
                       v-if="currentUser && team.creator && team.creator.username !== currentUser.username && team.follow_status.id"
                       size="is-medium"
                       class="is-clickable"
-                      :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-primary': team.follow_status.status === 'yes' }"
+                      :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-danger': team.follow_status.status === 'yes' }"
                       @click.native="confirmUnfollow(team.follow_status.id, 'team')"
                     >
                       <b-tooltip
                         :label="team.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Team'"
                         type="is-dark"
                       >
-                        <b-icon
-                          :type="team.follow_status.status === 'yes' ? 'is-white' : ''"
-                          custom-size="mdi-16px"
-                          icon="mdil-bell-off"
-                        />
+                        <span 
+                          :class="{ 
+                            'has-text-dark': team.follow_status.status === 'pending',
+                            'has-text-light': team.follow_status.status === 'yes'
+                          }"
+                        >
+                          {{ team.follow_status.status === 'pending' ? "Pending" : "Unfollow" }}
+                        </span>
                       </b-tooltip>
                     </b-tag>
                     <!-- Unfollowed status -->
@@ -501,7 +507,7 @@
                         label="Follow Team"
                         type="is-white"
                       >
-                        <b-icon icon="mdil-bell" />
+                        <span class="has-text-info">Follow</span>
                       </b-tooltip>
                     </b-tag>
                   </b-taglist>
@@ -607,6 +613,7 @@ import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import ShowMoreField from '@/components/Field/ShowMoreField.vue'
 import TipAction from '@/components/Action/TipAction.vue'
+import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
 
 const variables = require("@/assets/script/variables.json")
 
@@ -618,7 +625,8 @@ export default {
     UnfollowModal,
     NewTargetModal,
     ShowMoreField,
-    TipAction
+    TipAction,
+    FilterOutline
   },
   watch: {
     filter: {

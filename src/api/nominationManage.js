@@ -202,7 +202,6 @@ export async function voteNomination(id, action, voteId = "") {
   const currentUser = Parse.User.current()
   if (!currentUser) throw new Error("Not logged in")
 
-  // Otherwise, we need to register vote
   // Fetch the nomination
   const nomination = await new Nomination.fetchById(id)
 

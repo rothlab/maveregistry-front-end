@@ -63,8 +63,10 @@
       border-bottom-left-radius: 0.4rem
       border-bottom-right-radius: 0.4rem
       .card-footer-item
-        border-bottom-left-radius: 0.4rem
-        border-bottom-right-radius: 0.4rem
+        &:first-child
+          border-bottom-left-radius: 0.4rem
+        &:last-child
+          border-bottom-right-radius: 0.4rem
   &:only-child
     border-radius: 0.4rem
   .card-header
@@ -103,11 +105,11 @@
 .shadow
   box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.1) inset, 0 -1px 0 0 rgba(10, 10, 10, 0.1) inset
 .small-shadow
-  box-shadow: 0 .125rem .25rem rgba(0,0,0,.15)
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)
   transition: ease-in-out 200ms
   &:hover
     &.button
-      box-shadow: 0 .25rem .25rem rgba(0,0,0,.15)
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)
 .med-shadow
   box-shadow: 0 .5rem 0.25rem rgba(0,0,0,.15)
   transition: ease-in-out 200ms
@@ -154,3 +156,34 @@
   top: calc( 5rem + 1.5rem )
   @media screen and (max-width: $break-desktop)
     top: calc( 3rem + 1.5rem )
+.icon-48px
+  height: 48px
+  width: 48px
+  .material-design-icon__svg
+    height: 48px
+    width: 48px
+.icon-24px
+  height: 24px
+  width: 24px
+  .material-design-icon__svg
+    height: 24px
+    width: 24px
+.icon-18px
+  height: 18px
+  width: 18px
+  .material-design-icon__svg
+    height: 18px
+    width: 18px
+// Temp fix for pagination buttons
+.mdil.chevron-left
+  &:before
+    content: "\F140"
+    font-weight: bold
+    transform: rotate(90deg)
+.mdil.chevron-right
+  &:before
+    content: "\F140"
+    font-weight: bold
+    transform: rotate(270deg)
+.font-14px
+  font-size: 14px
