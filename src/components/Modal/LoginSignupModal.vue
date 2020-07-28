@@ -2,275 +2,283 @@
   <b-modal
     :active.sync="isActive"
     :width="500"
+    :can-cancel="['escape', 'outside']"
     class="card-modal"
   >
     <div class="card">
-      <div class="card-content">
-        <div class="section">
-          <vue-hcaptcha
-            sitekey="57b34ff1-21ab-4eee-b0f1-a16071d64d34"
-            size="invisible"
-            ref="captcha"
-            @verify="onVerifyCaptcha"
-            @expired="onErrorCaptcha('Captcha Expired')"
-            @error="onErrorCaptcha"
-          />
-          <div class="content has-text-centered">
+      <div class="card-content login-card">
+        <vue-hcaptcha
+          sitekey="57b34ff1-21ab-4eee-b0f1-a16071d64d34"
+          size="invisible"
+          ref="captcha"
+          @verify="onVerifyCaptcha"
+          @expired="onErrorCaptcha('Captcha Expired')"
+          @error="onErrorCaptcha"
+        />
+        <div class="level is-mobile">
+          <div class="level-left">
             <img
               width="200"
               src="@/assets/image/logo.png"
               alt="Mave Registry Logo"
             >
           </div>
+          <div class="level-right">
+            <button
+              class="delete"
+              aria-label="close"
+              @click="isActive = false"
+            />
+          </div>
+        </div>
 
-          <!-- Log in/Sign up tab -->
-          <b-tabs
-            position="is-centered"
-            type="is-boxed"
-            expanded
-            class="login-tab is-marginless"
-            :animated="false"
+        <!-- Log in/Sign up tab -->
+        <b-tabs
+          position="is-centered"
+          type="is-boxed"
+          expanded
+          class="login-tab is-marginless"
+          :animated="false"
+        >
+          <!-- Log in tab -->
+          <b-tab-item
+            icon="mdil-login"
+            label="Log in"
           >
-            <!-- Log in tab -->
-            <b-tab-item
-              icon="mdil-login"
-              label="Log in"
+            <ValidationObserver
+              ref="observer"
+              v-slot="{ passed }"
             >
-              <ValidationObserver
-                ref="observer"
-                v-slot="{ passed }"
-              >
-                <ValidationProvider
-                  rules="required"
-                  name="Username/Email"
-                  v-slot="{ errors, valid }"
-                >
-                  <!-- Need to add class here because validation provider screws it up -->
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                  >
-                    <b-input
-                      icon="mdil-account"
-                      placeholder="Username/Email"
-                      v-model.trim="username"
-                    />
-                  </b-field>
-                </ValidationProvider>
-                <PasswordField
-                  v-model="password"
-                  enter-to-submit
-                  @submit="login('password')"
-                />
-                <p class="control">
-                  <b-button
-                    expanded
-                    :disabled="!passed"
-                    class="is-primary"
-                    :loading="isLoading"
-                    @click="login('password')"
-                  >
-                    Log in
-                  </b-button>
-                </p>
-              </ValidationObserver>
-              <p class="forget-password has-text-right">
-                <router-link
-                  :to="{ name: 'Reset Password' }"
-                  target="_blank"
-                >
-                  Forgot Password?
-                </router-link>
-              </p>
-              <div class="level">
-                <div class="level-left">
-                  <p class="has-text-weight-medium has-text-centered">
-                    Sign in with
-                  </p>
-                </div>
-                <div class="level-right oauth">
-                  <div class="buttons is-space-between">
-                    <button
-                      class="button google-signin"
-                      @click="login('google')"
-                    />
-                    <button
-                      class="button orcid-signin"
-                      @click="login('orcid')"
-                    >
-                      <img
-                        src="@/assets/image/orcid_logo.png"
-                        alt="ORCID logo"
-                      >
-                      <span class="has-text-grey">ORCID</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </b-tab-item>
-            <!-- Sign up tab -->
-            <b-tab-item
-              icon="mdil-file-plus"
-              label="Sign up"
-            >
-              <ValidationObserver
-                ref="observer"
-                v-slot="{ passed }"
+              <ValidationProvider
+                rules="required"
+                name="Username/Email"
+                v-slot="{ errors, valid }"
               >
                 <!-- Need to add class here because validation provider screws it up -->
                 <b-field
-                  grouped
-                  class="field-margin is-space-between"
+                  :message="errors"
+                  class="field-margin"
+                  :type="{ 'is-danger': errors[0], '': valid }"
                 >
-                  <ValidationProvider
-                    rules="required"
-                    name="FirstName"
-                    v-slot="{ errors, valid }"
-                    class="name"
-                  >
-                    <b-field
-                      :message="errors"
-                      :type="{ 'is-danger': errors[0], '': valid }"
-                    >
-                      <b-input
-                        type="text"
-                        placeholder="First Name"
-                        v-model.trim="firstName"
-                      />
-                    </b-field>
-                  </ValidationProvider>
-                  <ValidationProvider
-                    rules="required"
-                    name="LastName"
-                    v-slot="{ errors, valid }"
-                    class="name"
-                  >
-                    <b-field
-                      :message="errors"
-                      :type="{ 'is-danger': errors[0], '': valid }"
-                    >
-                      <b-input
-                        type="text"
-                        placeholder="Last Name"
-                        v-model.trim="lastName"
-                      />
-                    </b-field>
-                  </ValidationProvider>
+                  <b-input
+                    icon="mdil-account"
+                    placeholder="Username/Email"
+                    v-model.trim="username"
+                  />
                 </b-field>
-                <ValidationProvider
-                  rules="required|alpha_dash"
-                  name="Username"
-                  v-slot="{ errors, valid }"
+              </ValidationProvider>
+              <PasswordField
+                v-model="password"
+                enter-to-submit
+                @submit="login('password')"
+              />
+              <p class="control">
+                <b-button
+                  expanded
+                  :disabled="!passed"
+                  class="is-primary"
+                  :loading="isLoading"
+                  @click="login('password')"
                 >
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                  >
-                    <b-input
-                      icon="mdil-account"
-                      type="text"
-                      placeholder="Username"
-                      v-model.trim="username"
-                    />
-                  </b-field>
-                </ValidationProvider>
-                <ValidationProvider
-                  rules="required|email"
-                  name="Email"
-                  v-slot="{ errors, valid }"
-                >
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                  >
-                    <b-input
-                      icon="mdil-email"
-                      type="email"
-                      placeholder="Email"
-                      v-model.trim="email"
-                    />
-                  </b-field>
-                </ValidationProvider>
-                <PasswordField
-                  has-confirm
-                  v-model="password"
-                  enter-to-submit
-                  @submit="executeCaptcha"
-                />
-                <ValidationProvider
-                  :rules="{ required: { allowFalse: false } }"
-                  name="Consent"
-                  v-slot="{ errors }"
-                >
-                  <b-checkbox v-model="hasConsent">
-                    I agree to the 
-                    <a
-                      href="/policy/terms"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >Terms</a> 
-                    and
-                    <a
-                      href="/policy/privacy"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >Privacy Policy</a>.
-                  </b-checkbox>
-                  <p
-                    class="has-text-danger is-size-7"
-                    v-if="errors[0]"
-                  >
-                    You have to agree to these linked agreements before signing up.
-                  </p>
-                </ValidationProvider>
-                <p
-                  class="control"
-                  style="padding-top: 0.5rem"
-                >
-                  <b-button
-                    expanded
-                    class="is-primary"
-                    :disabled="!passed"
-                    :loading="isLoading"
-                    @click="executeCaptcha"
-                  >
-                    Sign up
-                  </b-button>
+                  Log in
+                </b-button>
+              </p>
+            </ValidationObserver>
+            <p class="forget-password has-text-right">
+              <router-link
+                :to="{ name: 'Reset Password' }"
+                target="_blank"
+              >
+                Forgot Password?
+              </router-link>
+            </p>
+            <div class="level">
+              <div class="level-left">
+                <p class="has-text-weight-medium has-text-centered">
+                  Sign in with
                 </p>
-              </ValidationObserver>
-
-              <!-- Third party -->
-              <div class="level oauth signup">
-                <div class="level-left">
-                  <p class="has-text-weight-medium has-text-centered">
-                    Sign up with
-                  </p>
-                </div>
-                <div class="level-right oauth">
-                  <div class="buttons is-space-between">
-                    <button
-                      class="button google-signin"
-                      @click="login('google')"
-                    />
-                    <button
-                      class="button orcid-signin"
-                      @click="login('orcid')"
+              </div>
+              <div class="level-right oauth">
+                <div class="buttons is-space-between">
+                  <button
+                    class="button google-signin"
+                    @click="login('google')"
+                  />
+                  <button
+                    class="button orcid-signin"
+                    @click="login('orcid')"
+                  >
+                    <img
+                      src="@/assets/image/orcid_logo.png"
+                      alt="ORCID logo"
                     >
-                      <img
-                        src="@/assets/image/orcid_logo.png"
-                        alt="ORCID logo"
-                      >
-                      <span class="has-text-grey">ORCID</span>
-                    </button>
-                  </div>
+                    <span class="has-text-grey">ORCID</span>
+                  </button>
                 </div>
               </div>
-            </b-tab-item>
-          </b-tabs>
-        </div>
+            </div>
+          </b-tab-item>
+          <!-- Sign up tab -->
+          <b-tab-item
+            icon="mdil-file-plus"
+            label="Sign up"
+          >
+            <ValidationObserver
+              ref="observer"
+              v-slot="{ passed }"
+            >
+              <!-- Need to add class here because validation provider screws it up -->
+              <b-field
+                grouped
+                class="field-margin is-space-between"
+              >
+                <ValidationProvider
+                  rules="required"
+                  name="FirstName"
+                  v-slot="{ errors, valid }"
+                  class="name"
+                >
+                  <b-field
+                    :message="errors"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                  >
+                    <b-input
+                      type="text"
+                      placeholder="First Name"
+                      v-model.trim="firstName"
+                    />
+                  </b-field>
+                </ValidationProvider>
+                <ValidationProvider
+                  rules="required"
+                  name="LastName"
+                  v-slot="{ errors, valid }"
+                  class="name"
+                >
+                  <b-field
+                    :message="errors"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                  >
+                    <b-input
+                      type="text"
+                      placeholder="Last Name"
+                      v-model.trim="lastName"
+                    />
+                  </b-field>
+                </ValidationProvider>
+              </b-field>
+              <ValidationProvider
+                rules="required|alpha_dash"
+                name="Username"
+                v-slot="{ errors, valid }"
+              >
+                <b-field
+                  :message="errors"
+                  class="field-margin"
+                  :type="{ 'is-danger': errors[0], '': valid }"
+                >
+                  <b-input
+                    icon="mdil-account"
+                    type="text"
+                    placeholder="Username"
+                    v-model.trim="username"
+                  />
+                </b-field>
+              </ValidationProvider>
+              <ValidationProvider
+                rules="required|email"
+                name="Email"
+                v-slot="{ errors, valid }"
+              >
+                <b-field
+                  :message="errors"
+                  class="field-margin"
+                  :type="{ 'is-danger': errors[0], '': valid }"
+                >
+                  <b-input
+                    icon="mdil-email"
+                    type="email"
+                    placeholder="Email"
+                    v-model.trim="email"
+                  />
+                </b-field>
+              </ValidationProvider>
+              <PasswordField
+                has-confirm
+                v-model="password"
+                enter-to-submit
+                @submit="executeCaptcha"
+              />
+              <ValidationProvider
+                :rules="{ required: { allowFalse: false } }"
+                name="Consent"
+                v-slot="{ errors }"
+              >
+                <b-checkbox v-model="hasConsent">
+                  I agree to the 
+                  <a
+                    href="/policy/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >Terms</a> 
+                  and
+                  <a
+                    href="/policy/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >Privacy Policy</a>.
+                </b-checkbox>
+                <p
+                  class="has-text-danger is-size-7"
+                  v-if="errors[0]"
+                >
+                  You have to agree to these linked agreements before signing up.
+                </p>
+              </ValidationProvider>
+              <p
+                class="control"
+                style="padding-top: 0.5rem"
+              >
+                <b-button
+                  expanded
+                  class="is-primary"
+                  :disabled="!passed"
+                  :loading="isLoading"
+                  @click="executeCaptcha"
+                >
+                  Sign up
+                </b-button>
+              </p>
+            </ValidationObserver>
+
+            <!-- Third party -->
+            <div class="level oauth signup">
+              <div class="level-left">
+                <p class="has-text-weight-medium has-text-centered">
+                  Sign up with
+                </p>
+              </div>
+              <div class="level-right oauth">
+                <div class="buttons is-space-between">
+                  <button
+                    class="button google-signin"
+                    @click="login('google')"
+                  />
+                  <button
+                    class="button orcid-signin"
+                    @click="login('orcid')"
+                  >
+                    <img
+                      src="@/assets/image/orcid_logo.png"
+                      alt="ORCID logo"
+                    >
+                    <span class="has-text-grey">ORCID</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </b-tab-item>
+        </b-tabs>
       </div>
     </div>
   </b-modal>
@@ -499,6 +507,8 @@ export default {
 <style lang="sass">
 @import "@/assets/style/variables.sass"
 
+.login-card
+  padding: 3rem 3rem 2rem 3rem
 .login-tab .tab-content
   padding: 1rem 0 !important
 .oauth

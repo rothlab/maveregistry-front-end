@@ -4,13 +4,14 @@
     :can-cancel="['escape', 'outside']"
     :width="600"
     @close="followers = {}"
+    class="card-modal"
   >
     <div class="card">      
       <div class="card-content manage-follower">
         <!-- Title -->
         <header class="level is-mobile">
           <div class="level-left">
-            <p class="is-capitalized is-size-5">
+            <p class="has-text-primary is-capitalized is-size-5">
               Manage {{ classText }}
             </p>
           </div>

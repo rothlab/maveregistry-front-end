@@ -1,26 +1,33 @@
 <template>
   <b-modal
     :active.sync="isActive"
-    has-modal-card
+    :width="500"
     :can-cancel="['escape', 'outside']"
+    class="card-modal"
   >
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">
-          <span>Add a New {{ isCollaborator ? "Collaborator" : "Team" }}</span>
-        </p>
-        <button
-          class="delete"
-          aria-label="close"
-          @click="isActive = false"
-        />
-      </header>
+    <div class="card">
+      <div class="card-content">
+        <!-- Header -->
+        <div class="level is-mobile">
+          <div class="level-left">
+            <p class="is-size-5 has-text-primary">
+              Add a New {{ isCollaborator ? "Collaborator" : "Team" }}
+            </p>
+          </div>
+          <div class="level-right">
+            <button
+              class="delete"
+              aria-label="close"
+              @click="isActive = false"
+            />
+          </div>
+        </div>
 
-      <ValidationObserver
-        ref="observer"
-        v-slot="{ passed }"
-      >
-        <section class="modal-card-body">
+        <!-- Body -->
+        <ValidationObserver
+          ref="observer"
+          v-slot="{ passed }"
+        >
           <div class="content">
             <p class="is-size-5 has-text-weight-bold">
               Principal Investigator
@@ -28,9 +35,7 @@
 
             <PIInfoField v-model="team" />
           </div>
-        </section>
 
-        <footer class="modal-card-foot">
           <b-button
             expanded
             :loading="isLoading"
@@ -40,8 +45,8 @@
           >
             Add {{ isCollaborator ? "Collaborator" : "Team" }}
           </b-button>
-        </footer>
-      </ValidationObserver>
+        </ValidationObserver>
+      </div>
     </div>
   </b-modal>
 </template>

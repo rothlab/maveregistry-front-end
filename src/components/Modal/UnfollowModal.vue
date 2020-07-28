@@ -1,21 +1,29 @@
 <template>
   <b-modal
     :active.sync="isActive"
-    has-modal-card
+    :width="500"
     :can-cancel="['escape', 'outside']"
+    class="card-modal"
   >
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">
-          <span class="is-capitalized">Unfollow {{ type }}</span>
-        </p>
-        <button
-          class="delete"
-          aria-label="close"
-          @click="isActive = false"
-        />
-      </header>
-      <section class="modal-card-body">
+    <div class="card">
+      <div class="card-content">
+        <!-- Header -->
+        <div class="level is-mobile">
+          <div class="level-left">
+            <p class="is-size-5 has-text-primary is-capitalized">
+              Unfollow {{ type }}
+            </p>
+          </div>
+          <div class="level-right">
+            <button
+              class="delete"
+              aria-label="close"
+              @click="isActive = false"
+            />
+          </div>
+        </div>
+
+        <!-- Body -->
         <div class="container">
           <div class="media">
             <div class="media-left">
@@ -34,9 +42,8 @@
             </div>
           </div>
         </div>
-      </section>
-      <footer class="modal-card-foot has-hright">
-        <div class="buttons">
+
+        <div class="buttons footer-actions">
           <b-button
             @click="isActive = false"
           >
@@ -50,7 +57,7 @@
             Unfollow
           </b-button>
         </div>
-      </footer>
+      </div>
     </div>
   </b-modal>
 </template>
@@ -125,3 +132,9 @@ export default {
   }
 }
 </script>
+
+<style lang="sass" scoped>
+.footer-actions
+  margin-top: 1.5rem
+  justify-content: flex-end
+</style>
