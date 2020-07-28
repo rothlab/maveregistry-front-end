@@ -154,3 +154,32 @@
   top: calc( 5rem + 1.5rem )
   @media screen and (max-width: $break-desktop)
     top: calc( 3rem + 1.5rem )
+.icon-24px
+  height: 48px
+  width: 48px
+  .material-design-icon__svg
+    height: 48px
+    width: 48px
+.icon-24px
+  height: 24px
+  width: 24px
+  .material-design-icon__svg
+    height: 24px
+    width: 24px
+.icon-18px
+  height: 18px
+  width: 18px
+  .material-design-icon__svg
+    height: 18px
+    width: 18px
+// Temp fix for pagination buttons
+.mdil.chevron-left
+  &:before
+    content: "\F140"
+    font-weight: bold
+    transform: rotate(90deg)
+.mdil.chevron-right
+  &:before
+    content: "\F140"
+    font-weight: bold
+    transform: rotate(270deg)

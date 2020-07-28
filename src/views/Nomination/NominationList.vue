@@ -67,7 +67,7 @@
           paginated
           pagination-position="top"
           backend-pagination
-          icon-pack="mdi"
+          icon-pack="mdil"
           :per-page="pagination.limit"
           :total="pagination.count"
           :current-page="pagination.current"
@@ -85,12 +85,10 @@
                 slot-scope="{ active }"
                 :type="filter.type ? 'is-info' : 'is-light'"
               >
-                <b-icon
-                  pack="mdi"
-                  icon="filter-outline"
-                  size="is-small"
+                <FilterOutline
+                  class="filter-icon icon-18px"
                 />
-                <span>Type</span>
+                <span style="margin-left: 0.25rem">Type</span>
                 <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
               </b-button>
 
@@ -120,12 +118,10 @@
                 slot-scope="{ active }"
                 :type="filter.organism ? 'is-info' : 'is-light'"
               >
-                <b-icon
-                  pack="mdi"
-                  icon="filter-outline"
-                  size="is-small"
+                <FilterOutline
+                  class="filter-icon icon-18px"
                 />
-                <span>Organism</span>
+                <span style="margin-left: 0.25rem">Organism</span>
                 <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
               </b-button>
 
@@ -357,6 +353,7 @@ import { handleError } from "@/api/errorHandler.js"
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import Error from '@/components/Error.vue'
 import TipAction from '@/components/Action/TipAction.vue'
+import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
 
 const variables = require("@/assets/script/variables.json")
 
@@ -365,7 +362,8 @@ export default {
   components: {
     NewTargetModal,
     Error,
-    TipAction
+    TipAction,
+    FilterOutline
   },
   watch: {
     filter: {

@@ -58,7 +58,7 @@
           paginated
           pagination-position="top"
           backend-pagination
-          icon-pack="mdi"
+          icon-pack="mdil"
           :per-page="pagination.limit"
           :total="pagination.count"
           :current-page="pagination.current"

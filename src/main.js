@@ -15,8 +15,8 @@ import VueScrollTo from 'vue-scrollto'
 
 // Import stylesheets
 import "@/assets/style/bulma-customization.sass"
-import '@mdi/font/css/materialdesignicons.css'
 import '@mdi/light-font/css/materialdesignicons-light.css'
+import 'vue-material-design-icons/styles.css'
 import '@/assets/style/styles.sass'
 import 'vue-resize/dist/vue-resize.css'
 

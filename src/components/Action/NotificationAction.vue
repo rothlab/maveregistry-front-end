@@ -11,10 +11,9 @@
         slot="trigger"
         role="button"
       >
-        <b-icon
-          pack="mdi"
-          icon="bell"
-          type="is-light"
+        <bell-icon
+          title="Notification icon"
+          class="has-text-light icon-24px"
         />
         <span
           class="badge is-danger is-bold"
@@ -163,9 +162,14 @@
 </template>
 
 <script>
+import BellIcon from 'vue-material-design-icons/Bell.vue'
+
 const variables = require("@/assets/script/variables.json")
 
 export default {
+  components: {
+    BellIcon
+  },
   props: {
     isHover: {
       type: Boolean,

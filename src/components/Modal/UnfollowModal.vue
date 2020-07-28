@@ -19,11 +19,9 @@
         <div class="container">
           <div class="media">
             <div class="media-left">
-              <b-icon
-                pack="mdi"
-                icon="alert-circle"
-                size="is-large"
-                type="is-warning"
+              <AlertCircleIcon
+                decorative
+                class="has-text-warning icon-48px"
               />
             </div>
             <div class="media-content">
@@ -60,8 +58,12 @@
 <script>
 import * as FollowManage from "@/api/followManage.js"
 import { displayErrorToast } from "@/api/errorHandler.js"
+import AlertCircleIcon from 'vue-material-design-icons/AlertCircle.vue'
 
 export default {
+  components: {
+    AlertCircleIcon
+  },
   props: {
     follow: {
       type: String,
