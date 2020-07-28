@@ -19,7 +19,7 @@
                 icon-left="mdil-plus"
                 type="is-warning"
                 size="is-medium"
-                class="is-hidden-mobile"
+                class="is-hidden-mobile small-shadow"
                 @click="handleNewTargetModal()"
               >
                 New Project
@@ -29,7 +29,7 @@
                 icon-left="mdil-plus"
                 type="is-danger"
                 size="is-medium"
-                class="is-hidden-tablet"
+                class="is-hidden-tablet small-shadow"
                 @click="handleNewTargetModal()"
               >
                 New

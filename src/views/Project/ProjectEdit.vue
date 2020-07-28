@@ -361,9 +361,10 @@
           <div class="columns">
             <div class="column is-4 is-offset-8">
               <b-button
+                class="small-shadow"
                 :disabled="!passed"
                 expanded
-                type="is-primary"
+                type="is-warning"
                 size="is-medium"
                 icon-left="mdil-content-save"
                 @click="updateProject"
