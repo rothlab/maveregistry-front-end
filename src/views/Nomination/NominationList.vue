@@ -242,7 +242,6 @@
                 <p class="control action-button">
                   <b-tooltip
                     label="Up Vote"
-                    position="is-left"
                     type="is-dark"
                   >
                     <b-button
@@ -257,8 +256,7 @@
                 <p class="control action-button">
                   <b-tooltip
                     label="Down Vote"
-                    position="is-left"
-                    type="is-dark"
+                    type="is-danger"
                   >
                     <b-button
                       icon-left="mdil-thumb-down"
@@ -321,7 +319,7 @@
                     <b-button
                       icon-right="mdil-delete"
                       type="is-light"
-                      @click="deleteNomination(props.row)"
+                      @click="selectedNomination = props.row; isConfirmDeleteModalActive = true"
                     />
                   </b-tooltip>
                 </p>
@@ -342,6 +340,15 @@
         :has-feature="targetModalProps.field === 'feature'"
         @change="fetchNominations()"
       />
+
+      <!-- Confirm Delete Modal -->
+      <ConfirmDangerModal
+        :active.sync="isConfirmDeleteModalActive"
+        type="nomination"
+        action="delete"
+        :on-action="deleteNomination"
+        title="Delete Nomination"
+      />
     </div>
   </div>
 </template>
@@ -354,6 +361,7 @@ import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import Error from '@/components/Error.vue'
 import TipAction from '@/components/Action/TipAction.vue'
 import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
+import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -363,7 +371,8 @@ export default {
     NewTargetModal,
     Error,
     TipAction,
-    FilterOutline
+    FilterOutline,
+    ConfirmDangerModal
   },
   watch: {
     filter: {
@@ -402,7 +411,9 @@ export default {
         submit_text: "Nominate Target",
         target: undefined,
         submit_function: () => undefined
-      }
+      },
+      selectedNomination: undefined,
+      isConfirmDeleteModalActive: false
     }
   },
   async mounted() {
@@ -475,21 +486,9 @@ export default {
       // No need to catch error because it will be handled in the modal
       await NominationManage.updateNomination(attrs)
     },
-    async deleteNomination(attrs) {
-      this.$buefy.dialog.confirm({
-        title: "Delete Nomination",
-        message: "Are you sure you want to delete this nomination? This action cannot be undone.",
-        confirmText: "Delete",
-        type: "is-danger",
-        iconPack: "mdi",
-        hasIcon: true,
-        onConfirm: async () => {
-          // No need to catch error because it will be handled in the modal
-          await NominationManage.deleteNomination(attrs)
-
-          await this.fetchNominations()
-        }
-      })
+    async deleteNomination() {
+      await NominationManage.deleteNomination(this.selectedNomination)
+      await this.fetchNominations()
     },
     async vote(object, field, index) {
       // If not logged in, show the login panel instead

@@ -27,9 +27,7 @@
         :focusable="false"
         class="notification-center"
       >
-        <div
-          class="card"
-        >
+        <div class="card">
           <div class="card-header has-background-light">
             <div class="card-header-title">
               <span>
@@ -48,7 +46,7 @@
             </div>
           </div>
           <div
-            class="card-content"
+            class="card-content notification-scroll"
             v-if="count > 0"
           >
             <div
@@ -248,27 +246,29 @@ export default {
 
 .badge
   background-color: $danger
-  border: 2px solid $danger
   border-radius: 14px
-  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)
   color: #fff
   font-size: .65rem
   height: 14px
-  line-height: 8px
+  line-height: 11px
   min-width: 14px
   overflow: hidden
-  padding: .05rem .15rem
+  padding: .05rem .2rem
   position: absolute
   right: 0
   text-overflow: ellipsis
+  text-align: center
   top: 0
   transform: translate(25%,-25%)
   white-space: nowrap
+.notification-scroll
+  max-height: 300px
+  overflow-y: auto
 .notification-center
   @media screen and (min-width: $break-mobile)
     width: 28rem
   @media screen and (max-width: $break-mobile)
-    width: 100vw
+    max-width: 100vw
   .card
     box-shadow: unset
     border-radius: 6px

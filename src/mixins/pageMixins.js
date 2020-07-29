@@ -22,6 +22,9 @@ export default {
     },
     capitalize(string) {
       return string.slice(0,1).toUpperCase() + string.slice(1)
+    },
+    hasDeepLink(action) {
+      return this.$route.hash === action
     }
   }
 }

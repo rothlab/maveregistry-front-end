@@ -372,7 +372,7 @@
                       </router-link>
                     </div>
                     <div
-                      v-if="project.follow_status"
+                      v-if="project.follow_status && currentUser && project.creator.username !== currentUser.username && project.follow_status"
                       class="card-footer-item" 
                       :class="{ 
                         'has-background-white-bis': !project.follow_status.id, 
@@ -380,49 +380,31 @@
                         'has-background-danger': project.follow_status.status === 'yes'
                       }"
                     >
-                      <div
-                        v-if="currentUser && project.creator.username !== currentUser.username && project.follow_status"
+                      <!-- If not followed, show follow icon -->
+                      <div v-if="!project.follow_status.id">
+                        <a @click="confirmFollow(project.id, 'project', project.creator)">
+                          <b-icon icon="mdil-bell" />
+                          Follow Project
+                        </a>
+                      </div>
+                      <!-- If pending, show pending status and unfollow-->
+                      <b-tooltip
+                        :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Project'"
+                        type="is-dark"
+                        v-else
                       >
-                        <!-- If not followed, show follow icon -->
-                        <div v-if="!project.follow_status.id">
-                          <a @click="confirmFollow(project.id, 'project', project.creator)">
-                            <b-icon icon="mdil-bell" />
-                            Follow Project
-                          </a>
-                        </div>
-                        <!-- If pending, show pending status and unfollow-->
-                        <b-tooltip
-                          :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Project'"
-                          type="is-dark"
-                          v-else
+                        <a
+                          @click="confirmUnfollow(project.follow_status.id, 'project')"
+                          :class="{ 
+                            'has-text-info': !project.follow_status.id, 
+                            'has-text-dark': project.follow_status.status === 'pending',
+                            'has-text-light': project.follow_status.status === 'yes'
+                          }"
                         >
-                          <a
-                            @click="confirmUnfollow(project.follow_status.id, 'project')"
-                            :class="{ 
-                              'has-text-info': !project.follow_status.id, 
-                              'has-text-dark': project.follow_status.status === 'pending',
-                              'has-text-light': project.follow_status.status === 'yes'
-                            }"
-                          >
-                            <b-icon icon="mdil-bell-off" />
-                            Unfollow Project
-                          </a>
-                        </b-tooltip>
-                      </div>
-                      <div v-else>
-                        <b-tooltip
-                          label="Sorry, you cannot follow your own project"
-                          type="is-dark"
-                        >
-                          <span
-                            class="has-text-grey"
-                            style="cursor: not-allowed"
-                          >
-                            <b-icon icon="mdil-bell" />
-                            Follow Project
-                          </span>
-                        </b-tooltip>
-                      </div>
+                          <b-icon icon="mdil-bell-off" />
+                          Unfollow Project
+                        </a>
+                      </b-tooltip>
                     </div>
                   </div>
                 </b-collapse>

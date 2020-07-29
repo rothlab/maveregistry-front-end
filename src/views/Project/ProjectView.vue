@@ -286,7 +286,7 @@
                   target="_blank"
                 >
                   {{ creator.first_name + ' ' + creator.last_name }}
-                </router-link>
+                </router-link> <br>
               </p>
               <p
                 class="is-size-5"
@@ -301,7 +301,10 @@
                 v-if="isOwner && (followerCount > 0 || requestCount > 0)"
               >
                 <b>Follower{{ followerCount > 1 ? 's' : '' }}</b> <br>
-                <div class="buttons">
+                <div
+                  class="buttons"
+                  style="margin-top: 0.25rem"
+                >
                   <b-button
                     v-if="followerCount > 0"
                     class="action-button"
@@ -323,10 +326,32 @@
                 </div>
               </div>
             </div>
+
+            <div
+              class="project-header"
+              v-if="hasActions"
+            >
+              <p class="is-size-4 has-text-weight-bold">
+                Actions
+              </p>
+            </div>
+
+            <div
+              class="project-content"
+              v-if="hasActions"
+            >
+              <TransferAction
+                type="project"
+                :load-page="loadPage"
+                :is-owner="isOwner"
+                :target-id="projectId"
+                @has-transfer="(e) => hasTransfer = e"
+              />
+            </div>
           </div>
         </div>
       </div>
-
+      
       <!-- Manage follower modal -->
       <ManageFollowerModal
         :active.sync="isManageFollowerModalActive"
@@ -346,13 +371,15 @@ import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
+import TransferAction from '@/components/Action/TransferAction.vue'
 
 export default {
   title: "View Project",
   components: {
     Error,
     ManageFollowerModal,
-    FollowButtonAction
+    FollowButtonAction,
+    TransferAction
   },
   data() {
     return {
@@ -374,7 +401,8 @@ export default {
       funding: undefined,
       activities: [],
       followerCount: 0,
-      requestCount: 0
+      requestCount: 0,
+      hasTransfer: true // Default set to true so that the trasfer action can load
     }
   },
   computed: {
@@ -387,6 +415,9 @@ export default {
     hasActivity() {
       return this.activities.length > 0
     },
+    hasActions() {
+      return !!this.hasTransfer || this.isOwner
+    },
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     },
@@ -394,29 +425,34 @@ export default {
   async mounted() {
     this.isLoading.page = true
 
-    const project = await this.fetchProject(this.projectId)
-
-    if (project) {
-      this.hasProject = true
-      if (project.leads) this.leads = project.leads // Required, will always have value
-      if (project.team) this.team = project.team // Required, will always have value
-      if (project.collaborators)
-        this.collaborators = project.collaborators
-      if (project.funding) this.funding = project.funding
-      if (project.activities) this.activities = project.activities
-    } else {
-      this.hasProject = false
-    }
-
-    // Fetch team follower and request count
-    if (this.isOwner) await this.fetchFollowerAndRequestCount(this.projectId)
+    await this.loadPage()
 
     // Open follow request modal if needed
-    if (this.hasDeepLink("#manage-request")) this.openFollowerModal(true)
+    if (this.hasDeepLink("#manage-request") && this.isOwner) this.openFollowerModal(true)
 
     this.isLoading.page = false
   },
   methods: {
+    async loadPage() {
+      const project = await this.fetchProject(this.projectId)
+
+      if (project) {
+        this.hasProject = true
+        if (project.leads) this.leads = project.leads // Required, will always have value
+        if (project.team) this.team = project.team // Required, will always have value
+        if (project.collaborators)
+          this.collaborators = project.collaborators
+        if (project.funding) this.funding = project.funding
+        if (project.activities) this.activities = project.activities
+      } else {
+        this.hasProject = false
+      }
+
+      if (this.isOwner) {
+        // Fetch team follower and request count
+        await this.fetchFollowerAndRequestCount(this.projectId)
+      }
+    },
     async fetchProject(id) {
       // Error handling
       try {
@@ -454,9 +490,6 @@ export default {
     openFollowerModal(request) {
       this.isManageFollowerModalActive = true
       this.isRequest = request
-    },
-    hasDeepLink(action) {
-      return this.$route.hash === action
     }
   }
 }

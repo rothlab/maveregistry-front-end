@@ -261,6 +261,28 @@
                 </div>
               </div>
             </div>
+
+            <div
+              class="project-header"
+              v-if="hasActions"
+            >
+              <p class="is-size-4 has-text-weight-bold">
+                Actions
+              </p>
+            </div>
+
+            <div
+              class="project-content"
+              v-if="hasActions"
+            >
+              <TransferAction
+                type="team"
+                :load-page="loadPage"
+                :is-owner="isOwner"
+                :target-id="teamId"
+                @has-transfer="(e) => hasTransfer = e"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -284,13 +306,15 @@ import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import { handleError } from '@/api/errorHandler.js'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
+import TransferAction from '@/components/Action/TransferAction.vue'
 
 export default {
   title: "View Team",
   components: {
     Error,
     ManageFollowerModal,
-    FollowButtonAction
+    FollowButtonAction,
+    TransferAction
   },
   computed: {
     teamId() {
@@ -301,6 +325,9 @@ export default {
     },
     hasProject() {
       return this.projects && this.projects.length > 0
+    },
+    hasActions() {
+      return !!this.hasTransfer || this.isOwner
     },
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
@@ -321,24 +348,28 @@ export default {
       errorMessage: "",
       followerCount: 0,
       requestCount: 0,
-      isRequest: false
+      isRequest: false,
+      hasTransfer: true
     }
   },
   async mounted() {
     this.isLoading.page = true
 
-    // Fetch team
-    const team = await this.fetchTeam()
-
-    // Fetch team follower and request count
-    if (team && this.isOwner) await this.fetchFollowerAndRequestCount(team.id)
-
+    await this.loadPage()
+    
     // Open follow request modal if needed
     if (this.hasDeepLink("#manage-request")) this.openFollowerModal(true)
     
     this.isLoading.page = false
   },
   methods: {
+    async loadPage() {
+      // Fetch team
+      const team = await this.fetchTeam()
+
+      // Fetch team follower and request count
+      if (team && this.isOwner) await this.fetchFollowerAndRequestCount(team.id)
+    },
     async fetchTeam() {
       // Fetch team
       let team

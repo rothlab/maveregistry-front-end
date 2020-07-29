@@ -214,13 +214,14 @@ export async function voteNomination(id, action, voteId = "") {
     // it means the user wants to unregister their vote.
     // Otherwise, we just need to update the vote action.
     const currentAction = vote.get("action")
+    console.log(currentAction, action)
     if (currentAction === action) {
       await vote.destroy()
       nomination.increment(action + "_count", -1)
     } else {
       vote.set("action", action)
       nomination.increment(currentAction + "_count", -1)
-      nomination.increment(action + "_count")
+      nomination.increment(action + "_count", 1)
       await vote.save()
     }
 
