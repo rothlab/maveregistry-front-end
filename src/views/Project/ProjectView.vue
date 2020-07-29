@@ -481,7 +481,9 @@ export default {
     await this.loadPage()
 
     // Open follow request modal if needed
-    if (this.hasDeepLink("#manage-request")) this.openFollowerModal(true)
+    if (this.hasDeepLink("#manage-request") && this.isOwner) this.openFollowerModal(true)
+    // Open review transfer modal
+    if (this.hasDeepLink("#review-transfer-request") && this.transfer) this.isReviewTransferOwnershipModalActive = true
 
     this.isLoading.page = false
   },
