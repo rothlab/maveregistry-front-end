@@ -56,7 +56,7 @@
                   </span>
                 </p>
                 <p>
-                  Would you like to accept the transfer?
+                  Would you like to accept the ownership?
                 </p>
               </div>
             </div>

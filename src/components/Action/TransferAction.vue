@@ -107,12 +107,14 @@ export default {
       // Open review transfer modal
       if (this.hasDeepLink("#review-transfer-request") && this.transfer)
         this.isReviewTransferOwnershipModalActive = true
+      
+      this.$emit("has-transfer", !!this.transfer)
     }
   },
   methods: {
     async fetchTransfer() {
       const target = {
-        type: "project",
+        type: this.type,
         id: this.targetId
       }
 
