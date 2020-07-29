@@ -150,6 +150,34 @@ export async function fetchUserInfo (username, preference = false) {
   }
 }
 
+export async function queryUserByName (name, includeSelf = true) {
+  const firstNameQuery = new Parse.Query(Parse.User)
+  const lastNameQuery = new Parse.Query(Parse.User)
+  firstNameQuery.startsWith('first_name', name.toLowerCase())
+  lastNameQuery.startsWith('last_name', name.toLowerCase())
+
+  // Exclude the current user
+  if (!includeSelf) {
+    const currentUser = Parse.User.current()
+    firstNameQuery.notEqualTo("objectId", currentUser.id)
+    lastNameQuery.notEqualTo("objectId", currentUser.id)
+  }
+
+  // Execute OR query
+  const query = Parse.Query.or(firstNameQuery, lastNameQuery)
+  query.select(["first_name", "last_name", "profile_image"])
+  const users = await query.find()
+
+  return users.map((e) => {
+    return {
+      id: e.id,
+      first_name: e.get("first_name"),
+      last_name: e.get("last_name"),
+      profile_image: e.get("profile_image")
+    }
+  })
+}
+
 // Update user profile
 export async function updateUserProfile (userInfo) {
   // We can only change profile for the current logged in user

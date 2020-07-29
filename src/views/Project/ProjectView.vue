@@ -286,7 +286,7 @@
                   target="_blank"
                 >
                   {{ creator.first_name + ' ' + creator.last_name }}
-                </router-link>
+                </router-link> <br>
               </p>
               <p
                 class="is-size-5"
@@ -301,7 +301,10 @@
                 v-if="isOwner && (followerCount > 0 || requestCount > 0)"
               >
                 <b>Follower{{ followerCount > 1 ? 's' : '' }}</b> <br>
-                <div class="buttons">
+                <div
+                  class="buttons"
+                  style="margin-top: 0.25rem"
+                >
                   <b-button
                     v-if="followerCount > 0"
                     class="action-button"
@@ -323,10 +326,77 @@
                 </div>
               </div>
             </div>
+
+            <div
+              class="project-header"
+              v-if="hasActions"
+            >
+              <p class="is-size-4 has-text-weight-bold">
+                Actions
+              </p>
+            </div>
+
+            <div
+              class="project-content"
+              v-if="hasActions"
+            >
+              <!-- Transfer ownership -->
+              <b-button
+                v-if="isOwner && !transfer"
+                type="is-light"
+                icon-left="mdil-repeat"
+                @click="isTransferOwnershipModalActive = true"
+                expanded
+              >
+                Transfer Ownership
+              </b-button>
+              <b-button
+                v-else-if="isOwner && transfer"
+                type="is-warning"
+                icon-left="mdil-repeat-off"
+                @click="isCancelTransferOwnershipModalActive = true"
+                expanded
+              >
+                Cancel Ownership Transfer
+              </b-button>
+              <b-button
+                v-else-if="hasLoggedIn && !isOwner && transfer"
+                type="is-warning"
+                icon-left="mdil-repeat"
+                @click="isReviewTransferOwnershipModalActive = true"
+                expanded
+              >
+                Review Ownership Transfer
+              </b-button>
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- Transfer ownership modal -->
+      <TransferOwnershipModal
+        :active.sync="isTransferOwnershipModalActive"
+        type="project"
+        :target-id="projectId"
+        @transfer="(e) => transfer = e"
+      />
+
+      <!-- Cancel ownership transfer modal -->
+      <CancelTransferModal
+        v-if="transfer"
+        :active.sync="isCancelTransferOwnershipModalActive"
+        :transfer="transfer"
+        @transfer="transfer = undefined; isCancelTransferOwnershipModalActive = false"
+      />
+
+      <!-- Cancel ownership transfer modal -->
+      <ReviewTransferModal
+        v-if="transfer"
+        :active.sync="isReviewTransferOwnershipModalActive"
+        :transfer="transfer"
+        @transfer="loadPage(); isReviewTransferOwnershipModalActive = false"
+      />
+      
       <!-- Manage follower modal -->
       <ManageFollowerModal
         :active.sync="isManageFollowerModalActive"
@@ -342,17 +412,24 @@
 <script>
 import * as ProjectManage from "@/api/projectManage.js"
 import * as FollowManage from "@/api/followManage.js"
+import * as TransferManage from "@/api/transferManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
+import TransferOwnershipModal from '@/components/Modal/TransferOwnershipModal.vue'
+import CancelTransferModal from '@/components/Modal/CancelTransferModal.vue'
+import ReviewTransferModal from '@/components/Modal/ReviewTransferModal.vue'
 
 export default {
   title: "View Project",
   components: {
     Error,
     ManageFollowerModal,
-    FollowButtonAction
+    FollowButtonAction,
+    TransferOwnershipModal,
+    CancelTransferModal,
+    ReviewTransferModal
   },
   data() {
     return {
@@ -361,6 +438,9 @@ export default {
       },
       hasProject: false,
       isManageFollowerModalActive: false,
+      isTransferOwnershipModalActive: false,
+      isCancelTransferOwnershipModalActive: false,
+      isReviewTransferOwnershipModalActive: false,
       followStatus: undefined,
       isRequest: false,
       errorMessage: "",
@@ -374,7 +454,8 @@ export default {
       funding: undefined,
       activities: [],
       followerCount: 0,
-      requestCount: 0
+      requestCount: 0,
+      transfer: undefined
     }
   },
   computed: {
@@ -387,6 +468,9 @@ export default {
     hasActivity() {
       return this.activities.length > 0
     },
+    hasActions() {
+      return !!this.transfer || this.isOwner
+    },
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     },
@@ -394,22 +478,7 @@ export default {
   async mounted() {
     this.isLoading.page = true
 
-    const project = await this.fetchProject(this.projectId)
-
-    if (project) {
-      this.hasProject = true
-      if (project.leads) this.leads = project.leads // Required, will always have value
-      if (project.team) this.team = project.team // Required, will always have value
-      if (project.collaborators)
-        this.collaborators = project.collaborators
-      if (project.funding) this.funding = project.funding
-      if (project.activities) this.activities = project.activities
-    } else {
-      this.hasProject = false
-    }
-
-    // Fetch team follower and request count
-    if (this.isOwner) await this.fetchFollowerAndRequestCount(this.projectId)
+    await this.loadPage()
 
     // Open follow request modal if needed
     if (this.hasDeepLink("#manage-request")) this.openFollowerModal(true)
@@ -417,6 +486,31 @@ export default {
     this.isLoading.page = false
   },
   methods: {
+    async loadPage() {
+      const project = await this.fetchProject(this.projectId)
+
+      if (project) {
+        this.hasProject = true
+        if (project.leads) this.leads = project.leads // Required, will always have value
+        if (project.team) this.team = project.team // Required, will always have value
+        if (project.collaborators)
+          this.collaborators = project.collaborators
+        if (project.funding) this.funding = project.funding
+        if (project.activities) this.activities = project.activities
+      } else {
+        this.hasProject = false
+      }
+
+      if (this.isOwner) {
+        // Fetch team follower and request count
+        await this.fetchFollowerAndRequestCount(this.projectId)
+      }
+
+      if (this.hasLoggedIn) {
+        // Fetch pending transfer
+        await this.fetchTransfer()
+      }
+    },
     async fetchProject(id) {
       // Error handling
       try {
@@ -457,6 +551,14 @@ export default {
     },
     hasDeepLink(action) {
       return this.$route.hash === action
+    },
+    async fetchTransfer() {
+      const target = {
+        type: "project",
+        id: this.projectId
+      }
+
+      this.transfer = await TransferManage.fetchTransfer("owner", target, this.isOwner)
     }
   }
 }
