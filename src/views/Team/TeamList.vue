@@ -111,9 +111,9 @@
                     <router-link
                       :to="{ path: `/team/${props.row.id}`}"
                       target="_blank"
+                      class="is-capitalized"
                     >
-                      <span v-html="boldFind(props.row.first_name + ' ', filter.pi)" />
-                      <span v-html="boldFind(props.row.last_name, filter.pi)" />
+                      {{ props.row.first_name }} {{ props.row.last_name }}
                     </router-link>
                   </p>
                 </div>
