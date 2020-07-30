@@ -89,7 +89,8 @@
               <span
                 v-if="isOpenedBurger"
                 style="padding-left: 0.5rem"
-              >User</span>
+                class="is-capitalized"
+              >Hi, {{ currentUser.first_name }}</span>
             </div>
           </template>
 

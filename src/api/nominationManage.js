@@ -99,7 +99,7 @@ export async function fetchNominations(limit = 10, skip = 0, filter) {
     const targetQuery = new Parse.Query(Target)
     if (filter.type !== '') targetQuery.equalTo("type", filter.type)
     if (filter.organism !== '') targetQuery.equalTo("organism", filter.organism)
-    if (filter.name !== '') targetQuery.startsWith("name", filter.name)
+    if (filter.name !== '') targetQuery.startsWith("name", filter.name.toLowerCase())
     query.matchesQuery("target", targetQuery)
   }
 

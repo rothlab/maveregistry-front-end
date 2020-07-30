@@ -298,7 +298,7 @@ export async function fetchTargets(limit, skip, filter) {
   // Apply filter when available
   if (filter.type !== '') query.equalTo("type", filter.type)
   if (filter.organism !== '') query.equalTo("organism", filter.organism)
-  if (filter.name !== '') query.startsWith("name", filter.name)
+  if (filter.name !== '') query.startsWith("name", filter.name.toLowerCase())
   query.exists("projects") // include only targets with projects associated
   query.include(["projects.team", "projects.team.creator", "projects.creator"]) // Include projects and team objects on the return
   query.include(["projects.recent_activity", "projects.public_activity"]) // Include projects and team objects on the return
