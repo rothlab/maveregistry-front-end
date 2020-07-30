@@ -130,37 +130,20 @@
                 >{{ userInfo.website }}</a>
               </p>
 
-              <div
+              <p
                 class="is-size-5"
-                v-if="userInfo && userInfo.social"
+                v-if="userInfo.social"
               >
-                <b>Social Media</b><br>
-
-                <div
-                  class="buttons"
-                  style="margin-top: 0.25rem"
+                <b>Social Media</b> <br>
+                <a
+                  :href="`https://twitter.com/${userInfo.social.twitter}`"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <b-button
-                    type="is-twitter"
-                    tag="a"
-                    :href="`https://twitter.com/${userInfo.social.twitter}`"
-                    target="_blank"
-                    rel="noreferrer"
-                    icon-left="twitter"
-                    icon-pack="mdi"
-                    v-if="userInfo.social.twitter"
-                  >
-                    {{ userInfo.social.twitter }}
-                  </b-button>
-                  <b-button
-                    icon-left="twitter"
-                    icon-pack="mdi"
-                    v-if="userInfo.social.linkedin"
-                  >
-                    {{ userInfo.social.linkedin }}
-                  </b-button>
-                </div>
-              </div>
+                  <Twitter />
+                  {{ userInfo.social.twitter }}
+                </a>
+              </p>
             </div>
 
             <hr v-if="hasProject">
@@ -249,6 +232,7 @@ import * as TeamManage from "@/api/teamManage.js"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import Error from "@/components/Error.vue"
 import UserProfileAction from "@/components/Action/UserProfileAction.vue"
+import Twitter from 'vue-material-design-icons/Twitter.vue'
 
 function initialState (){
   return {
@@ -272,7 +256,8 @@ export default {
   title: "View User Profile",
   components: {
     Error,
-    UserProfileAction
+    UserProfileAction,
+    Twitter
   },
   computed: {
     isOwner() {

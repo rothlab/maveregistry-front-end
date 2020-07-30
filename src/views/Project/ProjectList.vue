@@ -342,7 +342,7 @@
                         />
                         <div v-else-if="project.follow_status">
                           <p
-                            v-if="!project.follow_status.id && project.creator.username !== currentUser.username"
+                            v-if="!project.follow_status.id && project.creator.username !== currentUser.username && !isModerator"
                             class="has-text-danger font-14px"
                           >
                             Click "Follow" to request access to project details and receive update alerts.
@@ -355,7 +355,7 @@
                             you will gain access to project details and receive update alerts.
                           </p>
                           <p
-                            v-else-if="project.follow_status.status === 'yes' || project.creator.username === currentUser.username"
+                            v-else-if="project.follow_status.status === 'yes' || project.creator.username === currentUser.username || isModerator"
                             class="has-text-danger font-14px"
                           >
                             No details available for this project.
