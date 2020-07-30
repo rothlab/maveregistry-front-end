@@ -301,6 +301,7 @@
                         label="Open for funding"
                         v-if="project.open_for_funding"
                         type="is-warning"
+                        position="is-left"
                       >
                         <b-icon
                           class="circle-icon has-background-warning has-text-dark"
@@ -313,6 +314,7 @@
                         label="Project Owner"
                         v-if="currentUser && project.creator.username === currentUser.username"
                         type="is-success"
+                        position="is-left"
                       >
                         <b-icon
                           icon="mdil-account"
@@ -394,6 +396,7 @@
                       <b-tooltip
                         :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Project'"
                         type="is-dark"
+                        position="is-left"
                         v-else
                       >
                         <a
@@ -469,7 +472,8 @@
                     >
                       <b-tooltip
                         :label="team.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Team'"
-                        type="is-dark"
+                        :type="team.follow_status.status === 'pending' ? 'is-warning' : 'is-danger'"
+                        position="is-left"
                       >
                         <span 
                           :class="{ 
@@ -491,6 +495,7 @@
                       <b-tooltip
                         label="Follow Team"
                         type="is-white"
+                        position="is-left"
                       >
                         <span class="has-text-info">Follow</span>
                       </b-tooltip>
@@ -510,8 +515,8 @@
                 <p class="control action-button">
                   <b-tooltip
                     label="Add new project"
-                    position="is-left"
                     type="is-dark"
+                    position="is-left"
                   >
                     <b-button
                       icon-right="mdil-plus"
@@ -524,24 +529,26 @@
                   <!-- Show MaveQuest for human genes -->
                   <b-tooltip
                     v-if="props.row.type == 'Gene' && props.row.organism == 'H. sapiens'"
-                    label="Plan with MaveQuest"
+                    label="Expore at MaveQuest"
+                    type="is-info"
                     position="is-left"
-                    type="is-dark"
                   >
                     <b-button
                       tag="a"
                       :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
                       target="_blank"
-                      icon-right="mdil-lightbulb-on"
                       type="is-light"
-                    />
+                      class="mavequest-button"
+                    >
+                      <img src="@/assets/image/mavequest_logo_grey.png">
+                    </b-button>
                   </b-tooltip>
                   <!-- Show Google search for others -->
                   <b-tooltip
                     v-else
                     label="Look up"
+                    type="is-info"
                     position="is-left"
-                    type="is-dark"
                   >
                     <b-button
                       tag="a"

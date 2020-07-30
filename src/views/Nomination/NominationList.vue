@@ -22,7 +22,7 @@
                 class="is-hidden-mobile small-shadow"
                 @click="handleNewTargetModal()"
               >
-                New Target
+                Nominate a Target
               </b-button>
               <!-- Mobile style -->
               <b-button
@@ -32,7 +32,7 @@
                 class="is-hidden-tablet small-shadow"
                 @click="handleNewTargetModal()"
               >
-                New
+                Nominate
               </b-button>
             </div>
           </div>
@@ -50,12 +50,12 @@
       <div v-else>
         <!-- Tip -->
         <TipAction tip="nomination">
-          <p class="has-text-weight-bold field-margin">
+          <p class="has-text-weight-bold field-margin description">
             What is a
             <span class="has-text-info">nomination</span>
             ?
           </p>
-          A nomination is a target of which variant effect maps we would love to see.
+          A nomination is a target sequence feature for which we will love to see a variant effect map.
         </TipAction>
 
         <!-- Add key here so that when user log in/out, the table columns will be refreshed -->
@@ -242,7 +242,8 @@
                 <p class="control action-button">
                   <b-tooltip
                     label="Up Vote"
-                    type="is-dark"
+                    type="is-success"
+                    position="is-left"
                   >
                     <b-button
                       icon-left="mdil-thumb-up"
@@ -257,6 +258,7 @@
                   <b-tooltip
                     label="Down Vote"
                     type="is-danger"
+                    position="is-left"
                   >
                     <b-button
                       icon-left="mdil-thumb-down"
@@ -275,14 +277,16 @@
               field="action"
               label="Action"
               width="5vw"
-              v-if="hasLoggedIn"
             >
               <b-field>
-                <p class="control action-button">
+                <p
+                  class="control action-button"
+                  v-if="hasLoggedIn"
+                >
                   <b-tooltip
                     label="Add New Project"
-                    position="is-left"
                     type="is-dark"
+                    position="is-left"
                   >
                     <b-button
                       icon-right="mdil-plus"
@@ -291,14 +295,47 @@
                     />
                   </b-tooltip>
                 </p>
+                <p class="control action-button">
+                  <b-tooltip
+                    v-if="props.row.target.type == 'Gene' && props.row.target.organism == 'H. sapiens'"
+                    label="Explore at MaveQuest"
+                    type="is-info"
+                    position="is-left"
+                  >
+                    <b-button
+                      tag="a"
+                      :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
+                      target="_blank"
+                      type="is-light"
+                      class="mavequest-button"
+                    >
+                      <img src="@/assets/image/mavequest_logo_grey.png">
+                    </b-button>
+                  </b-tooltip>
+                  <b-tooltip
+                    v-else
+                    label="Look up"
+                    type="is-info"
+                    position="is-left"
+                  >
+                    <b-button
+                      tag="a"
+                      :href="'https://www.google.com/search?q=' + props.row.name"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      icon-right="mdil-magnify"
+                      type="is-light"
+                    />
+                  </b-tooltip>
+                </p>
                 <p
                   class="control action-button"
-                  v-if="currentUser && currentUser.username === props.row.by.username"
+                  v-if="hasLoggedIn && currentUser && currentUser.username === props.row.by.username"
                 >
                   <b-tooltip
                     label="Edit Nomination"
-                    position="is-left"
                     type="is-dark"
+                    position="is-left"
                   >
                     <b-button
                       icon-right="mdil-pencil"
@@ -309,7 +346,7 @@
                 </p>
                 <p
                   class="control action-button"
-                  v-if="currentUser && currentUser.username === props.row.by.username"
+                  v-if="hasLoggedIn && currentUser && currentUser.username === props.row.by.username"
                 >
                   <b-tooltip
                     label="Delete Nomination"
