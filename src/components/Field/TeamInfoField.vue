@@ -21,8 +21,7 @@
       ref="teamField"
       placeholder="Search by Name"
       open-on-focus
-      icon-pack="mdi"
-      icon="magnify"
+      icon="mdil-magnify"
       field="display"
       clearable
       :data="teams"
