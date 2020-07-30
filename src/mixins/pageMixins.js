@@ -25,6 +25,16 @@ export default {
     },
     hasDeepLink(action) {
       return this.$route.hash === action
+    },
+    boldFind(text, find) {
+      if (!find || find.length < 1) return this.capitalize(text)
+
+      find = find.toLowerCase()
+      if (!text.startsWith(find)) return this.capitalize(text)
+      const trimmedText = text.replace(find, '')
+
+      console.log(`<b>${text.startsWith(find) ? find : '' }</b>${trimmedText}`)
+      return `<b>${text.startsWith(find) ? this.capitalize(find) : '' }</b>${trimmedText}`
     }
   }
 }

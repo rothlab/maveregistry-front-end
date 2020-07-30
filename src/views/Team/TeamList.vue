@@ -112,8 +112,8 @@
                       :to="{ path: `/team/${props.row.id}`}"
                       target="_blank"
                     >
-                      <b class="is-capitalized">{{ props.row.first_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.first_name, filter.pi) }}
-                      <b class="is-capitalized">{{ props.row.last_name.startsWith(filter.pi) ? filter.pi : '' }}</b>{{ trimKeyword(props.row.last_name, filter.pi) }}
+                      <span v-html="boldFind(props.row.first_name + ' ', filter.pi)" />
+                      <span v-html="boldFind(props.row.last_name, filter.pi)" />
                     </router-link>
                   </p>
                 </div>
@@ -221,7 +221,7 @@
                 <b-button
                   v-if="props.row.follow_status && props.row.follow_status.id"
                   icon-left="mdil-bell-off"
-                  :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-primary'"
+                  :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-danger'"
                   @click="confirmUnfollow(props.row.follow_status.id)"
                   @change="fetchTeams"
                   class=""

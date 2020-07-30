@@ -180,7 +180,7 @@
               label="Name"
               class="is-uppercase"
             >
-              {{ props.row.target.name }}
+              <span v-html="boldFind(props.row.target.name, filter.name)" />
             </b-table-column>
 
             <!-- Target type -->

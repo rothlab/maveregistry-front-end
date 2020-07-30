@@ -27,7 +27,7 @@
               <!-- Mobile style -->
               <b-button
                 icon-left="mdil-plus"
-                type="is-danger"
+                type="is-warning"
                 size="is-medium"
                 class="is-hidden-tablet small-shadow"
                 @click="handleNewTargetModal()"
@@ -51,7 +51,10 @@
         <!-- Tip -->
         <!-- Make sure you added the tip to the preferenceModule store -->
         <TipAction tip="why_follow">
-          <p class="has-text-weight-bold field-margin">
+          <p
+            class="has-text-weight-bold field-margin"
+            style="padding-right: 1rem"
+          >
             What do I get by
             <span class="has-text-info">following a project</span>
             ?
@@ -272,9 +275,9 @@
                         :icon="progressIcons[project.type]"
                         style="margin-right: 0.25rem"
                       />
-                      <span class="is-capitalized">{{ project.type }}</span>
+                      <span class="is-capitalized description">{{ project.type }}</span>
                       <span
-                        class="is-size-7 has-text-info"
+                        class="is-size-7 has-text-info is-hidden-touch is-hidden-desktop-only"
                         style="margin-left: 0.5rem"
                       >(Click to {{ innerProps.open ? 'collapse' : 'expand' }})</span>
                     </p>
@@ -286,9 +289,9 @@
                         icon="mdil-play"
                         style="margin-right: 0.25rem"
                       />
-                      <span class="is-capitalized">Under Investigation</span>
+                      <span class="is-capitalized description">Under Investigation</span>
                       <span
-                        class="is-size-7 has-text-info"
+                        class="is-size-7 has-text-info is-hidden-touch is-hidden-desktop-only"
                         style="margin-left: 0.5rem"
                       >(Click to {{ innerProps.open ? 'collapse' : 'expand' }})</span>
                     </p>
@@ -342,7 +345,7 @@
                             v-if="!project.follow_status.id && project.creator.username !== currentUser.username"
                             class="has-text-danger font-14px"
                           >
-                            Click "Follow Project" to request access to project details and receive update alerts.
+                            Click "Follow" to request access to project details and receive update alerts.
                           </p>
                           <p
                             v-else-if="project.follow_status.status === 'pending'"
@@ -368,7 +371,7 @@
                         target="_blank"
                       >
                         <b-icon icon="mdil-magnify" />
-                        View Details
+                        Details
                       </router-link>
                     </div>
                     <div
@@ -384,7 +387,7 @@
                       <div v-if="!project.follow_status.id">
                         <a @click="confirmFollow(project.id, 'project', project.creator)">
                           <b-icon icon="mdil-bell" />
-                          Follow Project
+                          Follow
                         </a>
                       </div>
                       <!-- If pending, show pending status and unfollow-->
@@ -402,7 +405,7 @@
                           }"
                         >
                           <b-icon icon="mdil-bell-off" />
-                          Unfollow Project
+                          Unfollow
                         </a>
                       </b-tooltip>
                     </div>
@@ -740,6 +743,7 @@ export default {
     .control:not(:first-child)
       margin-left: 0.75rem
 .team-control
+  height: 3.25rem
   .tags
     border-radius: 4px
     .tag

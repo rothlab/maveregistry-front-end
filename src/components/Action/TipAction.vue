@@ -25,11 +25,17 @@
 </template>
 
 <style lang="sass" scoped>
+@import "@/assets/style/variables.sass"
+
 .close-tip
   display: inline
   position: absolute
   right: 1rem
   bottom: 1rem
+  @media screen and (max-width: $break-mobile)
+    bottom: 0.5rem
+.notification
+  padding: 1.25rem
 </style>
 
 <script>

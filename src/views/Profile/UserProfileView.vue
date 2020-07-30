@@ -21,6 +21,7 @@
                 icon-left="mdil-pencil"
                 type="is-warning"
                 size="is-medium"
+                class="small-shadow"
                 @click="editProject"
               >
                 Edit
