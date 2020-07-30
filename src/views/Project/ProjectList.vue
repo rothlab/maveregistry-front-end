@@ -65,7 +65,7 @@
               icon="mdil-check"
               class="circle-icon has-background-success has-text-white"
             />
-            Access sensitive project details such as activities
+            Access project details such as activities
           </p>
           <p>
             <b-icon

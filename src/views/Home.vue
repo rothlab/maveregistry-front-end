@@ -44,7 +44,7 @@
                     Amazing MAVE projects
                   </h2>
                   <h1 class="title is-uppercase is-size-2">
-                    Registered Here
+                    Tracked Here
                   </h1>
                   <p class="is-size-5">
                     Mave Registry is a collaborative resource for sharing progress on Multiplexed Assays of Variant Effect (MAVE).
