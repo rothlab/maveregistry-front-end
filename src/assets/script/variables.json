@@ -6,7 +6,12 @@
   "target_organisms": [
     "H. sapiens",
     "E. coli",
-    "S. cerevisiae"
+    "S. cerevisiae",
+    "A. thaliana",
+    "C. elegans",
+    "D. melanogaster",
+    "D. rerio",
+    "M. musculus"
   ],
   "genomic_features": [
     "5’ UTR",
