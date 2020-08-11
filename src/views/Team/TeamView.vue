@@ -380,7 +380,10 @@ export default {
         throw error
       }
       
-      if (!team) return
+      if (!team) {
+        this.errorMessage = await handleError({ message: "Team Not Found"})
+        return
+      }
 
       // Format PI
       this.principalInvestigator = {

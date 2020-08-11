@@ -436,7 +436,6 @@ export default {
   methods: {
     async loadPage() {
       const project = await this.fetchProject(this.projectId)
-
       if (project) {
         this.hasProject = true
         if (project.leads) this.leads = project.leads // Required, will always have value
@@ -460,7 +459,7 @@ export default {
         const project = await ProjectManage.fetchProject(id, true, true)
 
         if (!project) {
-          this.errorMessage = await handleError({ code: 119 })
+          this.errorMessage = await handleError({ message: "Project Not Found" })
           return
         }
 
