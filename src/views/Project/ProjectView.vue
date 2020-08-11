@@ -191,7 +191,8 @@
                 </b> | {{ activity.type }}
                 
                 <br>
-                {{ activity.description }}
+
+                <span class="has-white-space-pre">{{ activity.description }}</span>
                 
                 <br>
                 
