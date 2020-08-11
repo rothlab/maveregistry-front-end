@@ -41,7 +41,7 @@
   ],
   "progress_type": [
     "Literature Search",
-    "Assay Development",
+    "Assay Development/Validation",
     "MAVE Data Collection",
     "MAVE Data Analysis",
     "Publication in Preparation",
@@ -49,7 +49,7 @@
   ],
   "progress_type_icons": {
     "Literature Search": "mdil-magnify",
-    "Assay Development": "mdil-flask",
+    "Assay Development/Validation": "mdil-flask",
     "MAVE Data Collection": "mdil-clipboard-plus",
     "MAVE Data Analysis": "mdil-chart-line",
     "Publication in Preparation": "mdil-pencil",
