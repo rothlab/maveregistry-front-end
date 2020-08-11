@@ -21,6 +21,7 @@
                 icon-left="mdil-content-save"
                 type="is-warning"
                 size="is-medium"
+                class="small-shadow"
                 :loading="isLoading.save_edit"
                 :disabled="isDisabled"
                 @click="saveProfile"
