@@ -43,6 +43,9 @@
           </div>
         </div>
 
+        <!-- Inject slot -->
+        <slot />
+
         <div class="buttons footer-actions">
           <b-button
             @click="isActive = false"
@@ -54,6 +57,7 @@
             type="is-danger"
             @click="performAction"
             class="is-capitalized"
+            :disabled="actionDisabled"
           >
             {{ action }}
           </b-button>
@@ -87,6 +91,10 @@ export default {
     onAction: {
       type: Function,
       required: true
+    },
+    actionDisabled: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -112,10 +120,11 @@ export default {
       // Loading
       this.isLoading = true
 
-      // Unfollow
+      // Call action
       try {
         await this.onAction()
       } catch (error) {
+        console.log("here")
         await displayErrorToast(error)
         return
       } finally {

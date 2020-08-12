@@ -213,3 +213,9 @@ export async function removeMember(teamId, username) {
   user.unset("team")
   await user.save()
 }
+
+export async function deleteTeam(teamId) {
+  // Fetch team and delete
+  const team = await new Team.fetchById(teamId)
+  return await team.destroy()
+}

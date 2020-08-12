@@ -272,7 +272,7 @@
             </div>
 
             <div
-              class="project-content"
+              class="project-content action-buttons"
               v-if="hasActions"
             >
               <TransferAction
@@ -281,7 +281,17 @@
                 :is-owner="isOwner"
                 :target-id="teamId"
                 @has-transfer="(e) => hasTransfer = e"
+                style="margin-bottom: 0.5rem"
               />
+              <b-button
+                v-if="isOwner"
+                icon-left="mdil-delete"
+                type="is-light"
+                expanded
+                @click="isConfirmDeleteModalActive = true"
+              >
+                Delete Team
+              </b-button>
             </div>
           </div>
         </div>
@@ -295,6 +305,23 @@
         type="team"
         @change="fetchFollowerAndRequestCount(teamId)"
       />
+
+      <!-- Confirm Delete Modal -->
+      <ConfirmDangerModal
+        :active.sync="isConfirmDeleteModalActive"
+        type="team"
+        action="delete"
+        :on-action="deleteTeam"
+        :action-disabled="projects.length > 0"
+      >
+        <div
+          v-if="projects.length > 0"
+          style="margin-top: 0.5rem"
+        >
+          To deleted a team, it cannot have any associated projects. <br>
+          This team has <b>{{ projects.length }}</b> projects. Please reassign them to other teams.
+        </div>
+      </ConfirmDangerModal>
     </div>
   </div>
 </template>
@@ -307,6 +334,7 @@ import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import { handleError } from '@/api/errorHandler.js'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
 import TransferAction from '@/components/Action/TransferAction.vue'
+import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
 
 export default {
   title: "View Team",
@@ -314,7 +342,8 @@ export default {
     Error,
     ManageFollowerModal,
     FollowButtonAction,
-    TransferAction
+    TransferAction,
+    ConfirmDangerModal
   },
   computed: {
     teamId() {
@@ -339,6 +368,7 @@ export default {
         page: false
       },
       isManageFollowerModalActive: false,
+      isConfirmDeleteModalActive: false,
       followStatus: undefined,
       principalInvestigator: {},
       members: [],
@@ -430,6 +460,10 @@ export default {
     },
     hasDeepLink(action) {
       return this.$route.hash === action
+    },
+    async deleteTeam() {
+      await TeamManage.deleteTeam(this.teamId)
+      this.$router.push({ name: 'Teams' })
     }
   }
 }
