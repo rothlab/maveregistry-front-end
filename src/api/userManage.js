@@ -220,7 +220,7 @@ export async function updateUserProfile (userInfo) {
     hasChanged = true
     user.set("profile_image", userInfo.profile_image)
   }
-  if (userInfo.team && (!user.get("team") || userInfo.team !== user.get("team").id)) {
+  if (userInfo.team) {
     const team = await new Team.fetchById(userInfo.team)
     hasChanged = true
     user.set("team", team)
