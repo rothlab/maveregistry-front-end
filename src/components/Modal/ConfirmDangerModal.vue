@@ -124,7 +124,6 @@ export default {
       try {
         await this.onAction()
       } catch (error) {
-        console.log("here")
         await displayErrorToast(error)
         return
       } finally {
