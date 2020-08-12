@@ -99,7 +99,7 @@ export const actions = {
           indefinite: true,
           onAction: async () => {
             try {
-              await UserManage.resendValidationEmail(error.username)
+              await UserManage.resendValidationEmail()
             } catch (err) {
               await displayErrorToast(err)
               return

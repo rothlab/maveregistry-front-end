@@ -269,8 +269,8 @@ export async function fetchUsersByTeamId (id) {
 }
 
 // Resend validation email
-export async function resendValidationEmail (username) {
-  return await Parse.Cloud.run("resendVerificationEmail", { username: username })
+export async function resendValidationEmail () {
+  return await Parse.Cloud.run("resendVerificationEmail")
 }
 
 // Get user roles
