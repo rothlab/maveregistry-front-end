@@ -69,48 +69,79 @@
                   <b><mark class="is-capitalized">{{ follower.by.last_name.startsWith(keyword) ? keyword : '' }}</mark>{{ trimKeyword(follower.by.last_name, keyword) }} </b>
                   <small>{{ follower.create_date.toLocaleString() }}</small><br>
                   <b-icon icon="mdil-comment-text" />{{ follower.reason }}
+                  <span
+                    v-if="follower.can_edit"
+                    class="has-text-danger"
+                    style="font-size: 13px"
+                  >
+                    <br>
+                    <b-icon
+                      icon="mdil-alert"
+                      custom-size="mdil-18px"
+                    />
+                    <span v-if="isRequest">If approved, {{ capitalize(follower.by.first_name) }} will be able to edit this project.</span>
+                    <span v-else>{{ capitalize(follower.by.first_name) }} can edit this project.</span>
+                  </span>
                 </p>
               </div>
             </div>
             <div class="media-right">
-              <!-- View Profile -->
-              <b-tooltip
-                label="View Profile"
-                position="is-left"
-                type="is-dark"
-              >
-                <router-link
-                  :to="{ name: 'User Profile View', params: { username: follower.by.username } }"
-                  target="_blank"
+              <div class="has-text-right">
+                <!-- View Profile -->
+                <b-tooltip
+                  label="View Profile"
+                  position="is-left"
+                  type="is-dark"
                 >
-                  <b-icon icon="mdil-eye" />
-                </router-link>
-              </b-tooltip>
+                  <router-link
+                    :to="{ name: 'User Profile View', params: { username: follower.by.username } }"
+                    target="_blank"
+                  >
+                    <b-icon icon="mdil-eye" />
+                  </router-link>
+                </b-tooltip>
 
-              <!-- Approve -->
-              <b-tooltip
-                label="Approve"
-                position="is-left"
-                type="is-dark"
-                v-if="isRequest"
-              >
-                <a @click="approveFollower(follower.id)"><b-icon
-                  icon="mdil-check"
-                  type="is-success"
-                /></a>
-              </b-tooltip>
+                <!-- Approve -->
+                <b-tooltip
+                  label="Approve"
+                  position="is-left"
+                  type="is-dark"
+                  v-if="isRequest"
+                >
+                  <a @click="approveFollower(follower.id, follower.can_edit)"><b-icon
+                    icon="mdil-check"
+                    type="is-success"
+                  /></a>
+                </b-tooltip>
 
-              <!-- Remove -->
-              <b-tooltip
-                label="Remove"
-                position="is-left"
-                type="is-dark"
+                <!-- Remove -->
+                <b-tooltip
+                  label="Remove"
+                  position="is-left"
+                  type="is-dark"
+                >
+                  <a @click="removeFollower(follower.id)"><b-icon
+                    icon="mdil-delete"
+                    type="is-danger"
+                  /></a>
+                </b-tooltip>
+              </div>
+
+              <b-select
+                size="is-small"
+                icon="mdil-pencil"
+                v-model="follower.can_edit"
+                :loading="isSettingFollower === id"
+                :disabled="isSettingFollower === id"
+                @input="setEditRole(follower.id, follower.can_edit, id)"
               >
-                <a @click="removeFollower(follower.id)"><b-icon
-                  icon="mdil-delete"
-                  type="is-danger"
-                /></a>
-              </b-tooltip>
+                <option :value="false">
+                  Viewer
+                </option>
+                <option :value="true">
+                  Editor
+                </option>
+              </b-select>
             </div>
           </div>
         </div>
@@ -180,6 +211,7 @@ export default {
     return {
       isActive: false,
       isLoading: false,
+      isSettingFollower: -1,
       followers: {},
       filteredFollowers: {} ,
       keyword: ""
@@ -242,10 +274,10 @@ export default {
         }
       })
     },
-    async approveFollower(id) {
+    async approveFollower(id, canEdit = false) {
       // Approve and refresh list
       try {
-        await FollowManage.approve(id)
+        await FollowManage.approve(id, canEdit)
         await this.fetchFollowers()
         this.$emit("change")
 
@@ -257,6 +289,18 @@ export default {
         })
       } catch (error) {
         await displayErrorToast(error)
+      }
+    },
+    async setEditRole(id, canEdit, selectId) {
+      // Disable the select component
+      this.isSettingFollower = selectId
+      
+      try {
+        await FollowManage.setEditRole(id, canEdit)
+      } catch (error) {
+        await displayErrorToast(error)
+      } finally {
+        this.isSettingFollower = -1
       }
     }
   }

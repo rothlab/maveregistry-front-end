@@ -14,11 +14,12 @@
             </div>
             <!-- Show edit button if current user is the project creator -->
             <div
-              class="level-right"
-              v-if="isOwner"
+              class="level-right buttons"
+              v-if="hasLoggedIn"
             >
               <!-- Edit project -->
               <b-button
+                v-if="isOwner || isEditor"
                 icon-left="mdil-pencil"
                 type="is-warning"
                 size="is-medium"
@@ -27,12 +28,8 @@
               >
                 Edit
               </b-button>
-            </div>
-            <div
-              class="level-right"
-              v-else-if="hasLoggedIn && isMember && followStatus" 
-            >
               <FollowButtonAction
+                v-if="isMember && followStatus && !isOwner" 
                 :follow-status="followStatus"
                 type="project"
                 :target-id="projectId"
@@ -202,9 +199,7 @@
                     <p class="has-text-primary">
                       {{ activity.type }}
                     </p>
-                    <p class="has-white-space-pre">
-                      {{ activity.description }}
-                    </p>
+                    <span class="has-white-space-pre">{{ activity.description }}</span>
                     <b-taglist
                       size="is-small"
                       v-if="activity.links && activity.links.length > 0"
@@ -445,6 +440,9 @@ export default {
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     },
+    isEditor() {
+      return this.followStatus && this.followStatus.can_edit
+    }
   },
   async mounted() {
     this.isLoading.page = true

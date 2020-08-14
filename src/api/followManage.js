@@ -9,6 +9,7 @@ export const Follow = Parse.Object.extend("Follow", {
     if (!attrs.target || attrs.target === "") throw new Error("Follow target is empty")
     if (!attrs.reason || attrs.reason.length <= 0) throw new Error("Follow reason is empty")
     if (!attrs.by) throw new Error("Follower is empty. Pleaes make sure you have logged in.")
+    if (!attrs.can_edit) throw new Error("Edit status is empty. Pleaes make sure you have logged in.")
   },
   format: async function () {
     // Fetch user
@@ -24,7 +25,8 @@ export const Follow = Parse.Object.extend("Follow", {
         profile_image: user.get("profile_image")
       },
       create_date: this.get("createdAt"),
-      reason: this.get("reason")
+      reason: this.get("reason"),
+      can_edit: this.get("can_edit")
     }
   }
 }, {
@@ -77,12 +79,13 @@ export async function getFollowStatus(targets, type, by) {
 
     return {
       id: status[0].id,
-      status: status[0].get("approvedAt") ? "yes" : "pending"
+      status: status[0].get("approvedAt") ? "yes" : "pending",
+      can_edit: status[0].get("approvedAt") && status[0].get("can_edit")
     }
   })
 }
 
-export async function follow(target, type, reason) {
+export async function follow(target, type, reason, requestEdit) {
   const currentUser = Parse.User.current()
   if (!currentUser) throw new Error("Not logged in")
 
@@ -90,7 +93,8 @@ export async function follow(target, type, reason) {
     target: target,
     type: type,
     reason: reason,
-    by: currentUser
+    by: currentUser,
+    can_edit: requestEdit
   })
 
   // If not existing, save it
@@ -107,16 +111,23 @@ export async function unfollow(id) {
   if (follow) await follow.destroy()
 }
 
-export async function approve(id) {
+export async function approve(id, canEdit) {
   // TODO: check permission
-
   const follow = await queryFollowById(id)
 
   if (follow) {
     follow.set("approvedAt", new Date())
+    follow.set("can_edit", canEdit)
     await follow.save()
+  }
+}
 
-    // TODO: trigger email notification
+export async function setEditRole(id, canEdit) {
+  const follow = await queryFollowById(id)
+
+  if (follow) {
+    follow.set("can_edit", canEdit)
+    await follow.save()
   }
 }
 
