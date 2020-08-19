@@ -7,5 +7,5 @@ export async function uploadFile(name, data) {
 }
 
 export async function uploadProfilePic(url, id) {
-  return await Parse.Cloud.run("uploadProfilePic", { url: url, id: id})
+  return await Parse.Cloud.run("uploadProfilePic", { url: url, id: id })
 }
