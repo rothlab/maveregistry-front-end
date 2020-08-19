@@ -14,7 +14,7 @@ export default {
     }
   },
   methods: {
-    profileImageUrl(user) {
+    getProfileImageFromUser(user) {
       // Set url as placeholder
       let url
       if (!user || !user.profile_image) return require("@/assets/image/blank-profile.png")

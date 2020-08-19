@@ -87,7 +87,7 @@
                           type="is-dark"
                         >
                           <img
-                            :src="getProfileImage(member.profile_image)"
+                            :src="getProfileImageFromUser(member)"
                             class="is-rounded"
                           >
                         </b-tooltip>
@@ -267,9 +267,6 @@ export default {
 
       // Jump to view
       this.$router.push({ name: 'Team View', params: { id: this.teamId } })
-    },
-    getProfileImage(url) {
-      return url ? url : require("@/assets/image/blank-profile.png")
     },
     async removeMember() {
       await TeamManage.removeMember(this.teamId, this.usernameToDelete)

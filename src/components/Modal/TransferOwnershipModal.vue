@@ -61,7 +61,7 @@
                   >
                     <img
                       class="is-rounded"
-                      :src="profileImageUrl(props.option)"
+                      :src="getProfileImageFromUser(props.option)"
                       alt="Profile Image"
                     >
                   </figure>

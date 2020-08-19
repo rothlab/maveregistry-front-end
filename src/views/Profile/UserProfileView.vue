@@ -186,7 +186,7 @@
           <!-- Profile image -->
           <div class="profile-image">
             <figure class="image is-square is-marginless">
-              <img :src="profileImageUrl(userInfo)">
+              <img :src="getProfileImageFromUser(userInfo)">
             </figure>
           </div>
 

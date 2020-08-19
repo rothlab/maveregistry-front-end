@@ -33,7 +33,7 @@
             >
               <img
                 class="is-rounded"
-                :src="profileImageUrl(creator)"
+                :src="getProfileImageFromUser(creator)"
                 alt="Profile Image"
               >
             </figure>

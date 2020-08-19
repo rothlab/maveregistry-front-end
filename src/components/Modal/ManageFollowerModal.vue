@@ -57,7 +57,7 @@
               <p class="image is-48x48">
                 <img
                   class="is-rounded"
-                  :src="profileImageUrl(follower.by)"
+                  :src="getProfileImageFromUser(follower.by)"
                 >
               </p>
             </figure>

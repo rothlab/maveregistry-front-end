@@ -127,7 +127,7 @@
                       type="is-dark"
                     >
                       <img
-                        :src="getProfileImage(member.profile_image)"
+                        :src="getProfileImageFromUser(member)"
                         class="is-rounded"
                       >
                     </b-tooltip>
@@ -454,9 +454,6 @@ export default {
     },
     editTeam() {
       this.$router.push({ name: 'Team Edit', params: { id: this.teamId, action: 'edit' } })
-    },
-    getProfileImage(url) {
-      return url ? url : require("@/assets/image/blank-profile.png")
     },
     hasDeepLink(action) {
       return this.$route.hash === action
