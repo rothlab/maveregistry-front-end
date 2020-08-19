@@ -201,16 +201,19 @@
                     </p>
                     <span class="has-white-space-pre">{{ activity.description }}</span>
                     <b-taglist
-                      size="is-small"
                       v-if="activity.links && activity.links.length > 0"
                       attached
+                      class="link-tags"
                     >
-                      <b-tag type="is-light">
+                      <b-tag
+                        type="is-light"
+                        class="font-14px"
+                      >
                         <b-icon icon="mdil-link" />
                         Links
                       </b-tag>
                   
-                      <b-tag class="has-background-white-bis">
+                      <b-tag class="has-background-white-bis font-14px">
                         <span
                           v-for="(link, linkId) in activity.links"
                           :key="linkId"
@@ -379,6 +382,12 @@
     align-items: center
     height: 36px
     width: 36px
+.link-tags
+  margin-top: 0.5rem
+  .icon
+    display: inline-flex
+    margin-left: -0.5rem !important
+    margin-right: -0.5rem !important
 </style>
 <script>
 import * as ProjectManage from "@/api/projectManage.js"
