@@ -173,7 +173,7 @@
               hoverable
               paginated
               pagination-simple
-              icon-pack="mdi"
+              icon-pack="mdil"
               default-sort="project"
             >
               <template slot-scope="props">
@@ -528,6 +528,13 @@ export default {
           license: "MIT",
           license_url: "https://github.com/robcresswell/vue-material-design-icons/blob/dev/LICENSE",
           link: "https://github.com/robcresswell/vue-material-design-icons"
+        },
+        {
+          project: "bulma-timeline",
+          team: "Wikiki",
+          license: "MIT",
+          license_url: "https://github.com/Wikiki/bulma-timeline/blob/master/LICENSE",
+          link: "https://github.com/Wikiki/bulma-timeline"
         },
       ]
     }

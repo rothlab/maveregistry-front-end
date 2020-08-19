@@ -59,6 +59,11 @@
           />
         </b-field>
 
+        <b-field>
+          <b-checkbox v-model="requestEdit">
+            Request edit permission on this {{ type }} (optional).
+          </b-checkbox>
+        </b-field>
         <b-button
           expanded
           :disabled="request.length <= 0"
@@ -112,7 +117,8 @@ export default {
     return {
       isActive: false,
       isLoading: false,
-      request: ""
+      request: "",
+      requestEdit: false
     }
   },
   methods: {
@@ -121,7 +127,7 @@ export default {
       this.isLoading = true
 
       try {
-        await FollowManage.follow(this.source, this.type, this.request)
+        await FollowManage.follow(this.source, this.type, this.request, this.requestEdit)
       } catch (error) {
         await displayErrorToast(error)
         return

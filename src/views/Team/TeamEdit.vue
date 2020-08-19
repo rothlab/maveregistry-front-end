@@ -61,7 +61,10 @@
                   </div>
                 </div>
 
-                <div class="columns">
+                <div
+                  class="columns"
+                  v-if="members.length > 0"
+                >
                   <div class="column is-3">
                     <span class="is-size-5">
                       Members
@@ -91,7 +94,7 @@
                       </router-link>
                       <button
                         class="delete right-corner"
-                        @click="confirmRemoveMember(member.username)"
+                        @click="usernameToDelete = member.username; isConfirmDeleteModalActive = true"
                       />
                     </figure>
                   </div>
@@ -158,6 +161,14 @@
           </div>
         </ValidationObserver>
       </div>
+
+      <!-- Confirm Delete Modal -->
+      <ConfirmDangerModal
+        :active.sync="isConfirmDeleteModalActive"
+        type="member"
+        action="remove"
+        :on-action="removeMember"
+      />
     </div>
   </div>
 </template>
@@ -167,12 +178,14 @@ import * as TeamManage from "@/api/teamManage.js"
 import PIInfoField from '@/components/Field/PIInfoField.vue'
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import { ValidationObserver } from 'vee-validate'
+import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
 
 export default {
   title: "Edit Team",
   components: {
     PIInfoField,
-    ValidationObserver
+    ValidationObserver,
+    ConfirmDangerModal
   },
   data() {
     return {
@@ -180,6 +193,8 @@ export default {
         page: false,
         submit: false
       },
+      isConfirmDeleteModalActive: false,
+      usernameToDelete: "",
       errorMessage: "",
       principalInvestigator: undefined,
       members: [],
@@ -256,30 +271,9 @@ export default {
     getProfileImage(url) {
       return url ? url : require("@/assets/image/blank-profile.png")
     },
-    confirmRemoveMember(username) {
-      this.$buefy.dialog.confirm({
-        title: "Remove member",
-        message: "Are you sure you want to remove this member?<br>They will be notified.",
-        confirmText: "Remove",
-        type: "is-danger",
-        hasIcon: true,
-        iconPack: "mdi",
-        onConfirm: async () => {
-          try {
-            await TeamManage.removeMember(this.teamId, username)
-          } catch (error) {
-            await displayErrorToast(error)
-            return
-          }
-
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: "Member Removed",
-            type: 'is-success',
-            queue: false
-          })
-        }
-      })
+    async removeMember() {
+      await TeamManage.removeMember(this.teamId, this.usernameToDelete)
+      this.members = this.members.filter(e => e.username !== this.usernameToDelete)
     }
   }
 }

@@ -320,7 +320,7 @@ export default {
     async resendValidationEmail() {
       this.isLoading.resend_email = true
       try {
-        await UserManage.resendValidationEmail(this.userInfo.username)
+        await UserManage.resendValidationEmail()
       } catch (error) {
         await displayErrorToast(error)
         return

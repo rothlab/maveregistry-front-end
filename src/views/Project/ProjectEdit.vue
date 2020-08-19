@@ -285,14 +285,14 @@
             </p>
           </div>
 
-          <div class="columns">
+          <div
+            class="columns"
+            v-for="(activity, index) in activities"
+            :key="index"
+          >
             <div class="column is-7">
               <div class="project-content">
-                <div
-                  v-for="(activity, index) in activities"
-                  :key="index"
-                  class="columns"
-                >
+                <div class="columns">
                   <div class="column is-3">
                     <p
                       v-if="!activity.end_date"
@@ -318,41 +318,49 @@
                     <ProjectActivityField v-model="activities[index]" />
                   </div>
                 </div>
-                <!-- Add project lead -->
-                <b-button
-                  class="add-record"
-                  type="is-light"
-                  icon-left="mdil-plus"
-                  expanded
-                  @click="activities.push(newActivity())"
-                >
-                  Add an Activity
-                </b-button>
               </div>
             </div>
 
-            <div class="column is-5">
+            <div
+              class="column is-5"
+              v-if="activity && activity.type"
+            >
               <b-notification :closable="false">
                 <div class="content">
                   <b-icon
                     class="header-icon"
                     type="is-primary"
                     custom-size="mdil-48px"
-                    icon="mdil-information"
+                    icon="mdil-lightbulb-on"
                   />
                   <p class="has-text-weight-bold">
-                    MAVE Registry supports the following types:
+                    Questions to consider
                   </p>
-                  <ol>
-                    <li>Literature Search: no experiments performed yet</li>
-                    <li>Assay Development: small-scale experiments</li>
-                    <li>MAVE Data Collection: full-scale MAVE experiments</li>
-                    <li>MAVE Data Analysis: computational analysis of MAVE data</li>
-                    <li>Publication in Preparation</li>
-                    <li>Publication Available: <b>this activity is visible to the public</b></li>
+                  <ol class="font-14px">
+                    <li
+                      v-for="(question, id) in typeDetails[activity.type].questions"
+                      :key="id"
+                    >
+                      {{ question }}
+                    </li>
                   </ol>
                 </div>
               </b-notification>
+            </div>
+          </div>
+
+          <div class="columns">
+            <div class="column is-7">
+              <!-- Add project lead -->
+              <b-button
+                class="add-record"
+                type="is-light"
+                icon-left="mdil-plus"
+                expanded
+                @click="activities.push(newActivity())"
+              >
+                Add an Activity
+              </b-button>
             </div>
           </div>
 
@@ -389,6 +397,8 @@ import { ValidationObserver } from 'vee-validate'
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import * as ProjectManage from "@/api/projectManage.js"
 
+const progressTypeDetails = require("@/assets/script/variables.json").progress_type_details
+
 // Helper functions
 // Check if a person is empty
 function isNotEmptyPerson (person, emptyPerson) {
@@ -423,8 +433,10 @@ export default {
       activities: [
         this.newActivity()
       ],
+      typeDetails: progressTypeDetails, 
       features: [],
       creator: undefined,
+      followStatus: undefined,
       updatedDate: new Date,
       isLoading: {
         page: false,
@@ -437,6 +449,9 @@ export default {
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     },
+    isEditor() {
+      return this.followStatus && this.followStatus.can_edit
+    },
     projectId() {
       return this.$route.params.id
     },
@@ -445,8 +460,7 @@ export default {
     this.isLoading.page = true
 
     if (this.isAction('edit') || this.isAction('new')) {
-      const project = await this.fetchProject(this.projectId)
-
+      const project = await this.fetchProject(this.projectId, false)
       // Populate project details if editing
       if (project) {
         if (project.leads) this.leads = project.leads // Required, will always have value
@@ -454,11 +468,12 @@ export default {
         if (project.collaborators && project.collaborators.length > 0) this.collaborators = project.collaborators.map(e => e.id)
         if (project.funding && project.funding.open_for_funding) this.openForFunding = project.funding.open_for_funding
         if (project.activities) this.activities = project.activities
+        if (project.follow_status && project.follow_status.length > 0) this.followStatus = project.follow_status[0]
       }
     }
 
-    // If not owner or invalid action jump to view page
-    if ((!this.isAction('new') && !this.isAction('edit')) || !this.isOwner) {
+    // If not owner or editor or invalid action jump to view page
+    if ((!this.isAction('new') && !this.isAction('edit')) || (!this.isOwner && !this.isEditor)) {
       this.$router.push({ name: 'Project View', params: { id: this.projectId } })
       return
     }
@@ -486,7 +501,7 @@ export default {
     async fetchProject(id) {
       // Error handling
       try {
-        const project = await ProjectManage.fetchProject(id, true)
+        const project = await ProjectManage.fetchProject(id, true, true)
       
         this.target = project.target
         this.features = project.features

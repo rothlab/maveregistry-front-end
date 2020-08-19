@@ -201,15 +201,11 @@ export async function queryById(id, detail = false, followers = false) {
 }
 
 export async function removeMember(teamId, username) {
-  // Fetch user
-  const query = new Parse.Query(Parse.User)
-  query.equalTo("username", username)
-  let user = await query.find()
-  user = user[0]
+  await Parse.Cloud.run("removeMember", { username: username, team_id: teamId})
+}
 
-  // Valid user belongs to a team and the team ID matches
-  const userTeam = user.get("team")
-  if (!userTeam || userTeam.id !== teamId) throw Error("User team mismatch")
-  user.unset("team")
-  await user.save()
+export async function deleteTeam(teamId) {
+  // Fetch team and delete
+  const team = await new Team.fetchById(teamId)
+  return await team.destroy()
 }

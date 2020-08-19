@@ -6,7 +6,12 @@
   "target_organisms": [
     "H. sapiens",
     "E. coli",
-    "S. cerevisiae"
+    "S. cerevisiae",
+    "A. thaliana",
+    "C. elegans",
+    "D. melanogaster",
+    "D. rerio",
+    "M. musculus"
   ],
   "genomic_features": [
     "5’ UTR",
@@ -36,7 +41,7 @@
   ],
   "progress_type": [
     "Literature Search",
-    "Assay Development",
+    "Assay Development/Validation",
     "MAVE Data Collection",
     "MAVE Data Analysis",
     "Publication in Preparation",
@@ -44,11 +49,65 @@
   ],
   "progress_type_icons": {
     "Literature Search": "mdil-magnify",
-    "Assay Development": "mdil-flask",
+    "Assay Development/Validation": "mdil-flask",
     "MAVE Data Collection": "mdil-clipboard-plus",
     "MAVE Data Analysis": "mdil-chart-line",
     "Publication in Preparation": "mdil-pencil",
     "Publication Available": "mdil-book"
+  },
+  "progress_type_details": {
+    "Literature Search": {
+      "description": "no experiments performed yet",
+      "questions": [
+        "How many variants? How many of them are pathogenic, benign or VUS?",
+        "How do variants affect gene function? Are they germline, somatic or both?",
+        "Any disease phenotype related to the target? You can add reference links below.",
+        "What’s the clinical impact of the target?",
+        "Can a MAVE dataset of the target lead to treatment options or other clinical actions?"
+      ]
+    },
+    "Assay Development/Validation": {
+      "description": "small-scale experiments",
+      "questions": [
+        "Which isoform are you working with? What’s its relevance?",
+        "What assays have you tried? In what model organisms? Have they been working? You can add reference links below.",
+        "Which assay did you choose to conduct the MAVE study? Why? You can add reference links below.",
+        "What’s your assay’s readout?",
+        "If you validated a previously known assay, did your result agree with what had been published?",
+        "If you developed a new assay, why didn’t you use existing assays (if any)?"
+      ]
+    },
+    "MAVE Data Collection": {
+      "description": "full-scale MAVE experiments",
+      "questions": [
+        "What are the main steps for data collection?",
+        "Which step are you at?",
+        "Any difficulties have you faced? How did you solve them?"
+      ]
+    },
+    "MAVE Data Analysis": {
+      "description": "computational analysis of MAVE data",
+      "questions": [
+        "What type of data (e.g. sequencing, imaging) are you analyzing?",
+        "If sequencing data is used, what platform (e.g. Illumina, PacBio) was used to generate them?",
+        "What computational tools and/or pipelines do you use? You can add reference links below.",
+        "If you are using in-house tools/pipelines, can you briefly describe it? You can add reference links below."
+      ]
+    },
+    "Publication in Preparation": {
+      "description": "preparing a manuscript for publication",
+      "questions": [
+        "Is there a preprint available? You can add links to the preprint below.",
+        "If not publicly available, are you willing to provide a copy of the manuscript upon request?"
+      ]
+    },
+    "Publication Available": {
+      "description": "manuscript published",
+      "questions": [
+        "Where is it published? You can add links to the publication below.",
+        "Any future plans for this target?"
+      ]
+    }
   },
   "intervals": [
     { "label": "year", "seconds": 31536000 },

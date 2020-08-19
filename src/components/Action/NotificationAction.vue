@@ -272,8 +272,9 @@ export default {
   .card
     box-shadow: unset
     border-radius: 6px
+    overflow: hidden
   .card-header
-    border-radius: 6px
+    border-radius: 6px 6px 0 0
   .card-content
     padding: 0
     border-radius: 4px

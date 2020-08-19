@@ -14,11 +14,12 @@
             </div>
             <!-- Show edit button if current user is the project creator -->
             <div
-              class="level-right"
-              v-if="isOwner"
+              class="level-right buttons"
+              v-if="hasLoggedIn"
             >
               <!-- Edit project -->
               <b-button
+                v-if="isOwner || isEditor"
                 icon-left="mdil-pencil"
                 type="is-warning"
                 size="is-medium"
@@ -27,12 +28,8 @@
               >
                 Edit
               </b-button>
-            </div>
-            <div
-              class="level-right"
-              v-else-if="hasLoggedIn && isMember && followStatus" 
-            >
               <FollowButtonAction
+                v-if="isMember && followStatus && !isOwner" 
                 :follow-status="followStatus"
                 type="project"
                 :target-id="projectId"
@@ -177,48 +174,58 @@
             </div>
 
             <div
-              class="project-content"
               v-if="hasActivity"
             >
-              <div
-                class="is-size-5 field-margin"
-                v-for="(activity, id) in activities"
-                :key="id"
-              >
-                <b>
-                  {{ activity.start_date.toLocaleDateString() }} -
-                  {{ activity.end_date ? activity.end_date.toLocaleDateString() : "Present" }}
-                </b> | {{ activity.type }}
-                
-                <br>
-                {{ activity.description }}
-                
-                <br>
-                
-                <b-taglist
-                  size="is-small"
-                  v-if="activity.links && activity.links.length > 0"
-                  attached
+              <div class="timeline">
+                <div
+                  class="timeline-item"
+                  v-for="(activity, id) in activities"
+                  :key="id"
                 >
-                  <b-tag type="is-light">
-                    <b-icon icon="mdil-link" />
-                    Links
-                  </b-tag>
-                  
-                  <b-tag class="has-background-white-bis">
-                    <span
-                      v-for="(link, linkId) in activity.links"
-                      :key="linkId"
+                  <div class="timeline-marker icon has-background-primary-light">
+                    <b-icon
+                      :icon="progressIcons[activity.type]"
+                      custom-size="mdil-24px"
+                      type="is-primary"
+                    />
+                  </div>
+                  <div class="timeline-content">
+                    <b-tag
+                      type="is-primary-light"
+                      class="is-uppercase has-text-primary"
                     >
-                      <a
-                        :href="link"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >{{ linkId + 1 }}</a>
-                      <span v-if="activity.links.length > linkId + 1">, </span>
-                    </span>
-                  </b-tag>
-                </b-taglist>
+                      {{ formatTime(activity.start_date, activity.end_date) }}
+                    </b-tag>
+                    <p class="has-text-primary">
+                      {{ activity.type }}
+                    </p>
+                    <span class="has-white-space-pre">{{ activity.description }}</span>
+                    <b-taglist
+                      size="is-small"
+                      v-if="activity.links && activity.links.length > 0"
+                      attached
+                    >
+                      <b-tag type="is-light">
+                        <b-icon icon="mdil-link" />
+                        Links
+                      </b-tag>
+                  
+                      <b-tag class="has-background-white-bis">
+                        <span
+                          v-for="(link, linkId) in activity.links"
+                          :key="linkId"
+                        >
+                          <a
+                            :href="link"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >{{ linkId + 1 }}</a>
+                          <span v-if="activity.links.length > linkId + 1">, </span>
+                        </span>
+                      </b-tag>
+                    </b-taglist>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -364,6 +371,15 @@
   </div>
 </template>
 
+<style lang="sass" scoped>
+.timeline
+  .icon
+    border: unset
+    display: flex
+    align-items: center
+    height: 36px
+    width: 36px
+</style>
 <script>
 import * as ProjectManage from "@/api/projectManage.js"
 import * as FollowManage from "@/api/followManage.js"
@@ -372,6 +388,8 @@ import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
 import TransferAction from '@/components/Action/TransferAction.vue'
+
+const variables = require("@/assets/script/variables.json")
 
 export default {
   title: "View Project",
@@ -393,6 +411,7 @@ export default {
       errorMessage: "",
       target: undefined,
       features: [],
+      progressIcons: variables.progress_type_icons,
       creator: undefined,
       updatedDate: undefined,
       leads: [],
@@ -421,6 +440,9 @@ export default {
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     },
+    isEditor() {
+      return this.followStatus && this.followStatus.can_edit
+    }
   },
   async mounted() {
     this.isLoading.page = true
@@ -435,7 +457,6 @@ export default {
   methods: {
     async loadPage() {
       const project = await this.fetchProject(this.projectId)
-
       if (project) {
         this.hasProject = true
         if (project.leads) this.leads = project.leads // Required, will always have value
@@ -443,7 +464,7 @@ export default {
         if (project.collaborators)
           this.collaborators = project.collaborators
         if (project.funding) this.funding = project.funding
-        if (project.activities) this.activities = project.activities
+        if (project.activities) this.activities = project.activities.sort((a, b) => a.start_date - b.start_date) // Order activities by starting date
       } else {
         this.hasProject = false
       }
@@ -459,7 +480,7 @@ export default {
         const project = await ProjectManage.fetchProject(id, true, true)
 
         if (!project) {
-          this.errorMessage = await handleError({ code: 119 })
+          this.errorMessage = await handleError({ message: "Project Not Found" })
           return
         }
 
@@ -490,6 +511,22 @@ export default {
     openFollowerModal(request) {
       this.isManageFollowerModalActive = true
       this.isRequest = request
+    },
+    formatTime(startDate, endDate = undefined) {
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+      // If no end date or start and end date are within the same month,
+      // just format the start date
+      if (!endDate || (startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear())) 
+        return months[startDate.getMonth()] + " " + startDate.getFullYear()
+
+      // If start and end date are within the same year but in different month
+      if (startDate.getFullYear() === endDate.getFullYear() && startDate.getMonth() !== endDate.getMonth())
+        return months[startDate.getMonth()] + " - " + months[endDate.getMonth()] + " " + startDate.getFullYear()
+
+      // If start and end date are in different year
+      if (startDate.getFullYear() !== endDate.getFullYear())
+        return months[startDate.getMonth()] + " " + startDate.getFullYear() + " - " + months[endDate.getMonth()] + " " + endDate.getFullYear()
     }
   }
 }

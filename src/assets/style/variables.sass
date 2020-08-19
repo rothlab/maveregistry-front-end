@@ -5,6 +5,8 @@ $light: #F5F5F5
 $light-invert: findColorInvert($light)
 $dark: #1a1423
 $dark-invert: findColorInvert($dark)
+$primary-light: #EEE7F1
+$primary-light-invert: findColorInvert($primary-light)
 $primary: #540d6e
 $primary-invert: findColorInvert($primary)
 $info: #209cee
@@ -32,6 +34,7 @@ $colors: map-merge($colors, ("black": ($black, $white)))
 $colors: map-merge($colors, ("light": ($light, $light-invert)))
 $colors: map-merge($colors, ("dark": ($dark, $dark-invert)))
 $colors: map-merge($colors, ("primary": ($primary, $primary-invert)))
+$colors: map-merge($colors, ("primary-light": ($primary-light, $primary-light-invert)))
 $colors: map-merge($colors, ("info": ($info, $info-invert)))
 $colors: map-merge($colors, ("success": ($success, $success-invert)))
 $colors: map-merge($colors, ("warning": ($warning, $warning-invert)))
