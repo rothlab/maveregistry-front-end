@@ -31,6 +31,21 @@
       </b-field>
     </ValidationProvider>
 
+    <b-message
+      v-if="type === 'Publication Available'"
+      type="is-warning"
+      size="is-small"
+      class="activity-tip"
+    >
+      <b-icon
+        icon="mdil-alert-circle"
+        custom-class="mdil-18px"
+      />
+      <span class="font-14px">
+        This activity will be made available to the public.
+      </span>
+    </b-message>
+
     <!-- Start and end date -->
     <b-field
       grouped
@@ -123,7 +138,7 @@
           v-model.trim="description"
           maxlength="3000"
           type="textarea"
-          placeholder="Max. 3000 characters"
+          placeholder="Need some inspiration? Find questions to consider in the right panel."
           @input="updateVal"
         />
       </b-field>
@@ -249,4 +264,10 @@ export default {
   display: block
 .link-input
   width: 90%
+</style>
+
+<style lang="sass">
+.activity-tip
+  .media-content
+    overflow-x: unset
 </style>
