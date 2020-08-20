@@ -179,22 +179,11 @@
                     />
                   </b-field>
                 </ValidationProvider>
-              </div>
-
-              <div
-                class="project-header"
-                v-if="userInfo.email_validated"
-              >
-                <p class="is-size-4 has-text-weight-bold">
-                  Team
-                </p>
-              </div>
-
-              <div
-                class="project-content"
-                v-if="userInfo.email_validated"
-              >
-                <TeamInfoField v-model="team" />
+                <TeamInfoField
+                  v-model="team"
+                  v-if="userInfo.email_validated"
+                  label="Team"
+                />
               </div>
             </ValidationObserver>
           </div>
