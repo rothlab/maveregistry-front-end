@@ -365,7 +365,8 @@ export default {
   watch: {
     currentUser: {
       deep: true,
-      handler: async function () {
+      handler: async function (val) {
+        if (!val) return
         try {
           this.checkEmail()
           await this.$store.dispatch("getRoles")
