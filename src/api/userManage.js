@@ -3,7 +3,7 @@ import { Team } from "./teamManage.js"
 import { uploadProfilePic } from "./fileManage.js"
 
 // Helper: parse user metadata
-function parseUserMetadata (user, includeTeam = true) {
+function parseUserMetadata (user, includeTeam = true, includeCreationDate = false) {
   let ret = {
     id: user.id,
     username: user.get("username"),
@@ -28,6 +28,13 @@ function parseUserMetadata (user, includeTeam = true) {
     if (team) ret.team = team.id
   }
 
+  if (includeCreationDate) {
+    // Get creation and updated date
+    const createdAt = user.get("createdAt")
+    const updatedAt = user.get("updatedAt")
+    if (createdAt) ret.created_at = createdAt
+    if (updatedAt) ret.updated_at = updatedAt
+  }
   return ret
 }
 
