@@ -25,7 +25,10 @@
 
         <!-- Body -->
         <div class="container">
-          <div class="media">
+          <div
+            class="media"
+            style="align-items: center;"
+          >
             <div class="media-left">
               <AlertCircleIcon
                 decorative
@@ -36,7 +39,7 @@
               <div class="content">
                 <p>
                   Are you sure you want to {{ action }} this {{ type }}? <br>
-                  <b>This action is not reversible.</b>
+                  <b v-if="isIrreversible">This action is not reversible.</b>
                 </p>
               </div>
             </div>
@@ -95,6 +98,10 @@ export default {
     actionDisabled: {
       type: Boolean,
       default: false
+    },
+    isIrreversible: {
+      type: Boolean,
+      default: true
     }
   },
   watch: {
