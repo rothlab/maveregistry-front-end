@@ -199,7 +199,8 @@ export default {
       principalInvestigator: undefined,
       members: [],
       creator: undefined,
-      updatedDate: new Date()
+      updatedDate: new Date(),
+      hasInitLoad: false
     }
   },
   computed: {
@@ -207,7 +208,16 @@ export default {
       return this.$route.params.id
     },
     isOwner() {
-      return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
+      return this.hasLoggedIn && this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
+    }
+  },
+  watch: {
+    async currentUser() {
+      if (this.hasInitLoad) {
+        await this.fetchTeam()
+
+        if (!this.isOwner) this.$router.push({ name: 'Team View', params: { id: this.teamId } })
+      }
     }
   },
   async mounted() {
@@ -222,6 +232,7 @@ export default {
       return
     }
 
+    this.hasInitLoad = true
     this.isLoading.page = false
   },
   methods: {
@@ -232,7 +243,7 @@ export default {
         team = await TeamManage.queryById(this.teamId, true, false)
       } catch (error) {
         this.errorMessage = await handleError(error)
-        throw error
+        return
       }
       
       // Format PI

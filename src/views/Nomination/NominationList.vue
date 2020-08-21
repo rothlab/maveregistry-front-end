@@ -419,7 +419,7 @@ export default {
       }
     },
     async currentUser() {
-      await this.fetchNominations()
+      if (this.hasInitLoad) await this.fetchNominations()
     }
   },
   data() {
@@ -450,11 +450,13 @@ export default {
         submit_function: () => undefined
       },
       selectedNomination: undefined,
-      isConfirmDeleteModalActive: false
+      isConfirmDeleteModalActive: false,
+      hasInitLoad: false
     }
   },
   async mounted() {
-    this.fetchNominations()
+    await this.fetchNominations()
+    this.hasInitLoad = true
   },
   methods: {
     async fetchNominations() {

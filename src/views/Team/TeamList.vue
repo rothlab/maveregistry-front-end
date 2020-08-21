@@ -323,25 +323,18 @@ export default {
       filter: {
         pi: "",
       },
-      errorMessage: ""
+      errorMessage: "",
+      hasInitLoad: false
     }
   },
   watch: {
-    async currentUser(val) {
-      if (val) {
-        this.errorMessage = ""
-        await this.fetchTeams()
-      } else {
-        this.errorMessage = "Access denied. This function is only available for logged-in users."
-      }
+    async currentUser() {
+      if (this.hasInitLoad) await this.fetchTeams()
     }
   },
   async mounted() {
-    if (!this.hasLoggedIn) {
-      this.errorMessage = "Access denied. This function is only available for logged-in users."
-    } else {
-      await this.fetchTeams()
-    }
+    await this.fetchTeams()
+    this.hasInitLoad = true
   },
   methods: {
     confirmFollow(id, creator) {

@@ -346,7 +346,6 @@ export default {
     // Check if an user has logged in, if so, use it
     try {
       await this.$store.dispatch("loginUserCache")
-      await this.$store.dispatch("getRoles")
     } catch (e) {
       await displayErrorToast(e)
     } finally {

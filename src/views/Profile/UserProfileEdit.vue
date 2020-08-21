@@ -289,7 +289,7 @@ export default {
   computed: {
     isOwner() {
       const username = this.$route.params.username
-      return username && this.$store.getters.isOwner(username)
+      return this.hasLoggedIn && username && this.$store.getters.isOwner(username)
     }
   },
   data () {
@@ -304,7 +304,15 @@ export default {
         save_profile_pic: false
       },
       errorMessage: "",
-      isDisabled: false
+      isDisabled: false,
+      hasInitLoad: false
+    }
+  },
+  watch: {
+    async currentUser() {
+      const username = this.$route.params.username
+      if (this.hasInitLoad && !this.isOwner) 
+        this.$router.push({ name: 'User Profile View', params: { username: username } })
     }
   },
   async mounted () {
@@ -317,6 +325,7 @@ export default {
     }
 
     this.userInfo = await this.fetchUserInfo(username)
+    this.hasInitLoad = true
 
     if (this.userInfo) {
       if (!this.userInfo.social) this.userInfo.social = {}

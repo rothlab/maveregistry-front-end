@@ -286,6 +286,7 @@ function initialState (){
       resend_email: false
     },
     errorMessage: "",
+    hasInitLoad: false,
   }
 }
 
@@ -315,14 +316,13 @@ export default {
       // Fetch and store user information
       const username = this.$route.params.username
       this.userInfo = await this.fetchUserInfo(username)
+      this.hasInitLoad = true
     },
-    async currentUser(val) {
+    async currentUser() {
+      if (!this.hasInitLoad) return
+
       // Fetch and store user information
       const username = this.$route.params.username
-
-      // If currentUser is the same as the user, don't refresh
-      if (val.username === username) return
-      
       this.userInfo = await this.fetchUserInfo(username)
     }
   },
@@ -332,6 +332,7 @@ export default {
   async mounted () {
     const username = this.$route.params.username
     this.userInfo = await this.fetchUserInfo(username)
+    this.hasInitLoad = true
   },
   methods: {
     async fetchUserInfo(username) {

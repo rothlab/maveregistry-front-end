@@ -442,34 +442,31 @@ export default {
         page: false,
         submit: false
       },
-      errorMessage: ""
+      errorMessage: "",
+      hasInitLoad: false
     }
   },
   computed: {
     isOwner() {
-      return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
+      return this.hasLoggedIn && this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     },
     isEditor() {
-      return this.followStatus && this.followStatus.can_edit
+      return this.hasLoggedIn && this.followStatus && this.followStatus.can_edit
     },
     projectId() {
       return this.$route.params.id
     },
   },
+  watch: {
+    async currentUser() {
+      if (this.hasInitLoad) await this.loadPage()
+    }
+  },
   async mounted() {
     this.isLoading.page = true
 
     if (this.isAction('edit') || this.isAction('new')) {
-      const project = await this.fetchProject(this.projectId, false)
-      // Populate project details if editing
-      if (project) {
-        if (project.leads) this.leads = project.leads // Required, will always have value
-        if (project.team) this.team = project.team.id // Required, will always have value
-        if (project.collaborators && project.collaborators.length > 0) this.collaborators = project.collaborators.map(e => e.id)
-        if (project.funding && project.funding.open_for_funding) this.openForFunding = project.funding.open_for_funding
-        if (project.activities) this.activities = project.activities
-        if (project.follow_status && project.follow_status.length > 0) this.followStatus = project.follow_status[0]
-      }
+      await this.loadPage()
     }
 
     // If not owner or editor or invalid action jump to view page
@@ -478,6 +475,7 @@ export default {
       return
     }
 
+    this.hasInitLoad = true
     this.isLoading.page = false
   },
   methods: {
@@ -498,10 +496,30 @@ export default {
         description: "",
       }
     },
+    async loadPage() {
+      this.errorMessage = ""
+
+      const project = await this.fetchProject(this.projectId, false)
+
+      // Populate project details if editing
+      if (project) {
+        if (project.leads) this.leads = project.leads // Required, will always have value
+        if (project.team) this.team = project.team.id // Required, will always have value
+        if (project.collaborators && project.collaborators.length > 0) this.collaborators = project.collaborators.map(e => e.id)
+        if (project.funding && project.funding.open_for_funding) this.openForFunding = project.funding.open_for_funding
+        if (project.activities) this.activities = project.activities
+        if (project.follow_status && project.follow_status.length > 0) this.followStatus = project.follow_status[0]
+      }
+    },
     async fetchProject(id) {
       // Error handling
       try {
         const project = await ProjectManage.fetchProject(id, true, true)
+
+        if (!project) {
+          this.errorMessage = "Project Not Found"
+          return
+        }
       
         this.target = project.target
         this.features = project.features
