@@ -43,6 +43,7 @@ export const mutations = {
 
 export const actions = {
   async subscribeToNotifications({ commit }) {
+    if (state.messages.length > 0) return
     await NotificationManage.retrieveAndSubscribe(commit)
   },
   async markAsRead({ commit }, ids) {
