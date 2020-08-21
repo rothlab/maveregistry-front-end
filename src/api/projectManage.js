@@ -356,6 +356,26 @@ export async function fetchProjectByTeamId(id, objects = []) {
   return await Promise.all(projects.map(e => e.format()))
 }
 
+export async function fetchProjectByUserId(id, objects = []) {
+  const userQuery = new Parse.Query(Parse.User)
+  userQuery.equalTo("objectId", id)
+  const query = new Parse.Query(Project)
+  query.matchesQuery("creator", userQuery)
+
+  // Include additional objects
+  for (let index = 0; index < objects.length; index++) {
+    query.include(objects[index])
+  }
+
+  // Exlude fields
+  query.select(["target.type", "target.name", "target.organism", "features"])
+
+  const projects = await query.find()
+
+  // Format and return
+  return await Promise.all(projects.map(e => e.format()))
+}
+
 export async function updateProject(payload) {
   // Fetch project by ID
   let project = await new Project.fetchById(payload.id)

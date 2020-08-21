@@ -65,7 +65,7 @@
                   >
                     <img
                       class="is-rounded"
-                      :src="profileImageUrl(notification.by)"
+                      :src="getProfileImageFromUser(notification.by)"
                     >
                   </p>
                   <p

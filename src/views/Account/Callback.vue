@@ -205,13 +205,8 @@ export default {
         await this.$store.dispatch("signupLoginUserGoogle", this.userInfo)
         window.close()
       } catch (error) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: "Authentication failed with Google",
-          type: 'is-danger',
-          queue: false
-        })
-        throw error
+        await displayErrorToast(error)
+        return
       } finally {
         this.isLoading = false
       }

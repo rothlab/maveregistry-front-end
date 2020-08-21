@@ -82,7 +82,7 @@
               >
                 <img
                   class="is-rounded"
-                  :src="profileImageUrl(currentUser)"
+                  :src="getProfileImageFromUser(currentUser)"
                   alt="Profile Image"
                 >
               </figure>
@@ -346,7 +346,6 @@ export default {
     // Check if an user has logged in, if so, use it
     try {
       await this.$store.dispatch("loginUserCache")
-      await this.$store.dispatch("getRoles")
     } catch (e) {
       await displayErrorToast(e)
     } finally {
@@ -365,7 +364,8 @@ export default {
   watch: {
     currentUser: {
       deep: true,
-      handler: async function () {
+      handler: async function (val) {
+        if (!val) return
         try {
           this.checkEmail()
           await this.$store.dispatch("getRoles")

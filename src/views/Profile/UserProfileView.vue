@@ -120,6 +120,19 @@
 
               <p
                 class="is-size-5"
+                v-if="userInfo.team"
+              >
+                <b>Team</b> <br>
+                <router-link
+                  :to="{ name: 'Team View', params: { id: userInfo.team.id } }"
+                  target="_blank"
+                >
+                  <span class="is-capitalized">{{ userInfo.team.first_name + " " + userInfo.team.last_name }},</span>
+                  {{ userInfo.team.affiliation }}
+                </router-link>
+              </p>
+              <p
+                class="is-size-5"
                 v-if="userInfo.website"
               >
                 <b>Website</b> <br>
@@ -153,7 +166,7 @@
               v-if="hasProject"
             >
               <p class="is-size-4 has-text-weight-bold">
-                Project
+                Projects
               </p>
             </div>
 
@@ -162,20 +175,43 @@
               v-if="hasProject"
             >
               <p class="is-size-5">
-                <span v-if="userInfo.team">
-                  <b>Team</b> <br>
-                  <a
-                    :href="'mailto:' + userInfo.team.email"
+                <span
+                  v-for="(project, id) in userInfo.projects"
+                  :key="id"
+                  class="is-block project-item"
+                >
+                  <router-link
+                    :to="{ name: 'Project View', params: { id: project.id } }"
                     target="_blank"
-                    rel="noopener noreferrer"
                   >
-                    <b-icon icon="mdil-email" />
-                  </a>
-                  <span class="is-capitalized">{{ userInfo.team.first_name + " " + userInfo.team.last_name }},</span>
-                  {{ userInfo.team.affiliation }}
+                    <b-icon icon="mdil-link" />
+                    {{ project.target.name.toUpperCase() }} ({{ project.target.type }}),
+                    <i>{{ project.target.organism }}</i>
+                  </router-link><br>
+                  <span class="has-text-grey is-size-6">Features: {{ project.features.join(", ") }}</span>
                 </span>
               </p>
             </div>
+
+            <!-- <hr v-if="hasTeam">
+
+            <div
+              class="project-header"
+              v-if="hasTeam"
+            >
+              <p class="is-size-4 has-text-weight-bold">
+                Teams
+              </p>
+            </div>
+
+            <div
+              class="project-content"
+              v-if="hasTeam"
+            >
+              <p class="is-size-5">
+                <b>Owner</b> <br>
+              </p>
+            </div> -->
           </div>
         </div>
 
@@ -186,7 +222,7 @@
           <!-- Profile image -->
           <div class="profile-image">
             <figure class="image is-square is-marginless">
-              <img :src="profileImageUrl(userInfo)">
+              <img :src="getProfileImageFromUser(userInfo)">
             </figure>
           </div>
 
@@ -228,6 +264,7 @@
 
 <script>
 import * as UserManage from "@/api/userManage.js"
+import * as ProjectManage from "@/api/projectManage.js"
 import * as TeamManage from "@/api/teamManage.js"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import Error from "@/components/Error.vue"
@@ -249,6 +286,7 @@ function initialState (){
       resend_email: false
     },
     errorMessage: "",
+    hasInitLoad: false,
   }
 }
 
@@ -264,6 +302,9 @@ export default {
       return this.userInfo && this.userInfo.username && this.$store.getters.isOwner(this.userInfo.username)
     },
     hasProject() {
+      return this.userInfo.projects && this.userInfo.projects.length > 0
+    },
+    hasTeam() {
       return this.userInfo.team
     }
   },
@@ -275,8 +316,11 @@ export default {
       // Fetch and store user information
       const username = this.$route.params.username
       this.userInfo = await this.fetchUserInfo(username)
+      this.hasInitLoad = true
     },
     async currentUser() {
+      if (!this.hasInitLoad) return
+
       // Fetch and store user information
       const username = this.$route.params.username
       this.userInfo = await this.fetchUserInfo(username)
@@ -288,6 +332,7 @@ export default {
   async mounted () {
     const username = this.$route.params.username
     this.userInfo = await this.fetchUserInfo(username)
+    this.hasInitLoad = true
   },
   methods: {
     async fetchUserInfo(username) {
@@ -298,9 +343,11 @@ export default {
       try {
         res = await UserManage.fetchUserInfo(username, true)
 
-        if (res && res.team) {
+        if (res) {
+          // Fetch projects
+          res.projects = await ProjectManage.fetchProjectByUserId(res.id)
           // Fetch team
-          res.team = await TeamManage.queryById(res.team)
+          if (res.team) res.team = await TeamManage.queryById(res.team)
         }
       } catch (error) {
         this.isLoading.page = false
@@ -350,4 +397,7 @@ export default {
 .resend-email
   @media screen and (max-width: $break-mobile)
     margin-top: 0.5rem
+.project-item
+  &:not(:last-child)
+    padding-bottom: 0.5rem
 </style>

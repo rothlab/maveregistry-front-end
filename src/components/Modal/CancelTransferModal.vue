@@ -42,7 +42,7 @@
                     >
                       <img
                         class="is-rounded"
-                        :src="profileImageUrl(transfer.recipient)"
+                        :src="getProfileImageFromUser(transfer.recipient)"
                         alt="Profile Image"
                       >
                     </figure>

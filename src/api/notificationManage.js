@@ -66,6 +66,7 @@ export async function retrieveAndSubscribe(commit) {
 
   const query = new Parse.Query(Notification)
   query.equalTo("for", currentUser)
+  query.include("target_body.by")
   query.select([
     "message", "is_read", "type", "target_body"
   ])

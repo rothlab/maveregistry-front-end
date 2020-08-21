@@ -628,7 +628,7 @@ export default {
       }
     },
     async currentUser() {
-      await this.fetchTargets()
+      if (this.hasInitLoad) await this.fetchTargets()
     }
   },
   data () {
@@ -665,7 +665,8 @@ export default {
         follow_unfollow: false,
         fetch_targets: false
       },
-      errorMessage: ""
+      errorMessage: "",
+      hasInitLoad: false
     }
   },
   async mounted () {
@@ -675,7 +676,9 @@ export default {
       if (this.$route.query.name) this.filter.name = this.$route.query.name
       if (this.$route.query.organism) this.filter.organism = this.$route.query.organism
     }
+
     await this.fetchTargets()
+    this.hasInitLoad = true
   },
   methods: {
     confirmFollow(id, type, creator) {

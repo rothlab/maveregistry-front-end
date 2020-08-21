@@ -1,7 +1,7 @@
 <template>
   <div class="field-margin">
     <label class="label">
-      Find or Add a Principal Investigator
+      {{ label }}
     </label>
 
     <!-- Add this provider to stop user from saving edit when no team was provided (but required) -->
@@ -17,6 +17,7 @@
     </ValidationProvider>
 
     <b-autocomplete
+      class="team-field"
       v-model="existTeamDisplay"
       ref="teamField"
       placeholder="Search by Name"
@@ -102,6 +103,10 @@ export default {
     isCollaborator: {
       type: Boolean,
       default: false
+    },
+    label: {
+      type: String,
+      default: "Find or Add a Principal Investigator"
     }
   },
   components: {
@@ -236,3 +241,11 @@ export default {
   }
 }
 </script>
+
+<style lang="sass">
+.team-field
+  .is-right
+    .mdil.close-circle
+      &:before
+        content: "\F1C0"
+</style>

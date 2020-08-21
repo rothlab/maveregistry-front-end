@@ -430,7 +430,8 @@ export default {
       activities: [],
       followerCount: 0,
       requestCount: 0,
-      hasTransfer: true // Default set to true so that the trasfer action can load
+      hasTransfer: true, // Default set to true so that the trasfer action can load
+      hasInitLoad: false
     }
   },
   computed: {
@@ -453,10 +454,16 @@ export default {
       return this.followStatus && this.followStatus.can_edit
     }
   },
+  watch: {
+    async currentUser() {
+      if (this.hasInitLoad) await this.loadPage()
+    }
+  },
   async mounted() {
     this.isLoading.page = true
 
     await this.loadPage()
+    this.hasInitLoad = true
 
     // Open follow request modal if needed
     if (this.hasDeepLink("#manage-request") && this.isOwner) this.openFollowerModal(true)
@@ -465,6 +472,8 @@ export default {
   },
   methods: {
     async loadPage() {
+      this.errorMessage = ""
+      
       const project = await this.fetchProject(this.projectId)
       if (project) {
         this.hasProject = true

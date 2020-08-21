@@ -127,7 +127,7 @@
                       type="is-dark"
                     >
                       <img
-                        :src="getProfileImage(member.profile_image)"
+                        :src="getProfileImageFromUser(member)"
                         class="is-rounded"
                       >
                     </b-tooltip>
@@ -379,13 +379,20 @@ export default {
       followerCount: 0,
       requestCount: 0,
       isRequest: false,
-      hasTransfer: true
+      hasTransfer: true,
+      hasInitLoad: false
+    }
+  },
+  watch: {
+    async currentUser() {
+      if (this.hasInitLoad) await this.loadPage()
     }
   },
   async mounted() {
     this.isLoading.page = true
 
     await this.loadPage()
+    this.hasInitLoad = true
     
     // Open follow request modal if needed
     if (this.hasDeepLink("#manage-request")) this.openFollowerModal(true)
@@ -394,6 +401,8 @@ export default {
   },
   methods: {
     async loadPage() {
+      this.errorMessage = ""
+      
       // Fetch team
       const team = await this.fetchTeam()
 
@@ -407,11 +416,6 @@ export default {
         team = await TeamManage.queryById(this.teamId, true, true)
       } catch (error) {
         this.errorMessage = await handleError(error)
-        throw error
-      }
-      
-      if (!team) {
-        this.errorMessage = await handleError({ message: "Team Not Found"})
         return
       }
 
@@ -454,9 +458,6 @@ export default {
     },
     editTeam() {
       this.$router.push({ name: 'Team Edit', params: { id: this.teamId, action: 'edit' } })
-    },
-    getProfileImage(url) {
-      return url ? url : require("@/assets/image/blank-profile.png")
     },
     hasDeepLink(action) {
       return this.$route.hash === action

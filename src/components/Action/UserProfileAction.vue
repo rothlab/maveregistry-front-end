@@ -22,9 +22,9 @@
       icon-left="mdil-delete"
       type="is-light"
       expanded
-      disabled
+      @click="isConfirmDeleteUserModalActive = true"
     >
-      Delete Account (Under Dev.)
+      Delete Account
     </b-button>
 
     <!-- Email frequency modal -->
@@ -32,6 +32,24 @@
       :id="notification"
       :active.sync="isNotificationPreferenceIdModalActive"
     />
+
+    <!-- Confirm Delete User Modal -->
+    <ConfirmDangerModal
+      :active.sync="isConfirmDeleteUserModalActive"
+      type="account"
+      action="delete"
+      :on-action="deleteUser"
+      :action-disabled="objectCount > 0"
+      title="Delete Account"
+    >
+      <p
+        v-if="objectCount > 0"
+        style="margin-top: 1rem"
+      >
+        This user still owns some objects (e.g. projects, teams or nominations). 
+        <b>You can only delete this user if they don't own any objects.</b>
+      </p>
+    </ConfirmDangerModal>
   </div>
 </template>
 
@@ -39,10 +57,12 @@
 import * as UserManage from "@/api/userManage.js"
 import { displayErrorToast } from "@/api/errorHandler.js"
 import EmailPreferenceModal from "@/components/Modal/EmailPreferenceModal.vue"
+import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
 
 export default {
   components: {
-    EmailPreferenceModal
+    EmailPreferenceModal,
+    ConfirmDangerModal
   },
   props: {
     email: {
@@ -58,6 +78,8 @@ export default {
     return {
       isLoading: false,
       isNotificationPreferenceIdModalActive: false,
+      isConfirmDeleteUserModalActive: false,
+      objectCount: 0
     }
   },
   methods: {
@@ -80,6 +102,9 @@ export default {
 
       this.isLoading = false
     },
+    deleteUser() {
+
+    }
   }
 }
 </script>

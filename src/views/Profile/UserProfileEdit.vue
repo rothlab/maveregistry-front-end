@@ -179,22 +179,11 @@
                     />
                   </b-field>
                 </ValidationProvider>
-              </div>
-
-              <div
-                class="project-header"
-                v-if="userInfo.email_validated"
-              >
-                <p class="is-size-4 has-text-weight-bold">
-                  Team
-                </p>
-              </div>
-
-              <div
-                class="project-content"
-                v-if="userInfo.email_validated"
-              >
-                <TeamInfoField v-model="team" />
+                <TeamInfoField
+                  v-model="team"
+                  v-if="userInfo.email_validated"
+                  label="Team"
+                />
               </div>
             </ValidationObserver>
           </div>
@@ -208,7 +197,7 @@
           <!-- Profile image -->
           <div class="profile-image">
             <figure class="image is-square is-marginless">
-              <img :src="profileImageUrl(userInfo)">
+              <img :src="getProfileImageFromUser(userInfo)">
               <div class="upload">
                 <b-button
                   tag="a"
@@ -300,7 +289,7 @@ export default {
   computed: {
     isOwner() {
       const username = this.$route.params.username
-      return username && this.$store.getters.isOwner(username)
+      return this.hasLoggedIn && username && this.$store.getters.isOwner(username)
     }
   },
   data () {
@@ -315,7 +304,15 @@ export default {
         save_profile_pic: false
       },
       errorMessage: "",
-      isDisabled: false
+      isDisabled: false,
+      hasInitLoad: false
+    }
+  },
+  watch: {
+    async currentUser() {
+      const username = this.$route.params.username
+      if (this.hasInitLoad && !this.isOwner) 
+        this.$router.push({ name: 'User Profile View', params: { username: username } })
     }
   },
   async mounted () {
@@ -328,6 +325,7 @@ export default {
     }
 
     this.userInfo = await this.fetchUserInfo(username)
+    this.hasInitLoad = true
 
     if (this.userInfo) {
       if (!this.userInfo.social) this.userInfo.social = {}
