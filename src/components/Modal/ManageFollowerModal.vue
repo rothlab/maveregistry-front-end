@@ -221,10 +221,14 @@ export default {
     async fetchFollowers() {
       this.isLoading = true
 
-      this.followers = await FollowManage.fetchFollows(this.target, this.type, this.isRequest)
-      this.filteredFollowers = this.followers
-
-       this.isLoading = false
+      try {
+        this.followers = await FollowManage.fetchFollows(this.target, this.type, this.isRequest)
+        this.filteredFollowers = this.followers
+      } catch (error) {
+        await displayErrorToast(error)
+      } finally {
+        this.isLoading = false
+      }
     },
     async filterByName(keyword) {
       if (keyword === "") {
@@ -236,9 +240,13 @@ export default {
         this.keyword = keyword.toLowerCase()
 
         // Fetch followers
-        this.filteredFollowers = await FollowManage.queryByName(this.target, this.type, this.keyword)
-
-        this.isLoading = false
+        try {
+          this.filteredFollowers = await FollowManage.queryByName(this.target, this.type, this.keyword)
+        } catch (error) {
+          await displayErrorToast(error)
+        } finally {
+          this.isLoading = false
+        }
       }
     },
     trimKeyword(string, keyword) {
