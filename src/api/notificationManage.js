@@ -30,7 +30,7 @@ export const Notification = Parse.Object.extend("Notification", {
         case "transfer":
           // If data is not available, fetch
           // This is because include is not implemented with LiveQuery
-          // if (!by.isDataAvailable()) await by.fetch()
+          if (!by.isDataAvailable()) await by.fetch()
 
           ret.by = {
             first_name: by.get("first_name"),
