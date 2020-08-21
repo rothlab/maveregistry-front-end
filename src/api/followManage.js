@@ -9,25 +9,29 @@ export const Follow = Parse.Object.extend("Follow", {
     if (!attrs.target || attrs.target === "") throw new Error("Follow target is empty")
     if (!attrs.reason || attrs.reason.length <= 0) throw new Error("Follow reason is empty")
     if (!attrs.by) throw new Error("Follower is empty. Pleaes make sure you have logged in.")
-    if (!attrs.can_edit) throw new Error("Edit status is empty. Pleaes make sure you have logged in.")
+    if (typeof attrs.can_edit !== "boolean") throw new Error("Edit status is empty. Pleaes make sure you have logged in.")
   },
-  format: async function () {
-    // Fetch user
-    const user = await this.get("by").fetch()
-
-    return {
+  format: async function (includeUser = true) {
+    let ret = {
       id: this.id,
       type: this.get("type"),
-      by: {
-        username: user.get("username"),
-        first_name: user.get("first_name"),
-        last_name: user.get("last_name"),
-        profile_image: user.get("profile_image")
-      },
       create_date: this.get("createdAt"),
       reason: this.get("reason"),
       can_edit: this.get("can_edit")
     }
+
+    if (includeUser) {
+      // Fetch user
+      const user = await this.get("by").fetch()
+      ret.by = {
+        username: user.get("username"),
+        first_name: user.get("first_name"),
+        last_name: user.get("last_name"),
+        profile_image: user.get("profile_image")
+      }
+    }
+
+    return ret
   }
 }, {
   create: async function(attrs) {
@@ -147,6 +151,17 @@ export async function fetchFollows(target, type, request = false, limit = 10, sk
   follows.results = await Promise.all(follows.results.map(e => e.format()))
 
   return follows 
+}
+
+export async function fetchFollowsByUserId(id) {
+  const userQuery = new Parse.Query(Parse.User)
+  userQuery.equalTo("objectId", id)
+  const query = new Parse.Query(Follow)
+  query.matchesQuery("by", userQuery)
+
+  const follows = await query.find()
+
+  return await Promise.all(follows.map(e => e.format(false)))
 }
 
 export async function countFollows(target, type, request = false) {
