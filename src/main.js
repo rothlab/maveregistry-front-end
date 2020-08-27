@@ -5,8 +5,6 @@ import Buefy from 'buefy'
 
 // Import plugins
 import "@/assets/script/field_validation_rules.js"
-import axios from 'axios'
-import VueAxios from 'vue-axios'
 import * as Sentry from '@sentry/browser';
 import { Vue as VueIntegration } from '@sentry/integrations';
 import VueAnimate from 'vue-animate-scroll'
@@ -50,7 +48,6 @@ Sentry.configureScope(scope => {
 })
 
 // Inject plugins
-Vue.use(VueAxios, axios)
 Vue.use(VueAnimate)
 Vue.use(VueScrollactive)
 Vue.use(VueScrollTo, {
