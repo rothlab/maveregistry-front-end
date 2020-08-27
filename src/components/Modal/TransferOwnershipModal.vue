@@ -27,7 +27,7 @@
         <div class="container">
           <div class="content">
             <p>
-              Once accepted by the recipient, you will lose ownership of this {{ type }}.
+              Once accepted by the recipient, you will lose ownership of this {{ type }} record.
               <b>This action is irreversible.</b>
             </p>
 
