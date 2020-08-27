@@ -14,9 +14,8 @@
     "@hcaptcha/vue-hcaptcha": "^0.2.2",
     "@mdi/font": "^5.5.55",
     "@mdi/light-font": "^0.2.63",
-    "@sentry/browser": "^5.21.1",
-    "@sentry/integrations": "^5.21.1",
-    "axios": "^0.19.2",
+    "@sentry/browser": "^5.22.0",
+    "@sentry/integrations": "^5.22.0",
     "buefy": "^0.8.20",
     "bulma-timeline": "^3.0.4",
     "core-js": "^3.6.5",
@@ -24,10 +23,9 @@
     "parse": "^2.15.0",
     "prerender-spa-plugin": "^3.4.0",
     "vee-validate": "^3.3.9",
-    "vue": "^2.6.11",
+    "vue": "^2.6.12",
     "vue-animate-scroll": "^0.1.5",
     "vue-avatar-cropper": "^1.0.6",
-    "vue-axios": "^2.1.5",
     "vue-lottie": "^0.2.1",
     "vue-material-design-icons": "^4.8.0",
     "vue-password-strength-meter": "^1.7.2",
@@ -52,7 +50,7 @@
     "eslint-plugin-vue": "^6.2.2",
     "sass": "^1.26.10",
     "sass-loader": "^9.0.3",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.12"
   },
   "eslintConfig": {
     "root": true,

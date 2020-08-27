@@ -299,13 +299,6 @@ export default {
           link: "https://github.com/getsentry/sentry-javascript"
         },
         {
-          project: "axios",
-          team: "Matt Zabriskie",
-          license: "MIT",
-          license_url: "https://github.com/axios/axios/blob/master/LICENSE",
-          link: "https://github.com/axios/axios"
-        },
-        {
           project: "core-js",
           team: "Denis Pushkarev",
           license: "MIT",
@@ -339,13 +332,6 @@ export default {
           license: "MIT",
           license_url: "https://opensource.org/licenses/MIT",
           link: "https://github.com/overtrue/vue-avatar-cropper"
-        },
-        {
-          project: "vue-axios",
-          team: "Nguyen Quoc Anh",
-          license: "MIT",
-          license_url: "https://github.com/imcvampire/vue-axios/blob/master/LICENSE",
-          link: "https://github.com/imcvampire/vue-axios"
         },
         {
           project: "Lottie Animation View for Vue",
