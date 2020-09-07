@@ -203,6 +203,17 @@ export async function removeMember(teamId, username) {
   await Parse.Cloud.run("removeMember", { username: username, team_id: teamId})
 }
 
+export async function fetchTeamsByUserId(id) {
+  const userQuery = new Parse.Query(Parse.User)
+  userQuery.equalTo("objectId", id)
+  const query = new Parse.Query(Team)
+  query.matchesQuery("creator", userQuery)
+
+  const teams = await query.find()
+
+  return await Promise.all(teams.map(e => e.format()))
+}
+
 export async function deleteTeam(teamId) {
   // Fetch team and delete
   const team = await new Team.fetchById(teamId)

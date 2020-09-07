@@ -260,3 +260,20 @@ export async function queryVotes(id) {
 
   return votes
 }
+
+export async function fetchNominationsByUserId(id) {
+  const userQuery = new Parse.Query(Parse.User)
+  userQuery.equalTo("objectId", id)
+  const query = new Parse.Query(Nomination)
+  query.matchesQuery("by", userQuery)
+
+  const nominations = await query.find()
+
+  return await Promise.all(nominations.map(e => e.format()))
+}
+
+export async function queryById(id) {
+  const nomination = await new Nomination.fetchById(id, ["target"])
+
+  return nomination.format()
+}

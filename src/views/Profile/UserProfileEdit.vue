@@ -182,7 +182,7 @@
                 <TeamInfoField
                   v-model="team"
                   v-if="userInfo.email_validated"
-                  label="Team"
+                  label="Team Affiliation"
                 />
               </div>
             </ValidationObserver>
@@ -221,34 +221,6 @@
               output-mime="image/jpeg"
               :output-quality="0.8"
             />
-          </div>
-          <!-- Actions -->
-          <div class="project-header">
-            <p class="is-size-4 has-text-weight-bold">
-              Actions
-            </p>
-          </div>
-
-          <div class="project-content">
-            <div class="action-buttons">
-              <b-button
-                icon-left="mdil-lock"
-                type="is-light"
-                expanded
-                @click="resetPassword"
-                :loading="isLoading.reset_pass"
-              >
-                Reset Password
-              </b-button>
-              <b-button
-                icon-left="mdil-delete"
-                type="is-light"
-                expanded
-                disabled
-              >
-                Delete Account (Under Dev.)
-              </b-button>
-            </div>
           </div>
         </div>
       </div>
@@ -299,7 +271,6 @@ export default {
       showProfile: false,
       isLoading: {
         page: true,
-        reset_pass: false,
         save_edit: false,
         save_profile_pic: false
       },
@@ -396,29 +367,6 @@ export default {
       } finally {
         this.isLoading.save_profile_pic = false
       }
-    },
-    async resetPassword() {
-      if (!this.userInfo.email) {
-        throw new Error("Missing email")
-      }
-      
-      try {
-        this.isLoading.reset_pass = true
-
-        await UserManage.resetPassword(this.userInfo.email)
-
-        // Confirmation
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: "Password Reset Email Sent",
-          type: 'is-success',
-          queue: false
-        })
-      } catch (error) {
-        await displayErrorToast(error)
-      }
-
-      this.isLoading.reset_pass = false
     },
     addTwitterAt() {
       if (!this.userInfo.social || !this.userInfo.social.twitter) return

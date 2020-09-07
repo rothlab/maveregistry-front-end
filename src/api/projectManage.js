@@ -360,7 +360,7 @@ export async function fetchProjectByTeamId(id, objects = []) {
   return await Promise.all(projects.map(e => e.format(false, false, objects.includes("collaborators"))))
 }
 
-export async function fetchProjectByUserId(id, objects = []) {
+export async function fetchProjectsByUserId(id, objects = []) {
   const userQuery = new Parse.Query(Parse.User)
   userQuery.equalTo("objectId", id)
   const query = new Parse.Query(Project)

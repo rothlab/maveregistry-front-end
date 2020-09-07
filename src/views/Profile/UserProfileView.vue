@@ -43,7 +43,7 @@
           >
             <div class="project-header">
               <p class="is-size-4 has-text-weight-bold">
-                Personal
+                Basics
               </p>
             </div>
 
@@ -122,11 +122,12 @@
                 class="is-size-5"
                 v-if="userInfo.team"
               >
-                <b>Team</b> <br>
+                <b>Team Affiliation</b> <br>
                 <router-link
                   :to="{ name: 'Team View', params: { id: userInfo.team.id } }"
                   target="_blank"
                 >
+                  <b-icon icon="mdil-link" />
                   <span class="is-capitalized">{{ userInfo.team.first_name + " " + userInfo.team.last_name }},</span>
                   {{ userInfo.team.affiliation }}
                 </router-link>
@@ -159,22 +160,26 @@
               </p>
             </div>
 
-            <hr v-if="hasProject">
+            <hr v-if="hasProject || hasTeam">
 
             <div
               class="project-header"
-              v-if="hasProject"
+              v-if="hasProject || hasTeam"
             >
               <p class="is-size-4 has-text-weight-bold">
-                Projects
+                Ownership
               </p>
             </div>
 
             <div
               class="project-content"
-              v-if="hasProject"
+              v-if="hasProject || hasTeam"
             >
-              <p class="is-size-5">
+              <p
+                class="is-size-5"
+                v-if="hasProject"
+              >
+                <b>Project{{ userInfo.projects.length > 1 ? "s" : "" }}</b> <br>
                 <span
                   v-for="(project, id) in userInfo.projects"
                   :key="id"
@@ -191,27 +196,49 @@
                   <span class="has-text-grey is-size-6">Features: {{ project.features.join(", ") }}</span>
                 </span>
               </p>
-            </div>
 
-            <!-- <hr v-if="hasTeam">
+              <p
+                class="is-size-5"
+                v-if="hasTeam"
+              >
+                <b>Team{{ userInfo.teams.length > 1 ? "s" : "" }}</b> <br>
+                <span
+                  v-for="(team, id) in userInfo.teams"
+                  :key="id"
+                  class="is-block project-item"
+                >
+                  <router-link
+                    :to="{ name: 'Team View', params: { id: team.id } }"
+                    target="_blank"
+                  >
+                    <b-icon icon="mdil-link" />
+                    <span class="is-capitalized">{{ team.first_name + " " + team.last_name }},</span>
+                    {{ team.affiliation }}
+                  </router-link><br>
+                </span>
+              </p>
 
-            <div
-              class="project-header"
-              v-if="hasTeam"
-            >
-              <p class="is-size-4 has-text-weight-bold">
-                Teams
+              <p
+                class="is-size-5"
+                v-if="hasNomination"
+              >
+                <b>Nomination{{ userInfo.nominations.length > 1 ? "s" : "" }}</b> <br>
+                <span
+                  v-for="(nomination, id) in userInfo.nominations"
+                  :key="id"
+                  class="is-block project-item"
+                >
+                  <router-link
+                    :to="{ name: 'Nominations', query: { id: nomination.id } }"
+                    target="_blank"
+                  >
+                    <b-icon icon="mdil-link" />
+                    {{ nomination.target.name.toUpperCase() }} ({{ nomination.target.type }}),
+                    <i>{{ nomination.target.organism }}</i><br>
+                  </router-link>
+                </span>
               </p>
             </div>
-
-            <div
-              class="project-content"
-              v-if="hasTeam"
-            >
-              <p class="is-size-5">
-                <b>Owner</b> <br>
-              </p>
-            </div> -->
           </div>
         </div>
 
@@ -241,6 +268,7 @@
               <UserProfileAction
                 :email="userInfo.email"
                 :notification="userInfo.notification_preference_id"
+                :object-count="objectCount"
               />
             </div>
           </div>
@@ -266,6 +294,7 @@
 import * as UserManage from "@/api/userManage.js"
 import * as ProjectManage from "@/api/projectManage.js"
 import * as TeamManage from "@/api/teamManage.js"
+import * as NominationManage from "@/api/nominationManage.js"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import Error from "@/components/Error.vue"
 import UserProfileAction from "@/components/Action/UserProfileAction.vue"
@@ -305,7 +334,18 @@ export default {
       return this.userInfo.projects && this.userInfo.projects.length > 0
     },
     hasTeam() {
-      return this.userInfo.team
+      return this.userInfo.teams && this.userInfo.teams.length > 0
+    },
+    hasNomination() {
+      return this.userInfo.nominations && this.userInfo.nominations.length > 0
+    },
+    objectCount() {
+      let sum = 0
+      if (this.hasProject) sum += this.userInfo.projects.length
+      if (this.hasTeam) sum += this.userInfo.teams.length
+      if (this.hasNomination) sum += this.userInfo.nominations.length
+
+      return sum
     }
   },
   watch: {
@@ -344,10 +384,17 @@ export default {
         res = await UserManage.fetchUserInfo(username, true)
 
         if (res) {
-          // Fetch projects
-          res.projects = await ProjectManage.fetchProjectByUserId(res.id)
           // Fetch team
           if (res.team) res.team = await TeamManage.queryById(res.team)
+
+          // Fetch projects
+          res.projects = await ProjectManage.fetchProjectsByUserId(res.id)
+          
+          // Fetch teams the user own
+          res.teams = await TeamManage.fetchTeamsByUserId(res.id)
+
+          // Fetch nominations
+          res.nominations = await NominationManage.fetchNominationsByUserId(res.id)
         }
       } catch (error) {
         this.isLoading.page = false
