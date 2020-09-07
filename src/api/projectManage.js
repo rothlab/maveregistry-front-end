@@ -429,3 +429,9 @@ export async function updateProject(payload) {
   // Use a cloud function to remove no longer needed activities
   await Parse.Cloud.run("updateProjectActivities", { ids: savedActivities.map(e => e.id) })
 }
+
+export async function deleteProject(id) {
+  // Fetch project by ID and delete
+  const project = await new Project.fetchById(id)
+  return await project.destroy()
+}
