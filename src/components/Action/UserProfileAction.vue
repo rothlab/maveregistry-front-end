@@ -18,14 +18,15 @@
     >
       Set Email Preference
     </b-button>
-    <b-button
+    <!-- <b-button
       icon-left="mdil-delete"
       type="is-light"
       expanded
       @click="isConfirmDeleteUserModalActive = true"
+      disabled
     >
-      Delete Account
-    </b-button>
+      Delete Account (under dev)
+    </b-button> -->
 
     <!-- Email frequency modal -->
     <EmailPreferenceModal
@@ -46,8 +47,8 @@
         v-if="objectCount > 0"
         style="margin-top: 1rem"
       >
-        This user still owns some objects (e.g. projects, teams or nominations). 
-        <b>You can only delete this user if they don't own any objects.</b>
+        This user still owns <b>{{ objectCount }}</b> objects (e.g. projects, teams or nominations). 
+        <b>Please delete or transfer them to other users.</b>
       </p>
     </ConfirmDangerModal>
   </div>
@@ -72,6 +73,10 @@ export default {
     notification: {
       type: String,
       required: true
+    },
+    objectCount: {
+      type: Number,
+      required: true
     }
   },
   data () {
@@ -79,7 +84,6 @@ export default {
       isLoading: false,
       isNotificationPreferenceIdModalActive: false,
       isConfirmDeleteUserModalActive: false,
-      objectCount: 0
     }
   },
   methods: {
@@ -103,7 +107,7 @@ export default {
       this.isLoading = false
     },
     deleteUser() {
-
+      throw new Error("Function under development")
     }
   }
 }

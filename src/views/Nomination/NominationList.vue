@@ -141,6 +141,17 @@
               </b-dropdown-item>
             </b-dropdown>
 
+            <!-- Filter by ID (only shown when a query param is available) -->
+            <b-tag
+              style="margin-left: 0.5em; height: 2.25rem !important; font-size: 16px"
+              type="is-info"
+              closable
+              @close="clearIdFilter"
+              v-if="queryId"
+            >
+              ID: {{ queryId }}
+            </b-tag>
+
             <!-- Filter by name -->
             <b-field style="margin-left: 0.5em">
               <b-input
@@ -420,6 +431,16 @@ export default {
     },
     async currentUser() {
       if (this.hasInitLoad) await this.fetchNominations()
+    },
+    async '$route.query.id'() {
+      await this.fetchNominations()
+    }
+  },
+  computed: {
+    queryId() {
+      if (this.$route.query && this.$route.query.id) return this.$route.query.id
+
+      return undefined
     }
   },
   data() {
@@ -462,6 +483,23 @@ export default {
     async fetchNominations() {
       this.isLoading.page = true
 
+      // Check if an ID is provided, if so, use it
+      if (this.queryId) {
+        try {
+          const nomination = await NominationManage.queryById(this.queryId)
+          this.nominations = [nomination]
+
+          // Update count
+          this.pagination.count = 1
+        } catch (error) {
+          this.errorMessage = await handleError(error)
+        } finally {
+          this.isLoading.page = false
+        }
+
+        return
+      }
+
       // Calculate skip
       const skip = (this.pagination.current - 1) * this.pagination.limit
 
@@ -473,7 +511,6 @@ export default {
         this.pagination.count = nominations.count
       } catch (error) {
         this.errorMessage = await handleError(error)
-        throw error
       } finally {
         this.isLoading.page = false
       }
@@ -562,6 +599,9 @@ export default {
       const votes = await NominationManage.queryVotes(object.id)
       this.nominations[index].vote = votes
       this.isLoading.page = false
+    },
+    clearIdFilter() {
+      this.$router.push({ path: 'Nominations' })
     }
   }
 }
