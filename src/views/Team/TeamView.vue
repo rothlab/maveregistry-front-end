@@ -67,7 +67,6 @@
           >
             <div
               class="project-header"
-              v-if="hasPeople"
             >
               <p class="is-size-4 has-text-weight-bold">
                 People
@@ -76,7 +75,6 @@
 
             <div
               class="project-content"
-              v-if="hasPeople"
             >
               <p
                 class="is-size-5"
@@ -110,6 +108,7 @@
               <div
                 class="is-size-5"
                 v-if="members.length > 0"
+                style="margin-bottom: 1em"
               >
                 <b>Member{{ members.length > 1 ? 's' : '' }}</b><br>
                 <figure
@@ -134,9 +133,29 @@
                   </router-link>
                 </figure>
               </div>
+
+              <div
+                class="is-size-5"
+                v-if="collaborators.length > 0"
+              >
+                <b>Collaborating Team{{ collaborators.length > 1 ? 's' : '' }}</b><br>
+                <div
+                  v-for="(collaborator, id) in collaborators"
+                  :key="id"
+                >
+                  <router-link
+                    :to="{ name: 'Team View', params: { id: collaborator.id } }"
+                    target="_blank"
+                  >
+                    <b-icon icon="mdil-link" />
+                  </router-link>
+                  <span class="is-capitalized">{{ collaborator.first_name + " " + collaborator.last_name }},</span>
+                  {{ collaborator.affiliation }}
+                </div>
+              </div>
             </div>
 
-            <hr v-if="hasPeople && hasProject">
+            <hr v-if="hasProject">
 
             <!-- Add no project detail display -->
             <div
@@ -349,9 +368,6 @@ export default {
     teamId() {
       return this.$route.params.id
     },
-    hasPeople() {
-      return this.principalInvestigator && this.members && this.members.length > 0
-    },
     hasProject() {
       return this.projects && this.projects.length > 0
     },
@@ -372,6 +388,7 @@ export default {
       followStatus: undefined,
       principalInvestigator: {},
       members: [],
+      collaborators: [],
       projects: [],
       updatedDate: new Date(),
       creator: {},
@@ -413,7 +430,7 @@ export default {
       // Fetch team
       let team
       try {
-        team = await TeamManage.queryById(this.teamId, true, true)
+        team = await TeamManage.queryById(this.teamId, true, true, true)
       } catch (error) {
         this.errorMessage = await handleError(error)
         return
@@ -435,8 +452,12 @@ export default {
       this.creator = team.creator
       this.updatedDate = team.update_date
 
-      // Format projects
-      if (team.projects) this.projects = team.projects
+      // Format projects and collaborators
+      if (team.projects) {
+        this.projects = team.projects
+        const collaborators = team.projects.map(e => e.collaborators).filter(Boolean)
+        if (collaborators.length > 0) this.collaborators = [].concat.apply([], collaborators)
+      }
 
       // Format follow status
       if (team.follow_status) this.followStatus = team.follow_status

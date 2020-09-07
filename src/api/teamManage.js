@@ -13,7 +13,7 @@ export const Team = Parse.Object.extend("Team", {
     if (attrs.email === "") throw new Error("Principal Investigator email is empty")
     if (attrs.affiliation === "") throw new Error("Principal Investigator affiliation is empty")
   },
-  format: async function (detail = false, project = false, follow = false) {
+  format: async function (detail = false, project = false, follow = false, collaborators = false) {
     let ret = {
       id: this.id,
       first_name: this.get("first_name"),
@@ -43,7 +43,9 @@ export const Team = Parse.Object.extend("Team", {
 
     // Fetch Project
     if (project) {
-      const projects = await fetchProjectByTeamId(this.id, ["target", "recent_activity", "public_activity"])
+      let objects = ["target", "recent_activity", "public_activity"]
+      if (collaborators) objects.push("collaborators")
+      const projects = await fetchProjectByTeamId(this.id, objects)
       if (projects && projects.length > 0) ret.projects = projects
     }
 
@@ -123,9 +125,7 @@ export async function addTeam(teamInfo) {
   if (team.id) throw new Error("Team exists")
 
   // Set the current user as the creator of the team
-  // And add it to the team
   team.set("creator", currentUser)
-  currentUser.set("team", team)
 
   const ret = await Parse.Object.saveAll([team, currentUser])
 
@@ -170,7 +170,6 @@ export async function fetchTeams(limit, skip, objects = []) {
 }
 
 export async function queryByName(name, limit, skip, objects = []) {
-  // TODO: add pagination
   const firstNameQuery = new Parse.Query(Team)
   const lastNameQuery = new Parse.Query(Team)
   firstNameQuery.startsWith('first_name', name.toLowerCase())
@@ -190,14 +189,14 @@ export async function queryByName(name, limit, skip, objects = []) {
   return teams
 }
 
-export async function queryById(id, detail = false, followers = false) {
+export async function queryById(id, detail = false, followers = false, collaborators = false) {
   let objects = []
   if (detail) objects.push("creator")
   
   const team = await new Team.fetchById(id, objects)
   if (!team) return
 
-  return team.format(detail, true, followers)
+  return team.format(detail, true, followers, collaborators)
 }
 
 export async function removeMember(teamId, username) {

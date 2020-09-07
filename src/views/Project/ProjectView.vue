@@ -347,7 +347,7 @@
             </div>
 
             <div
-              class="project-content"
+              class="project-content action-buttons"
               v-if="hasActions"
             >
               <TransferAction
@@ -356,7 +356,17 @@
                 :is-owner="isOwner"
                 :target-id="projectId"
                 @has-transfer="(e) => hasTransfer = e"
+                style="margin-bottom: 0.5rem"
               />
+              <b-button
+                v-if="isOwner"
+                icon-left="mdil-delete"
+                type="is-light"
+                expanded
+                @click="isConfirmDeleteModalActive = true"
+              >
+                Delete Project
+              </b-button>
             </div>
           </div>
         </div>
@@ -369,6 +379,14 @@
         :is-request="isRequest"
         type="project"
         @change="fetchFollowerAndRequestCount(projectId)"
+      />
+
+      <!-- Confirm Delete Modal -->
+      <ConfirmDangerModal
+        :active.sync="isConfirmDeleteModalActive"
+        type="project"
+        action="delete"
+        :on-action="deleteProject"
       />
     </div>
   </div>
@@ -397,6 +415,7 @@ import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
 import TransferAction from '@/components/Action/TransferAction.vue'
+import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -406,7 +425,8 @@ export default {
     Error,
     ManageFollowerModal,
     FollowButtonAction,
-    TransferAction
+    TransferAction,
+    ConfirmDangerModal
   },
   data() {
     return {
@@ -415,6 +435,7 @@ export default {
       },
       hasProject: false,
       isManageFollowerModalActive: false,
+      isConfirmDeleteModalActive: false,
       followStatus: undefined,
       isRequest: false,
       errorMessage: "",
@@ -545,6 +566,10 @@ export default {
       // If start and end date are in different year
       if (startDate.getFullYear() !== endDate.getFullYear())
         return months[startDate.getMonth()] + " " + startDate.getFullYear() + " - " + months[endDate.getMonth()] + " " + endDate.getFullYear()
+    },
+    async deleteProject() {
+      await ProjectManage.deleteProject(this.projectId)
+      this.$router.push({ name: 'Projects' })
     }
   }
 }
