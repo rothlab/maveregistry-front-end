@@ -139,7 +139,7 @@ export const Project = Parse.Object.extend("Project", {
     if (attrs.features && attrs.features.length > 0 && 
       attrs.features.some(val => variables.genomic_features.indexOf(val) === -1)) throw new Error("Some features are invalid")
   },
-  format: async function(detail = false, followers = false) {
+  format: async function(detail = false, followers = false, collaborators = false) {
     // Construct return object
     let ret = {
       id: this.id,
@@ -178,10 +178,6 @@ export const Project = Parse.Object.extend("Project", {
       const team = this.get("team")
       if (team && team.isDataAvailable()) ret.team = await team.format()
 
-      // Format collaborators
-      const collaborators = this.get("collaborators")
-      if (collaborators && collaborators.length > 0) ret.collaborators = await Promise.all(collaborators.map(e => e.format()))
-
       // Format activities
       const activities = await fetchActivityByProject([this])
       if (activities && activities.length > 0) ret.activities = await Promise.all(activities.map(e => e.format()))
@@ -199,6 +195,12 @@ export const Project = Parse.Object.extend("Project", {
     if (followers) {
       // Check if followed by the current user
       ret.follow_status = await getFollowStatus([this.id], "project", Parse.User.current())
+    }
+
+    if (collaborators) {
+      // Format collaborators
+      const collaborators = this.get("collaborators")
+      if (collaborators && collaborators.length > 0) ret.collaborators = await Promise.all(collaborators.map(e => e.format()))
     }
 
     return ret
@@ -333,7 +335,7 @@ export async function fetchProject(id, detail = false, follower = false) {
 
   // Format and return
   if (!project) return
-  return project.format(detail, follower)
+  return project.format(detail, follower, true)
 }
 
 export async function fetchProjectByTeamId(id, objects = []) {
@@ -347,13 +349,15 @@ export async function fetchProjectByTeamId(id, objects = []) {
     query.include(objects[index])
   }
 
-  // Exlude fields
-  query.select(["target.type", "target.name", "target.organism", "features", "recent_activity", "public_activity"])
+  // Include fields
+  let fields = ["target.type", "target.name", "target.organism", "features", "recent_activity", "public_activity"]
+  if (objects.includes("collaborators")) fields.push("collaborators")
+  query.select(fields)
 
   const projects = await query.find()
 
   // Format and return
-  return await Promise.all(projects.map(e => e.format()))
+  return await Promise.all(projects.map(e => e.format(false, false, objects.includes("collaborators"))))
 }
 
 export async function fetchProjectByUserId(id, objects = []) {
