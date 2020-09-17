@@ -250,7 +250,7 @@
                 <div class="columns">
                   <div class="column is-3">
                     <p class="is-size-5">
-                      Seek Funding
+                      Seeking Funding
                     </p>
                   </div>
                   <div class="column is-9 is-flex">

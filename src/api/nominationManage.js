@@ -266,7 +266,7 @@ export async function fetchNominationsByUserId(id) {
   userQuery.equalTo("objectId", id)
   const query = new Parse.Query(Nomination)
   query.matchesQuery("by", userQuery)
-
+  query.include("target")
   const nominations = await query.find()
 
   return await Promise.all(nominations.map(e => e.format()))
