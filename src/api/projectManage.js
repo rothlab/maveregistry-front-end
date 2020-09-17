@@ -439,3 +439,7 @@ export async function deleteProject(id) {
   const project = await new Project.fetchById(id)
   return await project.destroy()
 }
+
+export async function obtainProject(id) {
+  await Parse.Cloud.run("obtainObject", { type: "project", id: id })
+}

@@ -214,6 +214,10 @@ export async function fetchTeamsByUserId(id) {
   return await Promise.all(teams.map(e => e.format()))
 }
 
+export async function obtainTeam(id) {
+  await Parse.Cloud.run("obtainObject", { type: "team", id: id })
+}
+
 export async function deleteTeam(teamId) {
   // Fetch team and delete
   const team = await new Team.fetchById(teamId)

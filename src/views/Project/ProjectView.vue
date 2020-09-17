@@ -359,6 +359,16 @@
                 style="margin-bottom: 0.5rem"
               />
               <b-button
+                v-if="isModerator && !isOwner"
+                icon-left="mdil-trophy"
+                type="is-light"
+                expanded
+                @click="isConfirmObtainOnwershipModalActive = true"
+                style="margin-bottom: 0.5rem"
+              >
+                Obtain Ownership
+              </b-button>
+              <b-button
                 v-if="isOwner"
                 icon-left="mdil-delete"
                 type="is-light"
@@ -380,6 +390,18 @@
         type="project"
         @change="fetchFollowerAndRequestCount(projectId)"
       />
+
+      <!-- Obtain ownership modal -->
+      <ConfirmDangerModal
+        :active.sync="isConfirmObtainOnwershipModalActive"
+        type="project"
+        action="obtain"
+        :on-action="obtainProject"
+      >
+        <p style="margin: 1rem 0">
+          The current owner will not be notified.
+        </p>
+      </ConfirmDangerModal>
 
       <!-- Confirm Delete Modal -->
       <ConfirmDangerModal
@@ -426,7 +448,7 @@ export default {
     ManageFollowerModal,
     FollowButtonAction,
     TransferAction,
-    ConfirmDangerModal
+    ConfirmDangerModal,
   },
   data() {
     return {
@@ -436,6 +458,7 @@ export default {
       hasProject: false,
       isManageFollowerModalActive: false,
       isConfirmDeleteModalActive: false,
+      isConfirmObtainOnwershipModalActive: false,
       followStatus: undefined,
       isRequest: false,
       errorMessage: "",
@@ -466,7 +489,7 @@ export default {
       return this.activities.length > 0
     },
     hasActions() {
-      return !!this.hasTransfer || this.isOwner
+      return !!this.hasTransfer || this.isOwner || this.isModerator
     },
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
@@ -566,6 +589,10 @@ export default {
       // If start and end date are in different year
       if (startDate.getFullYear() !== endDate.getFullYear())
         return months[startDate.getMonth()] + " " + startDate.getFullYear() + " - " + months[endDate.getMonth()] + " " + endDate.getFullYear()
+    },
+    async obtainProject() {
+      await ProjectManage.obtainProject(this.projectId)
+      await this.loadPage()
     },
     async deleteProject() {
       await ProjectManage.deleteProject(this.projectId)
