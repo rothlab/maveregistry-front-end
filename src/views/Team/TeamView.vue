@@ -303,6 +303,16 @@
                 style="margin-bottom: 0.5rem"
               />
               <b-button
+                v-if="isModerator && !isOwner"
+                icon-left="mdil-trophy"
+                type="is-light"
+                expanded
+                @click="isConfirmObtainOnwershipModalActive = true"
+                style="margin-bottom: 0.5rem"
+              >
+                Obtain Ownership
+              </b-button>
+              <b-button
                 v-if="isOwner"
                 icon-left="mdil-delete"
                 type="is-light"
@@ -324,6 +334,18 @@
         type="team"
         @change="fetchFollowerAndRequestCount(teamId)"
       />
+
+      <!-- Obtain ownership modal -->
+      <ConfirmDangerModal
+        :active.sync="isConfirmObtainOnwershipModalActive"
+        type="team"
+        action="obtain"
+        :on-action="obtainTeam"
+      >
+        <p style="margin: 1rem 0">
+          The current owner will not be notified.
+        </p>
+      </ConfirmDangerModal>
 
       <!-- Confirm Delete Modal -->
       <ConfirmDangerModal
@@ -372,7 +394,7 @@ export default {
       return this.projects && this.projects.length > 0
     },
     hasActions() {
-      return !!this.hasTransfer || this.isOwner
+      return !!this.hasTransfer || this.isOwner || this.isModerator
     },
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
@@ -384,6 +406,7 @@ export default {
         page: false
       },
       isManageFollowerModalActive: false,
+      isConfirmObtainOnwershipModalActive: false,
       isConfirmDeleteModalActive: false,
       followStatus: undefined,
       principalInvestigator: {},
@@ -482,6 +505,10 @@ export default {
     },
     hasDeepLink(action) {
       return this.$route.hash === action
+    },
+    async obtainTeam() {
+      await TeamManage.obtainTeam(this.teamId)
+      await this.loadPage()
     },
     async deleteTeam() {
       await TeamManage.deleteTeam(this.teamId)
