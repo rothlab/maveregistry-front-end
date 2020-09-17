@@ -95,7 +95,7 @@
                     <b-icon icon="mdil-email" />
                   </a>
                   <span class="is-capitalized">{{ lead.first_name + " " + lead.last_name }},</span>
-                  {{ lead.position === "Other" ? lead.custom_position : lead.position }}
+                  {{ lead.position === "Other" ? lead.custom_position : lead.position }}<br>
                 </span>
               </p>
 
@@ -283,7 +283,7 @@
               >
                 <b>Funding</b> <br>
                 <b-icon :icon="funding.open_for_funding ? 'mdil-eye' : 'mdil-eye-off'" />
-                {{ funding.open_for_funding ? "Seek" : "Not Seek" }} Funding
+                {{ funding.open_for_funding ? "Seeking" : "Not Seeking" }} Funding
               </p>
               <p
                 class="is-size-5 is-capitalized"

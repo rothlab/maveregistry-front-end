@@ -192,7 +192,7 @@
                     
                     <div class="card-header-icon">
                       <b-tooltip
-                        label="Seek Funding"
+                        label="Seeking Funding"
                         v-if="project.open_for_funding"
                         type="is-warning"
                       >
