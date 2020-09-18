@@ -182,7 +182,7 @@ export const Project = Parse.Object.extend("Project", {
       const activities = await fetchActivityByProject([this])
       if (activities && activities.length > 0) ret.activities = await Promise.all(activities.map(e => e.format()))
     } else {
-      // Add recemt activity
+      // Add recent activity
       const recentActivity = this.get("recent_activity")
       const publicActivity = this.get("public_activity")
       if (recentActivity) {
@@ -431,7 +431,7 @@ export async function updateProject(payload) {
   await project.save()
 
   // Use a cloud function to remove no longer needed activities
-  await Parse.Cloud.run("updateProjectActivities", { ids: savedActivities.map(e => e.id) })
+  await Parse.Cloud.run("updateProjectActivities", { ids: savedActivities.map(e => e.id), project_id: payload.id })
 }
 
 export async function deleteProject(id) {
