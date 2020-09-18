@@ -526,7 +526,7 @@ export default {
         if (project.collaborators)
           this.collaborators = project.collaborators
         if (project.funding) this.funding = project.funding
-        if (project.activities) this.activities = project.activities.sort((a, b) => a.start_date - b.start_date) // Order activities by starting date
+        if (project.activities) this.activities = project.activities.sort((a, b) => b.start_date - a.start_date ) // Order activities by starting date descendingly
       } else {
         this.hasProject = false
       }
