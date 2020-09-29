@@ -29,7 +29,7 @@
               <span class="is-size-6 has-text-primary">Follow requests</span>
               <span class="is-size-7 help">You will be notified for requests to follow your projects or team.</span>
             </div>
-            <div class="column is-narrow">
+            <div class="column is-4">
               <b-select
                 placeholder="Frequency"
                 expanded
@@ -55,7 +55,7 @@
               <span class="is-size-6 has-text-primary">Project updates</span>
               <span class="is-size-7 help">You will be notified for updates of projects you follow.</span>
             </div>
-            <div class="column is-narrow">
+            <div class="column is-4">
               <b-select
                 placeholder="Frequency"
                 expanded
@@ -81,7 +81,7 @@
               <span class="is-size-6 has-text-primary">Team updates</span>
               <span class="is-size-7 help">You will be notified for updates of teams you follow.</span>
             </div>
-            <div class="column is-narrow">
+            <div class="column is-4">
               <b-select
                 placeholder="Frequency"
                 expanded
@@ -104,10 +104,36 @@
           </div>
           <div class="columns is-mobile">
             <div class="column">
+              <span class="is-size-6 has-text-primary">Registry status updates</span>
+              <span class="is-size-7 help">We will send you status updates of the Registry.</span>
+            </div>
+            <div class="column is-4">
+              <b-select
+                placeholder="Frequency"
+                expanded
+                v-model="status_update"
+              >
+                <option value="off">
+                  Off
+                </option>
+                <option value="weekly">
+                  Weekly
+                </option>
+                <option value="monthly">
+                  Monthly
+                </option>
+                <option value="quarterly">
+                  Quarterly
+                </option>
+              </b-select>
+            </div>
+          </div>
+          <div class="columns is-mobile">
+            <div class="column">
               <span class="is-size-6 has-text-primary">Newsletters</span>
               <span class="is-size-7 help">We may send you infrequent newsletters about Mave Registry.</span>
             </div>
-            <div class="column is-narrow">
+            <div class="column is-4">
               <b-select
                 placeholder="Frequency"
                 expanded
@@ -194,6 +220,7 @@ export default {
       follow_request: "",
       project_update: "",
       team_update: "",
+      status_update: "",
       newsletter: ""
     }
   },
@@ -216,6 +243,7 @@ export default {
         this.follow_request = preference.follow_request
         this.project_update = preference.project_update
         this.team_update = preference.team_update
+        this.status_update = preference.status_update
         this.newsletter = preference.newsletter
       }
     },
@@ -228,6 +256,7 @@ export default {
             follow_request: this.follow_request,
             project_update: this.project_update,
             team_update: this.team_update,
+            status_update: this.status_update,
             newsletter: this.newsletter
           })
         } catch (error) {

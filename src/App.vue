@@ -417,7 +417,6 @@ export default {
         ];
       }
       
-
       (function() {
         var d = document;
         var s = d.createElement("script");

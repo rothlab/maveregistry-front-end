@@ -303,6 +303,7 @@ export async function getEmailPreference(id) {
     follow_request: setting.get("email_follow_request"),
     project_update: setting.get("email_project_update"),
     team_update: setting.get("email_team_update"),
+    status_update: setting.get("email_status_update"),
     newsletter: setting.get("email_newsletter")
   }
 }
@@ -317,6 +318,7 @@ export async function setEmailPreference(id, preference) {
   setting.set("email_follow_request", preference.follow_request)
   setting.set("email_project_update", preference.project_update)
   setting.set("email_team_update", preference.team_update)
+  setting.set("email_status_update", preference.status_update)
   setting.set("email_newsletter", preference.newsletter)
   return await setting.save()
 }
