@@ -220,8 +220,8 @@
               >
                 <b-button
                   v-if="props.row.follow_status && props.row.follow_status.id"
-                  icon-left="mdil-bell-off"
-                  :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-danger'"
+                  :icon-left="props.row.follow_status.status === 'pending' ? 'mdil-clock' : 'mdil-bell'"
+                  :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-info'"
                   @click="confirmUnfollow(props.row.follow_status.id)"
                   @change="fetchTeams"
                   class=""
@@ -229,12 +229,12 @@
                 >
                   <b-tooltip
                     v-if="props.row.follow_status.status === 'pending'"
-                    label="Pending Approval"
+                    label="Pending Approval."
                     type="is-dark"
                   >
-                    Unfollow
+                    Pending
                   </b-tooltip>
-                  <span v-else>Unfollow</span>
+                  <span v-else>Following</span>
                 </b-button>
                 <b-button
                   v-else
