@@ -129,6 +129,7 @@
             <b-dropdown
               hoverable
               v-model="filter.organism"
+              position="is-bottom-left"
             >
               <b-button
                 slot="trigger"
@@ -221,7 +222,6 @@
             <b-table-column
               field="projects"
               label="Project Progress"
-              width="30vw"
             >
               <div class="has-text-left">
                 <!-- If not member, show this panel to indicate that nothing is available -->
@@ -382,7 +382,7 @@
                       :class="{ 
                         'has-background-white-bis': !project.follow_status.id, 
                         'has-background-warning': project.follow_status.status === 'pending',
-                        'has-background-danger': project.follow_status.status === 'yes'
+                        'has-background-info': project.follow_status.status === 'yes'
                       }"
                     >
                       <!-- If not followed, show follow icon -->
@@ -394,7 +394,7 @@
                       </div>
                       <!-- If pending, show pending status and unfollow-->
                       <b-tooltip
-                        :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Project'"
+                        :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to cancel request.' : 'Unfollow Project'"
                         type="is-dark"
                         position="is-left"
                         v-else
@@ -407,8 +407,14 @@
                             'has-text-light': project.follow_status.status === 'yes'
                           }"
                         >
-                          <b-icon icon="mdil-bell-off" />
-                          Unfollow
+                          <span v-if="project.follow_status.status === 'pending'">
+                            <b-icon icon="mdil-clock" />
+                            Pending
+                          </span>
+                          <span v-else-if="project.follow_status.status === 'yes'">
+                            <b-icon icon="mdil-bell" />
+                            Following
+                          </span>
                         </a>
                       </b-tooltip>
                     </div>
@@ -421,6 +427,7 @@
             <b-table-column
               field="team"
               label="Team"
+              width="12vw"
             >
               <div
                 v-if="!hasLoggedIn"
@@ -440,7 +447,7 @@
                 v-else
               >
                 <div
-                  class="control"
+                  class="control has-fullwidth"
                   v-for="(team, index) in props.row.teams"
                   :key="index"
                 >
@@ -467,12 +474,12 @@
                       v-if="currentUser && team.creator && team.creator.username !== currentUser.username && team.follow_status.id"
                       size="is-medium"
                       class="is-clickable"
-                      :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-danger': team.follow_status.status === 'yes' }"
+                      :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-info': team.follow_status.status === 'yes' }"
                       @click.native="confirmUnfollow(team.follow_status.id, 'team')"
                     >
                       <b-tooltip
-                        :label="team.follow_status.status === 'pending' ? 'Pending Approval. Click to retract request.' : 'Unfollow Team'"
-                        :type="team.follow_status.status === 'pending' ? 'is-warning' : 'is-danger'"
+                        :label="team.follow_status.status === 'pending' ? 'Pending Approval. Click to cancel request.' : 'Unfollow Team'"
+                        type="is-dark"
                         position="is-left"
                       >
                         <span 
@@ -481,7 +488,7 @@
                             'has-text-light': team.follow_status.status === 'yes'
                           }"
                         >
-                          {{ team.follow_status.status === 'pending' ? "Pending" : "Unfollow" }}
+                          {{ team.follow_status.status === 'pending' ? "Pending" : "Following" }}
                         </span>
                       </b-tooltip>
                     </b-tag>
@@ -494,7 +501,7 @@
                     >
                       <b-tooltip
                         label="Follow Team"
-                        type="is-white"
+                        type="is-dark"
                         position="is-left"
                       >
                         <span class="has-text-info">Follow</span>
@@ -756,6 +763,7 @@ export default {
   height: 3.25rem
   .tags
     border-radius: 4px
+    flex-wrap: nowrap
     .tag
       margin: 0
       height: 2.5rem
@@ -763,9 +771,13 @@ export default {
       &:first-child
         border-top-right-radius: 0
         border-bottom-right-radius: 0
+        flex-grow: 1
+        justify-content: flex-start
       &:only-child
         border-top-right-radius: 4px
         border-bottom-right-radius: 4px
+        flex-grow: 1
+        justify-content: flex-start
 .card-header-icon
   .b-tooltip
     &:not(:last-child), &:only-child

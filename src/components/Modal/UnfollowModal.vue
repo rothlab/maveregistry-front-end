@@ -29,7 +29,7 @@
             <div class="media-left">
               <AlertCircleIcon
                 decorative
-                class="has-text-warning icon-48px"
+                class="has-text-danger icon-48px"
               />
             </div>
             <div class="media-content">
@@ -51,7 +51,7 @@
           </b-button>
           <b-button
             :loading="isLoading"
-            type="is-warning"
+            type="is-danger"
             @click="unfollow"
           >
             Unfollow

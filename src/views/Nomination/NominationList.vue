@@ -112,6 +112,7 @@
             <b-dropdown
               hoverable
               v-model="filter.organism"
+              position="is-bottom-left"
             >
               <b-button
                 slot="trigger"
