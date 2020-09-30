@@ -351,6 +351,19 @@
                         />
                       </b-tooltip>
 
+                      <!-- Follow -->
+                      <b-tooltip
+                        label="Following"
+                        v-if="project.follow_status && project.follow_status.status === 'yes'"
+                        type="is-info"
+                        position="is-left"
+                      >
+                        <b-icon
+                          icon="mdil-bell"
+                          class="circle-icon has-background-info has-text-light"
+                        />
+                      </b-tooltip>
+
                       <!-- Expand -->
                       <b-icon
                         :icon="innerProps.open ? 'mdil-chevron-up' : 'mdil-chevron-down'"
