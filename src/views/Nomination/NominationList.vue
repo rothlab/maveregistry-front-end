@@ -79,6 +79,7 @@
             <b-dropdown
               hoverable
               v-model="filter.type"
+              @input="fetchNominations()"
             >
               <b-button
                 slot="trigger"
@@ -113,6 +114,7 @@
               hoverable
               v-model="filter.organism"
               position="is-bottom-left"
+              @input="fetchNominations()"
             >
               <b-button
                 slot="trigger"
@@ -153,13 +155,40 @@
               ID: {{ queryId }}
             </b-tag>
 
+            <!-- Filter by creation date -->
+            <b-field style="margin-left: 0.5em; margin-bottom: 0">
+              <b-datepicker
+                v-model="filter.created_after"
+                placeholder="Created Since a Date"
+                icon="mdil-calendar"
+                icon-prev="mdil-chevron-left"
+                icon-next="mdil-chevron-right"
+                :class="{ 'highlight-filter': filter.created_after }"
+                @input="fetchNominations()"
+              >
+                <b-button
+                  type="is-info"
+                  outlined
+                  @click="filter.created_after = undefined; fetchNominations()"
+                  expanded
+                  v-if="filter.created_after"
+                >
+                  Clear Filter
+                </b-button>
+              </b-datepicker>
+            </b-field>
+
             <!-- Filter by name -->
             <b-field style="margin-left: 0.5em">
               <b-input
                 v-model="filter.name"
                 placeholder="Search Name"
-                type="search"
                 icon="mdil-magnify"
+                :icon-right="filter.name ? 'mdil-delete': ''"
+                icon-right-clickable
+                @icon-right-click="filter.name = ''; fetchNominations()"
+                :class="{ 'highlight-filter': filter.name }"
+                @input="debouncedFetchNominations()"
               />
             </b-field>
           </template>
@@ -411,6 +440,7 @@ import Error from '@/components/Error.vue'
 import TipAction from '@/components/Action/TipAction.vue'
 import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
 import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
+import debounce from 'lodash/debounce'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -424,12 +454,6 @@ export default {
     ConfirmDangerModal
   },
   watch: {
-    filter: {
-      deep: true,
-      async handler() {
-        await this.fetchNominations()
-      }
-    },
     async currentUser() {
       if (this.hasInitLoad) await this.fetchNominations()
     },
@@ -459,7 +483,8 @@ export default {
       filter: {
         type: "",
         organism: "",
-        name: ""
+        name: "",
+        created_after: undefined
       },
       types: variables.target_types,
       organisms: variables.target_organisms,
@@ -477,6 +502,18 @@ export default {
     }
   },
   async mounted() {
+    // If filter queries are supplied, process them
+    if (this.$route.query) {
+      if (this.$route.query.type) this.filter.type = this.$route.query.type
+      if (this.$route.query.name) this.filter.name = this.$route.query.name
+      if (this.$route.query.organism) this.filter.organism = this.$route.query.organism
+      if (this.$route.query.created_after) {
+        const convertedDate = new Date(this.$route.query.created_after)
+        if (Object.prototype.toString.call(convertedDate) === '[object Date]' && isFinite(convertedDate)) {
+          this.filter.created_after = convertedDate
+        }
+      }
+    }
     await this.fetchNominations()
     this.hasInitLoad = true
   },
@@ -516,6 +553,9 @@ export default {
         this.isLoading.page = false
       }
     },
+    debouncedFetchNominations: debounce(async function() {
+      return await this.fetchNominations()
+    }, 500),
     handleNewTargetModal(prefilled = undefined) {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {

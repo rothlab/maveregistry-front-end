@@ -96,6 +96,7 @@
             <b-dropdown
               hoverable
               v-model="filter.type"
+              @input="fetchTargets()"
             >
               <b-button
                 slot="trigger"
@@ -130,6 +131,7 @@
               hoverable
               v-model="filter.organism"
               position="is-bottom-left"
+              @input="fetchTargets()"
             >
               <b-button
                 slot="trigger"
@@ -159,13 +161,40 @@
               </b-dropdown-item>
             </b-dropdown>
 
+            <!-- Filter by creation date -->
+            <b-field style="margin-left: 0.5em; margin-bottom: 0">
+              <b-datepicker
+                v-model="filter.created_after"
+                placeholder="Created Since a Date"
+                icon="mdil-calendar"
+                icon-prev="mdil-chevron-left"
+                icon-next="mdil-chevron-right"
+                :class="{ 'highlight-filter': filter.created_after }"
+                @input="fetchTargets()"
+              >
+                <b-button
+                  type="is-info"
+                  outlined
+                  @click="filter.created_after = undefined; fetchTargets()"
+                  expanded
+                  v-if="filter.created_after"
+                >
+                  Clear Filter
+                </b-button>
+              </b-datepicker>
+            </b-field>
+
             <!-- Filter by name -->
             <b-field style="margin-left: 0.5em">
               <b-input
                 v-model="filter.name"
                 placeholder="Search Name"
-                type="search"
                 icon="mdil-magnify"
+                :icon-right="filter.name ? 'mdil-delete': ''"
+                icon-right-clickable
+                @icon-right-click="filter.name = ''; fetchTargets()"
+                :class="{ 'highlight-filter': filter.name }"
+                @input="debouncedFetchTargets()"
               />
             </b-field>
           </template>
@@ -319,6 +348,19 @@
                         <b-icon
                           icon="mdil-account"
                           class="circle-icon has-background-success has-text-light"
+                        />
+                      </b-tooltip>
+
+                      <!-- Follow -->
+                      <b-tooltip
+                        label="Following"
+                        v-if="project.follow_status && project.follow_status.status === 'yes'"
+                        type="is-info"
+                        position="is-left"
+                      >
+                        <b-icon
+                          icon="mdil-bell"
+                          class="circle-icon has-background-info has-text-light"
                         />
                       </b-tooltip>
 
@@ -613,6 +655,7 @@ import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import ShowMoreField from '@/components/Field/ShowMoreField.vue'
 import TipAction from '@/components/Action/TipAction.vue'
 import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
+import debounce from 'lodash/debounce'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -628,12 +671,6 @@ export default {
     FilterOutline
   },
   watch: {
-    filter: {
-      deep: true,
-      async handler() {
-        await this.fetchTargets()
-      }
-    },
     async currentUser() {
       if (this.hasInitLoad) await this.fetchTargets()
     }
@@ -653,7 +690,8 @@ export default {
       filter: {
         type: "",
         organism: "",
-        name: ""
+        name: "",
+        created_after: undefined
       },
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
@@ -682,6 +720,12 @@ export default {
       if (this.$route.query.type) this.filter.type = this.$route.query.type
       if (this.$route.query.name) this.filter.name = this.$route.query.name
       if (this.$route.query.organism) this.filter.organism = this.$route.query.organism
+      if (this.$route.query.created_after) {
+        const convertedDate = new Date(this.$route.query.created_after)
+        if (Object.prototype.toString.call(convertedDate) === '[object Date]' && isFinite(convertedDate)) {
+          this.filter.created_after = convertedDate
+        }
+      }
     }
 
     await this.fetchTargets()
@@ -720,6 +764,9 @@ export default {
         this.isLoading.fetch_targets = false
       }
     },
+    debouncedFetchTargets: debounce(async function() {
+      return await this.fetchTargets()
+    }, 500),
     handleNewTargetModal(prefill = undefined) {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {

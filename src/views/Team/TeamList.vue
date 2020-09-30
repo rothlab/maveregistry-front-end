@@ -66,14 +66,40 @@
         >
           <!-- Filter -->
           <template slot="top-left">
+            <!-- Filter by creation date -->
+            <b-field style="margin-bottom: 0">
+              <b-datepicker
+                v-model="filter.created_after"
+                placeholder="Created Since a Date"
+                icon="mdil-calendar"
+                icon-prev="mdil-chevron-left"
+                icon-next="mdil-chevron-right"
+                :class="{ 'highlight-filter': filter.created_after }"
+                @input="fetchTeams()"
+              >
+                <b-button
+                  type="is-info"
+                  outlined
+                  @click="filter.created_after = undefined; fetchTeams()"
+                  expanded
+                  v-if="filter.created_after"
+                >
+                  Clear Filter
+                </b-button>
+              </b-datepicker>
+            </b-field>
+
             <!-- Filter by PI -->
-            <b-field>
+            <b-field style="margin-left: 0.5em; margin-bottom: 0">
               <b-input
                 v-model="filter.pi"
                 placeholder="Search Investigator"
-                type="search"
                 icon="mdil-magnify"
-                @input="(query) => filterTeams(query, 'investigator')"
+                :icon-right="filter.pi ? 'mdil-delete': ''"
+                icon-right-clickable
+                @icon-right-click="filter.pi = ''; fetchTeams()"
+                :class="{ 'highlight-filter': filter.pi }"
+                @input="debouncedFetchTeams()"
               />
             </b-field>
           </template>
@@ -223,8 +249,7 @@
                   :icon-left="props.row.follow_status.status === 'pending' ? 'mdil-clock' : 'mdil-bell'"
                   :type="props.row.follow_status.status === 'pending' ? 'is-warning' : 'is-info'"
                   @click="confirmUnfollow(props.row.follow_status.id)"
-                  @change="fetchTeams"
-                  class=""
+                  @change="fetchTeams()"
                   expanded
                 >
                   <b-tooltip
@@ -241,7 +266,7 @@
                   icon-left="mdil-bell"
                   type="is-light"
                   @click="confirmFollow(props.row.id, props.row.creator)"
-                  @change="fetchTeams"
+                  @change="fetchTeams()"
                   expanded
                 >
                   Follow
@@ -256,7 +281,7 @@
     <!-- New Team Modal -->
     <NewTeamModal
       :active.sync="isNewTeamModalActive"
-      @change="fetchTeams"
+      @change="fetchTeams()"
     />
 
     <!-- Follow Team Modal -->
@@ -283,8 +308,9 @@ import * as TeamManage from "@/api/teamManage.js"
 import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
-import { handleError, displayErrorToast } from "@/api/errorHandler.js"
+import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
+import debounce from 'lodash/debounce'
 
 export default {
   title: "Teams",
@@ -322,6 +348,7 @@ export default {
       },
       filter: {
         pi: "",
+        created_after: undefined
       },
       errorMessage: "",
       hasInitLoad: false
@@ -333,6 +360,17 @@ export default {
     }
   },
   async mounted() {
+    // If filter queries are supplied, process them
+    if (this.$route.query) {
+      if (this.$route.query.pi) this.filter.pi = this.$route.query.pi
+      if (this.$route.query.created_after) {
+        const convertedDate = new Date(this.$route.query.created_after)
+        if (Object.prototype.toString.call(convertedDate) === '[object Date]' && isFinite(convertedDate)) {
+          this.filter.created_after = convertedDate
+        }
+      }
+    }
+
     await this.fetchTeams()
     this.hasInitLoad = true
   },
@@ -367,7 +405,7 @@ export default {
       
       // Update targets
       try {
-        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, ["project", "follow", "creator"])
+        const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, this.filter, ["project", "follow", "creator"])
         this.teams = teams.results
 
         // Update pagination
@@ -379,6 +417,9 @@ export default {
         this.isLoading.fetch_team = false
       }
     },
+    debouncedFetchTeams: debounce(async function() {
+      return await this.fetchTeams()
+    }, 500),
     addTeam() {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {
@@ -387,34 +428,6 @@ export default {
       }
 
       this.isNewTeamModalActive = true
-    },
-    async filterTeams(query, type) {
-      if (query === "") {
-        this.fetchTeams()
-        return
-      }
-
-      // Loading
-      this.isLoading.fetch_team = true
-
-      try {
-        let teams
-        switch (type) {
-          case "investigator":
-            teams = await TeamManage.queryByName(query, this.pagination.limit, 0, ["project", "follow"])
-            break
-          case "affiliation":
-            // teams = await TeamManage.queryByAffiliation(query, this.pagination.limit, 0, ["project", "follow"])
-            break
-        }
-
-        this.teams = teams.results
-        this.pagination.count = teams.count
-      } catch (error) {
-        await displayErrorToast(error)
-      } finally {
-        this.isLoading.fetch_team = false
-      }
     },
     trimKeyword(string, keyword) {
       if (keyword.length <= 0 || !string.startsWith(keyword)) return this.capitalize(string)

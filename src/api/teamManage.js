@@ -144,11 +144,22 @@ export async function updateTeam(id, payload) {
   
   return await team.save()
 }
-export async function fetchTeams(limit, skip, objects = []) {
+export async function fetchTeams(limit, skip, filter = undefined, objects = []) {
   Parse.User._clearCache()
 
-  // Fetch teams
-  const query = new Parse.Query(Team)
+  let query;
+  query = new Parse.Query(Team)
+  if (filter && filter.pi) {
+    const firstNameQuery = new Parse.Query(Team)
+    const lastNameQuery = new Parse.Query(Team)
+    firstNameQuery.startsWith('first_name', filter.pi.toLowerCase())
+    lastNameQuery.startsWith('last_name', filter.pi.toLowerCase())
+  
+    // Execute OR query
+    query = Parse.Query.or(firstNameQuery, lastNameQuery)
+  }
+  if (filter && filter.created_after) query.greaterThanOrEqualTo("createdAt", filter.created_after)
+  
   // Apply pagination
   if (objects.includes("creator")) {
     query.include("creator")
@@ -166,26 +177,6 @@ export async function fetchTeams(limit, skip, objects = []) {
     e.format(false, objects.includes("project"), objects.includes("follow")))) // Format targets
   
   // Format and return
-  return teams
-}
-
-export async function queryByName(name, limit, skip, objects = []) {
-  const firstNameQuery = new Parse.Query(Team)
-  const lastNameQuery = new Parse.Query(Team)
-  firstNameQuery.startsWith('first_name', name.toLowerCase())
-  lastNameQuery.startsWith('last_name', name.toLowerCase())
-
-  // Execute OR query
-  const query = Parse.Query.or(firstNameQuery, lastNameQuery)
-
-  // Apply pagination
-  query.include("creator")
-  query.limit(limit)
-  query.skip(skip)
-  query.withCount() // include total amount of targets in the DB
-  let teams = await query.find()
-  teams.results = await Promise.all(teams.results.map(e => e.format(false, objects.includes("project"), objects.includes("follow"))))
-
   return teams
 }
 

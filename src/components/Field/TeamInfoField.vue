@@ -196,13 +196,8 @@ export default {
       // Fetch some teams to populate the dropdown menu
       let teams
       try {
-        if (query.length <= 0) {
-          teams = await TeamManage.fetchTeams(this.pagination.limit, this.pagination.skip)
-        } else {
-          // Otherwise, search team with matching names
-          teams = await TeamManage.queryByName(query, this.pagination.limit, this.pagination.skip)
-          this.pagination.skip = 0
-        }
+        const filter = query.length <= 0 ? undefined : { pi: query }
+        teams = await TeamManage.fetchTeams(this.pagination.limit, this.pagination.skip, filter)
       } catch (error) {
         this.errorMessage = await handleError(error)
         throw error
