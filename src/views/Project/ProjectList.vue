@@ -96,6 +96,7 @@
             <b-dropdown
               hoverable
               v-model="filter.type"
+              @input="fetchTargets()"
             >
               <b-button
                 slot="trigger"
@@ -130,6 +131,7 @@
               hoverable
               v-model="filter.organism"
               position="is-bottom-left"
+              @input="fetchTargets()"
             >
               <b-button
                 slot="trigger"
@@ -169,11 +171,12 @@
                 icon-next="mdil-chevron-right"
                 class="date-filter"
                 :class="{ 'highlight-filter': filter.created_after }"
+                @input="fetchTargets()"
               >
                 <b-button
                   type="is-info"
                   outlined
-                  @click="filter.created_after = undefined"
+                  @click="filter.created_after = undefined; fetchTargets()"
                   expanded
                   v-if="filter.created_after"
                 >
@@ -190,8 +193,9 @@
                 icon="mdil-magnify"
                 :icon-right="filter.name ? 'mdil-delete': ''"
                 icon-right-clickable
-                @icon-right-click="filter.name = ''"
+                @icon-right-click="filter.name = ''; fetchTargets()"
                 :class="{ 'highlight-filter': filter.name }"
+                @input="debouncedFetchTargets()"
               />
             </b-field>
           </template>
@@ -639,6 +643,7 @@ import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import ShowMoreField from '@/components/Field/ShowMoreField.vue'
 import TipAction from '@/components/Action/TipAction.vue'
 import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
+import debounce from 'lodash/debounce'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -654,12 +659,12 @@ export default {
     FilterOutline
   },
   watch: {
-    filter: {
-      deep: true,
-      async handler() {
-        await this.fetchTargets()
-      }
-    },
+    // filter: {
+    //   deep: true,
+    //   async handler() {
+    //     await this.fetchTargets()
+    //   }
+    // },
     async currentUser() {
       if (this.hasInitLoad) await this.fetchTargets()
     }
@@ -753,6 +758,9 @@ export default {
         this.isLoading.fetch_targets = false
       }
     },
+    debouncedFetchTargets: debounce(async function() {
+      return await this.fetchTargets()
+    }, 500),
     handleNewTargetModal(prefill = undefined) {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {
