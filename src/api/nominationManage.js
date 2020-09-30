@@ -82,9 +82,9 @@ export const Nomination = Parse.Object.extend("Nomination", {
       query.include(objects[index])
     }
 
-    const res = await query.find()
+    const res = await query.first()
 
-    return res[0]
+    return res
   }
 })
 Parse.Object.registerSubclass('Nomination', Nomination);
@@ -95,11 +95,12 @@ export async function fetchNominations(limit = 10, skip = 0, filter) {
   const query = new Parse.Query(Nomination)
 
   // Apply filter when available
-  if (filter.type + filter.organism + filter.name !== "") {
+  if (filter) {
     const targetQuery = new Parse.Query(Target)
     if (filter.type !== '') targetQuery.equalTo("type", filter.type)
     if (filter.organism !== '') targetQuery.equalTo("organism", filter.organism)
     if (filter.name !== '') targetQuery.startsWith("name", filter.name.toLowerCase())
+    if (filter.created_after) query.greaterThanOrEqualTo("createdAt", filter.created_after)
     query.matchesQuery("target", targetQuery)
   }
 
@@ -274,6 +275,8 @@ export async function fetchNominationsByUserId(id) {
 
 export async function queryById(id) {
   const nomination = await new Nomination.fetchById(id, ["target"])
+
+  if (!nomination) throw new Error("Invalid ID")
 
   return nomination.format()
 }
