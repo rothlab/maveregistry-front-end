@@ -301,6 +301,8 @@ export async function fetchTargets(limit, skip, filter) {
   if (filter.type !== '') query.equalTo("type", filter.type)
   if (filter.organism !== '') query.equalTo("organism", filter.organism)
   if (filter.name !== '') query.startsWith("name", filter.name.toLowerCase())
+  if (filter.created_after) query.greaterThanOrEqualTo("updatedAt", filter.created_after) // Using update date because we want to include all targets
+
   query.exists("projects") // include only targets with projects associated
   query.include(["projects.team", "projects.team.creator", "projects.creator"]) // Include projects and team objects on the return
   query.include(["projects.recent_activity", "projects.public_activity"]) // Include projects and team objects on the return
@@ -322,7 +324,19 @@ export async function fetchTargets(limit, skip, filter) {
   query.withCount() // include total amount of targets in the DB
 
   let targets = await query.find()
-  targets.results = await Promise.all(targets.results.map(e => e.format())) // Format targets
+
+  // Filter projects if a created after filter is set
+  if (filter.created_after) {
+    targets.results = targets.results.filter((target) => {
+      let projects = target.get("projects")
+      projects = projects.filter(e => e.get("createdAt") >= filter.created_after)
+      target.set("projects", projects)
+      return target
+    })
+  }
+
+  // Format targets
+  targets.results = await Promise.all(targets.results.map(e => e.format()))
   targets.results = targets.results.filter(Boolean)
   
   // Format and return

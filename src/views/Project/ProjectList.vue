@@ -159,13 +159,39 @@
               </b-dropdown-item>
             </b-dropdown>
 
+            <!-- Filter by creation date -->
+            <b-field style="margin-left: 0.5em; margin-bottom: 0">
+              <b-datepicker
+                v-model="filter.created_after"
+                placeholder="Created Since a Date"
+                icon="mdil-calendar"
+                icon-prev="mdil-chevron-left"
+                icon-next="mdil-chevron-right"
+                class="date-filter"
+                :class="{ 'highlight-filter': filter.created_after }"
+              >
+                <b-button
+                  type="is-info"
+                  outlined
+                  @click="filter.created_after = undefined"
+                  expanded
+                  v-if="filter.created_after"
+                >
+                  Clear Filter
+                </b-button>
+              </b-datepicker>
+            </b-field>
+
             <!-- Filter by name -->
             <b-field style="margin-left: 0.5em">
               <b-input
                 v-model="filter.name"
                 placeholder="Search Name"
-                type="search"
                 icon="mdil-magnify"
+                :icon-right="filter.name ? 'mdil-delete': ''"
+                icon-right-clickable
+                @icon-right-click="filter.name = ''"
+                :class="{ 'highlight-filter': filter.name }"
               />
             </b-field>
           </template>
@@ -653,7 +679,8 @@ export default {
       filter: {
         type: "",
         organism: "",
-        name: ""
+        name: "",
+        created_after: undefined
       },
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
@@ -682,6 +709,12 @@ export default {
       if (this.$route.query.type) this.filter.type = this.$route.query.type
       if (this.$route.query.name) this.filter.name = this.$route.query.name
       if (this.$route.query.organism) this.filter.organism = this.$route.query.organism
+      if (this.$route.query.created_after) {
+        const convertedDate = new Date(this.$route.query.created_after)
+        if (Object.prototype.toString.call(convertedDate) === '[object Date]' && isFinite(convertedDate)) {
+          this.filter.created_after = convertedDate
+        }
+      }
     }
 
     await this.fetchTargets()
@@ -782,4 +815,23 @@ export default {
   .b-tooltip
     &:not(:last-child), &:only-child
       margin-right: 0.25rem
+</style>
+
+<style lang="sass">
+@import "@/assets/style/variables.sass"
+
+.date-filter
+  .datepicker-cell
+    &.is-selected
+      background-color: $info !important
+    &.is-today
+      border-color: $info !important
+.highlight-filter
+  input
+    background-color: $info
+    border-color: $white !important
+    color: $white
+  .icon
+    &.is-left, &.is-right
+      color: $white !important
 </style>
