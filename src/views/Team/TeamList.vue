@@ -74,7 +74,6 @@
                 icon="mdil-calendar"
                 icon-prev="mdil-chevron-left"
                 icon-next="mdil-chevron-right"
-                class="date-filter"
                 :class="{ 'highlight-filter': filter.created_after }"
                 @input="fetchTeams()"
               >

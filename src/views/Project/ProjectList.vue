@@ -169,7 +169,6 @@
                 icon="mdil-calendar"
                 icon-prev="mdil-chevron-left"
                 icon-next="mdil-chevron-right"
-                class="date-filter"
                 :class="{ 'highlight-filter': filter.created_after }"
                 @input="fetchTargets()"
               >
@@ -659,12 +658,6 @@ export default {
     FilterOutline
   },
   watch: {
-    // filter: {
-    //   deep: true,
-    //   async handler() {
-    //     await this.fetchTargets()
-    //   }
-    // },
     async currentUser() {
       if (this.hasInitLoad) await this.fetchTargets()
     }
@@ -823,15 +816,4 @@ export default {
   .b-tooltip
     &:not(:last-child), &:only-child
       margin-right: 0.25rem
-</style>
-
-<style lang="sass">
-@import "@/assets/style/variables.sass"
-
-.date-filter
-  .datepicker-cell
-    &.is-selected
-      background-color: $info !important
-    &.is-today
-      border-color: $info !important
 </style>
