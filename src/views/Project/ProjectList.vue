@@ -834,12 +834,4 @@ export default {
       background-color: $info !important
     &.is-today
       border-color: $info !important
-.highlight-filter
-  input
-    background-color: $info
-    border-color: $white !important
-    color: $white
-  .icon
-    &.is-left, &.is-right
-      color: $white !important
 </style>
