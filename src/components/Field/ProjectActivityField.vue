@@ -49,7 +49,7 @@
     <!-- Start and end date -->
     <b-field
       grouped
-      class="field-margin is-space-between"
+      class="field-margin field-space-between"
     >
       <ValidationProvider
         rules="required"
@@ -96,6 +96,7 @@
             icon-prev="mdil-chevron-left"
             icon-next="mdil-chevron-right"
             @input="updateVal"
+            class="has-fullwidth"
           >
             <b-button
               icon-left="mdil-cancel"
@@ -108,6 +109,7 @@
 
           <div
             v-if="isOngoing"
+            class="has-fullwidth"
           >
             <b-button
               @click="isOngoing = false; updateVal()"

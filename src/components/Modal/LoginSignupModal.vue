@@ -130,7 +130,7 @@
               <!-- Need to add class here because validation provider screws it up -->
               <b-field
                 grouped
-                class="field-margin is-space-between"
+                class="field-margin field-space-between"
               >
                 <ValidationProvider
                   rules="required"
@@ -535,6 +535,7 @@ button
     border: unset
     box-shadow: 0 1px 1px 0 rgba(0,0,0,.25)
     border-radius: 2px
+    height: 34px
     &:active
       background-color: #eeeeee
     &:focus

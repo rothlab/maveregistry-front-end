@@ -53,7 +53,7 @@
               <div class="project-content">
                 <b-field
                   grouped
-                  class="field-margin is-space-between"
+                  class="field-margin field-space-between"
                 >
                   <ValidationProvider
                     rules="required"
