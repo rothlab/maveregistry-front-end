@@ -68,6 +68,48 @@
           <!-- These filters will be on the same line -->
           <template slot="top-left">
             <div class="filter-same-line">
+              <!-- Filter by conditions -->
+              <b-dropdown
+                :triggers="['hover', 'click']"
+                v-model="filter.conditions"
+                multiple
+                :mobile-modal="false"
+                position="is-bottom-right"
+                @input="fetchTeams()"
+                class="filter-item"
+              >
+                <b-button
+                  slot="trigger"
+                  slot-scope="{ active }"
+                  :type="filter.conditions.length > 0 ? 'is-info' : 'is-light'"
+                >
+                  <FilterOutline
+                    class="filter-icon icon-18px"
+                  />
+                  <span style="margin-left: 0.25rem">Condition</span>
+                  <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+                </b-button>
+
+                <b-dropdown-item
+                  v-if="filter.conditions.length > 0"
+                  value="clear"
+                  class="has-text-info"
+                >
+                  Clear Filter
+                </b-dropdown-item>
+                <b-dropdown-item
+                  v-for="(key, id) in Object.keys(conditions)"
+                  :key="id"
+                  :value="key"
+                >
+                  <b-icon
+                    :class="`circle-icon ${conditions[key].icon_class}`"
+                    :icon="conditions[key].icon"
+                  />
+                  {{ conditions[key].name }}
+                </b-dropdown-item>
+              </b-dropdown>
+
               <!-- Filter by creation date -->
               <b-datepicker
                 v-model="filter.created_after"
@@ -164,6 +206,16 @@
                   >
                     {{ props.row.first_name }} {{ props.row.last_name }}
                   </router-link>
+                  <b-tooltip
+                    label="Team Owner"
+                    type="is-success"
+                  >
+                    <b-icon
+                      v-if="props.row.creator.username === currentUser.username"
+                      icon="mdil-account"
+                      class="circle-icon has-background-success has-text-light"
+                    />
+                  </b-tooltip>
                 </p>
               </div>
 
@@ -264,7 +316,6 @@
             label="Action"
             width="5vw"
             v-slot="props"
-            v-if="currentUser && teams.some(e => e.creator && e.creator.username !== currentUser.username )"
           >
             <div
               class="action-button is-flex"
@@ -373,9 +424,17 @@ export default {
         creator: {},
         type: "team"
       },
+      conditions: {
+        "creator": { 
+          name: "Teams you created", 
+          icon: "mdil-account",
+          icon_class: "has-background-success has-text-light"
+        }
+      },
       filter: {
         pi: "",
-        created_after: undefined
+        created_after: undefined,
+        conditions: []
       },
       errorMessage: "",
       hasInitLoad: false
@@ -430,6 +489,10 @@ export default {
       // Calculate skip
       const skip = (this.pagination.current - 1) * this.pagination.limit
       
+      // Reset filter if clear is set
+      if (this.filter.conditions.length > 0 && this.filter.conditions.includes("clear"))
+        this.filter.conditions = []
+
       // Update targets
       try {
         const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, this.filter, ["project", "follow", "creator"])
