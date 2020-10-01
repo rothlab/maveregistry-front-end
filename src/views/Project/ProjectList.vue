@@ -223,8 +223,8 @@
               >
                 <template v-slot:trigger>
                   <b-tooltip
-                    label="Created on or after this date"
-                    type="is-info"
+                    label="Project created on or after this date"
+                    type="is-dark"
                   >
                     <b-button
                       :type="filter.created_after ? 'is-info' : 'is-light'"

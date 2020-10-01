@@ -176,8 +176,8 @@
               >
                 <template v-slot:trigger>
                   <b-tooltip
-                    label="Created on or after this date"
-                    type="is-info"
+                    label="Target nominated on or after this date"
+                    type="is-dark"
                   >
                     <b-button
                       :type="filter.created_after ? 'is-info' : 'is-light'"
