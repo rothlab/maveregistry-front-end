@@ -413,7 +413,7 @@
                     <!-- Owner -->
                     <b-tooltip
                       label="Project you created"
-                      v-if="currentUser && project.creator.username === currentUser.username"
+                      v-if="hasLoggedIn && project.creator.username === currentUser.username"
                       type="is-success"
                     >
                       <b-icon
@@ -508,7 +508,6 @@
                     <b-tooltip
                       :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to cancel request.' : 'Unfollow Project'"
                       type="is-dark"
-                      position="is-left"
                       v-else
                     >
                       <a
@@ -597,7 +596,6 @@
                 <b-tooltip
                   label="Add new project"
                   type="is-dark"
-                  position="is-left"
                 >
                   <b-button
                     icon-right="mdil-plus"
@@ -612,7 +610,6 @@
                   v-if="props.row.type == 'Gene' && props.row.organism == 'H. sapiens'"
                   label="Expore at MaveQuest"
                   type="is-info"
-                  position="is-left"
                 >
                   <b-button
                     tag="a"
@@ -629,7 +626,6 @@
                   v-else
                   label="Look up"
                   type="is-info"
-                  position="is-left"
                 >
                   <b-button
                     tag="a"

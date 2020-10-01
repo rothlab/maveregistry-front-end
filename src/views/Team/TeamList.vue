@@ -210,7 +210,7 @@
                   <b-tooltip
                     label="Team you created"
                     type="is-success"
-                    v-if="props.row.creator.username === currentUser.username"
+                    v-if="hasLoggedIn && props.row.creator.username === currentUser.username"
                   >
                     <b-icon
                       icon="mdil-account"
@@ -320,7 +320,7 @@
           >
             <div
               class="action-button is-flex"
-              v-if="props.row.creator.username !== currentUser.username"
+              v-if="hasLoggedIn && props.row.creator.username !== currentUser.username"
             >
               <b-button
                 v-if="props.row.follow_status && props.row.follow_status.id"

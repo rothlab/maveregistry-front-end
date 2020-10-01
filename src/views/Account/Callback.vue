@@ -15,7 +15,6 @@
             Please provide your email address
             <b-tooltip
               multilined
-              position="is-left"
               type="is-dark"
               label="Unable to retrieve email address due to your ORCID privacy setting"
             >

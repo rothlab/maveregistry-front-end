@@ -90,7 +90,6 @@
                 <!-- View Profile -->
                 <b-tooltip
                   label="View Profile"
-                  position="is-left"
                   type="is-dark"
                 >
                   <router-link
@@ -104,7 +103,6 @@
                 <!-- Approve -->
                 <b-tooltip
                   label="Approve"
-                  position="is-left"
                   type="is-dark"
                   v-if="isRequest"
                 >
@@ -117,7 +115,6 @@
                 <!-- Remove -->
                 <b-tooltip
                   label="Remove"
-                  position="is-left"
                   type="is-dark"
                 >
                   <a @click="removeFollower(follower.id)"><b-icon
