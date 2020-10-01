@@ -161,6 +161,47 @@
               >
                 ID: {{ queryId }}
               </b-tag>
+              <!-- Filter by conditions -->
+              <b-dropdown
+                :triggers="['hover', 'click']"
+                v-model="filter.conditions"
+                multiple
+                :mobile-modal="false"
+                position="is-bottom-right"
+                @input="fetchNominations()"
+                class="filter-item"
+              >
+                <b-button
+                  slot="trigger"
+                  slot-scope="{ active }"
+                  :type="filter.conditions.length > 0 ? 'is-info' : 'is-light'"
+                >
+                  <FilterOutline
+                    class="filter-icon icon-18px"
+                  />
+                  <span style="margin-left: 0.25rem">Condition</span>
+                  <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+                </b-button>
+
+                <b-dropdown-item
+                  v-if="filter.conditions.length > 0"
+                  value="clear"
+                  class="has-text-info"
+                >
+                  Clear Filter
+                </b-dropdown-item>
+                <b-dropdown-item
+                  v-for="(key, id) in Object.keys(conditions)"
+                  :key="id"
+                  :value="key"
+                >
+                  <b-icon
+                    :class="`circle-icon ${conditions[key].icon_class}`"
+                    :icon="conditions[key].icon"
+                  />
+                  {{ conditions[key].name }}
+                </b-dropdown-item>
+              </b-dropdown>
 
               <!-- Filter by creation date -->
               <b-datepicker
@@ -302,6 +343,17 @@
                   class="team-icon"
                 />
                 {{ props.row.by.first_name }} {{ props.row.by.last_name }}
+                <b-tooltip
+                  label="Your nomination"
+                  type="is-success"
+                  v-if="props.row.by.username === currentUser.username"
+                  style="margin-left: 0.75rem"
+                >
+                  <b-icon
+                    icon="mdil-account"
+                    class="circle-icon has-background-success has-text-light"
+                  />
+                </b-tooltip>
               </b-tag>
             </router-link>
           </b-table-column>
@@ -514,11 +566,19 @@ export default {
         limit: 10,
         current: 1
       },
+      conditions: {
+        "creator": { 
+          name: "Targets you nominated", 
+          icon: "mdil-account",
+          icon_class: "has-background-success has-text-light"
+        }
+      },
       filter: {
         type: "",
         organism: "",
         name: "",
-        created_after: undefined
+        created_after: undefined,
+        conditions: []
       },
       types: variables.target_types,
       organisms: variables.target_organisms,
@@ -574,6 +634,10 @@ export default {
 
       // Calculate skip
       const skip = (this.pagination.current - 1) * this.pagination.limit
+
+      // Reset filter if clear is set
+      if (this.filter.conditions.length > 0 && this.filter.conditions.includes("clear"))
+        this.filter.conditions = []
 
       try {
         const nominations = await NominationManage.fetchNominations(this.pagination.limit, skip, this.filter)

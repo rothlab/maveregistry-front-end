@@ -101,6 +101,9 @@ export async function fetchNominations(limit = 10, skip = 0, filter) {
     if (filter.organism !== '') targetQuery.equalTo("organism", filter.organism)
     if (filter.name !== '') targetQuery.startsWith("name", filter.name.toLowerCase())
     if (filter.created_after) query.greaterThanOrEqualTo("createdAt", filter.created_after)
+    if (filter.conditions.length > 0) {
+      if (filter.conditions.includes("creator")) query.equalTo("by", Parse.User.current())
+    }
     query.matchesQuery("target", targetQuery)
   }
 
