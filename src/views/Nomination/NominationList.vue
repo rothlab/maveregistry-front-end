@@ -372,7 +372,6 @@
                 <b-tooltip
                   label="Up Vote"
                   type="is-success"
-                  position="is-left"
                 >
                   <b-button
                     icon-left="mdil-thumb-up"
@@ -387,7 +386,6 @@
                 <b-tooltip
                   label="Down Vote"
                   type="is-danger"
-                  position="is-left"
                 >
                   <b-button
                     icon-left="mdil-thumb-down"
@@ -416,7 +414,6 @@
                 <b-tooltip
                   label="Add New Project"
                   type="is-dark"
-                  position="is-left"
                 >
                   <b-button
                     icon-right="mdil-plus"
@@ -430,7 +427,6 @@
                   v-if="props.row.target.type == 'Gene' && props.row.target.organism == 'H. sapiens'"
                   label="Explore at MaveQuest"
                   type="is-info"
-                  position="is-left"
                 >
                   <b-button
                     tag="a"
@@ -446,7 +442,6 @@
                   v-else
                   label="Look up"
                   type="is-info"
-                  position="is-left"
                 >
                   <b-button
                     tag="a"
@@ -465,7 +460,6 @@
                 <b-tooltip
                   label="Edit Nomination"
                   type="is-dark"
-                  position="is-left"
                 >
                   <b-button
                     icon-right="mdil-pencil"
@@ -480,7 +474,6 @@
               >
                 <b-tooltip
                   label="Delete Nomination"
-                  position="is-left"
                   type="is-dark"
                 >
                   <b-button

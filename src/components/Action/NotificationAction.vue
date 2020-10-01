@@ -117,7 +117,6 @@
                       <!-- Mark as read/unread -->
                       <b-tooltip
                         :label="`Mark as ${notification.is_read ? 'un' : ''}read`"
-                        position="is-left"
                         type="is-dark"
                         @click.native="markAs(notification.id, !notification.is_read)"
                         style="cursor: pointer; padding-left: 0.5rem"
@@ -130,7 +129,6 @@
                       <!-- Delete notification -->
                       <b-tooltip
                         label="Delete"
-                        position="is-left"
                         type="is-dark"
                         @click.native="removeNotification(notification.id)"
                         style="cursor: pointer; padding-left: 0.5rem"
