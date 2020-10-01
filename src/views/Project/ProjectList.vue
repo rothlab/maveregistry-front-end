@@ -220,398 +220,402 @@
             </div>
           </template>
 
-          <template slot-scope="props">
-            <!-- Target name-->
-            <b-table-column
-              field="target_name"
-              label="Name"
-              class="is-uppercase"
-            >
-              {{ props.row.name }}
-            </b-table-column>
+          <!-- Target name-->
+          <b-table-column
+            field="target_name"
+            label="Name"
+            class="is-uppercase"
+            v-slot="props"
+          >
+            {{ props.row.name }}
+          </b-table-column>
 
-            <!-- Target type -->
-            <b-table-column
-              field="target_type"
-              label="Type"
-              class="is-capitalized"
-            >
-              {{ props.row.type }}
-            </b-table-column>
+          <!-- Target type -->
+          <b-table-column
+            field="target_type"
+            label="Type"
+            class="is-capitalized"
+            v-slot="props"
+          >
+            {{ props.row.type }}
+          </b-table-column>
 
-            <!-- Target species -->
-            <b-table-column
-              field="target_organism"
-              label="Organism"
-            >
-              <i>{{ props.row.organism }}</i>
-            </b-table-column>
+          <!-- Target species -->
+          <b-table-column
+            field="target_organism"
+            label="Organism"
+            v-slot="props"
+          >
+            <i>{{ props.row.organism }}</i>
+          </b-table-column>
 
-            <!-- Progress -->
-            <b-table-column
-              field="projects"
-              label="Project Progress"
-            >
-              <div class="has-text-left">
-                <!-- If not member, show this panel to indicate that nothing is available -->
-                <div
-                  v-if="props.row.projects < 1"
-                  class="card project-card has-background-light"
-                >
-                  <div class="card-header">
-                    <p
-                      class="card-header-title"
-                      v-if="hasLoggedIn"
-                    >
-                      <b-icon
-                        icon="mdil-play"
-                        style="margin-right: 0.25rem"
-                      />
-                      Under Investigation
-                    </p>
-                    <p
-                      class="card-header-title is-capitalized"
-                      v-else
-                    >
-                      <b-icon
-                        icon="mdil-lock"
-                        style="margin-right: 0.25rem"
-                      />
-                      Login For Details
-                    </p>
-                  </div>
-                </div>
-
-                <b-collapse
-                  v-else
-                  class="card project-card has-background-light"
-                  animation="slide"
-                  v-for="(project, index) in props.row.projects"
-                  :key="index"
-                  :open="false"
-                >
-                  <div
-                    slot="trigger"
-                    slot-scope="innerProps"
-                    class="card-header"
-                    role="button"
-                  >
-                    <p
-                      v-if="project.type"
-                      class="card-header-title"
-                    >
-                      <b-icon
-                        :icon="progressIcons[project.type]"
-                        style="margin-right: 0.25rem"
-                      />
-                      <span class="is-capitalized description">{{ project.type }}</span>
-                      <span
-                        class="is-size-7 has-text-info is-hidden-touch is-hidden-desktop-only"
-                        style="margin-left: 0.5rem"
-                      >(Click to {{ innerProps.open ? 'collapse' : 'expand' }})</span>
-                    </p>
-                    <p
-                      v-else
-                      class="card-header-title"
-                    >
-                      <b-icon
-                        icon="mdil-play"
-                        style="margin-right: 0.25rem"
-                      />
-                      <span class="is-capitalized description">Under Investigation</span>
-                      <span
-                        class="is-size-7 has-text-info is-hidden-touch is-hidden-desktop-only"
-                        style="margin-left: 0.5rem"
-                      >(Click to {{ innerProps.open ? 'collapse' : 'expand' }})</span>
-                    </p>
-                    <div class="card-header-icon">
-                      <!-- Open for funding -->
-                      <b-tooltip
-                        label="Open for funding"
-                        v-if="project.open_for_funding"
-                        type="is-warning"
-                        position="is-left"
-                      >
-                        <b-icon
-                          class="circle-icon has-background-warning has-text-dark"
-                          icon="mdil-currency-usd"
-                        />
-                      </b-tooltip>
-
-                      <!-- Owner -->
-                      <b-tooltip
-                        label="Project Owner"
-                        v-if="currentUser && project.creator.username === currentUser.username"
-                        type="is-success"
-                        position="is-left"
-                      >
-                        <b-icon
-                          icon="mdil-account"
-                          class="circle-icon has-background-success has-text-light"
-                        />
-                      </b-tooltip>
-
-                      <!-- Follow -->
-                      <b-tooltip
-                        label="Following"
-                        v-if="project.follow_status && project.follow_status.status === 'yes'"
-                        type="is-info"
-                        position="is-left"
-                      >
-                        <b-icon
-                          icon="mdil-bell"
-                          class="circle-icon has-background-info has-text-light"
-                        />
-                      </b-tooltip>
-
-                      <!-- Expand -->
-                      <b-icon
-                        :icon="innerProps.open ? 'mdil-chevron-up' : 'mdil-chevron-down'"
-                      />
-                    </div>
-                  </div>
-                  <div class="card-content">
-                    <div
-                      class="content"
-                    >
-                      <div class="is-size-6">
-                        <span class="has-text-primary">
-                          Feature{{ project.features.length > 1 ? 's:' : ':' }}
-                          {{ project.features.join(", ") }}
-                        </span>
-                        <br>
-                        <ShowMoreField
-                          v-if="project.description"
-                          :value="project.description"
-                        />
-                        <div v-else-if="project.follow_status">
-                          <p
-                            v-if="!project.follow_status.id && project.creator.username !== currentUser.username && !isModerator"
-                            class="has-text-danger font-14px"
-                          >
-                            Click "Follow" to request access to project details and receive update alerts.
-                          </p>
-                          <p
-                            v-else-if="project.follow_status.status === 'pending'"
-                            class="has-text-danger font-14px"
-                          >
-                            Your follow request is pending approval. Once approved, 
-                            you will gain access to project details and receive update alerts.
-                          </p>
-                          <p
-                            v-else-if="project.follow_status.status === 'yes' || project.creator.username === currentUser.username || isModerator"
-                            class="has-text-danger font-14px"
-                          >
-                            No details available for this project.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="card-footer">
-                    <div class="card-footer-item has-background-white-bis">
-                      <router-link
-                        :to="{ path: `/project/${project.id}`}"
-                        target="_blank"
-                      >
-                        <b-icon icon="mdil-magnify" />
-                        Details
-                      </router-link>
-                    </div>
-                    <div
-                      v-if="project.follow_status && currentUser && project.creator.username !== currentUser.username && project.follow_status"
-                      class="card-footer-item" 
-                      :class="{ 
-                        'has-background-white-bis': !project.follow_status.id, 
-                        'has-background-warning': project.follow_status.status === 'pending',
-                        'has-background-info': project.follow_status.status === 'yes'
-                      }"
-                    >
-                      <!-- If not followed, show follow icon -->
-                      <div v-if="!project.follow_status.id">
-                        <a @click="confirmFollow(project.id, 'project', project.creator)">
-                          <b-icon icon="mdil-bell" />
-                          Follow
-                        </a>
-                      </div>
-                      <!-- If pending, show pending status and unfollow-->
-                      <b-tooltip
-                        :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to cancel request.' : 'Unfollow Project'"
-                        type="is-dark"
-                        position="is-left"
-                        v-else
-                      >
-                        <a
-                          @click="confirmUnfollow(project.follow_status.id, 'project')"
-                          :class="{ 
-                            'has-text-info': !project.follow_status.id, 
-                            'has-text-dark': project.follow_status.status === 'pending',
-                            'has-text-light': project.follow_status.status === 'yes'
-                          }"
-                        >
-                          <span v-if="project.follow_status.status === 'pending'">
-                            <b-icon icon="mdil-clock" />
-                            Pending
-                          </span>
-                          <span v-else-if="project.follow_status.status === 'yes'">
-                            <b-icon icon="mdil-bell" />
-                            Following
-                          </span>
-                        </a>
-                      </b-tooltip>
-                    </div>
-                  </div>
-                </b-collapse>
-              </div>
-            </b-table-column>
-
-            <!-- Active teams -->
-            <b-table-column
-              field="team"
-              label="Team"
-              width="12vw"
-            >
+          <!-- Progress -->
+          <b-table-column
+            field="projects"
+            label="Project Progress"
+            v-slot="props"
+          >
+            <div class="has-text-left">
+              <!-- If not member, show this panel to indicate that nothing is available -->
               <div
-                v-if="!hasLoggedIn"
+                v-if="props.row.projects < 1"
                 class="card project-card has-background-light"
               >
                 <div class="card-header">
-                  <p class="card-header-title is-capitalized">
-                    <b-icon icon="mdil-lock" />
-                    Login for details
+                  <p
+                    class="card-header-title"
+                    v-if="hasLoggedIn"
+                  >
+                    <b-icon
+                      icon="mdil-play"
+                      style="margin-right: 0.25rem"
+                    />
+                    Under Investigation
+                  </p>
+                  <p
+                    class="card-header-title is-capitalized"
+                    v-else
+                  >
+                    <b-icon
+                      icon="mdil-lock"
+                      style="margin-right: 0.25rem"
+                    />
+                    Login For Details
                   </p>
                 </div>
               </div>
-              <b-field
-                grouped
-                group-multiline
-                class="team-control"
+
+              <b-collapse
                 v-else
+                class="card project-card has-background-light"
+                animation="slide"
+                v-for="(project, index) in props.row.projects"
+                :key="index"
+                :open="false"
               >
                 <div
-                  class="control has-fullwidth"
-                  v-for="(team, index) in props.row.teams"
-                  :key="index"
+                  slot="trigger"
+                  slot-scope="innerProps"
+                  class="card-header"
+                  role="button"
                 >
-                  <b-taglist attached>
-                    <b-tag
-                      size="is-medium"
-                      class="is-capitalized"
-                    >
-                      <router-link
-                        :to="{ path: `/team/${team.id}`}"
-                        target="_blank"
-                        class="has-text-grey-darker"
-                      >
-                        <b-icon
-                          icon="mdil-account"
-                          class="team-icon"
-                        />
-                        {{ team.name }}
-                      </router-link>
-                    </b-tag>
-                    
-                    <!-- Followed status -->
-                    <b-tag
-                      v-if="currentUser && team.creator && team.creator.username !== currentUser.username && team.follow_status.id"
-                      size="is-medium"
-                      class="is-clickable"
-                      :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-info': team.follow_status.status === 'yes' }"
-                      @click.native="confirmUnfollow(team.follow_status.id, 'team')"
-                    >
-                      <b-tooltip
-                        :label="team.follow_status.status === 'pending' ? 'Pending Approval. Click to cancel request.' : 'Unfollow Team'"
-                        type="is-dark"
-                        position="is-left"
-                      >
-                        <span 
-                          :class="{ 
-                            'has-text-dark': team.follow_status.status === 'pending',
-                            'has-text-light': team.follow_status.status === 'yes'
-                          }"
-                        >
-                          {{ team.follow_status.status === 'pending' ? "Pending" : "Following" }}
-                        </span>
-                      </b-tooltip>
-                    </b-tag>
-                    <!-- Unfollowed status -->
-                    <b-tag
-                      v-else-if="currentUser && team.creator && team.creator.username !== currentUser.username && !team.follow_status.id"
-                      size="is-medium"
-                      class="is-clickable has-background-white-bis"
-                      @click.native="confirmFollow(team.id, 'team', team.creator)"
-                    >
-                      <b-tooltip
-                        label="Follow Team"
-                        type="is-dark"
-                        position="is-left"
-                      >
-                        <span class="has-text-info">Follow</span>
-                      </b-tooltip>
-                    </b-tag>
-                  </b-taglist>
-                </div>
-              </b-field>
-            </b-table-column>
-
-            <!-- Action -->
-            <b-table-column
-              field="action"
-              label="Action"
-              width="5vw"
-            >
-              <b-field>
-                <p class="control action-button">
-                  <b-tooltip
-                    label="Add new project"
-                    type="is-dark"
-                    position="is-left"
+                  <p
+                    v-if="project.type"
+                    class="card-header-title"
                   >
-                    <b-button
-                      icon-right="mdil-plus"
-                      @click="handleNewTargetModal(props.row)"
-                      type="is-light"
+                    <b-icon
+                      :icon="progressIcons[project.type]"
+                      style="margin-right: 0.25rem"
                     />
-                  </b-tooltip>
-                </p>
-                <p class="control action-button">
-                  <!-- Show MaveQuest for human genes -->
-                  <b-tooltip
-                    v-if="props.row.type == 'Gene' && props.row.organism == 'H. sapiens'"
-                    label="Expore at MaveQuest"
-                    type="is-info"
-                    position="is-left"
-                  >
-                    <b-button
-                      tag="a"
-                      :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
-                      target="_blank"
-                      type="is-light"
-                      class="mavequest-button"
-                    >
-                      <img src="@/assets/image/mavequest_logo_grey.png">
-                    </b-button>
-                  </b-tooltip>
-                  <!-- Show Google search for others -->
-                  <b-tooltip
+                    <span class="is-capitalized description">{{ project.type }}</span>
+                    <span
+                      class="is-size-7 has-text-info is-hidden-touch is-hidden-desktop-only"
+                      style="margin-left: 0.5rem"
+                    >(Click to {{ innerProps.open ? 'collapse' : 'expand' }})</span>
+                  </p>
+                  <p
                     v-else
-                    label="Look up"
-                    type="is-info"
-                    position="is-left"
+                    class="card-header-title"
                   >
-                    <b-button
-                      tag="a"
-                      :href="'https://www.google.com/search?q=' + props.row.name"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      icon-right="mdil-magnify"
-                      type="is-light"
+                    <b-icon
+                      icon="mdil-play"
+                      style="margin-right: 0.25rem"
                     />
-                  </b-tooltip>
+                    <span class="is-capitalized description">Under Investigation</span>
+                    <span
+                      class="is-size-7 has-text-info is-hidden-touch is-hidden-desktop-only"
+                      style="margin-left: 0.5rem"
+                    >(Click to {{ innerProps.open ? 'collapse' : 'expand' }})</span>
+                  </p>
+                  <div class="card-header-icon">
+                    <!-- Open for funding -->
+                    <b-tooltip
+                      label="Open for funding"
+                      v-if="project.open_for_funding"
+                      type="is-warning"
+                      position="is-left"
+                    >
+                      <b-icon
+                        class="circle-icon has-background-warning has-text-dark"
+                        icon="mdil-currency-usd"
+                      />
+                    </b-tooltip>
+
+                    <!-- Owner -->
+                    <b-tooltip
+                      label="Project Owner"
+                      v-if="currentUser && project.creator.username === currentUser.username"
+                      type="is-success"
+                      position="is-left"
+                    >
+                      <b-icon
+                        icon="mdil-account"
+                        class="circle-icon has-background-success has-text-light"
+                      />
+                    </b-tooltip>
+
+                    <!-- Follow -->
+                    <b-tooltip
+                      label="Following"
+                      v-if="project.follow_status && project.follow_status.status === 'yes'"
+                      type="is-info"
+                      position="is-left"
+                    >
+                      <b-icon
+                        icon="mdil-bell"
+                        class="circle-icon has-background-info has-text-light"
+                      />
+                    </b-tooltip>
+
+                    <!-- Expand -->
+                    <b-icon
+                      :icon="innerProps.open ? 'mdil-chevron-up' : 'mdil-chevron-down'"
+                    />
+                  </div>
+                </div>
+                <div class="card-content">
+                  <div
+                    class="content"
+                  >
+                    <div class="is-size-6">
+                      <span class="has-text-primary">
+                        Feature{{ project.features.length > 1 ? 's:' : ':' }}
+                        {{ project.features.join(", ") }}
+                      </span>
+                      <br>
+                      <ShowMoreField
+                        v-if="project.description"
+                        :value="project.description"
+                      />
+                      <div v-else-if="project.follow_status">
+                        <p
+                          v-if="!project.follow_status.id && project.creator.username !== currentUser.username && !isModerator"
+                          class="has-text-danger font-14px"
+                        >
+                          Click "Follow" to request access to project details and receive update alerts.
+                        </p>
+                        <p
+                          v-else-if="project.follow_status.status === 'pending'"
+                          class="has-text-danger font-14px"
+                        >
+                          Your follow request is pending approval. Once approved, 
+                          you will gain access to project details and receive update alerts.
+                        </p>
+                        <p
+                          v-else-if="project.follow_status.status === 'yes' || project.creator.username === currentUser.username || isModerator"
+                          class="has-text-danger font-14px"
+                        >
+                          No details available for this project.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <div class="card-footer-item has-background-white-bis">
+                    <router-link
+                      :to="{ path: `/project/${project.id}`}"
+                      target="_blank"
+                    >
+                      <b-icon icon="mdil-magnify" />
+                      Details
+                    </router-link>
+                  </div>
+                  <div
+                    v-if="project.follow_status && currentUser && project.creator.username !== currentUser.username && project.follow_status"
+                    class="card-footer-item" 
+                    :class="{ 
+                      'has-background-white-bis': !project.follow_status.id, 
+                      'has-background-warning': project.follow_status.status === 'pending',
+                      'has-background-info': project.follow_status.status === 'yes'
+                    }"
+                  >
+                    <!-- If not followed, show follow icon -->
+                    <div v-if="!project.follow_status.id">
+                      <a @click="confirmFollow(project.id, 'project', project.creator)">
+                        <b-icon icon="mdil-bell" />
+                        Follow
+                      </a>
+                    </div>
+                    <!-- If pending, show pending status and unfollow-->
+                    <b-tooltip
+                      :label="project.follow_status.status === 'pending' ? 'Pending Approval. Click to cancel request.' : 'Unfollow Project'"
+                      type="is-dark"
+                      position="is-left"
+                      v-else
+                    >
+                      <a
+                        @click="confirmUnfollow(project.follow_status.id, 'project')"
+                        :class="{ 
+                          'has-text-info': !project.follow_status.id, 
+                          'has-text-dark': project.follow_status.status === 'pending',
+                          'has-text-light': project.follow_status.status === 'yes'
+                        }"
+                      >
+                        <span v-if="project.follow_status.status === 'pending'">
+                          <b-icon icon="mdil-clock" />
+                          Pending
+                        </span>
+                        <span v-else-if="project.follow_status.status === 'yes'">
+                          <b-icon icon="mdil-bell" />
+                          Following
+                        </span>
+                      </a>
+                    </b-tooltip>
+                  </div>
+                </div>
+              </b-collapse>
+            </div>
+          </b-table-column>
+
+          <!-- Active teams -->
+          <b-table-column
+            field="team"
+            label="Team"
+            width="12vw"
+            v-slot="props"
+          >
+            <div
+              v-if="!hasLoggedIn"
+              class="card project-card has-background-light"
+            >
+              <div class="card-header">
+                <p class="card-header-title is-capitalized">
+                  <b-icon icon="mdil-lock" />
+                  Login for details
                 </p>
-              </b-field>
-            </b-table-column>
-          </template>
+              </div>
+            </div>
+            <b-field
+              grouped
+              group-multiline
+              class="team-control"
+              v-else
+            >
+              <div
+                class="control has-fullwidth"
+                v-for="(team, index) in props.row.teams"
+                :key="index"
+              >
+                <b-taglist attached>
+                  <b-tag
+                    size="is-medium"
+                    class="is-capitalized"
+                  >
+                    <router-link
+                      :to="{ path: `/team/${team.id}`}"
+                      target="_blank"
+                      class="has-text-grey-darker"
+                    >
+                      <b-icon
+                        icon="mdil-account"
+                        class="team-icon"
+                      />
+                      {{ team.name }}
+                    </router-link>
+                  </b-tag>
+                    
+                  <!-- Followed status -->
+                  <b-tag
+                    v-if="currentUser && team.creator && team.creator.username !== currentUser.username && team.follow_status.id"
+                    size="is-medium"
+                    class="is-clickable"
+                    :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-info': team.follow_status.status === 'yes' }"
+                    @click.native="confirmUnfollow(team.follow_status.id, 'team')"
+                  >
+                    <b-tooltip
+                      :label="team.follow_status.status === 'pending' ? 'Pending Approval. Click to cancel request.' : 'Unfollow Team'"
+                      type="is-dark"
+                      position="is-left"
+                    >
+                      <span 
+                        :class="{ 
+                          'has-text-dark': team.follow_status.status === 'pending',
+                          'has-text-light': team.follow_status.status === 'yes'
+                        }"
+                      >
+                        {{ team.follow_status.status === 'pending' ? "Pending" : "Following" }}
+                      </span>
+                    </b-tooltip>
+                  </b-tag>
+                  <!-- Unfollowed status -->
+                  <b-tag
+                    v-else-if="currentUser && team.creator && team.creator.username !== currentUser.username && !team.follow_status.id"
+                    size="is-medium"
+                    class="is-clickable has-background-white-bis"
+                    @click.native="confirmFollow(team.id, 'team', team.creator)"
+                  >
+                    <b-tooltip
+                      label="Follow Team"
+                      type="is-dark"
+                      position="is-left"
+                    >
+                      <span class="has-text-info">Follow</span>
+                    </b-tooltip>
+                  </b-tag>
+                </b-taglist>
+              </div>
+            </b-field>
+          </b-table-column>
+
+          <!-- Action -->
+          <b-table-column
+            field="action"
+            label="Action"
+            width="5vw"
+            v-slot="props"
+          >
+            <b-field>
+              <p class="control action-button">
+                <b-tooltip
+                  label="Add new project"
+                  type="is-dark"
+                  position="is-left"
+                >
+                  <b-button
+                    icon-right="mdil-plus"
+                    @click="handleNewTargetModal(props.row)"
+                    type="is-light"
+                  />
+                </b-tooltip>
+              </p>
+              <p class="control action-button">
+                <!-- Show MaveQuest for human genes -->
+                <b-tooltip
+                  v-if="props.row.type == 'Gene' && props.row.organism == 'H. sapiens'"
+                  label="Expore at MaveQuest"
+                  type="is-info"
+                  position="is-left"
+                >
+                  <b-button
+                    tag="a"
+                    :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
+                    target="_blank"
+                    type="is-light"
+                    class="mavequest-button"
+                  >
+                    <img src="@/assets/image/mavequest_logo_grey.png">
+                  </b-button>
+                </b-tooltip>
+                <!-- Show Google search for others -->
+                <b-tooltip
+                  v-else
+                  label="Look up"
+                  type="is-info"
+                  position="is-left"
+                >
+                  <b-button
+                    tag="a"
+                    :href="'https://www.google.com/search?q=' + props.row.name"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    icon-right="mdil-magnify"
+                    type="is-light"
+                  />
+                </b-tooltip>
+              </p>
+            </b-field>
+          </b-table-column>
         </b-table>
       </div>
 

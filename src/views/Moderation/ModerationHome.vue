@@ -108,171 +108,176 @@
               </div>
             </template>
 
-            <template slot-scope="props">
-              <!-- Username with link -->
-              <b-table-column
-                field="username"
-                label="Username"
+            <!-- Username with link -->
+            <b-table-column
+              field="username"
+              label="Username"
+              v-slot="props"
+            >
+              <router-link
+                :to="{ path: `/user/${props.row.username}`}"
+                target="_blank"
+                class="is-flex"
               >
-                <router-link
-                  :to="{ path: `/user/${props.row.username}`}"
-                  target="_blank"
-                  class="is-flex"
+                <span
+                  class="image is-24x24 is-inline-block"
+                  style="margin-right: 0.5rem"
                 >
-                  <span
-                    class="image is-24x24 is-inline-block"
-                    style="margin-right: 0.5rem"
+                  <img
+                    class="is-rounded"
+                    :src="getProfileImageFromUser(props.row)"
                   >
-                    <img
-                      class="is-rounded"
-                      :src="getProfileImageFromUser(props.row)"
-                    >
-                  </span>
-                  {{ props.row.username }}
-                </router-link>
-              </b-table-column>
-              <!-- Name -->
-              <b-table-column
-                field="name"
-                label="Name"
-              >
-                <span class="is-capitalized">
-                  {{ props.row.first_name }} {{ props.row.last_name }}
                 </span>
-              </b-table-column>
-              <!-- Name -->
-              <b-table-column
-                field="creation_date"
-                label="Creation Date"
+                {{ props.row.username }}
+              </router-link>
+            </b-table-column>
+            <!-- Name -->
+            <b-table-column
+              field="name"
+              label="Name"
+              v-slot="props"
+            >
+              <span class="is-capitalized">
+                {{ props.row.first_name }} {{ props.row.last_name }}
+              </span>
+            </b-table-column>
+            <!-- Name -->
+            <b-table-column
+              field="creation_date"
+              label="Creation Date"
+              v-slot="props"
+            >
+              {{ props.row.created_at.toLocaleString() }}
+            </b-table-column>
+            <!-- Projects -->
+            <b-table-column
+              field="projects"
+              label="Projects"
+              v-slot="props"
+            >
+              <!-- As owner -->
+              <b-tooltip
+                :label="`Owns ${props.row.counts.project_owner} project(s)`"
+                type="is-dark"
+                style="margin-right: 0.25rem"
               >
-                {{ props.row.created_at.toLocaleString() }}
-              </b-table-column>
-              <!-- Projects -->
-              <b-table-column
-                field="projects"
-                label="Projects"
+                <b-icon icon="mdil-account" />
+                {{ props.row.counts.project_owner }}
+              </b-tooltip>
+              <!-- As follower -->
+              <b-tooltip
+                :label="`Follows ${props.row.counts.project_follower} project(s)`"
+                type="is-dark"
               >
-                <!-- As owner -->
-                <b-tooltip
-                  :label="`Owns ${props.row.counts.project_owner} project(s)`"
-                  type="is-dark"
-                  style="margin-right: 0.25rem"
-                >
-                  <b-icon icon="mdil-account" />
-                  {{ props.row.counts.project_owner }}
-                </b-tooltip>
-                <!-- As follower -->
-                <b-tooltip
-                  :label="`Follows ${props.row.counts.project_follower} project(s)`"
-                  type="is-dark"
-                >
-                  <b-icon icon="mdil-rss" />
-                  {{ props.row.counts.project_follower }}
-                </b-tooltip>
-              </b-table-column>
-              <!-- Teams -->
-              <b-table-column
-                field="teams"
-                label="Teams"
+                <b-icon icon="mdil-rss" />
+                {{ props.row.counts.project_follower }}
+              </b-tooltip>
+            </b-table-column>
+            <!-- Teams -->
+            <b-table-column
+              field="teams"
+              label="Teams"
+              v-slot="props"
+            >
+              <!-- As owner -->
+              <b-tooltip
+                :label="`Owns ${props.row.counts.team_owner} team(s)`"
+                type="is-dark"
+                style="margin-right: 0.25rem"
               >
-                <!-- As owner -->
-                <b-tooltip
-                  :label="`Owns ${props.row.counts.team_owner} team(s)`"
-                  type="is-dark"
-                  style="margin-right: 0.25rem"
-                >
-                  <b-icon icon="mdil-account" />
-                  {{ props.row.counts.team_owner }}
-                </b-tooltip>
-                <!-- As follower -->
-                <b-tooltip
-                  :label="`Follows ${props.row.counts.team_follower} team(s)`"
-                  type="is-dark"
-                >
-                  <b-icon icon="mdil-rss" />
-                  {{ props.row.counts.team_follower }}
-                </b-tooltip>
-              </b-table-column>
-              <!-- Nominations -->
-              <b-table-column
-                field="nominations"
-                label="Nominations"
+                <b-icon icon="mdil-account" />
+                {{ props.row.counts.team_owner }}
+              </b-tooltip>
+              <!-- As follower -->
+              <b-tooltip
+                :label="`Follows ${props.row.counts.team_follower} team(s)`"
+                type="is-dark"
               >
-                <!-- As owner -->
-                <b-tooltip
-                  :label="`Nominated ${props.row.counts.nomination_owner} target(s)`"
-                  type="is-dark"
-                  style="margin-right: 0.25rem"
-                >
-                  <b-icon icon="mdil-account" />
-                  {{ props.row.counts.nomination_owner }}
-                </b-tooltip>
-                <!-- As follower -->
-                <b-tooltip
-                  :label="`Voted for ${props.row.counts.nomination_vote} target(s)`"
-                  type="is-dark"
-                >
-                  <b-icon icon="mdil-thumbs-up-down" />
-                  {{ props.row.counts.nomination_vote }}
-                </b-tooltip>
-              </b-table-column>
-              <!-- Actions -->
-              <b-table-column
-                field="actions"
-                label="Actions"
+                <b-icon icon="mdil-rss" />
+                {{ props.row.counts.team_follower }}
+              </b-tooltip>
+            </b-table-column>
+            <!-- Nominations -->
+            <b-table-column
+              field="nominations"
+              label="Nominations"
+              v-slot="props"
+            >
+              <!-- As owner -->
+              <b-tooltip
+                :label="`Nominated ${props.row.counts.nomination_owner} target(s)`"
+                type="is-dark"
+                style="margin-right: 0.25rem"
               >
-                <b-field>
-                  <p class="control action-button">
-                    <b-tooltip
-                      v-if="props.row.is_blocked"
-                      label="Unblock User"
+                <b-icon icon="mdil-account" />
+                {{ props.row.counts.nomination_owner }}
+              </b-tooltip>
+              <!-- As follower -->
+              <b-tooltip
+                :label="`Voted for ${props.row.counts.nomination_vote} target(s)`"
+                type="is-dark"
+              >
+                <b-icon icon="mdil-thumbs-up-down" />
+                {{ props.row.counts.nomination_vote }}
+              </b-tooltip>
+            </b-table-column>
+            <!-- Actions -->
+            <b-table-column
+              field="actions"
+              label="Actions"
+              v-slot="props"
+            >
+              <b-field>
+                <p class="control action-button">
+                  <b-tooltip
+                    v-if="props.row.is_blocked"
+                    label="Unblock User"
+                    type="is-warning"
+                  >
+                    <b-button
+                      icon-right="mdil-circle"
                       type="is-warning"
-                    >
-                      <b-button
-                        icon-right="mdil-circle"
-                        type="is-warning"
-                        @click="blockUnblockUser(props.row, 'unblocked')"
-                      />
-                    </b-tooltip>
-                    <b-tooltip
-                      v-else
-                      label="Block User"
-                      type="is-warning"
-                    >
-                      <b-button
-                        icon-right="mdil-cancel"
-                        type="is-light"
-                        @click="blockUnblockUser(props.row, 'blocked')"
-                      />
-                    </b-tooltip>
-                  </p>
-                  <p class="control action-button">
-                    <b-tooltip
-                      v-if="props.row.is_moderator"
-                      label="Remove moderator role"
+                      @click="blockUnblockUser(props.row, 'unblocked')"
+                    />
+                  </b-tooltip>
+                  <b-tooltip
+                    v-else
+                    label="Block User"
+                    type="is-warning"
+                  >
+                    <b-button
+                      icon-right="mdil-cancel"
+                      type="is-light"
+                      @click="blockUnblockUser(props.row, 'blocked')"
+                    />
+                  </b-tooltip>
+                </p>
+                <p class="control action-button">
+                  <b-tooltip
+                    v-if="props.row.is_moderator"
+                    label="Remove moderator role"
+                    type="is-info"
+                  >
+                    <b-button
+                      icon-right="mdil-eye-off"
                       type="is-info"
-                    >
-                      <b-button
-                        icon-right="mdil-eye-off"
-                        type="is-info"
-                        @click="grantModeratorRole(props.row, 'unset')"
-                      />
-                    </b-tooltip>
-                    <b-tooltip
-                      v-else
-                      label="Assign moderator role"
-                      type="is-info"
-                    >
-                      <b-button
-                        icon-right="mdil-eye"
-                        type="is-light"
-                        @click="grantModeratorRole(props.row, 'set')"
-                      />
-                    </b-tooltip>
-                  </p>
-                </b-field>
-              </b-table-column>
-            </template>
+                      @click="grantModeratorRole(props.row, 'unset')"
+                    />
+                  </b-tooltip>
+                  <b-tooltip
+                    v-else
+                    label="Assign moderator role"
+                    type="is-info"
+                  >
+                    <b-button
+                      icon-right="mdil-eye"
+                      type="is-light"
+                      @click="grantModeratorRole(props.row, 'set')"
+                    />
+                  </b-tooltip>
+                </p>
+              </b-field>
+            </b-table-column>
           </b-table>
         </div>
       </div>
