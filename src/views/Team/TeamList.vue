@@ -65,9 +65,10 @@
           @page-change="(change) => { pagination.current = change; fetchTeams() }"
         >
           <!-- Filter -->
+          <!-- These filters will be on the same line -->
           <template slot="top-left">
-            <!-- Filter by creation date -->
-            <b-field style="margin-bottom: 0">
+            <div class="filter-same-line">
+              <!-- Filter by creation date -->
               <b-datepicker
                 v-model="filter.created_after"
                 placeholder="Created Since"
@@ -75,8 +76,27 @@
                 icon-prev="mdil-chevron-left"
                 icon-next="mdil-chevron-right"
                 :class="{ 'highlight-filter': filter.created_after }"
+                :max-date="new Date()"
                 @input="fetchTeams()"
+                class="filter-item"
               >
+                <template v-slot:trigger>
+                  <b-tooltip
+                    label="Created on or after this date"
+                    type="is-info"
+                  >
+                    <b-button
+                      :type="filter.created_after ? 'is-info' : 'is-light'"
+                    >
+                      <FilterOutline
+                        class="filter-icon icon-18px"
+                      />
+                      <span>
+                        {{ filter.created_after ? filter.created_after.toLocaleDateString() : "Date" }}
+                      </span>
+                    </b-button>
+                  </b-tooltip>
+                </template>
                 <b-button
                   type="is-info"
                   outlined
@@ -87,21 +107,24 @@
                   Clear Filter
                 </b-button>
               </b-datepicker>
-            </b-field>
 
-            <!-- Filter by PI -->
-            <b-field style="margin-left: 0.5em; margin-bottom: 0">
-              <b-input
-                v-model="filter.pi"
-                placeholder="Search Investigator"
-                icon="mdil-magnify"
-                :icon-right="filter.pi ? 'mdil-delete': ''"
-                icon-right-clickable
-                @icon-right-click="filter.pi = ''; fetchTeams()"
-                :class="{ 'highlight-filter': filter.pi }"
-                @input="debouncedFetchTeams()"
-              />
-            </b-field>
+              <!-- Filter by PI -->
+              <b-field
+                class="filter-item"
+                style="width: 15rem"
+              >
+                <b-input
+                  v-model="filter.pi"
+                  placeholder="Search Investigator"
+                  icon="mdil-magnify"
+                  :icon-right="filter.pi ? 'mdil-delete': ''"
+                  icon-right-clickable
+                  @icon-right-click="filter.pi = ''; fetchTeams()"
+                  :class="{ 'highlight-filter': filter.pi }"
+                  @input="debouncedFetchTeams()"
+                />
+              </b-field>
+            </div>
           </template>
 
           <!-- No results -->
@@ -313,6 +336,7 @@ import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import debounce from 'lodash/debounce'
+import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
 
 export default {
   title: "Teams",
@@ -320,7 +344,8 @@ export default {
     NewTeamModal,
     FollowModal,
     UnfollowModal,
-    Error
+    Error,
+    FilterOutline
   },
   computed: {
     hasLoggedIn() {

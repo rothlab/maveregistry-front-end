@@ -152,11 +152,28 @@
 .b-table
   .top
     .level-left
+      .filter-same-line
+        margin-right: -0.5rem // This is important because it helps to hide the right margin of the last element of the first line
+        display: flex
+        .filter-item
+          margin-right: 0.5rem
+          margin-left: 0
+          margin-bottom: 0
       @media screen and (max-width: $break-mobile)
-        .dropdown:not(:first-child)
-          float: right
-        .field
-          margin: 1rem 0 0 0 !important
+        .filter-same-line
+          justify-content: space-between
+          flex-wrap: wrap
+          .filter-item
+            &:first-child
+              margin-bottom: 0.5rem
+              margin-left: 0
+            &:last-child
+              margin-left: 0
+              flex-grow: 1
+        .pagination
+          margin: -0.25rem !important
+          .field
+            margin: 0 !important
 .is-sticky
   position: sticky
   top: calc( 5rem + 1.5rem )
