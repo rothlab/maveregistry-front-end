@@ -402,7 +402,6 @@
                       label="Open for funding"
                       v-if="project.open_for_funding"
                       type="is-warning"
-                      position="is-left"
                     >
                       <b-icon
                         class="circle-icon has-background-warning has-text-dark"
@@ -412,10 +411,9 @@
 
                     <!-- Owner -->
                     <b-tooltip
-                      label="Project Owner"
+                      label="Project you created"
                       v-if="currentUser && project.creator.username === currentUser.username"
                       type="is-success"
-                      position="is-left"
                     >
                       <b-icon
                         icon="mdil-account"
@@ -428,7 +426,6 @@
                       label="Following"
                       v-if="project.follow_status && project.follow_status.status === 'yes'"
                       type="is-info"
-                      position="is-left"
                     >
                       <b-icon
                         icon="mdil-bell"

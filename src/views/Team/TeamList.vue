@@ -207,11 +207,11 @@
                     {{ props.row.first_name }} {{ props.row.last_name }}
                   </router-link>
                   <b-tooltip
-                    label="Team Owner"
+                    label="Team you created"
                     type="is-success"
+                    v-if="props.row.creator.username === currentUser.username"
                   >
                     <b-icon
-                      v-if="props.row.creator.username === currentUser.username"
                       icon="mdil-account"
                       class="circle-icon has-background-success has-text-light"
                     />
