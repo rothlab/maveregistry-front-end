@@ -167,6 +167,48 @@
                 </b-dropdown-item>
               </b-dropdown>
 
+              <!-- Filter by condition -->
+              <b-dropdown
+                :triggers="['hover', 'click']"
+                v-model="filter.conditions"
+                multiple
+                :mobile-modal="false"
+                position="is-bottom-left"
+                @input="fetchTargets()"
+                class="filter-item"
+              >
+                <b-button
+                  slot="trigger"
+                  slot-scope="{ active }"
+                  :type="filter.conditions.length > 0 ? 'is-info' : 'is-light'"
+                >
+                  <FilterOutline
+                    class="filter-icon icon-18px"
+                  />
+                  <span style="margin-left: 0.25rem">Condition</span>
+                  <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+                </b-button>
+
+                <b-dropdown-item
+                  v-if="filter.conditions.length > 0"
+                  value="clear"
+                  class="has-text-info"
+                >
+                  Clear Filter
+                </b-dropdown-item>
+                <b-dropdown-item
+                  v-for="(key, id) in Object.keys(conditions)"
+                  :key="id"
+                  :value="key"
+                >
+                  <b-icon
+                    :class="`circle-icon ${conditions[key].icon_class}`"
+                    :icon="conditions[key].icon"
+                  />
+                  {{ conditions[key].name }}
+                </b-dropdown-item>
+              </b-dropdown>
+
               <!-- Filter by creation date -->
               <b-datepicker
                 v-model="filter.created_after"
@@ -223,6 +265,27 @@
                   @input="debouncedFetchTargets()"
                 />
               </b-field>
+            </div>
+          </template>
+
+          <!-- No results -->
+          <template slot="empty">
+            <div
+              class="no-project has-vcentered"
+              v-if="!isLoading.fetch_targets"
+            >
+              <div class="info-icon">
+                <b-icon
+                  icon="mdil-clipboard"
+                  custom-size="mdil-48px"
+                  type="is-grey-light"
+                />
+              </div>
+              <div class="info-content">
+                <p class="has-text-grey">
+                  <span class="is-size-5">Sorry, we couldn't find any results.</span>
+                </p>
+              </div>
             </div>
           </template>
 
@@ -696,12 +759,30 @@ export default {
       progressIcons: variables.progress_type_icons,
       types: variables.target_types,
       organisms: variables.target_organisms,
+      conditions: {
+        "creator": { 
+          name: "Projects you created", 
+          icon: "mdil-account",
+          icon_class: "has-background-success has-text-light"
+        },
+        "follower": {
+          name: "Projects you follow",
+          icon: "mdil-bell",
+          icon_class: "has-background-info has-text-light"
+        },
+        "funding": {
+          name: "Projects with funding need",
+          icon: "mdil-currency-usd",
+          icon_class: "has-background-warning has-text-dark"
+        },
+      },
       // Filter
       filter: {
         type: "",
         organism: "",
         name: "",
-        created_after: undefined
+        created_after: undefined,
+        conditions: []
       },
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
@@ -759,6 +840,10 @@ export default {
 
       // Calculate skip
       const skip = (this.pagination.current - 1) * this.pagination.limit
+
+      // Reset filter if clear is set
+      if (this.filter.conditions.length > 0 && this.filter.conditions.includes("clear"))
+        this.filter.conditions = []
 
       // Update targets
       try {

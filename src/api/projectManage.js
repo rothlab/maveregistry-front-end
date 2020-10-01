@@ -1,6 +1,6 @@
 import { Parse } from "./parseConnect.js"
 import { Team } from "./teamManage.js"
-import { getFollowStatus } from "./followManage.js"
+import { getFollowStatus, fetchFollowedObjectsByUserId } from "./followManage.js"
 
 // Helper function
 // Find unqiue entries
@@ -296,13 +296,31 @@ export async function addProject(projectInfo) {
 export async function fetchTargets(limit, skip, filter) {
   // Fetch targets
   const query = new Parse.Query(Target)
+  let followedProjectIds = []
 
   // Apply filter when available
   if (filter.type !== '') query.equalTo("type", filter.type)
   if (filter.organism !== '') query.equalTo("organism", filter.organism)
   if (filter.name !== '') query.startsWith("name", filter.name.toLowerCase())
   if (filter.created_after) query.greaterThanOrEqualTo("updatedAt", filter.created_after) // Using update date because we want to include all targets
+  if (filter.conditions.length > 0) {
+    const projectQuery = new Parse.Query(Project)
 
+    // Creator only
+    if (filter.conditions.includes("creator")) projectQuery.equalTo("creator", Parse.User.current())
+
+    // Open for funding
+    if (filter.conditions.includes("funding")) projectQuery.equalTo("funding.open_for_funding", true)
+
+    // Follower only
+    if (filter.conditions.includes("follower")) {
+      followedProjectIds = await fetchFollowedObjectsByUserId(Parse.User.current().id, "project", true)
+      projectQuery.containsAll("objectId", followedProjectIds)
+    }
+    
+    query.matchesQuery("projects", projectQuery)
+  }
+  
   query.exists("projects") // include only targets with projects associated
   query.include(["projects.team", "projects.team.creator", "projects.creator"]) // Include projects and team objects on the return
   query.include(["projects.recent_activity", "projects.public_activity"]) // Include projects and team objects on the return
@@ -325,11 +343,25 @@ export async function fetchTargets(limit, skip, filter) {
 
   let targets = await query.find()
 
-  // Filter projects if a created after filter is set
-  if (filter.created_after) {
-    targets.results = targets.results.filter((target) => {
+  // Filter projects
+  if (filter.created_after || filter.conditions.length > 0) {
+    targets.results = targets.results.map((target) => {
       let projects = target.get("projects")
-      projects = projects.filter(e => e.get("createdAt") >= filter.created_after)
+      // If a created after filter is set
+      if (filter.created_after) projects = projects.filter(e => e.get("createdAt") >= filter.created_after)
+
+      // If conditional filters are set
+      if (filter.conditions.length > 0) {
+        // If owner-only filter is set
+        if (filter.conditions.includes("creator")) 
+          projects = projects.filter(e => e.get("creator").id === Parse.User.current().id)
+        // If seekig funding-only filter is set
+        if (filter.conditions.includes("funding")) 
+          projects = projects.filter(e => e.get("funding") && e.get("funding").open_for_funding)
+        // If follower-only filter is set
+        if (filter.conditions.includes("follower"))
+          projects = projects.filter(e => followedProjectIds.includes(e.id))
+      }
       target.set("projects", projects)
       return target
     })
