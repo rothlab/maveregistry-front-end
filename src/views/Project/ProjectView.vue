@@ -489,7 +489,7 @@ export default {
       return this.activities.length > 0
     },
     hasActions() {
-      return !!this.hasTransfer || this.isOwner || this.isModerator
+      return this.hasLoggedIn && (!!this.hasTransfer || this.isOwner || this.isModerator)
     },
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
