@@ -169,6 +169,7 @@
 
               <!-- Filter by condition -->
               <b-dropdown
+                v-if="hasLoggedIn"
                 :triggers="['hover', 'click']"
                 v-model="filter.conditions"
                 multiple
@@ -400,7 +401,7 @@
                     <!-- Open for funding -->
                     <b-tooltip
                       label="Open for funding"
-                      v-if="project.open_for_funding"
+                      v-if="isFunder && project.open_for_funding"
                       type="is-warning"
                     >
                       <b-icon
@@ -686,6 +687,7 @@ import ShowMoreField from '@/components/Field/ShowMoreField.vue'
 import TipAction from '@/components/Action/TipAction.vue'
 import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
 import debounce from 'lodash/debounce'
+import pick from 'lodash/pick'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -730,7 +732,8 @@ export default {
         "funding": {
           name: "Projects with funding need",
           icon: "mdil-currency-usd",
-          icon_class: "has-background-warning has-text-dark"
+          icon_class: "has-background-warning has-text-dark",
+          role: "funder"
         },
       },
       // Filter
@@ -776,6 +779,11 @@ export default {
       }
     }
 
+    // Hide display elements based on role
+    if (!this.isFunder) {
+      const conditionKeys = Object.keys(this.conditions).filter(e => !this.conditions[e].role || this.conditions[e].role !== 'funder')
+      this.conditions = pick(this.conditions, conditionKeys)
+    }
     await this.fetchTargets()
     this.hasInitLoad = true
   },

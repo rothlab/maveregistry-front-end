@@ -70,6 +70,7 @@
             <div class="filter-same-line">
               <!-- Filter by conditions -->
               <b-dropdown
+                v-if="hasLoggedIn"
                 :triggers="['hover', 'click']"
                 v-model="filter.conditions"
                 multiple

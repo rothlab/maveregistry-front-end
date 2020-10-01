@@ -3,11 +3,14 @@ export default {
     hasLoggedIn() {
       return this.$store.getters.hasLoggedIn
     },
-    isModerator() {
-      return this.$store.getters.hasRole("moderator")
-    },
     isMember() {
       return this.$store.getters.hasRole("member")
+    },
+    isFunder() {
+      return this.isMember && this.$store.getters.hasRole("funder") || this.isModerator
+    },
+    isModerator() {
+      return this.isMember && this.$store.getters.hasRole("moderator")
     },
     currentUser() {
       return this.$store.getters.getUser
