@@ -126,7 +126,7 @@
         <div class="column content">
           <div class="p-margin">
             <p class="is-size-5">
-              <b>Last updated July 22, 2020</b>
+              <b>Last updated October 01, 2020</b>
             </p>
             <p>
               Thank you for choosing to be part of our community at Roth Laboratory (“Company”, “we”, “us”, or “our”).
@@ -440,6 +440,10 @@
                 <li>
                   <b>Website Performance Monitoring</b><br>
                   Sentry
+                </li>
+                <li>
+                  <b>Customer Support and Feedback Collection</b><br>
+                  Crisp
                 </li>
               </ul>
             </p>
