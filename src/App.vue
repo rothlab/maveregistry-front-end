@@ -5,7 +5,7 @@
       shadow
       spaced
       type="is-primary"
-      :is-active.sync="isOpenedBurger"
+      :active.sync="isOpenedBurger"
       v-if="!$route.meta.hideNav"
     >
       <!-- Logo -->
@@ -353,7 +353,7 @@ export default {
     }
 
     // Load feedback chat icon
-    this.initFeedbackButton()
+    if (process.env.NODE_ENV !== "development") this.initFeedbackButton()
   },
   data () {
     return {
