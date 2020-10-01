@@ -95,6 +95,7 @@
             <!-- Filter by type -->
             <b-dropdown
               :triggers="['hover', 'click']"
+              :mobile-modal="false"
               v-model="filter.type"
               @input="fetchTargets()"
             >
@@ -130,6 +131,7 @@
             <b-dropdown
               :triggers="['hover', 'click']"
               v-model="filter.organism"
+              :mobile-modal="false"
               position="is-bottom-left"
               @input="fetchTargets()"
             >
