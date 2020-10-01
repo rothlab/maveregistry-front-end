@@ -3,7 +3,7 @@
     <!-- First and Last name -->
     <b-field
       grouped
-      class="field-margin is-space-between"
+      class="field-margin field-space-between"
     >
       <ValidationProvider
         :rules="hasRequired"
@@ -68,7 +68,7 @@
     <!-- Position -->
     <b-field
       grouped
-      class="field-margin is-space-between"
+      class="field-margin field-space-between"
     >
       <ValidationProvider
         :rules="hasRequired"

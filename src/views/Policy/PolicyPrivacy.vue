@@ -739,29 +739,30 @@
               hoverable
               style="padding-bottom: 1rem"
             >
-              <template slot-scope="props">
-                <b-table-column
-                  field="category"
-                  label="Category"
-                >
-                  {{ props.row.category }}
-                </b-table-column>
-                <b-table-column
-                  field="examples"
-                  label="Examples"
-                >
-                  {{ props.row.examples }}
-                </b-table-column>
-                <b-table-column
-                  field="isCollected"
-                  label="Collected"
-                >
-                  <span>
-                    <b-icon :icon="props.row.isCollected ? 'mdil-check' : 'mdil-cancel'" />
-                    {{ props.row.isCollected ? "Yes" : "No" }}
-                  </span>
-                </b-table-column>
-              </template>
+              <b-table-column
+                field="category"
+                label="Category"
+                v-slot="props"
+              >
+                {{ props.row.category }}
+              </b-table-column>
+              <b-table-column
+                field="examples"
+                label="Examples"
+                v-slot="props"
+              >
+                {{ props.row.examples }}
+              </b-table-column>
+              <b-table-column
+                field="isCollected"
+                label="Collected"
+                v-slot="props"
+              >
+                <span>
+                  <b-icon :icon="props.row.isCollected ? 'mdil-check' : 'mdil-cancel'" />
+                  {{ props.row.isCollected ? "Yes" : "No" }}
+                </span>
+              </b-table-column>
             </b-table>
             <p>
               We may also collect other personal information outside of these categories in instances where you interact with us in-person, 

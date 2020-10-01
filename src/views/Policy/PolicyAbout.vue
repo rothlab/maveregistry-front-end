@@ -176,41 +176,42 @@
               icon-pack="mdil"
               default-sort="project"
             >
-              <template slot-scope="props">
-                <b-table-column
-                  field="project"
-                  label="Project"
-                  sortable
+              <b-table-column
+                field="project"
+                label="Project"
+                sortable
+                v-slot="props"
+              >
+                <a
+                  :href="props.row.link"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <a
-                    :href="props.row.link"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {{ props.row.project }}
-                  </a>
-                </b-table-column>
-                <b-table-column
-                  field="team"
-                  label="Team/Authors"
-                  sortable
+                  {{ props.row.project }}
+                </a>
+              </b-table-column>
+              <b-table-column
+                field="team"
+                label="Team/Authors"
+                sortable
+                v-slot="props"
+              >
+                {{ props.row.team }}
+              </b-table-column>
+              <b-table-column
+                field="license"
+                label="License"
+                sortable
+                v-slot="props"
+              >
+                <a
+                  :href="props.row.license_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  {{ props.row.team }}
-                </b-table-column>
-                <b-table-column
-                  field="license"
-                  label="License"
-                  sortable
-                >
-                  <a
-                    :href="props.row.license_url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {{ props.row.license }}
-                  </a>
-                </b-table-column>
-              </template>
+                  {{ props.row.license }}
+                </a>
+              </b-table-column>
             </b-table>
           </div>
         </div>

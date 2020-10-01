@@ -86,6 +86,9 @@ export default {
       isConfirmDeleteUserModalActive: false,
     }
   },
+  mounted() {
+    if (this.$route.hash === "#email-preference") this.isNotificationPreferenceIdModalActive = true
+  },
   methods: {
     async resetPassword() {
       try {

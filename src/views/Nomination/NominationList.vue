@@ -77,7 +77,7 @@
           <template slot="top-left">
             <!-- Filter by type -->
             <b-dropdown
-              hoverable
+              :triggers="['hover', 'click']"
               v-model="filter.type"
               @input="fetchNominations()"
             >
@@ -111,7 +111,7 @@
 
             <!-- Filter by organism -->
             <b-dropdown
-              hoverable
+              :triggers="['hover', 'click']"
               v-model="filter.organism"
               position="is-bottom-left"
               @input="fetchNominations()"
@@ -159,7 +159,7 @@
             <b-field style="margin-left: 0.5em; margin-bottom: 0">
               <b-datepicker
                 v-model="filter.created_after"
-                placeholder="Created Since a Date"
+                placeholder="Created Since"
                 icon="mdil-calendar"
                 icon-prev="mdil-chevron-left"
                 icon-next="mdil-chevron-right"
@@ -214,196 +214,202 @@
             </div>
           </template>
 
-          <template slot-scope="props">
-            <!-- Target name-->
-            <b-table-column
-              field="target_name"
-              label="Name"
-              class="is-uppercase"
-            >
-              {{ props.row.target.name }}
-            </b-table-column>
+          <!-- Target name-->
+          <b-table-column
+            field="target_name"
+            label="Name"
+            class="is-uppercase"
+            v-slot="props"
+          >
+            {{ props.row.target.name }}
+          </b-table-column>
 
-            <!-- Target type -->
-            <b-table-column
-              field="target_type"
-              label="Type"
-              class="is-capitalized"
-            >
-              {{ props.row.target.type }}
-            </b-table-column>
+          <!-- Target type -->
+          <b-table-column
+            field="target_type"
+            label="Type"
+            class="is-capitalized"
+            v-slot="props"
+          >
+            {{ props.row.target.type }}
+          </b-table-column>
 
-            <!-- Target species -->
-            <b-table-column
-              field="target_organism"
-              label="Organism"
-            >
-              <i>{{ props.row.target.organism }}</i>
-            </b-table-column>
+          <!-- Target species -->
+          <b-table-column
+            field="target_organism"
+            label="Organism"
+            v-slot="props"
+          >
+            <i>{{ props.row.target.organism }}</i>
+          </b-table-column>
 
-            <!-- Reason -->
-            <b-table-column
-              field="reason"
-              label="Reason"
-              width="32vw"
-            >
-              {{ props.row.reason }}
-            </b-table-column>
+          <!-- Reason -->
+          <b-table-column
+            field="reason"
+            label="Reason"
+            width="32vw"
+            v-slot="props"
+          >
+            {{ props.row.reason }}
+          </b-table-column>
 
-            <!-- Nominator -->
-            <b-table-column
-              field="nominator"
-              label="Nominator"
-              width="5vw"
+          <!-- Nominator -->
+          <b-table-column
+            field="nominator"
+            label="Nominator"
+            width="5vw"
+            v-slot="props"
+          >
+            <router-link
+              :to="{ path: `/user/${props.row.by.username}`}"
+              target="_blank"
             >
-              <router-link
-                :to="{ path: `/user/${props.row.by.username}`}"
-                target="_blank"
+              <b-tag
+                size="is-medium"
+                class="is-capitalized shadow has-fullwidth"
+                style="justify-content: left"
               >
-                <b-tag
-                  size="is-medium"
-                  class="is-capitalized shadow"
+                <b-icon
+                  icon="mdil-account"
+                  class="team-icon"
+                />
+                {{ props.row.by.first_name }} {{ props.row.by.last_name }}
+              </b-tag>
+            </router-link>
+          </b-table-column>
+
+          <!-- Vote -->
+          <b-table-column
+            field="vote"
+            label="Vote"
+            width="5vw"
+            v-slot="props"
+          >
+            <b-field>
+              <p class="control action-button">
+                <b-tooltip
+                  label="Up Vote"
+                  type="is-success"
+                  position="is-left"
                 >
-                  <b-icon
-                    icon="mdil-account"
-                    class="team-icon"
+                  <b-button
+                    icon-left="mdil-thumb-up"
+                    @click="vote(props.row, 'up', props.index)"
+                    :type="props.row.vote.current_user && props.row.vote.current_user.action === 'up' ? 'is-success' : 'is-light' "
+                  >
+                    {{ props.row.vote.up }}
+                  </b-button>
+                </b-tooltip>
+              </p>
+              <p class="control action-button">
+                <b-tooltip
+                  label="Down Vote"
+                  type="is-danger"
+                  position="is-left"
+                >
+                  <b-button
+                    icon-left="mdil-thumb-down"
+                    @click="vote(props.row, 'down', props.index)"
+                    :type="props.row.vote.current_user && props.row.vote.current_user.action === 'down' ? 'is-danger' : 'is-light' "
+                  >
+                    {{ props.row.vote.down }}
+                  </b-button>
+                </b-tooltip>
+              </p>
+            </b-field>
+          </b-table-column>
+
+          <!-- Action -->
+          <b-table-column
+            field="action"
+            label="Action"
+            width="5vw"
+            v-slot="props"
+          >
+            <b-field>
+              <p
+                class="control action-button"
+                v-if="hasLoggedIn"
+              >
+                <b-tooltip
+                  label="Add New Project"
+                  type="is-dark"
+                  position="is-left"
+                >
+                  <b-button
+                    icon-right="mdil-plus"
+                    @click="addNewProject(props.row)"
+                    type="is-light"
                   />
-                  {{ props.row.by.first_name }} {{ props.row.by.last_name }}
-                </b-tag>
-              </router-link>
-            </b-table-column>
-
-            <!-- Vote -->
-            <b-table-column
-              field="vote"
-              label="Vote"
-              width="5vw"
-            >
-              <b-field>
-                <p class="control action-button">
-                  <b-tooltip
-                    label="Up Vote"
-                    type="is-success"
-                    position="is-left"
-                  >
-                    <b-button
-                      icon-left="mdil-thumb-up"
-                      @click="vote(props.row, 'up', props.index)"
-                      :type="props.row.vote.current_user && props.row.vote.current_user.action === 'up' ? 'is-success' : 'is-light' "
-                    >
-                      {{ props.row.vote.up }}
-                    </b-button>
-                  </b-tooltip>
-                </p>
-                <p class="control action-button">
-                  <b-tooltip
-                    label="Down Vote"
-                    type="is-danger"
-                    position="is-left"
-                  >
-                    <b-button
-                      icon-left="mdil-thumb-down"
-                      @click="vote(props.row, 'down', props.index)"
-                      :type="props.row.vote.current_user && props.row.vote.current_user.action === 'down' ? 'is-danger' : 'is-light' "
-                    >
-                      {{ props.row.vote.down }}
-                    </b-button>
-                  </b-tooltip>
-                </p>
-              </b-field>
-            </b-table-column>
-
-            <!-- Action -->
-            <b-table-column
-              field="action"
-              label="Action"
-              width="5vw"
-            >
-              <b-field>
-                <p
-                  class="control action-button"
-                  v-if="hasLoggedIn"
+                </b-tooltip>
+              </p>
+              <p class="control action-button">
+                <b-tooltip
+                  v-if="props.row.target.type == 'Gene' && props.row.target.organism == 'H. sapiens'"
+                  label="Explore at MaveQuest"
+                  type="is-info"
+                  position="is-left"
                 >
-                  <b-tooltip
-                    label="Add New Project"
-                    type="is-dark"
-                    position="is-left"
+                  <b-button
+                    tag="a"
+                    :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
+                    target="_blank"
+                    type="is-light"
+                    class="mavequest-button"
                   >
-                    <b-button
-                      icon-right="mdil-plus"
-                      @click="addNewProject(props.row)"
-                      type="is-light"
-                    />
-                  </b-tooltip>
-                </p>
-                <p class="control action-button">
-                  <b-tooltip
-                    v-if="props.row.target.type == 'Gene' && props.row.target.organism == 'H. sapiens'"
-                    label="Explore at MaveQuest"
-                    type="is-info"
-                    position="is-left"
-                  >
-                    <b-button
-                      tag="a"
-                      :href="'https://mavequest.varianteffect.org/query?gene=' + props.row.name"
-                      target="_blank"
-                      type="is-light"
-                      class="mavequest-button"
-                    >
-                      <img src="@/assets/image/mavequest_logo_grey.png">
-                    </b-button>
-                  </b-tooltip>
-                  <b-tooltip
-                    v-else
-                    label="Look up"
-                    type="is-info"
-                    position="is-left"
-                  >
-                    <b-button
-                      tag="a"
-                      :href="'https://www.google.com/search?q=' + props.row.name"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      icon-right="mdil-magnify"
-                      type="is-light"
-                    />
-                  </b-tooltip>
-                </p>
-                <p
-                  class="control action-button"
-                  v-if="hasLoggedIn && currentUser && currentUser.username === props.row.by.username"
+                    <img src="@/assets/image/mavequest_logo_grey.png">
+                  </b-button>
+                </b-tooltip>
+                <b-tooltip
+                  v-else
+                  label="Look up"
+                  type="is-info"
+                  position="is-left"
                 >
-                  <b-tooltip
-                    label="Edit Nomination"
-                    type="is-dark"
-                    position="is-left"
-                  >
-                    <b-button
-                      icon-right="mdil-pencil"
-                      type="is-light"
-                      @click="handleNewTargetModal(props.row)"
-                    />
-                  </b-tooltip>
-                </p>
-                <p
-                  class="control action-button"
-                  v-if="hasLoggedIn && currentUser && currentUser.username === props.row.by.username"
+                  <b-button
+                    tag="a"
+                    :href="'https://www.google.com/search?q=' + props.row.name"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    icon-right="mdil-magnify"
+                    type="is-light"
+                  />
+                </b-tooltip>
+              </p>
+              <p
+                class="control action-button"
+                v-if="hasLoggedIn && currentUser && currentUser.username === props.row.by.username"
+              >
+                <b-tooltip
+                  label="Edit Nomination"
+                  type="is-dark"
+                  position="is-left"
                 >
-                  <b-tooltip
-                    label="Delete Nomination"
-                    position="is-left"
-                    type="is-dark"
-                  >
-                    <b-button
-                      icon-right="mdil-delete"
-                      type="is-light"
-                      @click="selectedNomination = props.row; isConfirmDeleteModalActive = true"
-                    />
-                  </b-tooltip>
-                </p>
-              </b-field>
-            </b-table-column>
-          </template>
+                  <b-button
+                    icon-right="mdil-pencil"
+                    type="is-light"
+                    @click="handleNewTargetModal(props.row)"
+                  />
+                </b-tooltip>
+              </p>
+              <p
+                class="control action-button"
+                v-if="hasLoggedIn && currentUser && currentUser.username === props.row.by.username"
+              >
+                <b-tooltip
+                  label="Delete Nomination"
+                  position="is-left"
+                  type="is-dark"
+                >
+                  <b-button
+                    icon-right="mdil-delete"
+                    type="is-light"
+                    @click="selectedNomination = props.row; isConfirmDeleteModalActive = true"
+                  />
+                </b-tooltip>
+              </p>
+            </b-field>
+          </b-table-column>
         </b-table>
       </div>
 
