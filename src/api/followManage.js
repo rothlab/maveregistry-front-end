@@ -153,15 +153,17 @@ export async function fetchFollows(target, type, request = false, limit = 10, sk
   return follows 
 }
 
-export async function fetchFollowsByUserId(id) {
+export async function fetchFollowedObjectsByUserId(id, type = undefined, approved = false) {
   const userQuery = new Parse.Query(Parse.User)
   userQuery.equalTo("objectId", id)
   const query = new Parse.Query(Follow)
   query.matchesQuery("by", userQuery)
+  if (type) query.equalTo("type", type)
+  if (approved) query.exists("approvedAt")
 
   const follows = await query.find()
 
-  return await Promise.all(follows.map(e => e.format(false)))
+  return follows.map(e => e.get("target"))
 }
 
 export async function countFollows(target, type, request = false) {

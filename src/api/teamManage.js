@@ -147,18 +147,24 @@ export async function updateTeam(id, payload) {
 export async function fetchTeams(limit, skip, filter = undefined, objects = []) {
   Parse.User._clearCache()
 
-  let query;
-  query = new Parse.Query(Team)
-  if (filter && filter.pi) {
-    const firstNameQuery = new Parse.Query(Team)
-    const lastNameQuery = new Parse.Query(Team)
-    firstNameQuery.startsWith('first_name', filter.pi.toLowerCase())
-    lastNameQuery.startsWith('last_name', filter.pi.toLowerCase())
-  
-    // Execute OR query
-    query = Parse.Query.or(firstNameQuery, lastNameQuery)
+  let query = new Parse.Query(Team)
+  if (filter) {
+    if (filter.pi) {
+      const firstNameQuery = new Parse.Query(Team)
+      const lastNameQuery = new Parse.Query(Team)
+      firstNameQuery.startsWith('first_name', filter.pi.toLowerCase())
+      lastNameQuery.startsWith('last_name', filter.pi.toLowerCase())
+    
+      // Execute OR query
+      query = Parse.Query.or(firstNameQuery, lastNameQuery)
+    }
+
+    if (filter.created_after) query.greaterThanOrEqualTo("createdAt", filter.created_after)
+    
+    if (filter.conditions.length > 0) {
+      if (filter.conditions.includes("creator")) query.equalTo("creator", Parse.User.current())
+    }
   }
-  if (filter && filter.created_after) query.greaterThanOrEqualTo("createdAt", filter.created_after)
   
   // Apply pagination
   if (objects.includes("creator")) {

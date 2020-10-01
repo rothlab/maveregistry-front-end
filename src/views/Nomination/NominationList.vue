@@ -74,89 +74,138 @@
           @page-change="(change) => { pagination.current = change; fetchNominations() }"
         >
           <!-- Filter -->
+          <!-- These filters will be on the same line -->
           <template slot="top-left">
-            <!-- Filter by type -->
-            <b-dropdown
-              :triggers="['hover', 'click']"
-              v-model="filter.type"
-              @input="fetchNominations()"
-            >
-              <b-button
-                slot="trigger"
-                slot-scope="{ active }"
-                :type="filter.type ? 'is-info' : 'is-light'"
+            <div class="filter-same-line">
+              <!-- Filter by type -->
+              <b-dropdown
+                :triggers="['hover', 'click']"
+                v-model="filter.type"
+                :mobile-modal="false"
+                @input="fetchNominations()"
+                class="filter-item"
               >
-                <FilterOutline
-                  class="filter-icon icon-18px"
-                />
-                <span style="margin-left: 0.25rem">Type</span>
-                <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
-              </b-button>
+                <b-button
+                  slot="trigger"
+                  slot-scope="{ active }"
+                  :type="filter.type ? 'is-info' : 'is-light'"
+                >
+                  <FilterOutline
+                    class="filter-icon icon-18px"
+                  />
+                  <span style="margin-left: 0.25rem">Type</span>
+                  <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+                </b-button>
 
-              <b-dropdown-item
-                v-if="filter.type !== ''"
-                value=""
-                class="has-text-info"
-              >
-                Clear Filter
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-for="(type, id) in types"
-                :key="id"
-                :value="type"
-              >
-                {{ type }}
-              </b-dropdown-item>
-            </b-dropdown>
+                <b-dropdown-item
+                  v-if="filter.type !== ''"
+                  value=""
+                  class="has-text-info"
+                >
+                  Clear Filter
+                </b-dropdown-item>
+                <b-dropdown-item
+                  v-for="(type, id) in types"
+                  :key="id"
+                  :value="type"
+                >
+                  {{ type }}
+                </b-dropdown-item>
+              </b-dropdown>
 
-            <!-- Filter by organism -->
-            <b-dropdown
-              :triggers="['hover', 'click']"
-              v-model="filter.organism"
-              position="is-bottom-left"
-              @input="fetchNominations()"
-            >
-              <b-button
-                slot="trigger"
-                slot-scope="{ active }"
-                :type="filter.organism ? 'is-info' : 'is-light'"
+              <!-- Filter by organism -->
+              <b-dropdown
+                :triggers="['hover', 'click']"
+                v-model="filter.organism"
+                :mobile-modal="false"
+                position="is-bottom-left"
+                @input="fetchNominations()"
+                class="filter-item"
               >
-                <FilterOutline
-                  class="filter-icon icon-18px"
-                />
-                <span style="margin-left: 0.25rem">Organism</span>
-                <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
-              </b-button>
+                <b-button
+                  slot="trigger"
+                  slot-scope="{ active }"
+                  :type="filter.organism ? 'is-info' : 'is-light'"
+                >
+                  <FilterOutline
+                    class="filter-icon icon-18px"
+                  />
+                  <span style="margin-left: 0.25rem">Organism</span>
+                  <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+                </b-button>
 
-              <b-dropdown-item
-                v-if="filter.organism !== ''"
-                value=""
-                class="has-text-info"
+                <b-dropdown-item
+                  v-if="filter.organism !== ''"
+                  value=""
+                  class="has-text-info"
+                >
+                  Clear Filter
+                </b-dropdown-item>
+                <b-dropdown-item
+                  v-for="(organism, id) in organisms"
+                  :key="id"
+                  :value="organism"
+                >
+                  <i>{{ organism }}</i>
+                </b-dropdown-item>
+              </b-dropdown>
+
+              <!-- Filter by ID (only shown when a query param is available) -->
+              <b-tag
+                style="height: 2.5rem !important; font-size: 16px"
+                type="is-info"
+                closable
+                @close="clearIdFilter"
+                v-if="queryId"
+                class="filter-item"
               >
-                Clear Filter
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-for="(organism, id) in organisms"
-                :key="id"
-                :value="organism"
+                ID: {{ queryId }}
+              </b-tag>
+
+              <!-- Filter by conditions -->
+              <b-dropdown
+                v-if="hasLoggedIn"
+                :triggers="['hover', 'click']"
+                v-model="filter.conditions"
+                multiple
+                :mobile-modal="false"
+                position="is-bottom-right"
+                @input="fetchNominations()"
+                class="filter-item"
               >
-                <i>{{ organism }}</i>
-              </b-dropdown-item>
-            </b-dropdown>
+                <b-button
+                  slot="trigger"
+                  slot-scope="{ active }"
+                  :type="filter.conditions.length > 0 ? 'is-info' : 'is-light'"
+                >
+                  <FilterOutline
+                    class="filter-icon icon-18px"
+                  />
+                  <span style="margin-left: 0.25rem">Condition</span>
+                  <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+                </b-button>
 
-            <!-- Filter by ID (only shown when a query param is available) -->
-            <b-tag
-              style="margin-left: 0.5em; height: 2.25rem !important; font-size: 16px"
-              type="is-info"
-              closable
-              @close="clearIdFilter"
-              v-if="queryId"
-            >
-              ID: {{ queryId }}
-            </b-tag>
+                <b-dropdown-item
+                  v-if="filter.conditions.length > 0"
+                  value="clear"
+                  class="has-text-info"
+                >
+                  Clear Filter
+                </b-dropdown-item>
+                <b-dropdown-item
+                  v-for="(key, id) in Object.keys(conditions)"
+                  :key="id"
+                  :value="key"
+                >
+                  <b-icon
+                    :class="`circle-icon ${conditions[key].icon_class}`"
+                    :icon="conditions[key].icon"
+                  />
+                  {{ conditions[key].name }}
+                </b-dropdown-item>
+              </b-dropdown>
 
-            <!-- Filter by creation date -->
-            <b-field style="margin-left: 0.5em; margin-bottom: 0">
+              <!-- Filter by creation date -->
               <b-datepicker
                 v-model="filter.created_after"
                 placeholder="Created Since"
@@ -164,8 +213,27 @@
                 icon-prev="mdil-chevron-left"
                 icon-next="mdil-chevron-right"
                 :class="{ 'highlight-filter': filter.created_after }"
+                :max-date="new Date()"
                 @input="fetchNominations()"
+                class="filter-item"
               >
+                <template v-slot:trigger>
+                  <b-tooltip
+                    label="Target nominated on or after this date"
+                    type="is-dark"
+                  >
+                    <b-button
+                      :type="filter.created_after ? 'is-info' : 'is-light'"
+                    >
+                      <FilterOutline
+                        class="filter-icon icon-18px"
+                      />
+                      <span>
+                        {{ filter.created_after ? filter.created_after.toLocaleDateString() : "Date" }}
+                      </span>
+                    </b-button>
+                  </b-tooltip>
+                </template>
                 <b-button
                   type="is-info"
                   outlined
@@ -176,21 +244,24 @@
                   Clear Filter
                 </b-button>
               </b-datepicker>
-            </b-field>
 
-            <!-- Filter by name -->
-            <b-field style="margin-left: 0.5em">
-              <b-input
-                v-model="filter.name"
-                placeholder="Search Name"
-                icon="mdil-magnify"
-                :icon-right="filter.name ? 'mdil-delete': ''"
-                icon-right-clickable
-                @icon-right-click="filter.name = ''; fetchNominations()"
-                :class="{ 'highlight-filter': filter.name }"
-                @input="debouncedFetchNominations()"
-              />
-            </b-field>
+              <!-- Filter by name -->
+              <b-field
+                class="filter-item"
+                style="width: 10rem"
+              >
+                <b-input
+                  v-model="filter.name"
+                  placeholder="Search Name"
+                  icon="mdil-magnify"
+                  :icon-right="filter.name ? 'mdil-delete': ''"
+                  icon-right-clickable
+                  @icon-right-click="filter.name = ''; fetchNominations()"
+                  :class="{ 'highlight-filter': filter.name }"
+                  @input="debouncedFetchNominations()"
+                />
+              </b-field>
+            </div>
           </template>
 
           <!-- No results -->
@@ -274,6 +345,17 @@
                   class="team-icon"
                 />
                 {{ props.row.by.first_name }} {{ props.row.by.last_name }}
+                <b-tooltip
+                  label="Your nomination"
+                  type="is-success"
+                  v-if="props.row.by.username === currentUser.username"
+                  style="margin-left: 0.75rem"
+                >
+                  <b-icon
+                    icon="mdil-account"
+                    class="circle-icon has-background-success has-text-light"
+                  />
+                </b-tooltip>
               </b-tag>
             </router-link>
           </b-table-column>
@@ -486,11 +568,19 @@ export default {
         limit: 10,
         current: 1
       },
+      conditions: {
+        "creator": { 
+          name: "Targets you nominated", 
+          icon: "mdil-account",
+          icon_class: "has-background-success has-text-light"
+        }
+      },
       filter: {
         type: "",
         organism: "",
         name: "",
-        created_after: undefined
+        created_after: undefined,
+        conditions: []
       },
       types: variables.target_types,
       organisms: variables.target_organisms,
@@ -546,6 +636,10 @@ export default {
 
       // Calculate skip
       const skip = (this.pagination.current - 1) * this.pagination.limit
+
+      // Reset filter if clear is set
+      if (this.filter.conditions.length > 0 && this.filter.conditions.includes("clear"))
+        this.filter.conditions = []
 
       try {
         const nominations = await NominationManage.fetchNominations(this.pagination.limit, skip, this.filter)

@@ -65,9 +65,53 @@
           @page-change="(change) => { pagination.current = change; fetchTeams() }"
         >
           <!-- Filter -->
+          <!-- These filters will be on the same line -->
           <template slot="top-left">
-            <!-- Filter by creation date -->
-            <b-field style="margin-bottom: 0">
+            <div class="filter-same-line">
+              <!-- Filter by conditions -->
+              <b-dropdown
+                v-if="hasLoggedIn"
+                :triggers="['hover', 'click']"
+                v-model="filter.conditions"
+                multiple
+                :mobile-modal="false"
+                position="is-bottom-right"
+                @input="fetchTeams()"
+                class="filter-item"
+              >
+                <b-button
+                  slot="trigger"
+                  slot-scope="{ active }"
+                  :type="filter.conditions.length > 0 ? 'is-info' : 'is-light'"
+                >
+                  <FilterOutline
+                    class="filter-icon icon-18px"
+                  />
+                  <span style="margin-left: 0.25rem">Condition</span>
+                  <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+                </b-button>
+
+                <b-dropdown-item
+                  v-if="filter.conditions.length > 0"
+                  value="clear"
+                  class="has-text-info"
+                >
+                  Clear Filter
+                </b-dropdown-item>
+                <b-dropdown-item
+                  v-for="(key, id) in Object.keys(conditions)"
+                  :key="id"
+                  :value="key"
+                >
+                  <b-icon
+                    :class="`circle-icon ${conditions[key].icon_class}`"
+                    :icon="conditions[key].icon"
+                  />
+                  {{ conditions[key].name }}
+                </b-dropdown-item>
+              </b-dropdown>
+
+              <!-- Filter by creation date -->
               <b-datepicker
                 v-model="filter.created_after"
                 placeholder="Created Since"
@@ -75,8 +119,27 @@
                 icon-prev="mdil-chevron-left"
                 icon-next="mdil-chevron-right"
                 :class="{ 'highlight-filter': filter.created_after }"
+                :max-date="new Date()"
                 @input="fetchTeams()"
+                class="filter-item"
               >
+                <template v-slot:trigger>
+                  <b-tooltip
+                    label="Team created on or after this date"
+                    type="is-dark"
+                  >
+                    <b-button
+                      :type="filter.created_after ? 'is-info' : 'is-light'"
+                    >
+                      <FilterOutline
+                        class="filter-icon icon-18px"
+                      />
+                      <span>
+                        {{ filter.created_after ? filter.created_after.toLocaleDateString() : "Date" }}
+                      </span>
+                    </b-button>
+                  </b-tooltip>
+                </template>
                 <b-button
                   type="is-info"
                   outlined
@@ -87,21 +150,24 @@
                   Clear Filter
                 </b-button>
               </b-datepicker>
-            </b-field>
 
-            <!-- Filter by PI -->
-            <b-field style="margin-left: 0.5em; margin-bottom: 0">
-              <b-input
-                v-model="filter.pi"
-                placeholder="Search Investigator"
-                icon="mdil-magnify"
-                :icon-right="filter.pi ? 'mdil-delete': ''"
-                icon-right-clickable
-                @icon-right-click="filter.pi = ''; fetchTeams()"
-                :class="{ 'highlight-filter': filter.pi }"
-                @input="debouncedFetchTeams()"
-              />
-            </b-field>
+              <!-- Filter by PI -->
+              <b-field
+                class="filter-item"
+                style="width: 15rem"
+              >
+                <b-input
+                  v-model="filter.pi"
+                  placeholder="Search Investigator"
+                  icon="mdil-magnify"
+                  :icon-right="filter.pi ? 'mdil-delete': ''"
+                  icon-right-clickable
+                  @icon-right-click="filter.pi = ''; fetchTeams()"
+                  :class="{ 'highlight-filter': filter.pi }"
+                  @input="debouncedFetchTeams()"
+                />
+              </b-field>
+            </div>
           </template>
 
           <!-- No results -->
@@ -141,6 +207,16 @@
                   >
                     {{ props.row.first_name }} {{ props.row.last_name }}
                   </router-link>
+                  <b-tooltip
+                    label="Team you created"
+                    type="is-success"
+                    v-if="props.row.creator.username === currentUser.username"
+                  >
+                    <b-icon
+                      icon="mdil-account"
+                      class="circle-icon has-background-success has-text-light"
+                    />
+                  </b-tooltip>
                 </p>
               </div>
 
@@ -241,7 +317,6 @@
             label="Action"
             width="5vw"
             v-slot="props"
-            v-if="currentUser && teams.some(e => e.creator && e.creator.username !== currentUser.username )"
           >
             <div
               class="action-button is-flex"
@@ -313,6 +388,7 @@ import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import debounce from 'lodash/debounce'
+import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
 
 export default {
   title: "Teams",
@@ -320,7 +396,8 @@ export default {
     NewTeamModal,
     FollowModal,
     UnfollowModal,
-    Error
+    Error,
+    FilterOutline
   },
   computed: {
     hasLoggedIn() {
@@ -348,9 +425,17 @@ export default {
         creator: {},
         type: "team"
       },
+      conditions: {
+        "creator": { 
+          name: "Teams you created", 
+          icon: "mdil-account",
+          icon_class: "has-background-success has-text-light"
+        }
+      },
       filter: {
         pi: "",
-        created_after: undefined
+        created_after: undefined,
+        conditions: []
       },
       errorMessage: "",
       hasInitLoad: false
@@ -405,6 +490,10 @@ export default {
       // Calculate skip
       const skip = (this.pagination.current - 1) * this.pagination.limit
       
+      // Reset filter if clear is set
+      if (this.filter.conditions.length > 0 && this.filter.conditions.includes("clear"))
+        this.filter.conditions = []
+
       // Update targets
       try {
         const teams = await TeamManage.fetchTeams(this.pagination.limit, skip, this.filter, ["project", "follow", "creator"])

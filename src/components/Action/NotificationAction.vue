@@ -5,6 +5,7 @@
       position="is-bottom-left"
       aria-role="menu"
       animation="fadeInDown"
+      :mobile-modal="false"
       @active-change="refreshTimeElapsed"
     >
       <a
