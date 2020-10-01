@@ -289,7 +289,7 @@
           <b-table-column
             field="target_name"
             label="Name"
-            class="is-uppercase"
+            cell-class="is-uppercase"
             v-slot="props"
           >
             {{ props.row.target.name }}
@@ -299,7 +299,7 @@
           <b-table-column
             field="target_type"
             label="Type"
-            class="is-capitalized"
+            cell-class="is-capitalized"
             v-slot="props"
           >
             {{ props.row.target.type }}
