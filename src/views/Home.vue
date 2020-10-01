@@ -88,28 +88,6 @@
           </div>
         </div>
       </div>
-      <div class="hero-footer">
-        <!-- Tip to the next section -->
-        <div class="tip has-text-centered">
-          <p
-            class="is-inline-flex has-vcentered delay-2s"
-            v-animate="'fadeIn'"
-          >
-            <a
-              href="#landing-1"
-              v-scroll-to="'#landing-1'"
-              class="has-text-white"
-            >
-              <b-icon
-                custom-size="mdil-24px"
-                class="dalay-2s updown"
-                icon="mdil-chevron-double-down"
-              />
-              <span>How does Mave Registry work?</span>
-            </a>
-          </p>
-        </div>
-      </div>
     </section>
 
     <!-- Onboarding section 1 -->
@@ -185,27 +163,6 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="hero-footer">
-        <!-- Tip to the next section -->
-        <div class="tip has-text-centered">
-          <p 
-            class="is-inline-flex has-vcentered delay-2s"
-            v-animate="'fadeIn'"
-          >
-            <a
-              v-scroll-to="'#landing-2'"
-              class="has-text-dark"
-            >
-              <b-icon
-                class="updown"
-                custom-size="mdil-24px"
-                icon="mdil-chevron-double-down"
-              />
-              <span>What can Mave Registry do for you?</span>
-            </a>
-          </p>
         </div>
       </div>
     </section>
@@ -408,7 +365,7 @@ export default {
     max-width: 35rem
 @media screen and (max-width: $break-desktop)
   .full-height
-    height: calc( 100vh - 10rem )
+    height: calc( 100vh - 3rem )
 @media screen and (max-width: $break-mobile)
   .landing
     text-align: center
