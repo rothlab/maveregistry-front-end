@@ -413,7 +413,7 @@
                     <!-- Owner -->
                     <b-tooltip
                       label="Project you created"
-                      v-if="currentUser && project.creator.username === currentUser.username"
+                      v-if="hasLoggedIn && project.creator.username === currentUser.username"
                       type="is-success"
                     >
                       <b-icon

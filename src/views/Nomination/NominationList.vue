@@ -348,7 +348,7 @@
                 <b-tooltip
                   label="Your nomination"
                   type="is-success"
-                  v-if="props.row.by.username === currentUser.username"
+                  v-if="hasLoggedIn && props.row.by.username === currentUser.username"
                   style="margin-left: 0.75rem"
                 >
                   <b-icon
