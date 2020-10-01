@@ -159,7 +159,7 @@
             <b-field style="margin-left: 0.5em; margin-bottom: 0">
               <b-datepicker
                 v-model="filter.created_after"
-                placeholder="Created Since a Date"
+                placeholder="Created Since"
                 icon="mdil-calendar"
                 icon-prev="mdil-chevron-left"
                 icon-next="mdil-chevron-right"
