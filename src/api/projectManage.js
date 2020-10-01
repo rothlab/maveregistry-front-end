@@ -45,7 +45,7 @@ export const Target = Parse.Object.extend("Target", {
 
     // Get follow status for projects and teams
     const projectFollowStatus = await getFollowStatus(projects.map(e => e.id), "project", Parse.User.current())
-    const teamFollowStatus = await getFollowStatus(teams.map(e => e.id), "team", Parse.User.current())
+    // const teamFollowStatus = await getFollowStatus(teams.map(e => e.id), "team", Parse.User.current())
 
     return {
       id: this.id,
@@ -88,12 +88,12 @@ export const Target = Parse.Object.extend("Target", {
 
         return ret
       })),
-      teams: teams.map((e, i) => {
+      teams: teams.map((e) => {
         const creator = e.get("creator")
 
         let ret = {
           id: e.id,
-          name: e.get("first_name").substring(0, 1) + ' ' + e.get("last_name")
+          name: e.get("first_name") + ' ' + e.get("last_name")
         }
 
         if (creator) ret.creator = {
@@ -102,7 +102,7 @@ export const Target = Parse.Object.extend("Target", {
           last_name: creator.get("last_name"),
           profile_image: creator.get("profile_image")
         }
-        if (teamFollowStatus.length > i) ret.follow_status = teamFollowStatus[i]
+        // if (teamFollowStatus.length > i) ret.follow_status = teamFollowStatus[i]
 
         return ret
       })

@@ -538,7 +538,6 @@
           <b-table-column
             field="team"
             label="Team"
-            width="12vw"
             v-slot="props"
           >
             <div
@@ -579,45 +578,6 @@
                       />
                       {{ team.name }}
                     </router-link>
-                  </b-tag>
-                    
-                  <!-- Followed status -->
-                  <b-tag
-                    v-if="currentUser && team.creator && team.creator.username !== currentUser.username && team.follow_status.id"
-                    size="is-medium"
-                    class="is-clickable"
-                    :class="{ 'has-background-warning': team.follow_status.status === 'pending', 'has-background-info': team.follow_status.status === 'yes' }"
-                    @click.native="confirmUnfollow(team.follow_status.id, 'team')"
-                  >
-                    <b-tooltip
-                      :label="team.follow_status.status === 'pending' ? 'Pending Approval. Click to cancel request.' : 'Unfollow Team'"
-                      type="is-dark"
-                      position="is-left"
-                    >
-                      <span 
-                        :class="{ 
-                          'has-text-dark': team.follow_status.status === 'pending',
-                          'has-text-light': team.follow_status.status === 'yes'
-                        }"
-                      >
-                        {{ team.follow_status.status === 'pending' ? "Pending" : "Following" }}
-                      </span>
-                    </b-tooltip>
-                  </b-tag>
-                  <!-- Unfollowed status -->
-                  <b-tag
-                    v-else-if="currentUser && team.creator && team.creator.username !== currentUser.username && !team.follow_status.id"
-                    size="is-medium"
-                    class="is-clickable has-background-white-bis"
-                    @click.native="confirmFollow(team.id, 'team', team.creator)"
-                  >
-                    <b-tooltip
-                      label="Follow Team"
-                      type="is-dark"
-                      position="is-left"
-                    >
-                      <span class="has-text-info">Follow</span>
-                    </b-tooltip>
                   </b-tag>
                 </b-taglist>
               </div>
