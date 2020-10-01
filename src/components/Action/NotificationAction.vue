@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-dropdown
-      hoverable
+      :triggers="['hover', 'click']"
       position="is-bottom-left"
       aria-role="menu"
       animation="fadeInDown"

@@ -77,7 +77,7 @@
           <template slot="top-left">
             <!-- Filter by type -->
             <b-dropdown
-              hoverable
+              :triggers="['hover', 'click']"
               v-model="filter.type"
               @input="fetchNominations()"
             >
@@ -111,7 +111,7 @@
 
             <!-- Filter by organism -->
             <b-dropdown
-              hoverable
+              :triggers="['hover', 'click']"
               v-model="filter.organism"
               position="is-bottom-left"
               @input="fetchNominations()"
