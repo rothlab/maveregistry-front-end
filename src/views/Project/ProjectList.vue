@@ -756,7 +756,7 @@ export default {
           icon_class: "has-background-success has-text-light"
         },
         "follower": {
-          name: "Projects you follow",
+          name: "Targets and projects you follow",
           icon: "mdil-bell",
           icon_class: "has-background-info has-text-light"
         },

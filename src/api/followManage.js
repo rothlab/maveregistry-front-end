@@ -174,8 +174,10 @@ export async function fetchFollows(target, type, request = false, limit = 10, sk
 export async function fetchFollowedObjectsByUserId(id, type = undefined, approved = false) {
   const userQuery = new Parse.Query(Parse.User)
   userQuery.equalTo("objectId", id)
+
   const query = new Parse.Query(Follow)
   query.matchesQuery("by", userQuery)
+
   if (type) query.equalTo("type", type)
   if (approved) query.exists("approvedAt")
 

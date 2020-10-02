@@ -295,8 +295,9 @@ export async function addProject(projectInfo) {
 
 export async function fetchTargets(limit, skip, filter) {
   // Fetch targets
-  const query = new Parse.Query(Target)
+  let query = new Parse.Query(Target)
   let followedProjectIds = []
+  let followedTargetIds = []
 
   // Apply filter when available
   if (filter.type !== '') query.equalTo("type", filter.type)
@@ -305,6 +306,7 @@ export async function fetchTargets(limit, skip, filter) {
   if (filter.created_after) query.greaterThanOrEqualTo("updatedAt", filter.created_after) // Using update date because we want to include all targets
   if (filter.conditions.length > 0) {
     const projectQuery = new Parse.Query(Project)
+    const followedTargetQuery = new Parse.Query(Target)
 
     // Creator only
     if (filter.conditions.includes("creator")) projectQuery.equalTo("creator", Parse.User.current())
@@ -315,10 +317,15 @@ export async function fetchTargets(limit, skip, filter) {
     // Follower only
     if (filter.conditions.includes("follower")) {
       followedProjectIds = await fetchFollowedObjectsByUserId(Parse.User.current().id, "project", true)
-      projectQuery.containsAll("objectId", followedProjectIds)
+      projectQuery.containedIn("objectId", followedProjectIds)
+
+      followedTargetIds = await fetchFollowedObjectsByUserId(Parse.User.current().id, "target", false)
+      followedTargetQuery.containedIn("objectId", followedTargetIds)
     }
     
     query.matchesQuery("projects", projectQuery)
+
+    if (followedTargetIds.length > 0) query = Parse.Query.or(query, followedTargetQuery)
   }
   
   query.exists("projects") // include only targets with projects associated
