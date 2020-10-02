@@ -214,6 +214,7 @@
                 icon-next="mdil-chevron-right"
                 :class="{ 'highlight-filter': filter.created_after }"
                 :max-date="new Date()"
+                :mobile-native="false"
                 @input="fetchNominations()"
                 class="filter-item"
               >

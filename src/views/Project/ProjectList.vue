@@ -174,7 +174,6 @@
                 v-model="filter.conditions"
                 multiple
                 :mobile-modal="false"
-                position="is-bottom-left"
                 @input="fetchTargets()"
                 class="filter-item"
               >
@@ -218,6 +217,7 @@
                 icon-prev="mdil-chevron-left"
                 icon-next="mdil-chevron-right"
                 :class="{ 'highlight-filter': filter.created_after }"
+                :mobile-native="false"
                 :max-date="new Date()"
                 @input="fetchTargets()"
                 class="filter-item"

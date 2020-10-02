@@ -120,6 +120,7 @@
                 icon-next="mdil-chevron-right"
                 :class="{ 'highlight-filter': filter.created_after }"
                 :max-date="new Date()"
+                :mobile-native="false"
                 @input="fetchTeams()"
                 class="filter-item"
               >
