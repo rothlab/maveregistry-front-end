@@ -83,7 +83,7 @@
               </div>
             </div>
 
-            <div class="column is-5">
+            <div class="column is-5 is-hidden-mobile">
               <b-notification :closable="false">
                 <div class="content">
                   <b-icon
@@ -243,7 +243,7 @@
             </p>
           </div>
 
-          <div class="columns is-mobile">
+          <div class="columns">
             <div class="column is-7">
               <!-- Funding -->
               <div class="project-content">

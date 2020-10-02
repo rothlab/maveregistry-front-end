@@ -49,7 +49,7 @@
     <!-- Start and end date -->
     <b-field
       grouped
-      class="field-margin field-space-between"
+      class="field-margin field-space-between start-end-dates"
     >
       <ValidationProvider
         rules="required"
@@ -69,6 +69,7 @@
             icon="mdil-calendar"
             icon-prev="mdil-chevron-left"
             icon-next="mdil-chevron-right"
+            :mobile-native="false"
             @input="updateVal"
           />
         </b-field>
@@ -95,6 +96,7 @@
             icon="mdil-calendar"
             icon-prev="mdil-chevron-left"
             icon-next="mdil-chevron-right"
+            :mobile-native="false"
             @input="updateVal"
             class="has-fullwidth"
           >
@@ -269,7 +271,15 @@ export default {
 </style>
 
 <style lang="sass">
+@import "@/assets/style/variables.sass"
+
 .activity-tip
   .media-content
     overflow-x: unset
+.start-end-dates
+  .field.is-grouped
+    @media screen and (max-width: $break-mobile)
+      display: block
+    .field
+      flex-shrink: 1 !important
 </style>
