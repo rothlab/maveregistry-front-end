@@ -319,6 +319,42 @@
             <i>{{ props.row.organism }}</i>
           </b-table-column>
 
+          <!-- Active teams -->
+          <b-table-column
+            field="team"
+            label="Team"
+            v-slot="props"
+            width="10vw"
+          >
+            <div
+              v-if="!hasLoggedIn"
+            >
+              <b-icon
+                icon="mdil-lock"
+                class="team-icon"
+              />
+              Login for details
+            </div>
+            <div v-else>
+              <div
+                v-for="(team, index) in props.row.teams"
+                :key="index"
+              >
+                <router-link
+                  :to="{ path: `/team/${team.id}`}"
+                  target="_blank"
+                  class="is-capitalized"
+                >
+                  <b-icon
+                    icon="mdil-account"
+                    class="team-icon"
+                  />
+                  {{ team.name }}
+                </router-link>
+              </div>
+            </div>
+          </b-table-column>
+
           <!-- Progress -->
           <b-table-column
             field="projects"
@@ -353,7 +389,6 @@
                 </p>
               </div>
               
-
               <b-collapse
                 v-else
                 class="card project-card has-background-light"
@@ -533,42 +568,6 @@
             </div>
           </b-table-column>
 
-          <!-- Active teams -->
-          <b-table-column
-            field="team"
-            label="Team"
-            v-slot="props"
-            width="10vw"
-          >
-            <div
-              v-if="!hasLoggedIn"
-            >
-              <b-icon
-                icon="mdil-lock"
-                class="team-icon"
-              />
-              Login for details
-            </div>
-            <div v-else>
-              <div
-                v-for="(team, index) in props.row.teams"
-                :key="index"
-              >
-                <router-link
-                  :to="{ path: `/team/${team.id}`}"
-                  target="_blank"
-                  class="is-capitalized"
-                >
-                  <b-icon
-                    icon="mdil-account"
-                    class="team-icon"
-                  />
-                  {{ team.name }}
-                </router-link>
-              </div>
-            </div>
-          </b-table-column>
-
           <!-- Action -->
           <b-table-column
             field="action"
@@ -578,24 +577,36 @@
           >
             <b-field>
               <!-- Follw target -->
-              <p class="control action-button">
+              <p
+                class="control action-button"
+                style="flex-grow: 1"
+              >
                 <b-tooltip
                   :label="props.row.follow_status && props.row.follow_status.status === 'yes' ? 'Unfollow target' : 'Follow target'"
                   type="is-dark"
+                  class="has-fullwidth"
                 >
                   <!-- Confirm follow -->
                   <b-button
                     v-if="!props.row.follow_status || props.row.follow_status.status === 'no'"
-                    icon-right="mdil-bell"
+                    icon-left="mdil-bell"
                     @click="confirmFollow(props.row.id, 'target')"
                     type="is-light"
-                  />
+                    style="justify-content: flex-start"
+                    expanded
+                  >
+                    Follow
+                  </b-button>
                   <b-button
                     v-else-if="props.row.follow_status && props.row.follow_status.status === 'yes'"
-                    icon-right="mdil-bell"
+                    icon-left="mdil-bell"
                     @click="confirmUnfollow(props.row.follow_status.id, 'target')"
                     type="is-info"
-                  />
+                    style="justify-content: flex-start"
+                    expanded
+                  >
+                    Following
+                  </b-button>
                 </b-tooltip>
               </p>
 
