@@ -329,32 +329,30 @@
             <div class="has-text-left">
               <!-- If not member, show this panel to indicate that nothing is available -->
               <div
-                v-if="props.row.projects < 1"
+                v-if="props.row.projects < 1 && hasLoggedIn"
                 class="card project-card has-background-light"
               >
                 <div class="card-header">
-                  <p
-                    class="card-header-title"
-                    v-if="hasLoggedIn"
-                  >
+                  <p class="card-header-title">
                     <b-icon
                       icon="mdil-play"
                       style="margin-right: 0.25rem"
                     />
                     Under Investigation
                   </p>
-                  <p
-                    class="card-header-title is-capitalized"
-                    v-else
-                  >
-                    <b-icon
-                      icon="mdil-lock"
-                      style="margin-right: 0.25rem"
-                    />
-                    Login For Details
-                  </p>
                 </div>
               </div>
+
+              <div v-if="props.row.projects < 1 && !hasLoggedIn">
+                <p>
+                  <b-icon
+                    icon="mdil-lock"
+                    class="team-icon"
+                  />
+                  Login for details
+                </p>
+              </div>
+              
 
               <b-collapse
                 v-else
