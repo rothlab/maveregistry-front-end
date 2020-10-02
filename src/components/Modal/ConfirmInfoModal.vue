@@ -11,7 +11,7 @@
         <div class="level is-mobile">
           <div class="level-left">
             <p class="is-size-5 has-text-primary is-capitalized">
-              Unfollow {{ type }}
+              {{ `${action} ${type}` }}
             </p>
           </div>
           <div class="level-right">
@@ -30,24 +30,24 @@
             style="align-items: center;"
           >
             <div class="media-left">
-              <AlertCircleIcon
+              <InformationIcon
                 decorative
-                class="has-text-danger icon-48px"
+                class="has-text-primary icon-48px"
               />
             </div>
             <div class="media-content">
               <div class="content">
                 <p>
-                  Are you sure you want to unfollow this {{ type }}?
-                  <span v-if="type !== 'target'">
-                    <br>
-                    You will need to request to follow again.
-                  </span>
+                  Are you sure you want to {{ action }} this {{ type }}? <br>
+                  <b v-if="isIrreversible">This action is not reversible.</b>
                 </p>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Inject slot -->
+        <slot />
 
         <div class="buttons footer-actions">
           <b-button
@@ -57,10 +57,12 @@
           </b-button>
           <b-button
             :loading="isLoading"
-            type="is-danger"
-            @click="unfollow"
+            type="is-primary"
+            @click="performAction"
+            class="is-capitalized"
+            :disabled="actionDisabled"
           >
-            Unfollow
+            {{ action }}
           </b-button>
         </div>
       </div>
@@ -69,16 +71,15 @@
 </template>
 
 <script>
-import * as FollowManage from "@/api/followManage.js"
 import { displayErrorToast } from "@/api/errorHandler.js"
-import AlertCircleIcon from 'vue-material-design-icons/AlertCircle.vue'
+import InformationIcon from 'vue-material-design-icons/Information.vue'
 
 export default {
   components: {
-    AlertCircleIcon
+    InformationIcon
   },
   props: {
-    follow: {
+    action: {
       type: String,
       required: true
     },
@@ -89,6 +90,18 @@ export default {
     active: {
       type: Boolean,
       required: true
+    },
+    onAction: {
+      type: Function,
+      required: true
+    },
+    actionDisabled: {
+      type: Boolean,
+      default: false
+    },
+    isIrreversible: {
+      type: Boolean,
+      default: true
     }
   },
   watch: {
@@ -110,13 +123,13 @@ export default {
     }
   },
   methods: {
-    async unfollow() {
+    async performAction() {
       // Loading
       this.isLoading = true
 
-      // Unfollow
+      // Call action
       try {
-        await FollowManage.unfollow(this.follow)
+        await this.onAction()
       } catch (error) {
         await displayErrorToast(error)
         return
@@ -129,7 +142,7 @@ export default {
       
       // Show status update
       this.$buefy.toast.open({
-        message: `${this.capitalize(this.type)} Unfollowed`,
+        message: `${this.capitalize(this.type)} ${this.capitalize(this.action)}d`,
         type: "is-success"
       })
 

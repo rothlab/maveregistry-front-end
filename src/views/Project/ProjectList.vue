@@ -577,6 +577,29 @@
             v-slot="props"
           >
             <b-field>
+              <!-- Follw target -->
+              <p class="control action-button">
+                <b-tooltip
+                  :label="props.row.follow_status && props.row.follow_status.status === 'yes' ? 'Unfollow target' : 'Follow target'"
+                  type="is-dark"
+                >
+                  <!-- Confirm follow -->
+                  <b-button
+                    v-if="!props.row.follow_status || props.row.follow_status.status === 'no'"
+                    icon-right="mdil-bell"
+                    @click="confirmFollow(props.row.id, 'target')"
+                    type="is-light"
+                  />
+                  <b-button
+                    v-else-if="props.row.follow_status && props.row.follow_status.status === 'yes'"
+                    icon-right="mdil-bell"
+                    @click="confirmUnfollow(props.row.follow_status.id, 'target')"
+                    type="is-info"
+                  />
+                </b-tooltip>
+              </p>
+
+              <!-- Add project -->
               <p class="control action-button">
                 <b-tooltip
                   label="Add new project"
@@ -594,7 +617,7 @@
                 <b-tooltip
                   v-if="props.row.type == 'Gene' && props.row.organism == 'H. sapiens'"
                   label="Expore at MaveQuest"
-                  type="is-info"
+                  type="is-dark"
                 >
                   <b-button
                     tag="a"
@@ -644,6 +667,19 @@
         @change="fetchTargets()"
       />
 
+      <!-- Follow target modal -->
+      <ConfirmInfoModal
+        :active.sync="isFollowTargetModalActive"
+        action="follow"
+        type="target"
+        :is-irreversible="false"
+        :on-action="followTarget"
+      >
+        <p style="margin-top: 1rem">
+          You will be notified when new projects or nominations concerning this target are added to the Registry.
+        </p>
+      </ConfirmInfoModal>
+
       <!-- New project modal -->
       <NewTargetModal
         :active.sync="isNewTargetModalActive"
@@ -659,11 +695,13 @@
 
 <script>
 import * as ProjectManage from "@/api/projectManage.js"
+import * as FollowManage from "@/api/followManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
+import ConfirmInfoModal from '@/components/Modal/ConfirmInfoModal.vue'
 import ShowMoreField from '@/components/Field/ShowMoreField.vue'
 import TipAction from '@/components/Action/TipAction.vue'
 import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
@@ -679,6 +717,7 @@ export default {
     FollowModal,
     UnfollowModal,
     NewTargetModal,
+    ConfirmInfoModal,
     ShowMoreField,
     TipAction,
     FilterOutline
@@ -727,6 +766,7 @@ export default {
       },
       // Follow/unfollow target related parameters
       isFollowModelActive: false,
+      isFollowTargetModalActive: false,
       followProp: {
         source: "",
         creator: {},
@@ -772,8 +812,14 @@ export default {
     confirmFollow(id, type, creator) {
       this.followProp.source = id
       this.followProp.type = type
-      this.followProp.creator = creator
-      this.isFollowModelActive = true
+
+      // If follow target, do not need approval
+      if (type === 'target') {
+        this.isFollowTargetModalActive = true
+      } else {
+        this.followProp.creator = creator
+        this.isFollowModelActive = true
+      }
     },
     confirmUnfollow(id, type) {
       this.followProp.follow = id
@@ -832,6 +878,10 @@ export default {
 
       // Jump to new project registration page
       this.$router.push({ name: 'Project Edit', params: { id: projectId, action: 'new' } })
+    },
+    async followTarget() {
+      await FollowManage.follow(this.followProp.source, this.followProp.type)
+      await this.fetchTargets()
     }
   }
 }

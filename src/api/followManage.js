@@ -7,9 +7,12 @@ export const Follow = Parse.Object.extend("Follow", {
     if (!attrs) return
     if (!attrs.type || attrs.type === "") throw new Error("Follow type is empty")
     if (!attrs.target || attrs.target === "") throw new Error("Follow target is empty")
-    if (!attrs.reason || attrs.reason.length <= 0) throw new Error("Follow reason is empty")
     if (!attrs.by) throw new Error("Follower is empty. Pleaes make sure you have logged in.")
-    if (typeof attrs.can_edit !== "boolean") throw new Error("Edit status is empty. Pleaes make sure you have logged in.")
+
+    if (attrs.type !== "target") {
+      if (!attrs.reason || attrs.reason.length <= 0) throw new Error("Follow reason is empty")
+      if (typeof attrs.can_edit !== "boolean") throw new Error("Edit status is empty. Pleaes make sure you have logged in.")
+    }
   },
   format: async function (includeUser = true) {
     let ret = {
@@ -81,25 +84,40 @@ export async function getFollowStatus(targets, type, by) {
       status: "no"
     }
 
-    return {
+    let ret = {
       id: status[0].id,
-      status: status[0].get("approvedAt") ? "yes" : "pending",
-      can_edit: status[0].get("approvedAt") && status[0].get("can_edit")
+      status: "yes"
     }
+
+    // No approval is required for following targets
+    if (type !== "target") {
+      ret.status = status[0].get("approvedAt") ? "yes" : "pending"
+      ret.can_edit = status[0].get("approvedAt") && status[0].get("can_edit")
+    }
+
+    return ret
   })
 }
 
-export async function follow(target, type, reason, requestEdit) {
+export async function follow(target, type, reason = undefined, requestEdit = undefined) {
   const currentUser = Parse.User.current()
   if (!currentUser) throw new Error("Not logged in")
 
-  let follow = await new Follow.create({
+  let params = {
     target: target,
     type: type,
-    reason: reason,
-    by: currentUser,
-    can_edit: requestEdit
-  })
+    by: currentUser
+  }
+
+  // If not following target, check reason and request edit status is set
+  if (type !== "target") {
+    if (!reason || !requestEdit) throw new Error("Missing reason or request edit status")
+
+    params.reason = reason
+    params.can_edit = requestEdit
+  }
+
+  let follow = await new Follow.create(params)
 
   // If not existing, save it
   if (!follow.id) follow = await follow.save()

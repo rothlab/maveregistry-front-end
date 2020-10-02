@@ -52,6 +52,32 @@
           </div>
           <div class="columns is-mobile">
             <div class="column">
+              <span class="is-size-6 has-text-primary">Target updates</span>
+              <span class="is-size-7 help">You will be notified when project or nominations are added concerning targets you follow.</span>
+            </div>
+            <div class="column is-4">
+              <b-select
+                placeholder="Frequency"
+                expanded
+                v-model="target_update"
+              >
+                <option value="off">
+                  Off
+                </option>
+                <option value="immediately">
+                  Immediately
+                </option>
+                <option value="daily">
+                  Daily
+                </option>
+                <option value="weekly">
+                  Weekly
+                </option>
+              </b-select>
+            </div>
+          </div>
+          <div class="columns is-mobile">
+            <div class="column">
               <span class="is-size-6 has-text-primary">Project updates</span>
               <span class="is-size-7 help">You will be notified for updates of projects you follow.</span>
             </div>
@@ -218,6 +244,7 @@ export default {
         submit: false
       },
       follow_request: "",
+      target_update: "",
       project_update: "",
       team_update: "",
       status_update: "",
@@ -241,6 +268,7 @@ export default {
 
       if (preference) {
         this.follow_request = preference.follow_request
+        this.target_update = preference.target_update
         this.project_update = preference.project_update
         this.team_update = preference.team_update
         this.status_update = preference.status_update
@@ -254,6 +282,7 @@ export default {
         try {
           await UserManage.setEmailPreference(this.id, {
             follow_request: this.follow_request,
+            target_update: this.target_update,
             project_update: this.project_update,
             team_update: this.team_update,
             status_update: this.status_update,

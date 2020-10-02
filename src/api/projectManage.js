@@ -43,15 +43,16 @@ export const Target = Parse.Object.extend("Target", {
     // Handle team object
     const teams = projects.map(e => e.get("team")).filter(Boolean).filter(uniqueById)
 
-    // Get follow status for projects and teams
+    // Get follow status for target and projects
+    const targetFollowStatus = await getFollowStatus([this.id], "target", Parse.User.current())
     const projectFollowStatus = await getFollowStatus(projects.map(e => e.id), "project", Parse.User.current())
-    // const teamFollowStatus = await getFollowStatus(teams.map(e => e.id), "team", Parse.User.current())
 
     return {
       id: this.id,
       name: this.get("name"),
       type: this.get("type"),
       organism: this.get("organism"),
+      follow_status: targetFollowStatus.length > 0 ? targetFollowStatus[0] : undefined,
       projects: await Promise.all(projects.map(async (e, i) => {
         const recentActivity = e.get("recent_activity")
         const publicActivity = e.get("public_activity")
@@ -102,7 +103,6 @@ export const Target = Parse.Object.extend("Target", {
           last_name: creator.get("last_name"),
           profile_image: creator.get("profile_image")
         }
-        // if (teamFollowStatus.length > i) ret.follow_status = teamFollowStatus[i]
 
         return ret
       })
