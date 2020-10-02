@@ -324,6 +324,7 @@
             field="projects"
             label="Project Progress"
             v-slot="props"
+            width="40vw"
           >
             <div class="has-text-left">
               <!-- If not member, show this panel to indicate that nothing is available -->
@@ -539,49 +540,35 @@
             field="team"
             label="Team"
             v-slot="props"
+            width="10vw"
           >
             <div
               v-if="!hasLoggedIn"
-              class="card project-card has-background-light"
             >
-              <div class="card-header">
-                <p class="card-header-title is-capitalized">
-                  <b-icon icon="mdil-lock" />
-                  Login for details
-                </p>
-              </div>
+              <b-icon
+                icon="mdil-lock"
+                class="team-icon"
+              />
+              Login for details
             </div>
-            <b-field
-              grouped
-              group-multiline
-              class="team-control"
-              v-else
-            >
+            <div v-else>
               <div
-                class="control has-fullwidth"
                 v-for="(team, index) in props.row.teams"
                 :key="index"
               >
-                <b-taglist attached>
-                  <b-tag
-                    size="is-medium"
-                    class="is-capitalized"
-                  >
-                    <router-link
-                      :to="{ path: `/team/${team.id}`}"
-                      target="_blank"
-                      class="has-text-grey-darker"
-                    >
-                      <b-icon
-                        icon="mdil-account"
-                        class="team-icon"
-                      />
-                      {{ team.name }}
-                    </router-link>
-                  </b-tag>
-                </b-taglist>
+                <router-link
+                  :to="{ path: `/team/${team.id}`}"
+                  target="_blank"
+                  class="is-capitalized"
+                >
+                  <b-icon
+                    icon="mdil-account"
+                    class="team-icon"
+                  />
+                  {{ team.name }}
+                </router-link>
               </div>
-            </b-field>
+            </div>
           </b-table-column>
 
           <!-- Action -->
