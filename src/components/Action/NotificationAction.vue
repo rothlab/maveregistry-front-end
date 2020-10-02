@@ -120,6 +120,7 @@
                         type="is-dark"
                         @click.native="markAs(notification.id, !notification.is_read)"
                         style="cursor: pointer; padding-left: 0.5rem"
+                        position="is-left"
                       >
                         <b-icon
                           :icon="notification.is_read ? 'mdil-email' : 'mdil-email-open'"
@@ -132,6 +133,7 @@
                         type="is-dark"
                         @click.native="removeNotification(notification.id)"
                         style="cursor: pointer; padding-left: 0.5rem"
+                        position="is-left"
                       >
                         <b-icon
                           icon="mdil-delete"
