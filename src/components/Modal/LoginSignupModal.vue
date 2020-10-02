@@ -101,11 +101,17 @@
               <div class="level-right oauth">
                 <div class="buttons is-space-between">
                   <button
-                    class="button google-signin"
+                    class="button third-party-signin"
                     @click="login('google')"
-                  />
+                  >
+                    <img
+                      src="@/assets/image/google_logo.png"
+                      alt="ORCID logo"
+                    >
+                    <span class="has-text-grey">Google</span>
+                  </button>
                   <button
-                    class="button orcid-signin"
+                    class="button third-party-signin"
                     @click="login('orcid')"
                   >
                     <img
@@ -261,11 +267,17 @@
               <div class="level-right oauth">
                 <div class="buttons is-space-between">
                   <button
-                    class="button google-signin"
+                    class="button third-party-signin"
                     @click="login('google')"
-                  />
+                  >
+                    <img
+                      src="@/assets/image/google_logo.png"
+                      alt="ORCID logo"
+                    >
+                    <span class="has-text-grey">Google</span>
+                  </button>
                   <button
-                    class="button orcid-signin"
+                    class="button third-party-signin"
                     @click="login('orcid')"
                   >
                     <img
@@ -519,19 +531,7 @@ export default {
 .forget-password
   padding: 0.25rem 0 1rem 0
 button
-  &.google-signin
-    background-image: url("../../assets/image/google_signin_normal.png")
-    &:focus
-      background-image: url("../../assets/image/google_signin_focus.png")
-      box-shadow: unset
-    &:active
-      background-image: url("../../assets/image/google_signin_active.png")
-    background-size: auto 40px
-    padding: 0
-    border: unset
-    height: 40px
-    width: 167px
-  &.orcid-signin
+  &.third-party-signin
     border: unset
     box-shadow: 0 1px 1px 0 rgba(0,0,0,.25)
     border-radius: 2px
