@@ -257,7 +257,7 @@
             label="Project"
             v-slot="props"
           >
-            <div class="has-text-left">
+            <div class="has-text-left team-project-height">
               <!-- If not member, show this panel to indicate that nothing is available -->
               <div
                 v-if="!props.row.projects || props.row.projects < 1"
@@ -528,3 +528,9 @@ export default {
   }
 }
 </script>
+
+<style lang="sass">
+.team-project-height
+  max-height: 12.5rem
+  overflow-y: auto
+</style>

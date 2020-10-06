@@ -117,7 +117,7 @@
                   label="Remove"
                   type="is-dark"
                 >
-                  <a @click="removeFollower(follower.id)"><b-icon
+                  <a @click="deleteId = follower.id; isConfirmDeleteModalActive = true"><b-icon
                     icon="mdil-delete"
                     type="is-danger"
                   /></a>
@@ -155,14 +155,26 @@
         </div>
       </div>
     </div>
+
+    <!-- Confirm Delete User Modal -->
+    <ConfirmDangerModal
+      :active.sync="isConfirmDeleteModalActive"
+      type="follower"
+      action="remove"
+      :on-action="removeFollower"
+    />
   </b-modal>
 </template>
 
 <script>
 import * as FollowManage from "@/api/followManage.js"
 import { displayErrorToast } from "@/api/errorHandler.js"
+import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
 
 export default {
+  components: {
+    ConfirmDangerModal
+  },
   props: {
     active: {
       type: Boolean,
@@ -211,7 +223,9 @@ export default {
       isSettingFollower: -1,
       followers: {},
       filteredFollowers: {} ,
-      keyword: ""
+      keyword: "",
+      isConfirmDeleteModalActive: false,
+      deleteId: undefined
     }
   },
   methods: {
@@ -250,34 +264,10 @@ export default {
       if (keyword.length <= 0 || !string.startsWith(keyword)) return string.slice(0,1).toUpperCase() + string.slice(1)
       return string.replace(keyword, '')
     },
-    removeFollower(id) {
-      this.$buefy.dialog.confirm({
-        title: `Remove ${this.classText}`,
-        message: `Are you sure you want to remove this ${this.classText}?<br>They will <b>not</b> be notified.`,
-        type: "is-danger",
-        hasIcon: true,
-        iconPack: "mdi",
-        icon: "alert-circle",
-        cancelText: "Cancel",
-        confirmText: "Remove",
-        onConfirm: async () => {
-          // Delete follower
-          try {
-            await FollowManage.unfollow(id)
-            await this.fetchFollowers()
-            this.$emit("change")
-
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: `${this.capitalize(this.classText)} Removed`,
-              type: 'is-success',
-              queue: false
-            })
-          } catch (error) {
-            await displayErrorToast(error)
-          }
-        }
-      })
+    async removeFollower() {
+      await FollowManage.unfollow(this.deleteId)
+      await this.fetchFollowers()
+      this.$emit("change")
     },
     async approveFollower(id, canEdit = false) {
       // Approve and refresh list

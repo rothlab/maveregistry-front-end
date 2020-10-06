@@ -324,7 +324,7 @@
             field="team"
             label="Team"
             v-slot="props"
-            width="10vw"
+            width="12vw"
           >
             <div
               v-if="!hasLoggedIn"

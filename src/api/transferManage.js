@@ -108,8 +108,10 @@ export async function acceptTransfer(id) {
   query.doesNotExist("approvedAt") // Don't select approved transfer
   let transfer = await query.first()
 
-  // Approve transfer
+  // Validate the transfer
   if (!transfer) throw new Error("No transfer found")
+
+  // Approve transfer
   transfer.set("approvedAt", new Date())
   transfer = await transfer.save()
   return transfer.format(true)

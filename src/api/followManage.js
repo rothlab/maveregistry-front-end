@@ -111,7 +111,7 @@ export async function follow(target, type, reason = undefined, requestEdit = und
 
   // If not following target, check reason and request edit status is set
   if (type !== "target") {
-    if (!reason || !requestEdit) throw new Error("Missing reason or request edit status")
+    if (!reason || requestEdit === undefined) throw new Error("Missing reason or request edit status")
 
     params.reason = reason
     params.can_edit = requestEdit
