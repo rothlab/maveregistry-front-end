@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import PageNotFound from '../views/PageNotFound.vue'
 
 Vue.use(VueRouter)
 
@@ -119,6 +120,11 @@ Vue.use(VueRouter)
     name: 'Callback',
     meta: { hideNav: true, hideFooter: true },
     component: () => import(/* webpackChunkName: "callback" */ '../views/Account/Callback.vue')
+  },
+  {
+    path: '*',
+    name: 'Missing components',
+    component: PageNotFound,
   }
 ]
 
