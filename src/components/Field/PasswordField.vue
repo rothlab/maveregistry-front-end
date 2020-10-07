@@ -47,7 +47,7 @@
       <ValidationProvider
         name="initial"
         v-slot="{ errors, valid }" 
-        :rules="'required|password_strength:3,' + passStrength"
+        rules="required|password_strength"
       >
         <div class="field-margin">
           <b-field
@@ -58,7 +58,7 @@
               icon="mdil-lock"
               :key="revealPass ? 'reveal_pass' : 'hidden_pass'"
               :type="revealPass ? 'text' : 'password'"
-              placeholder="Password (min. 7 characters)"
+              placeholder="Password (min. 8 characters)"
               v-model="passwordInit"
               expanded
             />
@@ -75,23 +75,8 @@
             v-if="errors[0]"
             class="help has-text-danger"
           >
-            {{ errors[0] + (passFeedback ? passFeedback : '') }}
+            {{ errors[0] }}
           </p>
-          <!-- Password strength indicator -->
-          <div class="columns is-mobile is-vcentered password-strength">
-            <div class="column is-narrow">
-              <span class="is-size-7">Strength</span>
-            </div>
-            <div class="column">
-              <password
-                v-model="passwordInit"
-                :strength-meter-only="true"
-                @score="storePassStrength"
-                @feedback="storePassFeedback"
-                strength-meter-class="Password__strength-meter strength-meter"
-              />
-            </div>
-          </div>
         </div>
       </ValidationProvider>
       <ValidationProvider
@@ -136,12 +121,10 @@
 
 <script>
 import { ValidationProvider } from "vee-validate"
-import Password from 'vue-password-strength-meter'
 
 export default {
   components: {
     ValidationProvider,
-    Password
   },
   props: {
     value: {
@@ -164,17 +147,9 @@ export default {
       password: "",
       passwordInit: "",
       passwordConfirm: "",
-      passStrength: 0,
-      passFeedback: ""
     }
   },
   methods: {
-    storePassStrength(score) {
-      this.passStrength = score
-    },
-    storePassFeedback({suggestions}) {
-      this.passFeedback = suggestions[0]
-    },
     emitSubmit() {
       if (this.enterToSubmit) this.$emit("submit")
     }

@@ -342,13 +342,6 @@ export default {
           link: "https://github.com/chenqingspring/vue-lottie"
         },
         {
-          project: "vue-password-strength-meter",
-          team: "Jakub Juszczak",
-          license: "MIT",
-          license_url: "https://github.com/apertureless/vue-password-strength-meter/blob/develop/LICENSE.txt",
-          link: "https://github.com/apertureless/vue-password-strength-meter"
-        },
-        {
           project: "Vue Router",
           team: "Evan You",
           license: "MIT",
@@ -382,13 +375,6 @@ export default {
           license: "MIT",
           license_url: "https://github.com/xanf/vuex-shared-mutations/blob/master/LICENSE",
           link: "https://github.com/xanf/vuex-shared-mutations"
-        },
-        {
-          project: "zxcvbn",
-          team: "Dan Wheeler and Dropbox, Inc.",
-          license: "MIT",
-          license_url: "https://github.com/dropbox/zxcvbn/blob/master/LICENSE.txt",
-          link: "https://github.com/dropbox"
         },
         {
           project: "Sentry Webpack Plugin",

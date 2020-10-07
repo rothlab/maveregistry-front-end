@@ -41,11 +41,11 @@ extend('password', {
   message: 'Password confirmation does not match.'
 });
 extend('password_strength', {
-  params: ['target', 'score'],
-  validate(value, { target, score }) {
-    return score >= target
+  validate(value) {
+    const regex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})")
+    return regex.test(value)
   },
-  message: "Weak password. "
+  message: "Password must have a minimum of 8 characters with at least 1 lower case, 1 upper case and 1 digit."
 });
 extend('end_date', {
   params: ['target'],
