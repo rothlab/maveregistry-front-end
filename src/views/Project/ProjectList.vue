@@ -479,11 +479,15 @@
                     class="content"
                   >
                     <div class="is-size-6">
-                      <span class="has-text-primary">
+                      <span
+                        class="has-text-primary"
+                        v-if="project.features.length > 0"
+                      >
                         Feature{{ project.features.length > 1 ? 's:' : ':' }}
                         {{ project.features.join(", ") }}
+                        <br>
                       </span>
-                      <br>
+
                       <ShowMoreField
                         v-if="project.description"
                         :value="project.description"
