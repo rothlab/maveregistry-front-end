@@ -160,7 +160,6 @@
             <!-- Add no project detail display -->
             <div
               class="no-project has-vcentered"
-              style="height: 80%"
               v-if="!hasProject"
             >
               <div class="info-icon">
