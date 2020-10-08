@@ -194,6 +194,7 @@
             field="principal_investigator"
             label="Principal Investigator"
             v-slot="props"
+            cell-class="vertical-center"
           >
             <div class="level is-mobile is-paddingless">
               <div class="level-left">
@@ -244,13 +245,14 @@
             field="affiliation"
             label="Affiliation"
             v-slot="props"
+            cell-class="vertical-center"
           >
             {{ props.row.affiliation }}
           </b-table-column>
 
-          <!-- Project Progress -->
+          <!-- Projects -->
           <b-table-column
-            field="progress"
+            field="project"
             label="Project"
             v-slot="props"
           >
@@ -287,8 +289,8 @@
                     >
                       <b-icon icon="mdil-link" />
                       {{ project.target.name.toUpperCase() }}
-                      ({{ project.target.type }}, <i>{{ project.target.organism }}</i>):
-                      {{ project.features.join(",") }}
+                      ({{ project.target.type }}, <i>{{ project.target.organism }}</i>)
+                      <span v-if="project.features.length > 0">- {{ project.features.join(", ") }}</span>
                     </router-link>
                   </div>
                     

@@ -40,9 +40,7 @@
           </p>
         </div>
 
-        <div
-          class="project-content"
-        >
+        <div class="project-content">
           <b-table
             :data="users"
             :loading="isLoading.users"
@@ -55,8 +53,6 @@
             :total="userPagination.count"
             :current-page="userPagination.current"
             @page-change="(change) => { userPagination.current = change; fetchUsers() }"
-            detailed
-            detail-key="id"
           >
             <!-- Filter -->
             <template slot="top-left">
@@ -64,7 +60,7 @@
               <b-field style="margin-left: 0.5em">
                 <b-input
                   v-model="userFilter"
-                  placeholder="Search Name"
+                  placeholder="Name"
                   type="search"
                   icon="mdil-magnify"
                 />
@@ -92,27 +88,12 @@
               </div>
             </template>
 
-            <template
-              slot="detail"
-            >
-              <div class="columns">
-                <div class="column">
-                  <p>Projects</p>
-                </div>
-                <div class="column">
-                  <p>Teams</p>
-                </div>
-                <div class="column">
-                  <p>Nominations</p>
-                </div>
-              </div>
-            </template>
-
             <!-- Username with link -->
             <b-table-column
               field="username"
               label="Username"
               v-slot="props"
+              cell-class="vertical-center"
             >
               <router-link
                 :to="{ path: `/user/${props.row.username}`}"
@@ -131,29 +112,35 @@
                 {{ props.row.username }}
               </router-link>
             </b-table-column>
+
             <!-- Name -->
             <b-table-column
               field="name"
               label="Name"
               v-slot="props"
+              cell-class="vertical-center"
             >
               <span class="is-capitalized">
                 {{ props.row.first_name }} {{ props.row.last_name }}
               </span>
             </b-table-column>
-            <!-- Name -->
+
+            <!-- Creation Date -->
             <b-table-column
               field="creation_date"
               label="Creation Date"
               v-slot="props"
+              cell-class="vertical-center"
             >
               {{ props.row.created_at.toLocaleString() }}
             </b-table-column>
+
             <!-- Projects -->
             <b-table-column
               field="projects"
               label="Projects"
               v-slot="props"
+              cell-class="vertical-center"
             >
               <!-- As owner -->
               <b-tooltip
@@ -178,6 +165,7 @@
               field="teams"
               label="Teams"
               v-slot="props"
+              cell-class="vertical-center"
             >
               <!-- As owner -->
               <b-tooltip
@@ -197,11 +185,13 @@
                 {{ props.row.counts.team_follower }}
               </b-tooltip>
             </b-table-column>
+
             <!-- Nominations -->
             <b-table-column
               field="nominations"
               label="Nominations"
               v-slot="props"
+              cell-class="vertical-center"
             >
               <!-- As owner -->
               <b-tooltip
@@ -221,6 +211,7 @@
                 {{ props.row.counts.nomination_vote }}
               </b-tooltip>
             </b-table-column>
+
             <!-- Actions -->
             <b-table-column
               field="actions"
@@ -280,6 +271,158 @@
             </b-table-column>
           </b-table>
         </div>
+
+        <hr>
+
+        <div
+          class="project-header"
+        >
+          <p class="is-size-4 has-text-weight-bold is-flex has-vcentered">
+            <b-tag
+              size="is-medium"
+              type="is-info"
+              style="margin-right: 0.5rem"
+            >
+              {{ projectPagination.count }}
+            </b-tag>
+            Projects
+          </p>
+        </div>
+
+        <div class="project-content">
+          <b-table
+            :data="projects"
+            :loading="isLoading.projects"
+            hoverable
+            icon-pack="mdil"
+            paginated
+            pagination-position="top"
+            backend-pagination
+            :per-page="projectPagination.limit"
+            :total="projectPagination.count"
+            :current-page="projectPagination.current"
+            @page-change="(change) => { projectPagination.current = change; fetchProjects() }"
+          >
+            <!-- Filter -->
+            <template slot="top-left">
+              <!-- Filter by name -->
+              <b-field style="margin-left: 0.5em">
+                <b-input
+                  v-model="projectFilter"
+                  placeholder="Target"
+                  type="search"
+                  icon="mdil-magnify"
+                />
+              </b-field>
+            </template>
+
+            <!-- No results -->
+            <template slot="empty">
+              <div
+                class="no-project has-vcentered"
+                v-if="!isLoading.projects"
+              >
+                <div class="info-icon">
+                  <b-icon
+                    icon="mdil-clipboard"
+                    custom-size="mdil-48px"
+                    type="is-grey-light"
+                  />
+                </div>
+                <div class="info-content">
+                  <p class="has-text-grey">
+                    <span class="is-size-5">Sorry, we couldn't find any results.</span>
+                  </p>
+                </div>
+              </div>
+            </template>
+
+            <!-- Target Name -->
+            <b-table-column
+              field="target"
+              label="Target"
+              v-slot="props"
+              cell-class="vertical-center is-uppercase"
+            >
+              {{ props.row.target.name }}
+            </b-table-column>
+
+            <!-- Target Type and Organism-->
+            <b-table-column
+              field="type_organism"
+              label="Type and Organism"
+              v-slot="props"
+              cell-class="vertical-center is-capitalized"
+            >
+              {{ props.row.target.type }}, <i>{{ props.row.target.organism }}</i>
+            </b-table-column>
+
+            <!-- Owner with link -->
+            <b-table-column
+              field="owner"
+              label="Owner"
+              v-slot="props"
+              cell-class="vertical-center is-capitalized"
+            >
+              <router-link
+                :to="{ path: `/user/${props.row.creator.username}`}"
+                target="_blank"
+                class="is-flex"
+                v-if="props.row.creator"
+              >
+                <span
+                  class="image is-24x24 is-inline-block"
+                  style="margin-right: 0.5rem"
+                >
+                  <img
+                    class="is-rounded"
+                    :src="getProfileImageFromUser(props.row.creator)"
+                  >
+                </span>
+                {{ props.row.creator.first_name }} {{ props.row.creator.last_name }}
+              </router-link>
+              <div v-else>
+                Not available
+              </div>
+            </b-table-column>
+
+            <!-- Creation Date -->
+            <b-table-column
+              field="creation_date"
+              label="Creation Date"
+              v-slot="props"
+              cell-class="vertical-center"
+            >
+              {{ props.row.created_at.toLocaleString() }}
+            </b-table-column>
+
+            <!-- Following -->
+            <b-table-column
+              field="followers"
+              label="Followers"
+              v-slot="props"
+              cell-class="vertical-center"
+            >
+              <!-- Followers -->
+              <b-tooltip
+                label="Followers"
+                type="is-dark"
+                style="margin-right: 0.25rem"
+              >
+                <b-icon icon="mdil-bell" />
+                {{ props.row.counts.followers }}
+              </b-tooltip>
+              <!-- Requests -->
+              <b-tooltip
+                label="Requests"
+                type="is-dark"
+              >
+                <b-icon icon="mdil-clock" />
+                {{ props.row.counts.requests }}
+              </b-tooltip>
+            </b-table-column>
+          </b-table>
+        </div>
       </div>
     </div>
   </div>
@@ -298,13 +441,17 @@ export default {
   watch: {
     async userFilter() {
       await this.fetchUsers()
+    },
+    async projectFilter() {
+      await this.fetchProjects()
     }
   },
   data() {
     return {
       errorMessage: "",
       isLoading: {
-        users: false
+        users: false,
+        projects: false
       },
       userFilter: "",
       userPagination: {
@@ -314,11 +461,19 @@ export default {
       },
       users: undefined,
       userInAction: undefined,
+      projectPagination: {
+        count: 0,
+        limit: 10,
+        current: 1
+      },
+      projects: undefined,
+      projectFilter: "",
       isConfirmDeleteUserModalActive: false
     }
   },
-  async mounted() {
-    await this.fetchUsers()
+  mounted() {
+    this.fetchUsers()
+    this.fetchProjects()
   },
   methods: {
     async fetchUsers() {
@@ -336,6 +491,23 @@ export default {
         this.errorMessage = await handleError(error)
       } finally {
         this.isLoading.users = false
+      }
+    },
+    async fetchProjects() {
+      this.isLoading.projects = true
+
+      // Calculate skip
+      const skip = (this.projectPagination.current - 1) * this.projectPagination.limit
+
+      try {
+        // Load projects
+        const response = await ModerationHandler.listProjects(this.projectFilter, this.projectPagination.limit, skip)
+        this.projects = response.results
+        this.projectPagination.count = response.count
+      } catch (error) {
+        this.errorMessage = await handleError(error)
+      } finally {
+        this.isLoading.projects = false
       }
     },
     async blockUnblockUser(user, state) {
