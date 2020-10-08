@@ -194,6 +194,7 @@
             field="principal_investigator"
             label="Principal Investigator"
             v-slot="props"
+            cell-class="vertical-center"
           >
             <div class="level is-mobile is-paddingless">
               <div class="level-left">
@@ -244,13 +245,14 @@
             field="affiliation"
             label="Affiliation"
             v-slot="props"
+            cell-class="vertical-center"
           >
             {{ props.row.affiliation }}
           </b-table-column>
 
-          <!-- Project Progress -->
+          <!-- Projects -->
           <b-table-column
-            field="progress"
+            field="project"
             label="Project"
             v-slot="props"
           >

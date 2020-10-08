@@ -279,7 +279,7 @@
           >
             <b-input
               v-model="filter.name"
-              placeholder="Name"
+              placeholder="Target"
               icon="mdil-magnify"
               :icon-right="filter.name ? 'mdil-delete': ''"
               icon-right-clickable
@@ -328,8 +328,8 @@
           <!-- Target name-->
           <b-table-column
             field="target_name"
-            label="Name"
-            cell-class="is-uppercase"
+            label="Target"
+            cell-class="is-uppercase vertical-center"
             v-slot="props"
           >
             {{ props.row.name }}
@@ -339,7 +339,7 @@
           <b-table-column
             field="target_type"
             label="Type"
-            cell-class="is-capitalized"
+            cell-class="is-capitalized vertical-center"
             v-slot="props"
           >
             {{ props.row.type }}
@@ -350,6 +350,7 @@
             field="target_organism"
             label="Organism"
             v-slot="props"
+            cell-class="vertical-center"
           >
             <i>{{ props.row.organism }}</i>
           </b-table-column>
@@ -360,6 +361,7 @@
             label="Team"
             v-slot="props"
             width="12vw"
+            cell-class="vertical-center"
           >
             <div
               v-if="!hasLoggedIn"
@@ -393,7 +395,7 @@
           <!-- Progress -->
           <b-table-column
             field="projects"
-            label="Project Progress"
+            label="Project"
             v-slot="props"
             width="40vw"
           >
@@ -429,7 +431,7 @@
                 class="card project-card has-background-light"
                 animation="slide"
                 v-for="(project, index) in props.row.projects"
-                :key="index"
+                :key="`${index}-${pagination.current}`"
                 :open="false"
               >
                 <div
@@ -493,7 +495,7 @@
 
                     <!-- Follow -->
                     <b-tooltip
-                      label="Following"
+                      label="Following the project"
                       v-if="project.follow_status && project.follow_status.status === 'yes'"
                       type="is-info"
                     >
@@ -532,7 +534,7 @@
                           v-if="!project.follow_status.id && project.creator.username !== currentUser.username && !isModerator"
                           class="has-text-danger font-14px"
                         >
-                          Click "Follow" to request access to project details and receive update alerts.
+                          Click "Follow Project" to request access to project details and receive update alerts.
                         </p>
                         <p
                           v-else-if="project.follow_status.status === 'pending'"
@@ -575,6 +577,7 @@
                       <a @click="confirmFollow(project.id, 'project', project.creator)">
                         <b-icon icon="mdil-bell" />
                         Follow
+                        <span class="is-hidden-mobile">Project</span>
                       </a>
                     </div>
                     <!-- If pending, show pending status and unfollow-->

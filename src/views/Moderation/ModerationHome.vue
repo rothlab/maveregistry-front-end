@@ -113,6 +113,7 @@
               field="username"
               label="Username"
               v-slot="props"
+              cell-class="vertical-center"
             >
               <router-link
                 :to="{ path: `/user/${props.row.username}`}"
@@ -136,6 +137,7 @@
               field="name"
               label="Name"
               v-slot="props"
+              cell-class="vertical-center"
             >
               <span class="is-capitalized">
                 {{ props.row.first_name }} {{ props.row.last_name }}
@@ -146,6 +148,7 @@
               field="creation_date"
               label="Creation Date"
               v-slot="props"
+              cell-class="vertical-center"
             >
               {{ props.row.created_at.toLocaleString() }}
             </b-table-column>
@@ -154,6 +157,7 @@
               field="projects"
               label="Projects"
               v-slot="props"
+              cell-class="vertical-center"
             >
               <!-- As owner -->
               <b-tooltip
@@ -178,6 +182,7 @@
               field="teams"
               label="Teams"
               v-slot="props"
+              cell-class="vertical-center"
             >
               <!-- As owner -->
               <b-tooltip
@@ -202,6 +207,7 @@
               field="nominations"
               label="Nominations"
               v-slot="props"
+              cell-class="vertical-center"
             >
               <!-- As owner -->
               <b-tooltip
