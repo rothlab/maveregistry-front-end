@@ -38,6 +38,66 @@
         >
           <div class="project-header">
             <p class="is-size-4 has-text-weight-bold">
+              Target
+            </p>
+          </div>
+
+          <div
+            class="columns"
+            v-if="target"
+          >
+            <div class="column is-7">
+              <div class="project-content">
+                <div class="columns">
+                  <div class="column is-3">
+                    <p class="is-size-5">
+                      Name
+                    </p>
+                  </div>
+                  <div class="column is-9 is-flex">
+                    <p class="is-size-5">
+                      <span class="is-uppercase">{{ target.name }}</span>
+                      ({{ target.type }}, <span class="is-italic">{{ target.organism }}</span>)
+                    </p>
+                  </div>
+                </div>
+
+                <div class="columns">
+                  <div class="column is-3">
+                    <p class="is-size-5">
+                      Features
+                    </p>
+                  </div>
+                  <div class="column is-9 is-flex">
+                    <TargetFeatureFiled
+                      label="Find genomic features"
+                      v-model="features"
+                      class="has-fullwidth"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="column is-5">
+              <b-notification :closable="false">
+                <div class="content">
+                  <b-icon
+                    class="header-icon"
+                    type="is-primary"
+                    custom-size="mdil-48px"
+                    icon="mdil-information"
+                  />
+                  <p>Target name, type and relevant organism are not editable.</p>
+                </div>
+              </b-notification>
+            </div>
+          </div>
+          
+          <hr>
+
+          <div class="project-header">
+            <p class="is-size-4 has-text-weight-bold">
               People
             </p>
           </div>
@@ -81,95 +141,6 @@
                   Add a Project Lead
                 </b-button>
               </div>
-            </div>
-
-            <div class="column is-5 is-hidden-mobile">
-              <b-notification :closable="false">
-                <div class="content">
-                  <b-icon
-                    class="header-icon"
-                    type="is-primary"
-                    custom-size="mdil-48px"
-                    icon="mdil-information"
-                  />
-
-                  <div
-                    class="field-margin"
-                    v-if="creator"
-                  >
-                    <div class="has-text-white has-round-title has-background-primary is-inline-block">
-                      <b-icon icon="mdil-lightbulb" />
-                      About
-                    </div>
-                    <div class="level is-mobile is-marginless">
-                      <div class="level-left is-capitalized">
-                        <b-tooltip
-                          label="Creator"
-                          type="is-dark"
-                        >
-                          <b-icon icon="mdil-account" />
-                          <router-link
-                            :to="{ name: 'User Profile View', params: { username: creator.username } }"
-                            target="_blank"
-                            v-if="creator"
-                          >
-                            {{ creator.first_name }} {{ creator.last_name }}
-                          </router-link>
-                        </b-tooltip>
-                      </div>
-
-                      <div class="level-right">
-                        <b-tooltip
-                          label="Last Update Date"
-                          type="is-dark"
-                        >
-                          <b-icon icon="mdil-clock" />
-                          {{ updatedDate.toLocaleString() }}
-                        </b-tooltip>
-                      </div>
-                    </div>
-
-                    <div class="level">
-                      <div class="level-left">
-                        <b-icon icon="mdil-tag" />
-                        Feature: {{ features.join(", ") }}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div v-if="target">
-                    <div class="has-text-white has-round-title has-background-primary is-inline-block">
-                      <b-icon icon="mdil-pin" />
-                      Target
-                    </div>
-                    <div class="level is-mobile is-marginless">
-                      <div class="level-item is-capitalized">
-                        Type: {{ target.type }}
-                      </div>
-                      <div class="level-item is-capitalized">
-                        <span>
-                          Name:
-                          <span class="is-uppercase">{{ target.name }}</span>
-                        </span>
-                      </div>
-                      <div class="level-item">
-                        <span>Organism: <i>{{ target.organism }}</i></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="content has-text-right">
-                  <b-tooltip
-                    label="Sorry, please create a new project instead."
-                    type="is-dark"
-                  >
-                    <p class="has-text-primary">
-                      Can I edit this?
-                    </p>
-                  </b-tooltip>
-                </div>
-              </b-notification>
             </div>
           </div>
 
@@ -236,7 +207,6 @@
           </div>
 
           <hr>
-
           <div class="project-header">
             <p class="is-size-4 has-text-weight-bold">
               Funding
@@ -392,6 +362,7 @@
 import PersonalInfoField from '@/components/Field/PersonalInfoField.vue'
 import TeamInfoField from '@/components/Field/TeamInfoField.vue'
 import ProjectActivityField from '@/components/Field/ProjectActivityField.vue'
+import TargetFeatureFiled from '@/components/Field/TargetFeatureField.vue'
 import Error from '@/components/Error.vue'
 import { ValidationObserver } from 'vee-validate'
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
@@ -411,6 +382,7 @@ export default {
     PersonalInfoField,
     TeamInfoField,
     ProjectActivityField,
+    TargetFeatureFiled,
     ValidationObserver,
     Error
   },
@@ -550,6 +522,7 @@ export default {
       // Construct payload
       const project = {
         id: this.projectId,
+        features: this.features,
         leads: this.leads.filter(e => isNotEmptyPerson(e, this.newLead())),
         team: this.team,
         collaborators: this.collaborators.filter(e => e !== ""),

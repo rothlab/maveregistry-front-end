@@ -51,12 +51,116 @@
 
       <!-- Team table -->
       <div v-else>
+        <!-- Filter -->
+        <!-- These filters will be on the same line -->
+        <div class="filter-same-line">
+          <!-- Filter by conditions -->
+          <b-dropdown
+            v-if="hasLoggedIn"
+            :triggers="['hover', 'click']"
+            v-model="filter.conditions"
+            multiple
+            :mobile-modal="false"
+            position="is-bottom-right"
+            @input="fetchTeams()"
+            class="filter-item"
+          >
+            <b-button
+              slot="trigger"
+              slot-scope="{ active }"
+              :type="filter.conditions.length > 0 ? 'is-info' : 'is-light'"
+            >
+              <FilterOutline
+                class="filter-icon icon-18px"
+              />
+              <span style="margin-left: 0.25rem">Condition</span>
+              <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
+            </b-button>
+
+            <b-dropdown-item
+              v-if="filter.conditions.length > 0"
+              value="clear"
+              class="has-text-info"
+            >
+              Clear Filter
+            </b-dropdown-item>
+            <b-dropdown-item
+              v-for="(key, id) in Object.keys(conditions)"
+              :key="id"
+              :value="key"
+            >
+              <b-icon
+                :class="`circle-icon ${conditions[key].icon_class}`"
+                :icon="conditions[key].icon"
+              />
+              {{ conditions[key].name }}
+            </b-dropdown-item>
+          </b-dropdown>
+
+          <!-- Filter by creation date -->
+          <b-datepicker
+            v-model="filter.created_after"
+            placeholder="Created Since"
+            icon="mdil-calendar"
+            icon-prev="mdil-chevron-left"
+            icon-next="mdil-chevron-right"
+            :class="{ 'highlight-filter': filter.created_after }"
+            :max-date="new Date()"
+            :mobile-native="false"
+            @input="fetchTeams()"
+            class="filter-item"
+          >
+            <template v-slot:trigger>
+              <b-tooltip
+                label="Team created on or after this date"
+                type="is-dark"
+              >
+                <b-button
+                  :type="filter.created_after ? 'is-info' : 'is-light'"
+                >
+                  <FilterOutline
+                    class="filter-icon icon-18px"
+                  />
+                  <span>
+                    {{ filter.created_after ? filter.created_after.toLocaleDateString() : "Date" }}
+                  </span>
+                </b-button>
+              </b-tooltip>
+            </template>
+            <b-button
+              type="is-info"
+              outlined
+              @click="filter.created_after = undefined; fetchTeams()"
+              expanded
+              v-if="filter.created_after"
+            >
+              Clear Filter
+            </b-button>
+          </b-datepicker>
+
+          <!-- Filter by PI -->
+          <b-field
+            class="filter-item"
+            style="width: 12rem"
+          >
+            <b-input
+              v-model="filter.pi"
+              placeholder="Investigator"
+              icon="mdil-magnify"
+              :icon-right="filter.pi ? 'mdil-delete': ''"
+              icon-right-clickable
+              @icon-right-click="filter.pi = ''; fetchTeams()"
+              :class="{ 'highlight-filter': filter.pi }"
+              @input="debouncedFetchTeams()"
+            />
+          </b-field>
+        </div>
         <b-table
           :data="teams"
           :loading="isLoading.fetch_team"
           hoverable
           paginated
-          pagination-position="top"
+          pagination-position="bottom"
           backend-pagination
           icon-pack="mdil"
           :per-page="pagination.limit"
@@ -64,113 +168,6 @@
           :current-page="pagination.current"
           @page-change="(change) => { pagination.current = change; fetchTeams() }"
         >
-          <!-- Filter -->
-          <!-- These filters will be on the same line -->
-          <template slot="top-left">
-            <div class="filter-same-line">
-              <!-- Filter by conditions -->
-              <b-dropdown
-                v-if="hasLoggedIn"
-                :triggers="['hover', 'click']"
-                v-model="filter.conditions"
-                multiple
-                :mobile-modal="false"
-                position="is-bottom-right"
-                @input="fetchTeams()"
-                class="filter-item"
-              >
-                <b-button
-                  slot="trigger"
-                  slot-scope="{ active }"
-                  :type="filter.conditions.length > 0 ? 'is-info' : 'is-light'"
-                >
-                  <FilterOutline
-                    class="filter-icon icon-18px"
-                  />
-                  <span style="margin-left: 0.25rem">Condition</span>
-                  <b-icon :icon="active ? 'mdil-chevron-up' : 'mdil-chevron-down'" />
-                </b-button>
-
-                <b-dropdown-item
-                  v-if="filter.conditions.length > 0"
-                  value="clear"
-                  class="has-text-info"
-                >
-                  Clear Filter
-                </b-dropdown-item>
-                <b-dropdown-item
-                  v-for="(key, id) in Object.keys(conditions)"
-                  :key="id"
-                  :value="key"
-                >
-                  <b-icon
-                    :class="`circle-icon ${conditions[key].icon_class}`"
-                    :icon="conditions[key].icon"
-                  />
-                  {{ conditions[key].name }}
-                </b-dropdown-item>
-              </b-dropdown>
-
-              <!-- Filter by creation date -->
-              <b-datepicker
-                v-model="filter.created_after"
-                placeholder="Created Since"
-                icon="mdil-calendar"
-                icon-prev="mdil-chevron-left"
-                icon-next="mdil-chevron-right"
-                :class="{ 'highlight-filter': filter.created_after }"
-                :max-date="new Date()"
-                :mobile-native="false"
-                @input="fetchTeams()"
-                class="filter-item"
-              >
-                <template v-slot:trigger>
-                  <b-tooltip
-                    label="Team created on or after this date"
-                    type="is-dark"
-                  >
-                    <b-button
-                      :type="filter.created_after ? 'is-info' : 'is-light'"
-                    >
-                      <FilterOutline
-                        class="filter-icon icon-18px"
-                      />
-                      <span>
-                        {{ filter.created_after ? filter.created_after.toLocaleDateString() : "Date" }}
-                      </span>
-                    </b-button>
-                  </b-tooltip>
-                </template>
-                <b-button
-                  type="is-info"
-                  outlined
-                  @click="filter.created_after = undefined; fetchTeams()"
-                  expanded
-                  v-if="filter.created_after"
-                >
-                  Clear Filter
-                </b-button>
-              </b-datepicker>
-
-              <!-- Filter by PI -->
-              <b-field
-                class="filter-item"
-                style="width: 15rem"
-              >
-                <b-input
-                  v-model="filter.pi"
-                  placeholder="Search Investigator"
-                  icon="mdil-magnify"
-                  :icon-right="filter.pi ? 'mdil-delete': ''"
-                  icon-right-clickable
-                  @icon-right-click="filter.pi = ''; fetchTeams()"
-                  :class="{ 'highlight-filter': filter.pi }"
-                  @input="debouncedFetchTeams()"
-                />
-              </b-field>
-            </div>
-          </template>
-
           <!-- No results -->
           <template slot="empty">
             <div
