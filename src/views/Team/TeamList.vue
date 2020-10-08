@@ -289,8 +289,8 @@
                     >
                       <b-icon icon="mdil-link" />
                       {{ project.target.name.toUpperCase() }}
-                      ({{ project.target.type }}, <i>{{ project.target.organism }}</i>):
-                      {{ project.features.join(",") }}
+                      ({{ project.target.type }}, <i>{{ project.target.organism }}</i>)
+                      <span v-if="project.features.length > 0">- {{ project.features.join(", ") }}</span>
                     </router-link>
                   </div>
                     
