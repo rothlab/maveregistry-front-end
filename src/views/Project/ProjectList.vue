@@ -275,7 +275,7 @@
           <!-- Filter by name -->
           <b-field
             class="filter-item"
-            style="width: 10rem"
+            style="width: 9rem"
           >
             <b-input
               v-model="filter.name"

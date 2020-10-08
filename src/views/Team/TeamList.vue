@@ -141,11 +141,11 @@
           <!-- Filter by PI -->
           <b-field
             class="filter-item"
-            style="width: 15rem"
+            style="width: 12rem"
           >
             <b-input
               v-model="filter.pi"
-              placeholder="Search Investigator"
+              placeholder="Investigator"
               icon="mdil-magnify"
               :icon-right="filter.pi ? 'mdil-delete': ''"
               icon-right-clickable

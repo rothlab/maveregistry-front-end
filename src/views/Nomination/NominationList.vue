@@ -233,11 +233,11 @@
           <!-- Filter by name -->
           <b-field
             class="filter-item"
-            style="width: 10rem"
+            style="width: 9rem"
           >
             <b-input
               v-model="filter.name"
-              placeholder="Search Name"
+              placeholder="Name"
               icon="mdil-magnify"
               :icon-right="filter.name ? 'mdil-delete': ''"
               icon-right-clickable
