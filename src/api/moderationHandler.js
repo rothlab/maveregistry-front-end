@@ -14,3 +14,8 @@ export async function blockUnblockUser(userId, state) {
 export async function grantModeratorRole(userId, state) {
   return await Parse.Cloud.run("setModeratorRole", { user_id: userId, state: state })
 }
+
+// List projects
+export async function listProjects(filter = "", limit = 10, skip = 0) {
+  return await Parse.Cloud.run("listProjects", { filter: filter, limit: limit, skip: skip })
+}

@@ -144,6 +144,7 @@ export const Project = Parse.Object.extend("Project", {
     let ret = {
       id: this.id,
       features: this.get("features"),
+      create_date: this.get("createdAt"),
       update_date: this.get("updatedAt"),
     }
 
