@@ -328,6 +328,16 @@ export async function fetchTargets(limit, skip, filter) {
     if (followedTargetIds.length > 0) query = Parse.Query.or(query, followedTargetQuery)
   }
   
+  if (filter.progress) {
+    const projectQuery = new Parse.Query(Project)
+    const activityQuery = new Parse.Query(ProjectActivity)
+    activityQuery.equalTo("type", filter.progress)
+
+    // If published activity, search publish activity field
+    projectQuery.matchesQuery(filter.progress === "Publication Available" ? "public_activity" : "recent_activity", activityQuery)
+    query.matchesQuery("projects", projectQuery)
+  }
+
   query.exists("projects") // include only targets with projects associated
   query.include(["projects.team", "projects.team.creator", "projects.creator"]) // Include projects and team objects on the return
   query.include(["projects.recent_activity", "projects.public_activity"]) // Include projects and team objects on the return
@@ -351,7 +361,7 @@ export async function fetchTargets(limit, skip, filter) {
   let targets = await query.find()
 
   // Filter projects
-  if (filter.created_after || filter.conditions.length > 0) {
+  if (filter.created_after || filter.conditions.length > 0 || filter.progress) {
     targets.results = targets.results.map((target) => {
       let projects = target.get("projects")
       // If a created after filter is set
@@ -369,6 +379,15 @@ export async function fetchTargets(limit, skip, filter) {
         if (filter.conditions.includes("follower"))
           projects = projects.filter(e => followedProjectIds.includes(e.id))
       }
+
+      // If progress filter is set
+      if (filter.progress) {
+        projects = projects.filter((project) => {
+          const activity = project.get(filter.progress === "Publication Available" ? "public_activity" : "recent_activity")
+          return activity && activity.get("type") === filter.progress
+        })
+      }
+
       target.set("projects", projects)
       return target
     })

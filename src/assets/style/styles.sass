@@ -149,31 +149,29 @@
   .modal-content
     border-radius: 12px
     box-shadow: 0 1rem 3rem rgba(0,0,0,.175)
-.b-table
-  .top
-    .level-left
-      .filter-same-line
-        margin-right: -0.5rem // This is important because it helps to hide the right margin of the last element of the first line
-        display: flex
-        .filter-item
-          margin-right: 0.5rem
-          margin-left: 0
-          margin-bottom: 0
-      @media screen and (max-width: $break-mobile)
-        .filter-same-line
-          justify-content: space-between
-          flex-wrap: wrap
-          .filter-item
-            margin-bottom: 0.5rem
-            &:first-child
-              margin-left: 0
-            &:last-child
-              margin-left: 0
-              flex-grow: 1
-        .pagination
-          margin: -0.25rem !important
-          .field
-            margin: 0 !important
+.filter-same-line
+  margin-right: -0.5rem // This is important because it helps to hide the right margin of the last element of the first line
+  display: flex
+  .filter-item
+    margin-right: 0.5rem
+    margin-left: 0
+    margin-bottom: 1rem
+@media screen and (max-width: $break-mobile)
+  .filter-same-line
+    justify-content: space-between
+    flex-wrap: wrap
+    .filter-item
+      margin-bottom: 0.5rem
+      &:first-child
+        margin-left: 0
+      &:last-child
+        margin-left: 0
+        flex-grow: 1
+        margin-bottom: 1rem
+  .pagination
+    margin: -0.25rem !important
+    .field
+      margin: 0 !important
 .is-sticky
   position: sticky
   top: calc( 5rem + 1.5rem )
