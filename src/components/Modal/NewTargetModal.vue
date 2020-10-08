@@ -121,33 +121,10 @@
                 </b-select>
               </b-field>
             </ValidationProvider>
-              
-            <ValidationProvider
-              name="Features"
-              v-slot="{ errors, valid }"
-              v-if="hasFeature"
-              immediate
-            > 
-              <!-- Target features -->
-              <b-field
-                :message="errors"
-                class="field-margin"
-                :type="{ 'is-danger': errors[0], '': valid }"
-                label="Target features"
-              >
-                <b-taginput
-                  v-model="features"
-                  :data="selection.features"
-                  autocomplete
-                  append-to-body
-                  open-on-focus
-                  icon="mdil-magnify"
-                  placeholder="Search for a genomic feature"
-                  @typing="getFilteredFeatures"
-                  @input="resetFeatures"
-                />
-              </b-field>
-            </ValidationProvider>
+            
+            <TargetFeatureFiled
+              v-model="features"
+            />
 
             <ValidationProvider
               rules="required"
@@ -190,13 +167,15 @@
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import { displayErrorToast } from "@/api/errorHandler.js"
+import TargetFeatureFiled from '@/components/Field/TargetFeatureField.vue'
 
 const variables = require("@/assets/script/variables.json")
 
 export default {
   components: {
     ValidationProvider,
-    ValidationObserver
+    ValidationObserver,
+    TargetFeatureFiled
   },
   props: {
     active: {
@@ -277,7 +256,6 @@ export default {
       reason: "",
       features: [],
       selection: {
-        features: variables.genomic_features,
         types: variables.target_types,
         organisms: variables.target_organisms
       }
@@ -317,14 +295,6 @@ export default {
         // Handle UI changes
         this.isLoading = false
       }
-    },
-    getFilteredFeatures(text) {
-      this.selection.features = variables.genomic_features.filter(e => {
-        return !this.features.includes(e) && e.toLowerCase().indexOf(text.toLowerCase()) >= 0
-      })
-    },
-    resetFeatures() {
-      this.selection.features = variables.genomic_features.filter(e => !this.features.includes(e))
     }
   }
 }

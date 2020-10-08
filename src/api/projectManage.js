@@ -465,6 +465,7 @@ export async function updateProject(payload) {
   const recentActivity = findRecentActivity(activities)
 
   // Update project
+  project.set("features", payload.features)
   project.set("leads", payload.leads)
   project.set("team", team)
   project.set("collaborators", collaborators)
