@@ -34,7 +34,7 @@
           >
             <vue-vimeo-player
               :video-id="tutorial.video_id"
-              :options="{ dnt: true, responsive: true, title: false, portrait: false, byline: false }"
+              :options="{ dnt: true, responsive: true, title: false, portrait: false, byline: false, playsinline: false }"
             />
           </b-carousel-item>
 
