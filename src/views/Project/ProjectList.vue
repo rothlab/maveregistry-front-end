@@ -865,6 +865,12 @@ export default {
   },
   methods: {
     confirmFollow(id, type, creator) {
+      // If not logged in, show the login panel instead
+      if (!this.hasLoggedIn) {
+        this.$emit("login")
+        return
+      }
+
       this.followProp.source = id
       this.followProp.type = type
 
