@@ -56,6 +56,20 @@
             ?
           </p>
           A nomination is a target sequence feature for which we will love to see a variant effect map.
+          <p
+            class="has-text-weight-bold field-margin"
+            style="padding: 1rem 0 0 0"
+          >
+            Need some help?
+          </p>
+          <p style="margin: 0.5rem 0 0.75rem 0">
+            <b-icon
+              icon="mdil-play"
+              class="circle-icon has-background-info"
+              type="is-light"
+            />
+            Watch <a @click.stop.prevent="isTutorialModalActive = true">this video tutorial</a> to get started!
+          </p>
         </TipAction>
         
         <!-- Filter -->
@@ -507,6 +521,12 @@
         :on-action="deleteNomination"
         title="Delete Nomination"
       />
+
+      <!-- Tutorial modal -->
+      <VideoTutorialPlayerModal
+        :active.sync="isTutorialModalActive"
+        :selected="3"
+      />
     </div>
   </div>
 </template>
@@ -520,6 +540,7 @@ import Error from '@/components/Error.vue'
 import TipAction from '@/components/Action/TipAction.vue'
 import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
 import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
+import VideoTutorialPlayerModal from "@/components/Modal/VideoTutorialPlayerModal.vue"
 import debounce from 'lodash/debounce'
 
 const variables = require("@/assets/script/variables.json")
@@ -531,7 +552,8 @@ export default {
     Error,
     TipAction,
     FilterOutline,
-    ConfirmDangerModal
+    ConfirmDangerModal,
+    VideoTutorialPlayerModal
   },
   watch: {
     async currentUser() {
@@ -586,6 +608,7 @@ export default {
       },
       selectedNomination: undefined,
       isConfirmDeleteModalActive: false,
+      isTutorialModalActive: false,
       hasInitLoad: false
     }
   },

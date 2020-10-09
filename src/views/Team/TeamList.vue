@@ -51,6 +51,24 @@
 
       <!-- Team table -->
       <div v-else>
+        <!-- Tip -->
+        <!-- Make sure you added the tip to the preferenceModule store -->
+        <TipAction tip="team_help">
+          <p
+            class="has-text-weight-bold field-margin"
+            style="padding-right: 1rem"
+          >
+            Need some help?
+          </p>
+          <p style="margin: 0.5rem 0 0.75rem 0">
+            <b-icon
+              icon="mdil-play"
+              class="circle-icon has-background-info"
+              type="is-light"
+            />
+            Watch <a @click.stop.prevent="isTutorialModalActive = true">this video tutorial</a> to get started!
+          </p>
+        </TipAction>
         <!-- Filter -->
         <!-- These filters will be on the same line -->
         <div class="filter-same-line">
@@ -377,6 +395,12 @@
       :type="followProp.type"
       @change="fetchTeams()"
     />
+
+    <!-- Tutorial modal -->
+    <VideoTutorialPlayerModal
+      :active.sync="isTutorialModalActive"
+      :selected="2"
+    />
   </div>
 </template>
 
@@ -385,6 +409,8 @@ import * as TeamManage from "@/api/teamManage.js"
 import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
+import VideoTutorialPlayerModal from "@/components/Modal/VideoTutorialPlayerModal.vue"
+import TipAction from '@/components/Action/TipAction.vue'
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import debounce from 'lodash/debounce'
@@ -396,6 +422,8 @@ export default {
     NewTeamModal,
     FollowModal,
     UnfollowModal,
+    VideoTutorialPlayerModal,
+    TipAction,
     Error,
     FilterOutline
   },
@@ -409,6 +437,7 @@ export default {
       isNewTeamModalActive: false,
       isFollowModelActive: false,
       isUnfollowModelActive: false,
+      isTutorialModalActive: false,
       isLoading: {
         fetch_team: false,
         new_team: false
