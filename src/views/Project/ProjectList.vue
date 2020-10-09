@@ -74,6 +74,20 @@
             />
             Receive on-site and email notifications of project update
           </p>
+          <p
+            class="has-text-weight-bold field-margin"
+            style="padding-right: 1rem"
+          >
+            Need some help?
+          </p>
+          <p style="margin: 0.5rem 0 0.75rem 0">
+            <b-icon
+              icon="mdil-play"
+              class="circle-icon has-background-info"
+              type="is-light"
+            />
+            Watch <a @click.stop.prevent="isTutorialModalActive = true">this video tutorial</a> to get started!
+          </p>
         </TipAction>
 
         <!-- Filter -->
@@ -742,6 +756,12 @@
         :target="preFilledProject"
         has-feature
       />
+
+      <!-- Tutorial modal -->
+      <VideoTutorialPlayerModal
+        :active.sync="isTutorialModalActive"
+        :selected="1"
+      />
     </div>
   </div>
 </template>
@@ -755,6 +775,7 @@ import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import ConfirmInfoModal from '@/components/Modal/ConfirmInfoModal.vue'
+import VideoTutorialPlayerModal from "@/components/Modal/VideoTutorialPlayerModal.vue"
 import ShowMoreField from '@/components/Field/ShowMoreField.vue'
 import TipAction from '@/components/Action/TipAction.vue'
 import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
@@ -771,6 +792,7 @@ export default {
     UnfollowModal,
     NewTargetModal,
     ConfirmInfoModal,
+    VideoTutorialPlayerModal,
     ShowMoreField,
     TipAction,
     FilterOutline
@@ -832,6 +854,8 @@ export default {
       isUnfollowModelActive: false,
       // Register new activity related parameters
       isNewTargetModalActive: false,
+      // Show video tutorial
+      isTutorialModalActive: false,
       isLoading: {
         new_project: false,
         follow_unfollow: false,

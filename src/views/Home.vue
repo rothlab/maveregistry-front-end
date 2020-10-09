@@ -79,6 +79,21 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- Tutorial videos -->
+                <div
+                  class="landing-tutorial-videos delay-2s"
+                  v-animate="'fadeIn'"
+                  @click.prevent="isTutorialModalActive = true"
+                >
+                  <b-icon
+                    icon="mdil-play"
+                    type="is-dark"
+                    class="circle-icon has-background-grey-lighter"
+                    style="margin-right: 1rem"
+                  />
+                  <span class="is-size-6">Watch video tutorials</span>
+                </div>
               </div>
             </div>
 
@@ -88,6 +103,9 @@
           </div>
         </div>
       </div>
+
+      <!-- Tutorial modal -->
+      <VideoTutorialPlayerModal :active.sync="isTutorialModalActive" />
     </section>
 
     <!-- Onboarding section 1 -->
@@ -271,14 +289,17 @@
 </template>
 
 <script>
+import VideoTutorialPlayerModal from "@/components/Modal/VideoTutorialPlayerModal.vue"
 import Lottie from "vue-lottie"
 
 export default {
   components: {
-    Lottie
+    Lottie,
+    VideoTutorialPlayerModal
   },
   data () {
     return {
+      isTutorialModalActive: false,
       activeTab: 0,
       tabs: [
         {
@@ -322,6 +343,8 @@ export default {
 
 
 <style lang="sass">
+@import "@/assets/style/variables.sass"
+
 .tabs
   overflow: visible
 .carousel-items
@@ -380,6 +403,13 @@ export default {
     padding: 0rem 1.5rem
     @media screen and (max-width: $break-mobile)
       width: 80%
+.landing-tutorial-videos
+  margin-top: 2rem
+  padding: 1rem
+  background-color: rgba($grey-lighter, 0.1)
+  border-radius: 4px
+  text-align: center
+  cursor: pointer
 .demo-display
   position: relative
   right: 22rem

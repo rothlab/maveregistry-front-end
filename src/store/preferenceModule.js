@@ -2,6 +2,7 @@ export const state = {
   hasAcceptedCookieConsent: false,
   showTip: {
     why_follow: true,
+    team_help: true,
     nomination: true
   }
 }
