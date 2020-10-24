@@ -161,7 +161,7 @@ export async function fetchTeams(limit, skip, filter = undefined, objects = []) 
 
     if (filter.created_after) query.greaterThanOrEqualTo("createdAt", filter.created_after)
     
-    if (filter.conditions.length > 0) {
+    if (filter.conditions && filter.conditions.length > 0) {
       if (filter.conditions.includes("creator")) query.equalTo("creator", Parse.User.current())
     }
   }
