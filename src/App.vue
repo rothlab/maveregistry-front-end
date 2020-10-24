@@ -394,7 +394,10 @@ export default {
           actionText: isInProfile ? "Dismiss" : "Verify Email",
           indefinite: true,
           onAction: () => {
-            if (!isInProfile)
+            // If not logged in, show log in panel
+            if (!this.hasLoggedIn) this.isLoginSignupModalActive = true
+
+            if (!isInProfile && this.hasLoggedIn)
               this.$router.push({ name: 'User Profile View', params: { username: this.currentUser.username } })
           }
         })
