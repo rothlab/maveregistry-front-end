@@ -282,8 +282,11 @@
               >
                 <div class="card-header">
                   <p class="card-header-title is-capitalized">
-                    <b-icon icon="mdil-play" />
-                    Under Investigation
+                    <b-icon
+                      icon="mdil-information"
+                      style="margin-right: 4px"
+                    />
+                    None Posted
                   </p>
                 </div>
               </div>
