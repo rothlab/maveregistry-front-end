@@ -412,11 +412,12 @@
             label="Project"
             v-slot="props"
             width="40vw"
+            cell-class="vertical-center"
           >
             <div class="has-text-left">
               <!-- If not member, show this panel to indicate that nothing is available -->
               <div
-                v-if="props.row.projects < 1 && hasLoggedIn"
+                v-if="props.row.projects.length < 1 && hasLoggedIn"
                 class="card project-card has-background-light"
               >
                 <div class="card-header">
@@ -430,7 +431,7 @@
                 </div>
               </div>
 
-              <div v-if="props.row.projects < 1 && !hasLoggedIn">
+              <div v-if="props.row.projects.length < 1 && !hasLoggedIn">
                 <p>
                   <b-icon
                     icon="mdil-lock"
@@ -532,7 +533,7 @@
                     <div class="is-size-6">
                       <span
                         class="has-text-primary"
-                        v-if="project.features.length > 0"
+                        v-if="project.features && project.features.length > 0"
                       >
                         Feature{{ project.features.length > 1 ? 's:' : ':' }}
                         {{ project.features.join(", ") }}
@@ -543,7 +544,7 @@
                         v-if="project.description"
                         :value="project.description"
                       />
-                      <div v-else-if="project.follow_status">
+                      <div v-else-if="project.follow_status && currentUser">
                         <p
                           v-if="!project.follow_status.id && project.creator.username !== currentUser.username && !isModerator"
                           class="has-text-danger font-14px"

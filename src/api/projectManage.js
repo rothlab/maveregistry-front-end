@@ -38,7 +38,7 @@ export const Target = Parse.Object.extend("Target", {
   },
   format: async function () {
     // Fetch projects
-    const projects = this.get("projects").filter(e => e instanceof Project)
+    let projects = this.get("projects").filter(e => e instanceof Project)
 
     // Handle team object
     const teams = projects.map(e => e.get("team")).filter(Boolean).filter(uniqueById)
@@ -47,48 +47,51 @@ export const Target = Parse.Object.extend("Target", {
     const targetFollowStatus = await getFollowStatus([this.id], "target", Parse.User.current())
     const projectFollowStatus = await getFollowStatus(projects.map(e => e.id), "project", Parse.User.current())
 
+    // Parse projects
+    projects = await Promise.all(projects.map(async (e, i) => {
+      const recentActivity = e.get("recent_activity")
+      const publicActivity = e.get("public_activity")
+      const funding = e.get("funding")
+      const creator = e.get("creator")
+      
+      let ret = {
+        id: e.id,
+        features: e.get("features")
+      }
+      
+      if (creator) ret.creator = {
+        username: creator.get("username"),
+        first_name: creator.get("first_name"),
+        last_name: creator.get("last_name"),
+        profile_image: creator.get("profile_image")
+      }
+      if (projectFollowStatus.length > i) ret.follow_status = projectFollowStatus[i]
+      if (funding && funding.open_for_funding) ret.open_for_funding = funding.open_for_funding
+      if (recentActivity) {
+        // If having recent activity, meaning we have access to this project,
+        // we display the most recent activity
+        if (recentActivity.get("type")) ret.type = recentActivity.get("type")
+        if (recentActivity.get("description")) ret.description = recentActivity.get("description")
+      } else if (publicActivity) {
+        // If just having access to the public activity,
+        // we display that instead
+        if (publicActivity.get("type")) ret.type = publicActivity.get("type")
+        if (publicActivity.get("description")) ret.description = publicActivity.get("description")
+      } else if (!Parse.User.current()) {
+        // If not logged in, don't return projects without recent or public activity
+        return undefined
+      }
+
+      return ret
+    }))
+
     return {
       id: this.id,
       name: this.get("name"),
       type: this.get("type"),
       organism: this.get("organism"),
       follow_status: targetFollowStatus.length > 0 ? targetFollowStatus[0] : undefined,
-      projects: await Promise.all(projects.map(async (e, i) => {
-        const recentActivity = e.get("recent_activity")
-        const publicActivity = e.get("public_activity")
-        const funding = e.get("funding")
-        const creator = e.get("creator")
-        
-        let ret = {
-          id: e.id,
-          features: e.get("features")
-        }
-        
-        if (creator) ret.creator = {
-          username: creator.get("username"),
-          first_name: creator.get("first_name"),
-          last_name: creator.get("last_name"),
-          profile_image: creator.get("profile_image")
-        }
-        if (projectFollowStatus.length > i) ret.follow_status = projectFollowStatus[i]
-        if (funding && funding.open_for_funding) ret.open_for_funding = funding.open_for_funding
-        if (recentActivity) {
-          // If having recent activity, meaning we have access to this project,
-          // we display the most recent activity
-          if (recentActivity.get("type")) ret.type = recentActivity.get("type")
-          if (recentActivity.get("description")) ret.description = recentActivity.get("description")
-        } else if (publicActivity) {
-          // If just having access to the public activity,
-          // we display that instead
-          if (publicActivity.get("type")) ret.type = publicActivity.get("type")
-          if (publicActivity.get("description")) ret.description = publicActivity.get("description")
-        } else if (!Parse.User.current()) {
-          // If not logged in, don't return projects without recent or public activity
-          return undefined
-        }
-
-        return ret
-      })),
+      projects: projects.filter(Boolean),
       teams: teams.map((e) => {
         const creator = e.get("creator")
 
