@@ -10,6 +10,7 @@ import { Vue as VueIntegration } from '@sentry/integrations';
 import VueAnimate from 'vue-animate-scroll'
 import VueScrollactive from 'vue-scrollactive'
 import VueScrollTo from 'vue-scrollto'
+import SimpleAnalytics from "simple-analytics-vue";
 
 // Import stylesheets
 import "@/assets/style/bulma-customization.sass"
@@ -54,6 +55,7 @@ Vue.use(VueScrollTo, {
   duration: 600,
   offset: -100
 })
+Vue.use(SimpleAnalytics, { skip: process.env.NODE_ENV === "development" })
 
 // Inject mixins
 Vue.mixin(pageMixins)

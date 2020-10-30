@@ -205,12 +205,16 @@
                 v-slot="props"
               >
                 <a
+                  v-if="props.row.license_url"
                   :href="props.row.license_url"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   {{ props.row.license }}
                 </a>
+                <span v-else>
+                  {{ props.row.license }}
+                </span>
               </b-table-column>
             </b-table>
           </div>
@@ -426,11 +430,11 @@ export default {
           link: "https://github.com/webpack-contrib/sass-loader"
         },
         {
-          project: "Simple Parse Server SMTP Email Adapter",
-          team: "Jose Luis",
-          license: "MIT",
-          license_url: "https://github.com/lcortess/simple-parse-smtp-adapter/blob/master/LICENSE",
-          link: "https://github.com/lcortess/simple-parse-smtp-adapter"
+          project: "Vue plugin for Simple Analytics",
+          team: "Simple Analytics",
+          license: "All rights reserved",
+          license_url: undefined,
+          link: "https://github.com/simpleanalytics/vue-plugin"
         },
         {
           project: "parse-server-s3-adapter",
