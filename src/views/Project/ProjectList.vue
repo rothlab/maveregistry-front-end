@@ -221,7 +221,7 @@
             @input="fetchTargets()"
             class="filter-item"
           >
-            <template v-slot:trigger>
+            <template #trigger>
               <b-tooltip
                 label="Project created on or after this date"
                 type="is-dark"

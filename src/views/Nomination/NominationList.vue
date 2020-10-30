@@ -216,7 +216,7 @@
             @input="fetchNominations()"
             class="filter-item"
           >
-            <template v-slot:trigger>
+            <template #trigger>
               <b-tooltip
                 label="Target nominated on or after this date"
                 type="is-dark"
