@@ -430,13 +430,6 @@ export default {
           link: "https://github.com/webpack-contrib/sass-loader"
         },
         {
-          project: "Vue plugin for Simple Analytics",
-          team: "Simple Analytics",
-          license: "All rights reserved",
-          license_url: undefined,
-          link: "https://github.com/simpleanalytics/vue-plugin"
-        },
-        {
           project: "parse-server-s3-adapter",
           team: "Parse Platform",
           license: "BSD",

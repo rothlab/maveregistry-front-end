@@ -352,8 +352,11 @@ export default {
       this.isLoading = false
     }
 
-    // Load feedback chat icon
-    if (process.env.NODE_ENV !== "development") this.initFeedbackButton()
+    // Load production third-party functionality
+    if (process.env.NODE_ENV !== "development") {
+      this.initFeedbackButton() // Crisp Feedback button
+      this.initSimpleAnalytics() // Simple Analytics
+    }
   },
   data () {
     return {
@@ -405,8 +408,8 @@ export default {
     },
     initFeedbackButton() {
       // Init parameters
-      window.$crisp = [];
-      window.CRISP_WEBSITE_ID = "fcaf4708-d52f-439f-a74d-f6fb241d2958";
+      window.$crisp = []
+      window.CRISP_WEBSITE_ID = "fcaf4708-d52f-439f-a74d-f6fb241d2958"
 
       // Register a callback function to send basic information
       if (this.hasLoggedIn && this.currentUser) {
@@ -417,17 +420,29 @@ export default {
             window.$crisp.push(["set", "user:email", this.currentUser.email])
             window.$crisp.push(["set", "user:avatar", [this.currentUser.profile_image]])
           }]
-        ];
+        ]
       }
       
       (function() {
-        var d = document;
-        var s = d.createElement("script");
+        var d = document
+        var s = d.createElement("script")
 
-        s.src = "https://client.crisp.chat/l.js";
-        s.async = 1;
-        d.getElementsByTagName("head")[0].appendChild(s);
+        s.src = "https://client.crisp.chat/l.js"
+        s.async = 1
+        d.getElementsByTagName("head")[0].appendChild(s)
       })();
+    },
+    initSimpleAnalytics() {
+      (function() {
+        var d = document
+        var s = d.createElement("script")
+
+        s.src = "https://sa.registry.varianteffect.org/latest.js"
+        s.async = 1
+        s.defer = 1
+        s.setAttribute("data-skip-dnt", "true")
+        d.head.appendChild(s)
+      })()
     }
   }
 }
