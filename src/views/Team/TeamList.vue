@@ -128,7 +128,7 @@
             @input="fetchTeams()"
             class="filter-item"
           >
-            <template v-slot:trigger>
+            <template #trigger>
               <b-tooltip
                 label="Team created on or after this date"
                 type="is-dark"
