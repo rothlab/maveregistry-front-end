@@ -28,7 +28,8 @@ export default new Vuex.Store({
       key: 'preference',
       paths: [
         'preference', 'user.nonce'
-      ]
+      ],
+      fetchBeforeUse: true
     })
   ]
 })

@@ -1,5 +1,5 @@
 export const state = {
-  hasAcceptedCookieConsent: false,
+  showCookieConsentBanner: true,
   showTip: {
     why_follow: true,
     team_help: true,
@@ -8,8 +8,8 @@ export const state = {
 }
 
 export const getters = {
-  hasAcceptedCookieConsent: (state) => {
-    return state.hasAcceptedCookieConsent
+  showCookieConsentBanner: (state) => {
+    return state.showCookieConsentBanner
   },
   showTip: (state) => (tip) => {
     return !!state.showTip[tip]
@@ -18,7 +18,7 @@ export const getters = {
 
 export const mutations = {
   setCookieConsent(state) {
-    state.hasAcceptedCookieConsent = true
+    state.showCookieConsentBanner = false
   },
   hideTip(state, tip) {
     if (state.showTip[tip]) state.showTip[tip] = false
