@@ -228,9 +228,13 @@ export async function updateUserProfile (userInfo) {
     user.set("profile_image", userInfo.profile_image)
   }
   if (userInfo.team) {
-    const team = await new Team.fetchById(userInfo.team)
+    if (userInfo.team === "unset") {
+      user.unset("team") 
+    } else {
+      const team = await new Team.fetchById(userInfo.team)
+      user.set("team", team)
+    }
     hasChanged = true
-    user.set("team", team)
   }
   if (userInfo.social) {
     // Remove properties with empty string
