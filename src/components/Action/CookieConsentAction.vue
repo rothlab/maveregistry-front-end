@@ -5,7 +5,7 @@
   >
     <div
       class="cookie-consent has-background-dark"
-      v-if="!hasAcceptedCookieConsent"
+      v-if="showCookieConsentBanner"
     >
       <div class="level is-mobile">
         <div class="level-left">
@@ -40,8 +40,8 @@
 <script>
 export default {
   computed: {
-    hasAcceptedCookieConsent() {
-      return this.$store.getters.hasAcceptedCookieConsent
+    showCookieConsentBanner() {
+      return this.$store.getters.showCookieConsentBanner
     }
   },
   data () {
