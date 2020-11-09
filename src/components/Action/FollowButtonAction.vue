@@ -8,7 +8,7 @@
       class="small-shadow"
       @click="isFollowModelActive = true"
     >
-      Follow
+      Follow/Edit
     </b-button>
     <!-- Follow up modal -->
     <FollowModal

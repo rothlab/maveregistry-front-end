@@ -8,7 +8,8 @@
             <div class="level-left">
               <div class="content">
                 <p class="is-size-3 has-text-weight-medium">
-                  View Project
+                  <span class="is-hidden-mobile">View</span>
+                  Project
                 </p>
               </div>
             </div>
