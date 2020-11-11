@@ -108,10 +108,38 @@
 
               <div
                 class="is-size-5"
-                v-if="members.length > 0"
                 style="margin-bottom: 1em"
               >
                 <b>Member{{ members.length > 1 ? 's' : '' }}</b><br>
+                
+                <!-- Join team -->
+                <b-button
+                  v-if="!isMember"
+                  icon-left="mdil-plus"
+                  rounded
+                  size="is-small"
+                  style="margin: 0.5rem 0.5rem 0 0"
+                  type="is-link"
+                  outlined
+                  @click="isJoinTeamModalActive = true"
+                >
+                  Join team
+                </b-button>
+
+                <!-- Leave team -->
+                <b-button
+                  v-else
+                  icon-left="mdil-logout"
+                  rounded
+                  size="is-small"
+                  style="margin: 0.5rem 0.5rem 0 0"
+                  type="is-danger"
+                  outlined
+                  @click="isLeaveTeamModalActive = true"
+                >
+                  Leave team
+                </b-button>
+
                 <figure
                   v-for="(member, id) in members"
                   :key="id"
@@ -363,6 +391,28 @@
           This team has <b>{{ projects.length }}</b> projects. Please reassign them to other teams.
         </div>
       </ConfirmDangerModal>
+
+      <!-- Confirm Join Team Modal -->
+      <ConfirmInfoModal
+        :active.sync="isJoinTeamModalActive"
+        action="Join"
+        type="team"
+        :is-irreversible="false"
+        :on-action="joinTeam"
+      >
+        <!-- <p style="margin-top: 1rem">
+          Team creator will be notified You will be notified when new projects or nominations concerning this target are added to the Registry.
+        </p> -->
+      </ConfirmInfoModal>
+
+      <!-- Confirm Leave Team Modal -->
+      <ConfirmDangerModal
+        :active.sync="isLeaveTeamModalActive"
+        type="team"
+        action="Leave"
+        :on-action="leaveTeam"
+        :is-irreversible="false"
+      />
     </div>
   </div>
 </template>
@@ -372,6 +422,7 @@ import * as TeamManage from "@/api/teamManage.js"
 import * as FollowManage from "@/api/followManage.js"
 import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
+import ConfirmInfoModal from '@/components/Modal/ConfirmInfoModal.vue'
 import { handleError } from '@/api/errorHandler.js'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
 import TransferAction from '@/components/Action/TransferAction.vue'
@@ -384,7 +435,8 @@ export default {
     ManageFollowerModal,
     FollowButtonAction,
     TransferAction,
-    ConfirmDangerModal
+    ConfirmDangerModal,
+    ConfirmInfoModal
   },
   computed: {
     teamId() {
@@ -398,6 +450,9 @@ export default {
     },
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
+    },
+    isMember() {
+      return this.currentUser && this.currentUser.team === this.teamId
     }
   },
   data () {
@@ -408,6 +463,8 @@ export default {
       isManageFollowerModalActive: false,
       isConfirmObtainOnwershipModalActive: false,
       isConfirmDeleteModalActive: false,
+      isJoinTeamModalActive: false,
+      isLeaveTeamModalActive: false,
       followStatus: undefined,
       principalInvestigator: {},
       members: [],
@@ -513,6 +570,18 @@ export default {
     async deleteTeam() {
       await TeamManage.deleteTeam(this.teamId)
       this.$router.push({ name: 'Teams' })
+    },
+    async joinTeam() {
+      await this.$store.dispatch('updateUserProfile', {
+        team: this.teamId
+      })
+      await this.loadPage()
+    },
+    async leaveTeam() {
+      await this.$store.dispatch('updateUserProfile', {
+        team: "unset"
+      })
+      await this.loadPage()
     }
   }
 }

@@ -182,6 +182,7 @@
                 <TeamInfoField
                   v-model="team"
                   v-if="userInfo.email_validated"
+                  :is-required="false"
                   label="Team Affiliation"
                 />
               </div>
@@ -336,7 +337,13 @@ export default {
 
       // Update user
       try {
-        this.userInfo.team = this.team
+        if (this.userInfo.team && !this.team) {
+          // If user had a team, unset it
+          this.userInfo.team = "unset"
+        } else {
+          this.userInfo.team = this.team
+        }
+        
         await this.$store.dispatch('updateUserProfile', this.userInfo)
       } catch (e) {
         this.isLoading.save_edit = false

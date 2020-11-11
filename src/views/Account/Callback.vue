@@ -16,7 +16,7 @@
             <b-tooltip
               multilined
               type="is-dark"
-              label="Unable to retrieve email address due to your ORCID privacy setting"
+              label="Unable to retrieve email address from ORCID"
             >
               <b-icon icon="mdil-alert-circle" />
             </b-tooltip>
@@ -148,6 +148,10 @@ export default {
         ret = await this.$store.dispatch('signupLoginUserOrcid', this.userInfo)
 
         if (ret === "resend_email") return
+        if (ret === "missing email") {
+          this.hasEmail = false
+          return
+        }
       } catch (e) {
         await displayErrorToast(e)
         return

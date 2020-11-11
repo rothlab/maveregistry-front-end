@@ -114,6 +114,8 @@ export const actions = {
         })
 
         return "resend_email"
+      } else if (error === "missing email") {
+        return "missing email"
       } else {
         throw e
       }

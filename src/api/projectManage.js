@@ -345,11 +345,12 @@ export async function fetchTargets(limit, skip, filter) {
   query.exists("projects") // include only targets with projects associated
   query.include(["projects.team", "projects.team.creator", "projects.creator"]) // Include projects and team objects on the return
   query.include(["projects.recent_activity", "projects.public_activity"]) // Include projects and team objects on the return
+  query.descending("updatedAt") // Sort by updated date
 
   // Select fields
   query.select(
     [
-      "name", "type", "organism", 
+      "name", "type", "organism",
       "projects.features", "projects.funding", "projects.creator",
       "projects.team", "projects.team.creator", "projects.team.first_name", "projects.team.last_name",
       "projects.team.creator.username", "projects.team.creator.first_name", "projects.team.creator.last_name", "projects.team.creator.profile_image",
