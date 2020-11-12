@@ -249,7 +249,7 @@ export async function removeMember(teamId, username) {
   await Parse.Cloud.run("removeMember", { username: username, team_id: teamId})
 }
 
-export async function fetchTeamsByUserId(id) {
+export async function fetchTeamOwnershipsByUserId(id) {
   const userQuery = new Parse.Query(Parse.User)
   userQuery.equalTo("objectId", id)
   const query = new Parse.Query(Team)
@@ -277,6 +277,21 @@ export async function deleteTeam(teamId) {
   // Fetch team and delete
   const team = await new Team.fetchById(teamId)
   return await team.destroy()
+}
+
+export async function fetchTeamAffiliationsByUserId(id) {
+  // Fetch team members
+  const userQuery = new Parse.Query(Parse.User)
+  userQuery.equalTo("objectId", id)
+  const query = new Parse.Query(TeamMember)
+  query.matchesQuery("member", userQuery)
+  query.exists("approvedAt")
+  query.include("target")
+  const members = await query.find()
+
+  // Format teams
+  const teams = members.map(e => e.get("target"))
+  return await Promise.all(teams.map(e => e.format()))
 }
 
 export async function joinTeam(teamId, type, userId = undefined) {

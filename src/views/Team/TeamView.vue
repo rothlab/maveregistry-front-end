@@ -119,7 +119,7 @@
                     <!-- Owner view -->
                     <div v-if="isOwner">
                       <!-- Invite to join team -->
-                      <b-button
+                      <!-- <b-button
                         icon-left="mdil-plus"
                         rounded
                         size="is-small"
@@ -129,7 +129,7 @@
                         @click="isInviteJoinModalActive = true"
                       >
                         Invite
-                      </b-button>
+                      </b-button> -->
 
                       <!-- Review join team request-->
                       <b-button

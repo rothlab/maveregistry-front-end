@@ -185,23 +185,6 @@
 
               <div class="project-header">
                 <p class="is-size-4 has-text-weight-bold">
-                  Team
-                </p>
-              </div>
-
-              <div class="project-content">
-                <TeamInfoField
-                  v-model="team"
-                  v-if="userInfo.email_validated"
-                  :is-required="false"
-                  label="Team Affiliation"
-                />
-              </div>
-
-              <hr>
-
-              <div class="project-header">
-                <p class="is-size-4 has-text-weight-bold">
                   Funder Role
                 </p>
               </div>
@@ -354,7 +337,6 @@ import * as FileManage from "@/api/fileManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "@/components/Error.vue"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
-import TeamInfoField from '@/components/Field/TeamInfoField.vue'
 import AvatarCropper from "vue-avatar-cropper"
 
 export default {
@@ -363,7 +345,6 @@ export default {
     ValidationProvider,
     ValidationObserver,
     Error,
-    TeamInfoField,
     AvatarCropper
   },
   computed: {
@@ -375,7 +356,6 @@ export default {
   data () {
     return {
       userInfo: {},
-      team: "",
       showProfile: false,
       isLoading: {
         page: true,
@@ -414,7 +394,6 @@ export default {
 
     if (this.userInfo) {
       if (!this.userInfo.social) this.userInfo.social = {}
-      if (this.userInfo.team) this.team = this.userInfo.team
     }
 
     this.$watch(
@@ -450,13 +429,6 @@ export default {
 
       // Update user
       try {
-        if (this.userInfo.team && !this.team) {
-          // If user had a team, unset it
-          this.userInfo.team = "unset"
-        } else {
-          this.userInfo.team = this.team
-        }
-
         await this.$store.dispatch('updateUserProfile', this.userInfo)
       } catch (e) {
         this.isLoading.save_edit = false
