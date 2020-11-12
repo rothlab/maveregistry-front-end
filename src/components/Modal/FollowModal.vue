@@ -26,7 +26,7 @@
         <!-- Body -->
         <div class="is-flex p-margin">
           <span>
-            Your request will be submitted to the {{ type }} creator
+            Your request will be submitted to {{ type }} creator
             <figure
               class="image is-24x24 is-inline-flex"
               style="margin: 0 0.25rem"

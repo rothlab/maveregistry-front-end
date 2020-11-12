@@ -1,7 +1,6 @@
 import { Parse } from "./parseConnect.js"
 import { getFollowStatus } from "./followManage.js"
 import { fetchProjectByTeamId } from "./projectManage.js"
-import { fetchUsersByTeamId } from "./userManage.js"
 
 // Define team object
 export const Team = Parse.Object.extend("Team", {
@@ -37,7 +36,7 @@ export const Team = Parse.Object.extend("Team", {
 
     if (detail) {
       // Fetch members
-      const members = await fetchUsersByTeamId(this.id)
+      const members = await fetchMembers(this)
       ret.members = members
     }
 
@@ -105,6 +104,58 @@ export const Team = Parse.Object.extend("Team", {
 })
 Parse.Object.registerSubclass('Team', Team);
 
+// Define team member object
+export const TeamMember = Parse.Object.extend("TeamMember", {
+  initialize: function (attrs) {
+    // Validate attrs
+    if (!attrs) return
+    if (!attrs.type) throw new Error("Member request type is not defined")
+    if (!["request", "invite"].includes(attrs.type)) throw new Error("Member request type is not valid")
+    if (!attrs.member) throw new Error("Member is not defined")
+    if (!attrs.target) throw new Error("Member request target is not defined")
+  },
+  format: function () {
+    const member = this.get("member")
+
+    let ret = {
+      id: this.id,
+      type: this.get("type"),
+      created_at: this.get("createdAt"),
+      member: {
+        username: member.get("username"),
+        first_name: member.get("first_name"),
+        last_name: member.get("last_name"),
+        profile_image: member.get("profile_image")
+      }
+    }
+
+    if (this.get("approvedAt")) ret.approved_at = this.get("approvedAt")
+
+    return ret
+  }
+}, {
+  create: async function(attrs) {
+    // Check if exists
+    let query = new Parse.Query(TeamMember)
+    if (attrs.id) {
+      // An id is provided, use it as the key
+      query.equalTo("objectId", attrs.id)
+    } else {
+      query.equalTo("target", attrs.target)
+      query.equalTo("member", attrs.member)
+      query.equalTo("type", attrs.type)
+    }
+
+    const result = await query.first()
+
+    // If a team member is already found, we just need to return it
+    if (result) return result
+    
+    return new TeamMember(attrs)
+  }
+})
+Parse.Object.registerSubclass('TeamMember', TeamMember);
+
 export async function addTeam(teamInfo) {
   // Validate if logged in
   const currentUser = Parse.User.current()
@@ -127,9 +178,7 @@ export async function addTeam(teamInfo) {
   // Set the current user as the creator of the team
   team.set("creator", currentUser)
 
-  const ret = await Parse.Object.saveAll([team, currentUser])
-
-  return ret[0]
+  return await team.save()
 }
 
 export async function updateTeam(id, payload) {
@@ -211,6 +260,15 @@ export async function fetchTeamsByUserId(id) {
   return await Promise.all(teams.map(e => e.format()))
 }
 
+export async function fetchMembers(team) {
+  // Fetch team members
+  const query = new Parse.Query(TeamMember)
+  query.equalTo("target", team)
+  query.include("member")
+  const members = await query.find()
+  return members.map(e => e.format())
+}
+
 export async function obtainTeam(id) {
   await Parse.Cloud.run("obtainObject", { type: "team", id: id })
 }
@@ -219,4 +277,71 @@ export async function deleteTeam(teamId) {
   // Fetch team and delete
   const team = await new Team.fetchById(teamId)
   return await team.destroy()
+}
+
+export async function joinTeam(teamId, type, userId = undefined) {
+  // Check current user
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
+
+  // Fetch team
+  const team = await new Team.fetchById(teamId)
+
+  // Construct member attributes
+  let attrs = {
+    type: type,
+    target: team,
+    member: currentUser,
+  }
+  // If the request is an invitation from team creator,
+  // then member needs to be assigned to the invitee
+  if (type === "invite") {
+    // Fetch user
+    const query = new Parse.Query(Parse.User)
+    const user = await query.get(userId)
+    if (!user) throw new Error("User does not exist")
+    attrs.member = user
+  }
+
+  // Create team member
+  const member = await new TeamMember.create(attrs)
+
+  // Throw error if member already exist
+  if (member.id) throw new Error("Team member exists")
+
+  // Save member and return
+  return await member.save()
+}
+
+export async function acceptJoinRequest(requestId) {
+  // Check current user
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
+
+  // Fetch team member
+  const query = new Parse.Query(TeamMember)
+  query.equalTo("objectId", requestId)
+  query.include("target")
+  const member = await query.first()
+
+  // Check current user is team owner
+  // const team = member.get("target")
+  // if (team.get("creator").id !== currentUser.id) throw new Error("Access denied. You are not team owner.")
+
+  // Approve request
+  member.set("approvedAt", new Date())
+  await member.save()
+}
+
+export async function leaveTeam(memberId) {
+  // Check current user
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
+
+  // Fetch member
+  const query = new Parse.Query(TeamMember)
+  const member = await query.get(memberId)
+
+  // Remove member
+  await member.destroy()
 }
