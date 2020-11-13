@@ -23,165 +23,212 @@
           </div>
         </header>
 
-        <div class="content">
-          <div class="columns is-mobile">
-            <div class="column">
-              <span class="is-size-6 has-text-primary">Follow requests</span>
-              <span class="is-size-7 help">You will be notified for requests to follow your projects or team.</span>
-            </div>
-            <div class="column is-4">
-              <b-select
-                placeholder="Frequency"
-                expanded
-                v-model="follow_request"
+        <div class="container">
+          <b-tabs
+            position="is-centered"
+            type="is-boxed"
+          >
+            <b-tab-item label="Request">
+              <div
+                class="columns is-mobile"
               >
-                <option value="off">
-                  Off
-                </option>
-                <option value="immediately">
-                  Immediately
-                </option>
-                <option value="daily">
-                  Daily
-                </option>
-                <option value="weekly">
-                  Weekly
-                </option>
-              </b-select>
-            </div>
-          </div>
-          <div class="columns is-mobile">
-            <div class="column">
-              <span class="is-size-6 has-text-primary">Target updates</span>
-              <span class="is-size-7 help">You will be notified when project or nominations are added concerning targets you follow.</span>
-            </div>
-            <div class="column is-4">
-              <b-select
-                placeholder="Frequency"
-                expanded
-                v-model="target_update"
-              >
-                <option value="off">
-                  Off
-                </option>
-                <option value="immediately">
-                  Immediately
-                </option>
-                <option value="daily">
-                  Daily
-                </option>
-                <option value="weekly">
-                  Weekly
-                </option>
-              </b-select>
-            </div>
-          </div>
-          <div class="columns is-mobile">
-            <div class="column">
-              <span class="is-size-6 has-text-primary">Project updates</span>
-              <span class="is-size-7 help">You will be notified for updates of projects you follow.</span>
-            </div>
-            <div class="column is-4">
-              <b-select
-                placeholder="Frequency"
-                expanded
-                v-model="project_update"
-              >
-                <option value="off">
-                  Off
-                </option>
-                <option value="immediately">
-                  Immediately
-                </option>
-                <option value="daily">
-                  Daily
-                </option>
-                <option value="weekly">
-                  Weekly
-                </option>
-              </b-select>
-            </div>
-          </div>
-          <div class="columns is-mobile">
-            <div class="column">
-              <span class="is-size-6 has-text-primary">Team updates</span>
-              <span class="is-size-7 help">You will be notified for updates of teams you follow.</span>
-            </div>
-            <div class="column is-4">
-              <b-select
-                placeholder="Frequency"
-                expanded
-                v-model="team_update"
-              >
-                <option value="off">
-                  Off
-                </option>
-                <option value="immediately">
-                  Immediately
-                </option>
-                <option value="daily">
-                  Daily
-                </option>
-                <option value="weekly">
-                  Weekly
-                </option>
-              </b-select>
-            </div>
-          </div>
-          <div class="columns is-mobile">
-            <div class="column">
-              <span class="is-size-6 has-text-primary">Registry status updates</span>
-              <span class="is-size-7 help">We will send you status updates of the Registry.</span>
-            </div>
-            <div class="column is-4">
-              <b-select
-                placeholder="Frequency"
-                expanded
-                v-model="status_update"
-              >
-                <option value="off">
-                  Off
-                </option>
-                <option value="weekly">
-                  Weekly
-                </option>
-                <option value="monthly">
-                  Monthly
-                </option>
-                <option value="quarterly">
-                  Quarterly
-                </option>
-              </b-select>
-            </div>
-          </div>
-          <div class="columns is-mobile">
-            <div class="column">
-              <span class="is-size-6 has-text-primary">Newsletters</span>
-              <span class="is-size-7 help">We may send you infrequent newsletters about Mave Registry.</span>
-            </div>
-            <div class="column is-4">
-              <b-select
-                placeholder="Frequency"
-                expanded
-                v-model="newsletter"
-              >
-                <option value="off">
-                  Off
-                </option>
-                <option value="immediately">
-                  Immediately
-                </option>
-                <option value="quarterly">
-                  Quarterly
-                </option>
-                <option value="yearly">
-                  Yearly
-                </option>
-              </b-select>
-            </div>
-          </div>
-        </div>
+                <div class="column">
+                  <span class="is-size-6 has-text-primary">Follow</span>
+                  <span class="is-size-7 help">Email me requests to follow my projects and teams.</span>
+                </div>
+                <div class="column is-4">
+                  <b-select
+                    placeholder="Frequency"
+                    expanded
+                    v-model="follow_request"
+                  >
+                    <option value="off">
+                      Off
+                    </option>
+                    <option value="immediately">
+                      Immediately
+                    </option>
+                    <option value="daily">
+                      Daily
+                    </option>
+                    <option value="weekly">
+                      Weekly
+                    </option>
+                  </b-select>
+                </div>
+              </div>
 
+              <div
+                class="columns is-mobile"
+              >
+                <div class="column">
+                  <span class="is-size-6 has-text-primary">Join Team</span>
+                  <span class="is-size-7 help">Email me requests to join my teams.</span>
+                </div>
+                <div class="column is-4">
+                  <b-select
+                    placeholder="Frequency"
+                    expanded
+                    v-model="join_team_request"
+                  >
+                    <option value="off">
+                      Off
+                    </option>
+                    <option value="immediately">
+                      Immediately
+                    </option>
+                    <option value="daily">
+                      Daily
+                    </option>
+                    <option value="weekly">
+                      Weekly
+                    </option>
+                  </b-select>
+                </div>
+              </div>
+            </b-tab-item>
+
+            <b-tab-item label="Update">
+              <div class="columns is-mobile">
+                <div class="column">
+                  <span class="is-size-6 has-text-primary">Target</span>
+                  <span class="is-size-7 help">Email me updates concerning targets I follow.</span>
+                </div>
+                <div class="column is-4">
+                  <b-select
+                    placeholder="Frequency"
+                    expanded
+                    v-model="target_update"
+                  >
+                    <option value="off">
+                      Off
+                    </option>
+                    <option value="immediately">
+                      Immediately
+                    </option>
+                    <option value="daily">
+                      Daily
+                    </option>
+                    <option value="weekly">
+                      Weekly
+                    </option>
+                  </b-select>
+                </div>
+              </div>
+
+              <div class="columns is-mobile">
+                <div class="column">
+                  <span class="is-size-6 has-text-primary">Project</span>
+                  <span class="is-size-7 help">Email me updates concering projects I follow.</span>
+                </div>
+                <div class="column is-4">
+                  <b-select
+                    placeholder="Frequency"
+                    expanded
+                    v-model="project_update"
+                  >
+                    <option value="off">
+                      Off
+                    </option>
+                    <option value="immediately">
+                      Immediately
+                    </option>
+                    <option value="daily">
+                      Daily
+                    </option>
+                    <option value="weekly">
+                      Weekly
+                    </option>
+                  </b-select>
+                </div>
+              </div>
+
+              <div class="columns is-mobile">
+                <div class="column">
+                  <span class="is-size-6 has-text-primary">Team</span>
+                  <span class="is-size-7 help">Email me updates concerning teams I follow.</span>
+                </div>
+                <div class="column is-4">
+                  <b-select
+                    placeholder="Frequency"
+                    expanded
+                    v-model="team_update"
+                  >
+                    <option value="off">
+                      Off
+                    </option>
+                    <option value="immediately">
+                      Immediately
+                    </option>
+                    <option value="daily">
+                      Daily
+                    </option>
+                    <option value="weekly">
+                      Weekly
+                    </option>
+                  </b-select>
+                </div>
+              </div>
+
+              <div class="columns is-mobile">
+                <div class="column">
+                  <span class="is-size-6 has-text-primary">Registry status</span>
+                  <span class="is-size-7 help">Email me status updates of the Registry.</span>
+                </div>
+                <div class="column is-4">
+                  <b-select
+                    placeholder="Frequency"
+                    expanded
+                    v-model="status_update"
+                  >
+                    <option value="off">
+                      Off
+                    </option>
+                    <option value="weekly">
+                      Weekly
+                    </option>
+                    <option value="monthly">
+                      Monthly
+                    </option>
+                    <option value="quarterly">
+                      Quarterly
+                    </option>
+                  </b-select>
+                </div>
+              </div>
+            </b-tab-item>
+
+            <b-tab-item label="Communication">
+              <div class="columns is-mobile">
+                <div class="column">
+                  <span class="is-size-6 has-text-primary">Newsletters</span>
+                  <span class="is-size-7 help">Email me infrequent newsletters about the Registry.</span>
+                </div>
+                <div class="column is-4">
+                  <b-select
+                    placeholder="Frequency"
+                    expanded
+                    v-model="newsletter"
+                  >
+                    <option value="off">
+                      Off
+                    </option>
+                    <option value="immediately">
+                      Immediately
+                    </option>
+                    <option value="quarterly">
+                      Quarterly
+                    </option>
+                    <option value="yearly">
+                      Yearly
+                    </option>
+                  </b-select>
+                </div>
+              </div>
+            </b-tab-item>
+          </b-tabs>
+        </div>
+        
         <footer>
           <div class="content has-text-right">
             <b-button
@@ -244,6 +291,7 @@ export default {
         submit: false
       },
       follow_request: "",
+      join_team_request: "",
       target_update: "",
       project_update: "",
       team_update: "",
@@ -268,6 +316,7 @@ export default {
 
       if (preference) {
         this.follow_request = preference.follow_request
+        this.join_team_request = preference.join_team_request
         this.target_update = preference.target_update
         this.project_update = preference.project_update
         this.team_update = preference.team_update
@@ -282,6 +331,7 @@ export default {
         try {
           await UserManage.setEmailPreference(this.id, {
             follow_request: this.follow_request,
+            join_team_request: this.join_team_request,
             target_update: this.target_update,
             project_update: this.project_update,
             team_update: this.team_update,
