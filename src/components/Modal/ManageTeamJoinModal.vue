@@ -64,9 +64,9 @@
                 <p>
                   <!-- Add highlighting when a keyword is given -->
                   <b><mark class="is-capitalized">{{ request.member.first_name.startsWith(keyword) ? keyword : '' }}</mark>{{ trimKeyword(request.member.first_name, keyword) }} </b>
-                  <b><mark class="is-capitalized">{{ request.member.last_name.startsWith(keyword) ? keyword : '' }}</mark>{{ trimKeyword(request.member.last_name, keyword) }} </b>
-                  <small>{{ request.created_at.toLocaleString() }}</small><br>
-                  <b-icon icon="mdil-comment-text" />No reason
+                  <b><mark class="is-capitalized">{{ request.member.last_name.startsWith(keyword) ? keyword : '' }}</mark>{{ trimKeyword(request.member.last_name, keyword) }} </b><br>
+                  {{ request.created_at.toLocaleString() }}
+                  <!-- <b-icon icon="mdil-comment-text" />No reason -->
                 </p>
               </div>
             </div>
