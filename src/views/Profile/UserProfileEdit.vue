@@ -181,15 +181,21 @@
                 </ValidationProvider>
               </div>
 
-              <hr>
+              <hr v-if="false">
 
-              <div class="project-header">
+              <div
+                class="project-header"
+                v-if="false"
+              >
                 <p class="is-size-4 has-text-weight-bold">
                   Funder Role
                 </p>
               </div>
 
-              <div class="project-content">
+              <div
+                class="project-content"
+                v-if="false"
+              >
                 <b-checkbox
                   v-model="funder.hasRole"
                   class="field-margin"
