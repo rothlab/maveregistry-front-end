@@ -31,7 +31,7 @@
             </div>
             <div
               class="level-right"
-              v-else-if="hasLoggedIn && isMember && followStatus" 
+              v-else-if="hasLoggedIn && followStatus" 
             >
               <FollowButtonAction
                 :follow-status="followStatus"
@@ -110,35 +110,74 @@
                 class="is-size-5"
                 style="margin-bottom: 1em"
               >
-                <b>Member{{ members.length > 1 ? 's' : '' }}</b><br>
-                
-                <!-- Join team -->
-                <b-button
-                  v-if="!isMember"
-                  icon-left="mdil-plus"
-                  rounded
-                  size="is-small"
-                  style="margin: 0.5rem 0.5rem 0 0"
-                  type="is-link"
-                  outlined
-                  @click="isJoinTeamModalActive = true"
-                >
-                  Join team
-                </b-button>
+                <div class="is-flex has-vcentered">
+                  <span><b>Member{{ members.length > 1 ? 's' : '' }}</b></span>
+                  <div
+                    class="is-inline-flex"
+                    style="margin-left: 0.5rem"
+                  >
+                    <!-- Owner view -->
+                    <div v-if="isOwner">
+                      <!-- Invite to join team -->
+                      <!-- <b-button
+                        icon-left="mdil-plus"
+                        rounded
+                        size="is-small"
+                        style="margin: 0.5rem 0.5rem 0 0"
+                        type="is-link"
+                        outlined
+                        @click="isInviteJoinModalActive = true"
+                      >
+                        Invite
+                      </b-button> -->
 
-                <!-- Leave team -->
-                <b-button
-                  v-else
-                  icon-left="mdil-logout"
-                  rounded
-                  size="is-small"
-                  style="margin: 0.5rem 0.5rem 0 0"
-                  type="is-danger"
-                  outlined
-                  @click="isLeaveTeamModalActive = true"
-                >
-                  Leave team
-                </b-button>
+                      <!-- Review join team request-->
+                      <b-button
+                        v-if="joinRequests.length > 0"
+                        icon-left="mdil-comment-text"
+                        rounded
+                        size="is-small"
+                        style="margin: 0.5rem 0.5rem 0 0"
+                        type="is-primary"
+                        outlined
+                        @click="isReviewJoinRequestModalActive = true"
+                      >
+                        Review {{ joinRequests.length }} join {{ joinRequests.length > 1 ? "requests" : "request" }}
+                      </b-button>
+                    </div>
+
+                    <!-- Other member view -->
+                    <div v-else>
+                      <!-- Join team -->
+                      <b-button
+                        v-if="!memberStats"
+                        icon-left="mdil-plus"
+                        rounded
+                        size="is-small"
+                        style="margin: 0.5rem 0.5rem 0 0"
+                        type="is-link"
+                        outlined
+                        @click="isJoinTeamModalActive = true"
+                      >
+                        Join team
+                      </b-button>
+                  
+                      <!-- Leave team -->
+                      <b-button
+                        v-else
+                        :icon-left="memberStats === 'pending' ? 'mdil-clock' : 'mdil-logout'"
+                        rounded
+                        size="is-small"
+                        style="margin: 0.5rem 0.5rem 0 0"
+                        type="is-danger"
+                        outlined
+                        @click="isLeaveTeamModalActive = true"
+                      >
+                        {{ memberStats === "pending" ? "Request pending approval" : "Leave team" }}
+                      </b-button>
+                    </div>
+                  </div>
+                </div>
 
                 <figure
                   v-for="(member, id) in members"
@@ -146,16 +185,16 @@
                   class="image is-32x32 is-inline-block member-icons"
                 >
                   <router-link
-                    :to="{ name: 'User Profile View', params: { username: member.username } }"
+                    :to="{ name: 'User Profile View', params: { username: member.member.username } }"
                     target="_blank"
                     class="is-capitalized"
                   >
                     <b-tooltip
-                      :label="`${member.first_name} ${member.last_name}`"
+                      :label="`${member.member.first_name} ${member.member.last_name}`"
                       type="is-dark"
                     >
                       <img
-                        :src="getProfileImageFromUser(member)"
+                        :src="getProfileImageFromUser(member.member)"
                         class="is-rounded"
                       >
                     </b-tooltip>
@@ -395,23 +434,52 @@
       <!-- Confirm Join Team Modal -->
       <ConfirmInfoModal
         :active.sync="isJoinTeamModalActive"
-        action="Join"
+        action="join"
         type="team"
         :is-irreversible="false"
         :on-action="joinTeam"
       >
-        <!-- <p style="margin-top: 1rem">
-          Team creator will be notified You will be notified when new projects or nominations concerning this target are added to the Registry.
-        </p> -->
+        <div style="margin-top: 1rem">
+          Your request will be submitted to team creator
+          <figure
+            class="image is-24x24 is-inline-flex"
+            style="margin: 0 0.25rem"
+          >
+            <img
+              class="is-rounded"
+              :src="getProfileImageFromUser(creator)"
+              alt="Profile Image"
+            >
+          </figure>
+          <router-link
+            :to="{ name: 'User Profile View', params: { username: creator.username } }"
+            target="_blank"
+            style="margin-right: 0.25rem"
+          >
+            <span class="is-capitalized">{{ creator.first_name }} {{ creator.last_name }}</span>
+          </router-link>
+          for review.
+        </div>
       </ConfirmInfoModal>
 
       <!-- Confirm Leave Team Modal -->
       <ConfirmDangerModal
         :active.sync="isLeaveTeamModalActive"
-        type="team"
-        action="Leave"
+        :type="memberStats === 'pending' ? 'request' : 'team'"
+        :action="memberStats === 'pending' ? 'retract' : 'leave'"
         :on-action="leaveTeam"
-        :is-irreversible="false"
+      >
+        <p style="margin-top: 1rem">
+          {{ memberStats === "pending" ? "To join" : "To rejoin" }}
+          the team later, you need to request again.
+        </p>
+      </ConfirmDangerModal>
+
+      <!-- Confirm Review Join Team Modal -->
+      <ManageTeamJoinModal
+        :active.sync="isReviewJoinRequestModalActive"
+        :requests="joinRequests"
+        @change="loadPage"
       />
     </div>
   </div>
@@ -422,6 +490,7 @@ import * as TeamManage from "@/api/teamManage.js"
 import * as FollowManage from "@/api/followManage.js"
 import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
+import ManageTeamJoinModal from '@/components/Modal/ManageTeamJoinModal.vue'
 import ConfirmInfoModal from '@/components/Modal/ConfirmInfoModal.vue'
 import { handleError } from '@/api/errorHandler.js'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
@@ -433,6 +502,7 @@ export default {
   components: {
     Error,
     ManageFollowerModal,
+    ManageTeamJoinModal,
     FollowButtonAction,
     TransferAction,
     ConfirmDangerModal,
@@ -451,8 +521,13 @@ export default {
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
     },
-    isMember() {
-      return this.currentUser && this.currentUser.team === this.teamId
+    memberStats() {
+      if (this.currentUser) {
+        if (this.members.some(e => e.member.username === this.currentUser.username)) return "member"
+        if (this.hasRequestedJoinTeam) return "pending"
+      }
+
+      return undefined
     }
   },
   data () {
@@ -465,9 +540,14 @@ export default {
       isConfirmDeleteModalActive: false,
       isJoinTeamModalActive: false,
       isLeaveTeamModalActive: false,
+      isInviteJoinModalActive: false,
+      isReviewJoinRequestModalActive: false,
       followStatus: undefined,
       principalInvestigator: {},
+      joinRequests: [],
       members: [],
+      memberId: "",
+      hasRequestedJoinTeam: false,
       collaborators: [],
       projects: [],
       updatedDate: new Date(),
@@ -486,25 +566,54 @@ export default {
     }
   },
   async mounted() {
-    this.isLoading.page = true
-
     await this.loadPage()
     this.hasInitLoad = true
     
-    // Open follow request modal if needed
-    if (this.hasDeepLink("#manage-request")) this.openFollowerModal(true)
-    
-    this.isLoading.page = false
+    if (this.isOwner) {
+      // Open follow request modal if needed
+      if (this.hasDeepLink("#manage-request")) this.openFollowerModal(true)
+
+      // Open join request review modal if needed
+      if (this.hasDeepLink("#review-join-team-request")) this.isReviewJoinRequestModalActive = true
+    }
   },
   methods: {
     async loadPage() {
       this.errorMessage = ""
+      this.isLoading.page = true
       
       // Fetch team
-      const team = await this.fetchTeam()
+      try {
+        const team = await this.fetchTeam()
 
-      // Fetch team follower and request count
-      if (team && this.isOwner) await this.fetchFollowerAndRequestCount(team.id)
+        // Format members
+        if (team.members) {
+          // For owner, separate join requests
+          if (this.isOwner) {
+            this.joinRequests = team.members.filter(member => member.type === "request" && !member.approved_at)
+          } else {
+            // For member or request submiteer, get member/requestId
+            const member = team.members.filter(e => e.member.username == this.currentUser.username)
+            if (member && member.length === 1) {
+              this.memberId = member[0].id
+              this.hasRequestedJoinTeam = member[0].type === "request" && !member[0].approved_at
+            } else {
+              this.memberId = ""
+              this.hasRequestedJoinTeam = false
+            }
+          }
+
+          // Choose only approved members
+          this.members = team.members.filter(member => member.approved_at)
+        }
+
+        // Fetch team follower and request count
+        if (team && this.isOwner) await this.fetchFollowerAndRequestCount(team.id)
+      } catch (error) {
+        this.errorMessage = await handleError(console.error())
+      } finally {
+        this.isLoading.page = false
+      }
     },
     async fetchTeam() {
       // Fetch team
@@ -524,9 +633,6 @@ export default {
         affiliation: team.affiliation
       }
       if (team.website && team.website.length > 0) this.principalInvestigator.website = team.website
-
-      // Format members
-      if (team.members) this.members = team.members
 
       // Format creator and update date
       this.creator = team.creator
@@ -572,15 +678,11 @@ export default {
       this.$router.push({ name: 'Teams' })
     },
     async joinTeam() {
-      await this.$store.dispatch('updateUserProfile', {
-        team: this.teamId
-      })
+      await TeamManage.joinTeam(this.teamId, "request")
       await this.loadPage()
     },
     async leaveTeam() {
-      await this.$store.dispatch('updateUserProfile', {
-        team: "unset"
-      })
+      await TeamManage.leaveTeam(this.memberId)
       await this.loadPage()
     }
   }

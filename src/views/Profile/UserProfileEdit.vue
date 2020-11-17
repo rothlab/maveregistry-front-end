@@ -179,12 +179,108 @@
                     />
                   </b-field>
                 </ValidationProvider>
-                <TeamInfoField
-                  v-model="team"
-                  v-if="userInfo.email_validated"
-                  :is-required="false"
-                  label="Team Affiliation"
-                />
+              </div>
+
+              <hr v-if="false">
+
+              <div
+                class="project-header"
+                v-if="false"
+              >
+                <p class="is-size-4 has-text-weight-bold">
+                  Funder Role
+                </p>
+              </div>
+
+              <div
+                class="project-content"
+                v-if="false"
+              >
+                <b-checkbox
+                  v-model="funder.hasRole"
+                  class="field-margin"
+                >
+                  I am representing a funding agency and would like to request for
+                  <b-tooltip
+                    label="Once granted, you will be able view other members' funding need, if they choose to disclose it."
+                    multilined
+                    type="is-dark"
+                  >
+                    <span class="has-text-info">funder role (?)</span>.
+                  </b-tooltip>
+                </b-checkbox>
+
+                <!-- Pending approval message -->
+                <b-message
+                  v-if="funder.hasRole && !funder.approved"
+                  type="is-warning"
+                  size="is-small"
+                  class="activity-tip"
+                >
+                  <b-icon
+                    icon="mdil-alert-circle"
+                    custom-class="mdil-18px"
+                  />
+                  <span class="font-14px">
+                    Your request needs to be reviewed and approved by moderators. 
+                  </span>
+                </b-message>
+
+                <!-- Approved message -->
+                <b-message
+                  v-else-if="funder.hasRole && funder.approved"
+                  type="is-success"
+                  size="is-small"
+                  class="activity-tip"
+                >
+                  <b-icon
+                    icon="mdil-check"
+                    custom-class="mdil-18px"
+                  />
+                  <span class="font-14px">
+                    Your request was approved. <b>Changes to this section need to reviewed by moderators.</b>
+                  </span>
+                </b-message>
+
+                <!-- Funding Agency -->
+                <ValidationProvider
+                  rules="required"
+                  name="Funding Agency"
+                  v-slot="{ errors, valid }"
+                  v-if="funder.hasRole"
+                >
+                  <b-field
+                    :message="errors"
+                    class="field-margin"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                    label="Funding Agency"
+                  >
+                    <b-input
+                      type="text"
+                      v-model.trim="funder.agency"
+                    />
+                  </b-field>
+                </ValidationProvider>
+
+                <!-- Position -->
+                <ValidationProvider
+                  rules="required"
+                  name="Position"
+                  v-slot="{ errors, valid }"
+                  v-if="funder.hasRole"
+                >
+                  <b-field
+                    :message="errors"
+                    class="field-margin"
+                    :type="{ 'is-danger': errors[0], '': valid }"
+                    label="Position"
+                  >
+                    <b-input
+                      type="text"
+                      v-model.trim="funder.position"
+                    />
+                  </b-field>
+                </ValidationProvider>
               </div>
             </ValidationObserver>
           </div>
@@ -247,7 +343,6 @@ import * as FileManage from "@/api/fileManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "@/components/Error.vue"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
-import TeamInfoField from '@/components/Field/TeamInfoField.vue'
 import AvatarCropper from "vue-avatar-cropper"
 
 export default {
@@ -256,7 +351,6 @@ export default {
     ValidationProvider,
     ValidationObserver,
     Error,
-    TeamInfoField,
     AvatarCropper
   },
   computed: {
@@ -268,7 +362,6 @@ export default {
   data () {
     return {
       userInfo: {},
-      team: "",
       showProfile: false,
       isLoading: {
         page: true,
@@ -277,7 +370,13 @@ export default {
       },
       errorMessage: "",
       isDisabled: false,
-      hasInitLoad: false
+      hasInitLoad: false,
+      funder: {
+        hasRole: false,
+        approved: false,
+        agency: "",
+        position: ""
+      }
     }
   },
   watch: {
@@ -301,7 +400,6 @@ export default {
 
     if (this.userInfo) {
       if (!this.userInfo.social) this.userInfo.social = {}
-      if (this.userInfo.team) this.team = this.userInfo.team
     }
 
     this.$watch(
@@ -337,13 +435,6 @@ export default {
 
       // Update user
       try {
-        if (this.userInfo.team && !this.team) {
-          // If user had a team, unset it
-          this.userInfo.team = "unset"
-        } else {
-          this.userInfo.team = this.team
-        }
-        
         await this.$store.dispatch('updateUserProfile', this.userInfo)
       } catch (e) {
         this.isLoading.save_edit = false

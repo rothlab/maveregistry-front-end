@@ -78,23 +78,23 @@
                       class="image is-48x48 is-inline-block member-icons"
                     >
                       <router-link
-                        :to="{ name: 'User Profile View', params: { username: member.username } }"
+                        :to="{ name: 'User Profile View', params: { username: member.member.username } }"
                         target="_blank"
                         class="is-capitalized"
                       >
                         <b-tooltip
-                          :label="`${member.first_name} ${member.last_name}`"
+                          :label="`${member.member.first_name} ${member.member.last_name}`"
                           type="is-dark"
                         >
                           <img
-                            :src="getProfileImageFromUser(member)"
+                            :src="getProfileImageFromUser(member.member)"
                             class="is-rounded"
                           >
                         </b-tooltip>
                       </router-link>
                       <button
                         class="delete right-corner"
-                        @click="usernameToDelete = member.username; isConfirmDeleteModalActive = true"
+                        @click="requestId = member.id; isConfirmDeleteModalActive = true"
                       />
                     </figure>
                   </div>
@@ -194,7 +194,7 @@ export default {
         submit: false
       },
       isConfirmDeleteModalActive: false,
-      usernameToDelete: "",
+      requestId: "",
       errorMessage: "",
       principalInvestigator: undefined,
       members: [],
@@ -280,8 +280,12 @@ export default {
       this.$router.push({ name: 'Team View', params: { id: this.teamId } })
     },
     async removeMember() {
-      await TeamManage.removeMember(this.teamId, this.usernameToDelete)
-      this.members = this.members.filter(e => e.username !== this.usernameToDelete)
+      this.isLoading.page = true
+
+      await TeamManage.leaveTeam(this.requestId)
+      this.members = this.members.filter(e => e.id !== this.requestId)
+      
+      this.isLoading.page = false
     }
   }
 }

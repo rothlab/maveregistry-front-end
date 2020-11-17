@@ -517,6 +517,7 @@ export default {
     },
     async fetchTeams() {
       // Loading
+      this.errorMessage = ""
       this.isLoading.fetch_team = true
 
       // Calculate skip

@@ -59,7 +59,7 @@
             <span class="has-text-info">following a project</span>
             ?
           </p>
-          Once your request to follow a project is apporved by the project owner, you will be able to:
+          Once your request to follow a project is approved by the project owner, you will be able to:
           <p style="margin: 0.5rem 0 0.75rem 0">
             <b-icon
               icon="mdil-check"

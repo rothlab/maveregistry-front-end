@@ -120,20 +120,6 @@
 
               <p
                 class="is-size-5"
-                v-if="userInfo.team"
-              >
-                <b>Team Affiliation</b> <br>
-                <router-link
-                  :to="{ name: 'Team View', params: { id: userInfo.team.id } }"
-                  target="_blank"
-                >
-                  <b-icon icon="mdil-link" />
-                  <span class="is-capitalized">{{ userInfo.team.first_name + " " + userInfo.team.last_name }},</span>
-                  {{ userInfo.team.affiliation }}
-                </router-link>
-              </p>
-              <p
-                class="is-size-5"
                 v-if="userInfo.website"
               >
                 <b>Website</b> <br>
@@ -157,6 +143,43 @@
                   <Twitter />
                   {{ userInfo.social.twitter }}
                 </a>
+              </p>
+            </div>
+
+            <hr v-if="hasAffiliation">
+
+            <div
+              class="project-header"
+              v-if="hasAffiliation"
+            >
+              <p class="is-size-4 has-text-weight-bold">
+                Affiliation
+              </p>
+            </div>
+
+            <div
+              class="project-content"
+              v-if="hasAffiliation"
+            >
+              <p
+                class="is-size-5"
+                v-if="userInfo.team_aff"
+              >
+                <b>Team{{ userInfo.team_aff.length > 1 ? "s" : "" }}</b><br>
+
+                <span
+                  v-for="(team, id) in userInfo.team_aff"
+                  :key="id"
+                >
+                  <router-link
+                    :to="{ name: 'Team View', params: { id: team.id } }"
+                    target="_blank"
+                  >
+                    <b-icon icon="mdil-link" />
+                    <span class="is-capitalized">{{ team.first_name + " " + team.last_name }},</span>
+                    {{ team.affiliation }}
+                  </router-link>
+                </span>
               </p>
             </div>
 
@@ -330,6 +353,9 @@ export default {
     isOwner() {
       return this.userInfo && this.userInfo.username && this.$store.getters.isOwner(this.userInfo.username)
     },
+    hasAffiliation() {
+      return this.userInfo.team_aff
+    },
     hasProject() {
       return this.userInfo.projects && this.userInfo.projects.length > 0
     },
@@ -385,13 +411,14 @@ export default {
 
         if (res) {
           // Fetch team
-          if (res.team) res.team = await TeamManage.queryById(res.team)
+          const teamAff = await TeamManage.fetchTeamAffiliationsByUserId(res.id)
+          if (teamAff && teamAff.length > 0) res.team_aff = teamAff
 
           // Fetch projects
           res.projects = await ProjectManage.fetchProjectsByUserId(res.id)
           
           // Fetch teams the user own
-          res.teams = await TeamManage.fetchTeamsByUserId(res.id)
+          res.teams = await TeamManage.fetchTeamOwnershipsByUserId(res.id)
 
           // Fetch nominations
           res.nominations = await NominationManage.fetchNominationsByUserId(res.id)

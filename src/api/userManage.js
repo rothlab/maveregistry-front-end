@@ -3,7 +3,7 @@ import { Team } from "./teamManage.js"
 import { uploadProfilePic } from "./fileManage.js"
 
 // Helper: parse user metadata
-function parseUserMetadata (user, includeTeam = true, includeCreationDate = false) {
+function parseUserMetadata (user, includeCreationDate = false) {
   let ret = {
     id: user.id,
     username: user.get("username"),
@@ -21,12 +21,6 @@ function parseUserMetadata (user, includeTeam = true, includeCreationDate = fals
   // we have to make a deep copy as later we might want to change it
   const social = user.get("social")
   if (social) ret.social = JSON.parse(JSON.stringify(social))
-
-  if (includeTeam) {
-    // Get team when available
-    const team = user.get("team")
-    if (team) ret.team = team.id
-  }
 
   if (includeCreationDate) {
     // Get creation and updated date
@@ -276,7 +270,7 @@ export async function fetchUsersByTeamId (id) {
   query.matchesQuery("team", teamQuery)
   const members = await query.find()
 
-  return members.map(e => parseUserMetadata(e, false))
+  return members.map(e => parseUserMetadata(e))
 }
 
 // Resend validation email
@@ -305,6 +299,7 @@ export async function getEmailPreference(id) {
   return {
     id: setting.id,
     follow_request: setting.get("email_follow_request"),
+    join_team_request: setting.get("email_join_team_request"),
     target_update: setting.get("email_target_update"),
     project_update: setting.get("email_project_update"),
     team_update: setting.get("email_team_update"),
@@ -321,6 +316,7 @@ export async function setEmailPreference(id, preference) {
   const setting = await query.get(id)
 
   setting.set("email_follow_request", preference.follow_request)
+  setting.set("email_join_team_request", preference.join_team_request)
   setting.set("email_target_update", preference.target_update)
   setting.set("email_project_update", preference.project_update)
   setting.set("email_team_update", preference.team_update)
