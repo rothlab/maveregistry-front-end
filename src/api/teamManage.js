@@ -122,6 +122,7 @@ export const TeamMember = Parse.Object.extend("TeamMember", {
       type: this.get("type"),
       created_at: this.get("createdAt"),
       member: {
+        id: member.id,
         username: member.get("username"),
         first_name: member.get("first_name"),
         last_name: member.get("last_name"),
@@ -359,4 +360,18 @@ export async function leaveTeam(memberId) {
 
   // Remove member
   await member.destroy()
+}
+
+export async function acceptInvitation(memberId) {
+  // Check current user
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
+
+  // Fetch member
+  const query = new Parse.Query(TeamMember)
+  const member = await query.get(memberId)
+
+  // Set approved at time
+  member.set("approvedAt", new Date())
+  await member.save()
 }
