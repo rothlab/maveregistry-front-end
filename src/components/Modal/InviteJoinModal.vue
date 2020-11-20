@@ -198,109 +198,116 @@
                 />
               </div>
             </div>
-
+            
             <div
               class="media"
               v-for="(invitation, id) in invitations"
               :key="id"
             >
               <figure class="media-left">
-                <div v-if="!isLoading.invites">
-                  <p class="image is-48x48">
-                    <img
-                      v-if="invitation.type === 'internal'"
-                      class="is-rounded"
-                      :src="getProfileImageFromUser(invitation.user)"
-                    >
-                    <b-tooltip
-                      v-else
-                      label="Invited via Email"
-                    >
-                      <b-icon
-                        class="circle-icon has-background-primary-light"
+                <p class="image is-48x48">
+                  <img
+                    v-if="invitation.type === 'internal'"
+                    class="is-rounded"
+                    :src="getProfileImageFromUser(invitation.user)"
+                  >
+                  <b-tooltip
+                    v-else
+                    label="Invited via Email"
+                  >
+                    <b-icon
+                      class="circle-icon has-background-primary-light"
                       
-                        icon="mdil-email"
-                        size="is-large"
-                        custom-size="mdil-24px"
-                        type="is-primary"
-                      />
-                    </b-tooltip>
-                  </p>
-                </div>
-                <b-skeleton
-                  v-else
-                  circle
-                  width="48px"
-                  height="48px"
-                />
+                      icon="mdil-email"
+                      size="is-large"
+                      custom-size="mdil-24px"
+                      type="is-primary"
+                    />
+                  </b-tooltip>
+                </p>
               </figure>
 
               <div class="media-content">
                 <div class="content">
-                  <p v-if="!isLoading.invites">
+                  <p>
                     <b class="is-capitalized">{{ invitation.user.first_name }} {{ invitation.user.last_name }} </b>
                     <span v-if="invitation.user.email">({{ invitation.user.email }})</span>
                     <br>
                     <small>Invitation sent: {{ invitation.create_date.toLocaleString() }}</small>
                   </p>
-                  <p v-else>
+                </div>
+              </div>
+
+              <div class="media-right">
+                <div class="has-text-right">
+                  <!-- View Profile -->
+                  <b-tooltip
+                    v-if="invitation.type === 'internal'"
+                    label="View Profile"
+                    type="is-dark"
+                    position="is-left"
+                  >
+                    <router-link
+                      :to="{ name: 'User Profile View', params: { username: invitation.user.username } }"
+                      target="_blank"
+                    >
+                      <b-icon icon="mdil-eye" />
+                    </router-link>
+                  </b-tooltip>
+
+                  <!-- Remove -->
+                  <b-tooltip
+                    v-if="!invitation.accepted_at"
+                    label="Remove"
+                    type="is-dark"
+                  >
+                    <a @click="deleteId = invitation.id; isConfirmDeleteModalActive = true"><b-icon
+                      icon="mdil-delete"
+                      type="is-danger"
+                    /></a>
+                  </b-tooltip>
+                </div>
+
+                <div class="is-italic is-flex has-vcentered">
+                  <div
+                    v-if="!invitation.accepted_at"
+                    class="has-text-grey"
+                  >
+                    <small>Waiting reponse</small>
+                    <b-icon icon="mdil-clock" />
+                  </div>
+                  <div
+                    v-else
+                    class="has-text-success"
+                  >
+                    <small>Accepted</small>
+                    <b-icon icon="mdil-check" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-if="invitations.length === 0"
+              class="media"
+            >
+              <figure class="media-left">
+                <b-skeleton
+                  circle
+                  width="48px"
+                  height="48px"
+                />
+              </figure>
+              <div class="media-content">
+                <div class="content">
+                  <p>
                     <b-skeleton />
                     <b-skeleton />
                   </p>
                 </div>
               </div>
-
               <div class="media-right">
-                <div v-if="!isLoading.invites">
-                  <div class="has-text-right">
-                    <!-- View Profile -->
-                    <b-tooltip
-                      v-if="invitation.type === 'internal'"
-                      label="View Profile"
-                      type="is-dark"
-                      position="is-left"
-                    >
-                      <router-link
-                        :to="{ name: 'User Profile View', params: { username: invitation.user.username } }"
-                        target="_blank"
-                      >
-                        <b-icon icon="mdil-eye" />
-                      </router-link>
-                    </b-tooltip>
-
-                    <!-- Remove -->
-                    <b-tooltip
-                      v-if="!invitation.accepted_at"
-                      label="Remove"
-                      type="is-dark"
-                    >
-                      <a @click="deleteId = invitation.id; isConfirmDeleteModalActive = true"><b-icon
-                        icon="mdil-delete"
-                        type="is-danger"
-                      /></a>
-                    </b-tooltip>
-                  </div>
-
-                  <div class="is-italic is-flex has-vcentered">
-                    <div
-                      v-if="!invitation.accepted_at"
-                      class="has-text-grey"
-                    >
-                      <small>Waiting reponse</small>
-                      <b-icon icon="mdil-clock" />
-                    </div>
-                    <div
-                      v-else
-                      class="has-text-success"
-                    >
-                      <small>Accepted</small>
-                      <b-icon icon="mdil-check" />
-                    </div>
-                  </div>
-                </div>
-                <div v-else>
-                  <b-skeleton width="30px" />
-                </div>
+                <b-skeleton width="30px" />
               </div>
             </div>
           </div>
@@ -433,6 +440,8 @@ export default {
       if (val !== this.active) {
         this.$emit("update:active", val)
       }
+
+      if (!val) this.invitations = []
     },
     async active(val) {
       if (val != this.isActive) {
@@ -460,7 +469,7 @@ export default {
         last_name: "",
         email: ""
       },
-      invitations: [[], [], []], // Set three empty elements to allow loading skeleton animation
+      invitations: [], // Set three empty elements to allow loading skeleton animation
       pagination: {
         total: 0,
         limit: 5,
