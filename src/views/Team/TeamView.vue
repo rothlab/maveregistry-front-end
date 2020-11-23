@@ -611,6 +611,9 @@ export default {
 
       // Open join request review modal if needed
       if (this.hasDeepLink("#review-join-team-request")) this.isReviewJoinRequestModalActive = true
+    } else {
+      // Open accept invitation modal if needed
+      if (this.hasDeepLink("#review-invite-request") && this.memberStats === 'invited') this.isReviewInvitationModalActive = true
     }
   },
   methods: {

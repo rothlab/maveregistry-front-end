@@ -20,7 +20,16 @@ export const Invite = Parse.Object.extend("Invite", {
       create_date: this.get("createdAt")
     }
 
-    if (includeFrom) ret.from = this.get("from")
+    if (includeFrom) {
+      const from = this.get("from")
+      ret.from = {
+        id: from.id,
+        username: from.get("username"),
+        first_name: from.get("first_name"),
+        last_name: from.get("last_name"),
+        profile_image: from.get("profile_image")
+      }
+    }
     if (this.get("acceptedAt")) ret.accepted_at = this.get("acceptedAt")
 
     if (ret.type === "internal") {
@@ -53,6 +62,11 @@ export const Invite = Parse.Object.extend("Invite", {
   }
 })
 Parse.Object.registerSubclass("Invite", Invite)
+
+// Query invitation by ID
+export async function queryInvitation(id) {
+  return await Parse.Cloud.run("fetchInvitation", { invite_id: id })
+}
 
 // Query invitations
 export async function queryInvitations(fromUser, targetType = undefined, targetPointer = undefined, pagination = undefined) {
@@ -177,4 +191,13 @@ export async function checkInviteStatus() {
   const invite = await query.first()
 
   return invite
+}
+
+export async function acceptInvitation(inviteId) {
+  // Validate if logged in
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
+
+  // Accept invitation at the backend
+  await Parse.Cloud.run("acceptInvitation", { invite_id: inviteId })
 }
