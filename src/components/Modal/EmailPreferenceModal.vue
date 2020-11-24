@@ -227,10 +227,22 @@
               </div>
             </b-tab-item>
           </b-tabs>
+
+          <!-- If opted out, show notice -->
+          <b-loading
+            :is-full-page="false"
+            v-model="optedOut"
+            class="overlay"
+          >
+            <b-icon icon="mdil-blank" />
+          </b-loading>
         </div>
         
         <footer>
-          <div class="content has-text-right">
+          <div
+            class="content has-text-right"
+            v-if="!optedOut"
+          >
             <b-button
               icon-left="mdil-content-save"
               type="is-primary"
@@ -239,6 +251,32 @@
             >
               Save Preference
             </b-button>
+          </div>
+          <div v-else>
+            <b-notification
+              :closable="false"
+              type="is-primary-light"
+              role="alert"
+            >
+              <div class="level">
+                <div class="level-left">
+                  <div class="level-item">
+                    You have opted out from all email notifications.
+                  </div>
+                </div>
+                <div class="level-right">
+                  <div class="level-item">
+                    <b-button
+                      type="is-primary"
+                      :loading="isLoading.submit"
+                      @click="optIn"
+                    >
+                      Opt back in
+                    </b-button>
+                  </div>
+                </div>
+              </div>
+            </b-notification>
           </div>
         </footer>
       </div>
@@ -253,6 +291,7 @@
 
 <script>
 import * as UserManage from "@/api/userManage.js"
+import * as NotificationManage from "@/api/notificationManage.js"
 import { displayErrorToast } from "@/api/errorHandler.js"
 
 export default {
@@ -290,6 +329,7 @@ export default {
         page: false,
         submit: false
       },
+      optedOut: false,
       follow_request: "",
       join_team_request: "",
       target_update: "",
@@ -305,6 +345,7 @@ export default {
       let preference
 
       try {
+        this.optedOut = !!await NotificationManage.fetchOptOutStatus(this.currentUser.email)
         preference = await UserManage.getEmailPreference(this.id)
       } catch (error) {
         this.isActive = false
@@ -352,6 +393,25 @@ export default {
           type: 'is-success',
           queue: false
         })
+      }
+    },
+    async optIn() {
+      this.isLoading.submit = true 
+
+      try {
+        await NotificationManage.optOutEmail(this.currentUser.email)
+        await this.getPreference()
+
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: `Opted ${this.optedOut ? 'out' : 'in'}`,
+          type: 'is-success',
+          queue: false
+        })
+      } catch (error) {
+        await displayErrorToast(error)
+      } finally {
+        this.isLoading.submit = false
       }
     }
   }

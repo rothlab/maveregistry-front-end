@@ -122,6 +122,16 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "callback" */ '../views/Account/Callback.vue')
   },
   {
+    path: '/invitation/:id/',
+    name: 'Invitation',
+    component: () => import(/* webpackChunkName: "invitation" */ '../views/Account/Invitation.vue')
+  },
+  {
+    path: '/opt-out/:email/',
+    name: 'Opt Out',
+    component: () => import(/* webpackChunkName: "invitation" */ '../views/Account/OptOut.vue')
+  },
+  {
     path: '*',
     name: 'Missing components',
     component: PageNotFound,

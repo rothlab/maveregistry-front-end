@@ -60,6 +60,16 @@ export const Notification = Parse.Object.extend("Notification", {
 })
 Parse.Object.registerSubclass("Notification", Notification);
 
+// Define Opt-out
+export const OptOut = Parse.Object.extend("OptOut", {
+  initialize: function (attrs) {
+    // Validate attrs
+    if (!attrs) return
+    if (!attrs.email) throw new Error("Opt-out email is empty")
+  }
+})
+Parse.Object.registerSubclass("OptOut", OptOut);
+
 export async function retrieveAndSubscribe(commit) {
   const currentUser = Parse.User.current()
 
@@ -103,4 +113,31 @@ export async function remove(id) {
   const query = new Parse.Query(Notification)
   const notification = await query.get(id)
   await notification.destroy()
+}
+
+export async function fetchOptOutStatus(email) {
+  // Validate email
+  if (!email) throw new Error("Missing email")
+
+  // Fetch opt-out object
+  const query = new Parse.Query(OptOut)
+  query.equalTo("email", email)
+  
+  return await query.first()
+}
+
+export async function optOutEmail(email, response = undefined) {
+  // Fetch opt-out object
+  let optOut = await this.fetchOptOutStatus(email)
+
+  if (optOut) {
+    // If already opted out
+    // opt in by removing the entry
+    await optOut.destroy()
+  } else {
+    optOut = new OptOut({
+      email: email
+    })
+    await optOut.save(null, { context: { captcha: response }})
+  }
 }

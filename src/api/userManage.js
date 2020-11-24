@@ -324,3 +324,15 @@ export async function setEmailPreference(id, preference) {
   setting.set("email_newsletter", preference.newsletter)
   return await setting.save()
 }
+
+export async function getUserByEmail(email) {
+  if (!Parse.User.current()) return
+
+  const query = new Parse.Query(Parse.User)
+  query.equalTo("email", email)
+  const user = await query.first()
+
+  if (user) return parseUserMetadata(user)
+
+  return undefined
+}

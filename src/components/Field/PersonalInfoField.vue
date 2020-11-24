@@ -67,6 +67,7 @@
     </ValidationProvider>
     <!-- Position -->
     <b-field
+      v-if="hasPosition"
       grouped
       class="field-margin field-space-between"
     >
@@ -133,6 +134,10 @@ export default {
       required: true
     },
     isRequired: {
+      type: Boolean,
+      default: true
+    },
+    hasPosition: {
       type: Boolean,
       default: true
     }

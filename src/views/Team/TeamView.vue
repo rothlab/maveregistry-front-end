@@ -119,7 +119,7 @@
                     <!-- Owner view -->
                     <div v-if="isOwner">
                       <!-- Invite to join team -->
-                      <!-- <b-button
+                      <b-button
                         icon-left="mdil-plus"
                         rounded
                         size="is-small"
@@ -129,7 +129,7 @@
                         @click="isInviteJoinModalActive = true"
                       >
                         Invite
-                      </b-button> -->
+                      </b-button>
 
                       <!-- Review join team request-->
                       <b-button
@@ -164,7 +164,7 @@
                   
                       <!-- Leave team -->
                       <b-button
-                        v-else
+                        v-else-if="memberStats !== 'invited'"
                         :icon-left="memberStats === 'pending' ? 'mdil-clock' : 'mdil-logout'"
                         rounded
                         size="is-small"
@@ -174,6 +174,20 @@
                         @click="isLeaveTeamModalActive = true"
                       >
                         {{ memberStats === "pending" ? "Request pending approval" : "Leave team" }}
+                      </b-button>
+
+                      <!-- Review invitation -->
+                      <b-button
+                        v-else
+                        rounded
+                        size="is-small"
+                        style="margin: 0.5rem 0.5rem 0 0"
+                        icon-left="mdil-comment-text"
+                        type="is-primary"
+                        outlined
+                        @click="isReviewInvitationModalActive = true"
+                      >
+                        Review Invitation
                       </b-button>
                     </div>
                   </div>
@@ -462,6 +476,15 @@
         </div>
       </ConfirmInfoModal>
 
+      <!-- Review Invitation Modal -->
+      <ConfirmInfoModal
+        :active.sync="isReviewInvitationModalActive"
+        action="accept"
+        type="invitation"
+        :is-irreversible="false"
+        :on-action="acceptInvitation"
+      />
+
       <!-- Confirm Leave Team Modal -->
       <ConfirmDangerModal
         :active.sync="isLeaveTeamModalActive"
@@ -481,6 +504,14 @@
         :requests="joinRequests"
         @change="loadPage"
       />
+
+      <!-- Invite to join team modal -->
+      <InviteJoinModal
+        type="team"
+        :type-id="teamId"
+        :active.sync="isInviteJoinModalActive"
+        :members="members"
+      />
     </div>
   </div>
 </template>
@@ -492,6 +523,7 @@ import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import ManageTeamJoinModal from '@/components/Modal/ManageTeamJoinModal.vue'
 import ConfirmInfoModal from '@/components/Modal/ConfirmInfoModal.vue'
+import InviteJoinModal from '@/components/Modal/InviteJoinModal.vue'
 import { handleError } from '@/api/errorHandler.js'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
 import TransferAction from '@/components/Action/TransferAction.vue'
@@ -502,6 +534,7 @@ export default {
   components: {
     Error,
     ManageFollowerModal,
+    InviteJoinModal,
     ManageTeamJoinModal,
     FollowButtonAction,
     TransferAction,
@@ -525,6 +558,7 @@ export default {
       if (this.currentUser) {
         if (this.members.some(e => e.member.username === this.currentUser.username)) return "member"
         if (this.hasRequestedJoinTeam) return "pending"
+        if (this.hasInvitedJoinTeam) return "invited"
       }
 
       return undefined
@@ -542,12 +576,14 @@ export default {
       isLeaveTeamModalActive: false,
       isInviteJoinModalActive: false,
       isReviewJoinRequestModalActive: false,
+      isReviewInvitationModalActive: false,
       followStatus: undefined,
       principalInvestigator: {},
       joinRequests: [],
       members: [],
       memberId: "",
       hasRequestedJoinTeam: false,
+      hasInvitedJoinTeam: false,
       collaborators: [],
       projects: [],
       updatedDate: new Date(),
@@ -575,6 +611,9 @@ export default {
 
       // Open join request review modal if needed
       if (this.hasDeepLink("#review-join-team-request")) this.isReviewJoinRequestModalActive = true
+    } else {
+      // Open accept invitation modal if needed
+      if (this.hasDeepLink("#review-invite-request") && this.memberStats === 'invited') this.isReviewInvitationModalActive = true
     }
   },
   methods: {
@@ -594,12 +633,15 @@ export default {
           } else {
             // For member or request submiteer, get member/requestId
             const member = team.members.filter(e => e.member.username == this.currentUser.username)
+            console.log(member)
             if (member && member.length === 1) {
               this.memberId = member[0].id
               this.hasRequestedJoinTeam = member[0].type === "request" && !member[0].approved_at
+              this.hasInvitedJoinTeam = member[0].type === "invite" && !member[0].approved_at
             } else {
               this.memberId = ""
               this.hasRequestedJoinTeam = false
+              this.hasInvitedJoinTeam = false
             }
           }
 
@@ -683,6 +725,10 @@ export default {
     },
     async leaveTeam() {
       await TeamManage.leaveTeam(this.memberId)
+      await this.loadPage()
+    },
+    async acceptInvitation() {
+      await TeamManage.acceptInvitation(this.memberId)
       await this.loadPage()
     }
   }
