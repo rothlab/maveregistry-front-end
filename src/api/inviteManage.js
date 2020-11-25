@@ -118,7 +118,7 @@ export async function fetchInvitations(targetType = undefined, targetPointer = u
   const currentUser = Parse.User.current()
   if (!currentUser) throw new Error("Not logged in")
 
-  const invites = await this.queryInvitations(currentUser, targetType, targetPointer, pagination)
+  const invites = await queryInvitations(currentUser, targetType, targetPointer, pagination)
 
   return {
     count: invites.count,
@@ -136,7 +136,7 @@ export async function addInvitations(invitees, targetType, targetPointer = undef
   if (!currentUser) throw new Error("Not logged in")
 
   // Query existing invitations
-  const existInvit = await this.queryInvitations(currentUser, targetType, targetPointer)
+  const existInvit = await queryInvitations(currentUser, targetType, targetPointer)
 
   // If with existing invitations,
   // filter out invitees that already exist in invitations
