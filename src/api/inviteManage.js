@@ -9,7 +9,6 @@ export const Invite = Parse.Object.extend("Invite", {
     if (!["email", "internal"].includes(attrs.type)) throw new Error("Invalid invite type")
     if (!attrs.external_user && !attrs.internal_user) throw new Error("Missing invitee")
     if (!attrs.target_type || attrs.target_type === "") throw new Error("Missing target type")
-    if (!attrs.target_pointer || attrs.target_pointer === "") throw new Error("Missing target pointer")
   },
   format: function(includeFrom = false) {
     let ret = {
@@ -31,6 +30,7 @@ export const Invite = Parse.Object.extend("Invite", {
       }
     }
     if (this.get("acceptedAt")) ret.accepted_at = this.get("acceptedAt")
+    if (this.get("message")) ret.message = this.get("message")
 
     if (ret.type === "internal") {
       const user = this.get("internal_user")
@@ -68,6 +68,26 @@ export async function queryInvitation(id) {
   return await Parse.Cloud.run("fetchInvitation", { invite_id: id })
 }
 
+export async function queryInvitationMessage(targetType, targetPointer = undefined) {
+  // Validate if logged in
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
+  
+  // Fetch invitation
+  const query = new Parse.Query(Invite)
+  query.equalTo("internal_user", currentUser)
+  query.equalTo("target_type", targetType)
+  if (targetPointer) {
+    query.equalTo("target_pointer", targetPointer)
+  } else {
+    query.doesNotExist("target_pointer")
+  }
+  const invitation = await query.first()
+
+  if (!invitation) return undefined
+  return invitation.get("message")
+}
+
 // Query invitations
 export async function queryInvitations(fromUser, targetType = undefined, targetPointer = undefined, pagination = undefined) {
   // If not from any user, throw error
@@ -76,8 +96,13 @@ export async function queryInvitations(fromUser, targetType = undefined, targetP
   const query = new Parse.Query(Invite)
   query.equalTo("from", fromUser)
   query.include("internal_user")
+  query.descending("createdAt")
   if (targetType) query.equalTo("target_type", targetType)
-  if (targetPointer) query.equalTo("target_pointer", targetPointer)
+  if (targetPointer) {
+    query.equalTo("target_pointer", targetPointer)
+  } else {
+    query.doesNotExist("target_pointer")
+  }
   if (pagination) {
     query.limit(pagination.limit)
     query.skip((pagination.current - 1) * pagination.limit)
@@ -102,7 +127,7 @@ export async function fetchInvitations(targetType = undefined, targetPointer = u
 }
 
 // Create invitations
-export async function addInvitations(invitees, targetType, targetPointer) {
+export async function addInvitations(invitees, targetType, targetPointer = undefined, message = "") {
   // If no invitees, throw error
   if (!invitees || invitees.length < 1) throw new Error("No invitees")
 
@@ -118,13 +143,13 @@ export async function addInvitations(invitees, targetType, targetPointer) {
   if (existInvit.length > 0) {
     invitees = invitees.filter((invitee) => {
       // Scan through existing invitations
-      return !existInvit.some((invit) => {
-        if (invitee.email_invite) {
-          const user = invit.get("external_user")
-          return user && user.email === invitee.email
+      return !existInvit.some((invite) => {
+        let toUser = invite.get("internal_user")
+        if (toUser) {
+          return toUser.id === invitee.id
         } else {
-          const user = invit.get("internal_user")
-          return user && user.id === invitee.id
+          const toUser = invite.get("external_user")
+          return toUser.email === invitee.email
         }
       })
     })
@@ -143,6 +168,9 @@ export async function addInvitations(invitees, targetType, targetPointer) {
       target_type: targetType,
       target_pointer: targetPointer,
     }
+
+    // Add message if available
+    if (message) attrs.message = message
 
     if (invitee.email_invite) {
       attrs.type = "email"

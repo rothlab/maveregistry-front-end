@@ -16,27 +16,40 @@
               class="level-right"
               v-if="hasLoggedIn"
             >
-              <!-- Register new team -->
-              <!-- Non-mobile style -->
-              <b-button
-                icon-left="mdil-plus"
-                type="is-warning"
-                size="is-medium"
-                class="is-hidden-mobile small-shadow"
-                @click="addTeam"
-              >
-                New Team
-              </b-button>
-              <!-- Mobile style -->
-              <b-button
-                icon-left="mdil-plus"
-                type="is-warning"
-                size="is-medium"
-                class="is-hidden-tablet small-shadow"
-                @click="addTeam"
-              >
-                New
-              </b-button>
+              <div class="buttons">
+                <!-- Register new team -->
+                <!-- Non-mobile style -->
+                <b-button
+                  icon-left="mdil-plus"
+                  type="is-warning"
+                  size="is-medium"
+                  class="is-hidden-mobile small-shadow"
+                  @click="addTeam"
+                >
+                  New Team
+                </b-button>
+                <!-- Mobile style -->
+                <b-button
+                  icon-left="mdil-plus"
+                  type="is-warning"
+                  size="is-medium"
+                  class="is-hidden-tablet small-shadow"
+                  @click="addTeam"
+                >
+                  New
+                </b-button>
+
+                <!-- Invite -->
+                <b-button
+                  icon-left="mdil-email-open"
+                  type="is-warning"
+                  size="is-medium"
+                  class="small-shadow"
+                  @click="isInviteModalActive = true"
+                >
+                  Invite
+                </b-button>
+              </div>
             </div>
           </div>
         </div>
@@ -404,6 +417,12 @@
       :active.sync="isTutorialModalActive"
       :selected="2"
     />
+
+    <!-- Invite modal -->
+    <InviteModal
+      type="team"
+      :active.sync="isInviteModalActive"
+    />
   </div>
 </template>
 
@@ -413,6 +432,7 @@ import NewTeamModal from "@/components/Modal/NewTeamModal.vue"
 import FollowModal from '@/components/Modal/FollowModal.vue'
 import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import VideoTutorialPlayerModal from "@/components/Modal/VideoTutorialPlayerModal.vue"
+import InviteModal from "@/components/Modal/InviteModal.vue"
 import TipAction from '@/components/Action/TipAction.vue'
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
@@ -426,6 +446,7 @@ export default {
     FollowModal,
     UnfollowModal,
     VideoTutorialPlayerModal,
+    InviteModal,
     TipAction,
     Error,
     FilterOutline
@@ -441,6 +462,7 @@ export default {
       isFollowModelActive: false,
       isUnfollowModelActive: false,
       isTutorialModalActive: false,
+      isInviteModalActive: false,
       isLoading: {
         fetch_team: false,
         new_team: false
@@ -491,6 +513,10 @@ export default {
     }
 
     await this.fetchTeams()
+
+    // Handle deep links
+    if (this.hasDeepLink("#create")) this.addTeam()
+
     this.hasInitLoad = true
   },
   methods: {

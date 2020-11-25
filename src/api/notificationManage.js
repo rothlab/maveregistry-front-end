@@ -29,6 +29,7 @@ export const Notification = Parse.Object.extend("Notification", {
         case "follow":
         case "transfer":
         case "join":
+        case "invite":
           // If data is not available, fetch
           // This is because include is not implemented with LiveQuery
           if (!by.isDataAvailable()) await by.fetch()

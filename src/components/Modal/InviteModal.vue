@@ -12,7 +12,7 @@
           <header class="level is-mobile">
             <div class="level-left">
               <p class="has-text-primary is-capitalized is-size-5">
-                Invite to Join {{ type }}
+                Invite People
               </p>
             </div>
             <div class="level-right">
@@ -163,6 +163,15 @@
                 </b-button>
               </p>
             </b-field>
+            <b-field
+              class="field-margin"
+            >
+              <b-input
+                v-model.trim="message"
+                placeholder="Enter an optional message along with each invitation"
+                expanded
+              />
+            </b-field>
           </div>
 
           <hr>
@@ -233,13 +242,32 @@
                     <b class="is-capitalized">{{ invitation.user.first_name }} {{ invitation.user.last_name }} </b>
                     <span v-if="invitation.user.email">({{ invitation.user.email }})</span>
                     <br>
-                    <small>Invitation sent: {{ invitation.create_date.toLocaleString() }}</small>
+                    <span v-if="invitation.message">
+                      <b-icon icon="mdil-message-text" />
+                      <span>{{ invitation.message }}</span>
+                    </span>
+                    <span
+                      v-else
+                      class="has-text-grey"
+                    >
+                      <b-icon icon="mdil-message" />
+                      <span>No message</span>
+                    </span>
                   </p>
                 </div>
               </div>
 
               <div class="media-right">
                 <div class="has-text-right">
+                  <!-- Date -->
+                  <b-tooltip
+                    :label="`Invited on ${invitation.create_date.toLocaleString()}`"
+                    type="is-dark"
+                    position="is-left"
+                  >
+                    <b-icon icon="mdil-calendar" />
+                  </b-tooltip>
+
                   <!-- View Profile -->
                   <b-tooltip
                     v-if="invitation.type === 'internal'"
@@ -260,6 +288,7 @@
                     v-if="!invitation.accepted_at"
                     label="Remove"
                     type="is-dark"
+                    position="is-left"
                   >
                     <a @click="deleteId = invitation.id; isConfirmDeleteModalActive = true"><b-icon
                       icon="mdil-delete"
@@ -424,7 +453,7 @@ export default {
     },
     typeId: {
       type: String,
-      required: true
+      default: undefined 
     },
     active: {
       type: Boolean,
@@ -440,15 +469,23 @@ export default {
       if (val !== this.active) {
         this.$emit("update:active", val)
       }
-
-      if (!val) this.invitations = []
     },
     async active(val) {
       if (val != this.isActive) {
         this.isActive = val
       }
 
-      if (val) this.fetchInvites()
+      if (val) {
+        // Clean up when modal is closed
+        this.invitations = []
+        this.users = []
+        this.isSearching = false
+        this.selectedUsers = []
+        this.message = ""
+
+        // Fetch invites
+        this.fetchInvites()
+      }
     }
   },
   data() {
@@ -464,6 +501,7 @@ export default {
       isSearching: false,
       users: [],
       selectedUsers: [],
+      message: "",
       emailInvitation: {
         first_name: "",
         last_name: "",
@@ -510,7 +548,6 @@ export default {
 
           // Remove members and already invitated users
           this.users = users.filter((user) => {
-            console.log(user)
             const isMember = this.members.some(member => member.member && member.member.id === user.id)
             const hasInvited = this.invitations.some(invitation => invitation.user && invitation.user.id === user.id)
 
@@ -580,7 +617,7 @@ export default {
 
       // Save invites
       try {
-        const invitesSent = await InviteManage.addInvitations(this.selectedUsers, this.type, this.typeId)
+        const invitesSent = await InviteManage.addInvitations(this.selectedUsers, this.type, this.typeId, this.message)
 
         // Prepare message
         let message = `${invitesSent.length} invite${invitesSent.length > 1 ? "s" : ""} sent.`

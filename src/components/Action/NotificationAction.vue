@@ -105,7 +105,7 @@
                           target="_blank"
                         >
                           <b>{{ notification.target.type }}</b>
-                        </router-link> 
+                        </router-link>
                       </span>
                       <span>.</span>
                     </p>

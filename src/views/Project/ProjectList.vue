@@ -13,27 +13,40 @@
               </div>
             </div>
             <div class="level-right">
-              <!-- Register new project -->
-              <!-- Non-mobile style -->
-              <b-button
-                icon-left="mdil-plus"
-                type="is-warning"
-                size="is-medium"
-                class="is-hidden-mobile small-shadow"
-                @click="handleNewTargetModal()"
-              >
-                New Project
-              </b-button>
-              <!-- Mobile style -->
-              <b-button
-                icon-left="mdil-plus"
-                type="is-warning"
-                size="is-medium"
-                class="is-hidden-tablet small-shadow"
-                @click="handleNewTargetModal()"
-              >
-                New
-              </b-button>
+              <div class="buttons">
+                <!-- Register new project -->
+                <!-- Non-mobile style -->
+                <b-button
+                  icon-left="mdil-plus"
+                  type="is-warning"
+                  size="is-medium"
+                  class="is-hidden-mobile small-shadow"
+                  @click="handleNewTargetModal()"
+                >
+                  New Project
+                </b-button>
+                <!-- Mobile style -->
+                <b-button
+                  icon-left="mdil-plus"
+                  type="is-warning"
+                  size="is-medium"
+                  class="is-hidden-tablet small-shadow"
+                  @click="handleNewTargetModal()"
+                >
+                  New
+                </b-button>
+
+                <!-- Invite -->
+                <b-button
+                  icon-left="mdil-email-open"
+                  type="is-warning"
+                  size="is-medium"
+                  class="small-shadow"
+                  @click="handleInvite()"
+                >
+                  Invite
+                </b-button>
+              </div>
             </div>
           </div>
         </div>
@@ -763,6 +776,12 @@
         :active.sync="isTutorialModalActive"
         :selected="1"
       />
+
+      <!-- Invite modal -->
+      <InviteModal
+        type="project"
+        :active.sync="isInviteModalActive"
+      />
     </div>
   </div>
 </template>
@@ -777,6 +796,7 @@ import UnfollowModal from '@/components/Modal/UnfollowModal.vue'
 import NewTargetModal from '@/components/Modal/NewTargetModal.vue'
 import ConfirmInfoModal from '@/components/Modal/ConfirmInfoModal.vue'
 import VideoTutorialPlayerModal from "@/components/Modal/VideoTutorialPlayerModal.vue"
+import InviteModal from "@/components/Modal/InviteModal.vue"
 import ShowMoreField from '@/components/Field/ShowMoreField.vue'
 import TipAction from '@/components/Action/TipAction.vue'
 import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
@@ -794,6 +814,7 @@ export default {
     NewTargetModal,
     ConfirmInfoModal,
     VideoTutorialPlayerModal,
+    InviteModal,
     ShowMoreField,
     TipAction,
     FilterOutline
@@ -857,6 +878,8 @@ export default {
       isNewTargetModalActive: false,
       // Show video tutorial
       isTutorialModalActive: false,
+      // Invite people modal
+      isInviteModalActive: false,
       isLoading: {
         new_project: false,
         follow_unfollow: false,
@@ -885,7 +908,12 @@ export default {
       const conditionKeys = Object.keys(this.conditions).filter(e => !this.conditions[e].role || this.conditions[e].role !== 'funder')
       this.conditions = pick(this.conditions, conditionKeys)
     }
+    
     await this.fetchTargets()
+
+    // Handle deep links
+    if (this.hasDeepLink("#create")) this.handleNewTargetModal()
+
     this.hasInitLoad = true
   },
   methods: {
@@ -968,6 +996,15 @@ export default {
     async followTarget() {
       await FollowManage.follow(this.followProp.source, this.followProp.type)
       await this.fetchTargets()
+    },
+    handleInvite() {
+      // If not logged in, show the login panel instead
+      if (!this.hasLoggedIn) {
+        this.$emit("login")
+        return
+      }
+
+      this.isInviteModalActive = true
     }
   }
 }
