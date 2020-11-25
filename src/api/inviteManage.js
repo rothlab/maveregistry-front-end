@@ -68,6 +68,26 @@ export async function queryInvitation(id) {
   return await Parse.Cloud.run("fetchInvitation", { invite_id: id })
 }
 
+export async function queryInvitationMessage(targetType, targetPointer = undefined) {
+  // Validate if logged in
+  const currentUser = Parse.User.current()
+  if (!currentUser) throw new Error("Not logged in")
+  
+  // Fetch invitation
+  const query = new Parse.Query(Invite)
+  query.equalTo("internal_user", currentUser)
+  query.equalTo("target_type", targetType)
+  if (targetPointer) {
+    query.equalTo("target_pointer", targetPointer)
+  } else {
+    query.doesNotExist("target_pointer")
+  }
+  const invitation = await query.first()
+
+  if (!invitation) return undefined
+  return invitation.get("message")
+}
+
 // Query invitations
 export async function queryInvitations(fromUser, targetType = undefined, targetPointer = undefined, pagination = undefined) {
   // If not from any user, throw error
@@ -123,13 +143,13 @@ export async function addInvitations(invitees, targetType, targetPointer = undef
   if (existInvit.length > 0) {
     invitees = invitees.filter((invitee) => {
       // Scan through existing invitations
-      return !existInvit.some((invit) => {
-        if (invitee.email_invite) {
-          const user = invit.get("external_user")
-          return user && user.email === invitee.email
+      return !existInvit.some((invite) => {
+        let toUser = invite.get("internal_user")
+        if (toUser) {
+          return toUser.id === invitee.id
         } else {
-          const user = invit.get("internal_user")
-          return user && user.id === invitee.id
+          const toUser = invite.get("external_user")
+          return toUser.email === invitee.email
         }
       })
     })

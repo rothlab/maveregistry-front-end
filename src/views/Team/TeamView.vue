@@ -483,7 +483,18 @@
         type="invitation"
         :is-irreversible="false"
         :on-action="acceptInvitation"
-      />
+      >
+        <b-message
+          v-if="invitationMessage"
+          type="is-info"
+        >
+          <p class="is-size-5">
+            <b-icon icon="mdil-message-text" />
+            <span>Message</span>
+          </p>
+          {{ invitationMessage }}
+        </b-message>
+      </ConfirmInfoModal>
 
       <!-- Confirm Leave Team Modal -->
       <ConfirmDangerModal
@@ -519,6 +530,7 @@
 <script>
 import * as TeamManage from "@/api/teamManage.js"
 import * as FollowManage from "@/api/followManage.js"
+import * as InviteManage from "@/api/inviteManage.js"
 import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import ManageTeamJoinModal from '@/components/Modal/ManageTeamJoinModal.vue'
@@ -584,6 +596,7 @@ export default {
       memberId: "",
       hasRequestedJoinTeam: false,
       hasInvitedJoinTeam: false,
+      invitationMessage: "",
       collaborators: [],
       projects: [],
       updatedDate: new Date(),
@@ -613,7 +626,7 @@ export default {
       if (this.hasDeepLink("#review-join-team-request")) this.isReviewJoinRequestModalActive = true
     } else {
       // Open accept invitation modal if needed
-      if (this.hasDeepLink("#review-invite-request") && this.memberStats === 'invited') this.isReviewInvitationModalActive = true
+      if (this.hasDeepLink("#review-invitation") && this.memberStats === 'invited') this.isReviewInvitationModalActive = true
     }
   },
   methods: {
@@ -633,11 +646,13 @@ export default {
           } else {
             // For member or request submiteer, get member/requestId
             const member = team.members.filter(e => e.member.username == this.currentUser.username)
-            console.log(member)
             if (member && member.length === 1) {
               this.memberId = member[0].id
               this.hasRequestedJoinTeam = member[0].type === "request" && !member[0].approved_at
               this.hasInvitedJoinTeam = member[0].type === "invite" && !member[0].approved_at
+              // Get invitation message
+              if (this.hasInvitedJoinTeam)
+                this.invitationMessage = await InviteManage.queryInvitationMessage("team", this.teamId)
             } else {
               this.memberId = ""
               this.hasRequestedJoinTeam = false
