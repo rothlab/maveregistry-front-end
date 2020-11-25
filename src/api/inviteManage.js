@@ -9,7 +9,6 @@ export const Invite = Parse.Object.extend("Invite", {
     if (!["email", "internal"].includes(attrs.type)) throw new Error("Invalid invite type")
     if (!attrs.external_user && !attrs.internal_user) throw new Error("Missing invitee")
     if (!attrs.target_type || attrs.target_type === "") throw new Error("Missing target type")
-    if (!attrs.target_pointer || attrs.target_pointer === "") throw new Error("Missing target pointer")
   },
   format: function(includeFrom = false) {
     let ret = {
@@ -31,6 +30,7 @@ export const Invite = Parse.Object.extend("Invite", {
       }
     }
     if (this.get("acceptedAt")) ret.accepted_at = this.get("acceptedAt")
+    if (this.get("message")) ret.message = this.get("message")
 
     if (ret.type === "internal") {
       const user = this.get("internal_user")
@@ -76,8 +76,13 @@ export async function queryInvitations(fromUser, targetType = undefined, targetP
   const query = new Parse.Query(Invite)
   query.equalTo("from", fromUser)
   query.include("internal_user")
+  query.descending("createdAt")
   if (targetType) query.equalTo("target_type", targetType)
-  if (targetPointer) query.equalTo("target_pointer", targetPointer)
+  if (targetPointer) {
+    query.equalTo("target_pointer", targetPointer)
+  } else {
+    query.doesNotExist("target_pointer")
+  }
   if (pagination) {
     query.limit(pagination.limit)
     query.skip((pagination.current - 1) * pagination.limit)
@@ -102,7 +107,7 @@ export async function fetchInvitations(targetType = undefined, targetPointer = u
 }
 
 // Create invitations
-export async function addInvitations(invitees, targetType, targetPointer) {
+export async function addInvitations(invitees, targetType, targetPointer = undefined, message = "") {
   // If no invitees, throw error
   if (!invitees || invitees.length < 1) throw new Error("No invitees")
 
@@ -143,6 +148,9 @@ export async function addInvitations(invitees, targetType, targetPointer) {
       target_type: targetType,
       target_pointer: targetPointer,
     }
+
+    // Add message if available
+    if (message) attrs.message = message
 
     if (invitee.email_invite) {
       attrs.type = "email"

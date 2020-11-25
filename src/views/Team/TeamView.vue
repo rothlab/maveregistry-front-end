@@ -126,7 +126,7 @@
                         style="margin: 0.5rem 0.5rem 0 0"
                         type="is-link"
                         outlined
-                        @click="isInviteJoinModalActive = true"
+                        @click="isInviteModalActive = true"
                       >
                         Invite
                       </b-button>
@@ -506,10 +506,10 @@
       />
 
       <!-- Invite to join team modal -->
-      <InviteJoinModal
+      <InviteModal
         type="team"
         :type-id="teamId"
-        :active.sync="isInviteJoinModalActive"
+        :active.sync="isInviteModalActive"
         :members="members"
       />
     </div>
@@ -523,7 +523,7 @@ import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import ManageTeamJoinModal from '@/components/Modal/ManageTeamJoinModal.vue'
 import ConfirmInfoModal from '@/components/Modal/ConfirmInfoModal.vue'
-import InviteJoinModal from '@/components/Modal/InviteJoinModal.vue'
+import InviteModal from '@/components/Modal/InviteModal.vue'
 import { handleError } from '@/api/errorHandler.js'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
 import TransferAction from '@/components/Action/TransferAction.vue'
@@ -534,7 +534,7 @@ export default {
   components: {
     Error,
     ManageFollowerModal,
-    InviteJoinModal,
+    InviteModal,
     ManageTeamJoinModal,
     FollowButtonAction,
     TransferAction,
@@ -574,7 +574,7 @@ export default {
       isConfirmDeleteModalActive: false,
       isJoinTeamModalActive: false,
       isLeaveTeamModalActive: false,
-      isInviteJoinModalActive: false,
+      isInviteModalActive: false,
       isReviewJoinRequestModalActive: false,
       isReviewInvitationModalActive: false,
       followStatus: undefined,

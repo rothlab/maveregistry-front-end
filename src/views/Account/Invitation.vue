@@ -48,21 +48,44 @@
                       {{ invitation.from.last_name }}
                     </span>
                   </router-link>
-                  <span style="margin-left: 0.5rem">invites you to join their {{ invitation.target.type }}.</span>
+                  <span style="margin-left: 0.5rem">invites you to {{ action ? `${action} a` : `${action} their` }} {{ invitation.target.type }}.</span>
                 </p>
 
                 <b-message
-                  v-if="invitation.target && invitation.target.details"
+                  v-if="invitation.message || (invitation.target && invitation.target.details)"
                   class="field-margin"
                   type="is-info"
                 >
-                  <p
-                    v-for="(detail, id) in invitation.target.details"
-                    :key="id"
-                    class="is-capitalized"
+                  <!-- Message -->
+                  <div
+                    v-if="invitation.message"
+                    class="invitation-detail"
                   >
-                    {{ detail }}
-                  </p>
+                    <p class="is-size-5">
+                      <b-icon icon="mdil-message-text" />
+                      <span>Message</span>
+                    </p>
+                    <p>
+                      {{ invitation.message }}
+                    </p>
+                  </div>
+                  <!-- Team detail -->
+                  <div
+                    v-if="invitation.target && invitation.target.details"
+                    class="invitation-detail"
+                  >
+                    <p class="is-size-5">
+                      <b-icon icon="mdil-information" />
+                      <span class="is-capitalized">{{ invitation.target.type }} detail</span>
+                    </p>
+                    <p
+                      v-for="(detail, id) in invitation.target.details"
+                      :key="id"
+                      class="is-capitalized"
+                    >
+                      {{ detail }}
+                    </p>
+                  </div>
                 </b-message>
 
                 <div v-if="!isAccepted">
@@ -95,13 +118,25 @@
 
                       <b-button
                         tag="router-link"
-                        v-if="invitation.target && invitation.target.type"
+                        v-if="invitation.target && invitation.target.type && invitation.target.id"
                         type="is-primary-light"
                         icon-left="mdil-link"
                         expanded
                         :to="`/${invitation.target.type}/${invitation.target.id}`"
                       >
                         View {{ invitation.target.type }}
+                      </b-button>
+
+                      <b-button
+                        tag="router-link"
+                        v-if="invitation.target && invitation.target.type && !invitation.target.id"
+                        type="is-primary-light"
+                        icon-left="mdil-link"
+                        expanded
+                        :to="`/${invitation.target.type}s#create`"
+                        class="is-capitalized"
+                      >
+                        {{ action }} a {{ invitation.target.type }}
                       </b-button>
                     </div>
                   </footer>
@@ -146,6 +181,10 @@ export default {
   computed: {
     inviteId() {
       return this.$route.params.id
+    },
+    action() {
+      if (this.invitation.target && this.invitation.target.id) return "join"
+      return "create"
     }
   },
   async mounted() {
@@ -159,10 +198,12 @@ export default {
         this.invitation = await InviteManage.queryInvitation(this.inviteId)
         this.isAccepted = !!this.invitation.accept_date
 
-        // If internal invitation, jump to corresponding object
-        if (this.invitation.type === "internal") this.$router.push({
-          path: `/${this.invitation.target.type}/${this.invitation.target.id}#review-invite-request`
-        })
+        // If internal invitation and object specific, jump to corresponding page
+        if (this.invitation.type === "internal" && this.invitation.target && this.invitation.target.id) {
+          this.$router.push({
+            path: `/${this.invitation.target.type}/${this.invitation.target.id}#review-invite-request`
+          })
+        }
       } catch (error) {
         this.errorMessage = await handleError(error)
       } finally {
@@ -197,3 +238,12 @@ export default {
   }
 }
 </script>
+
+<style lang="sass" scoped>
+.invitation-detail  
+  margin-bottom: 1rem
+  &:last-child
+    margin-bottom: 0
+  p
+    margin-bottom: 0.25rem
+</style>

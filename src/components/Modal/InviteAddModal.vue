@@ -12,7 +12,7 @@
           <header class="level is-mobile">
             <div class="level-left">
               <p class="has-text-primary is-capitalized is-size-5">
-                Invite to Join {{ type }}
+                Invite to Add {{ type }}
               </p>
             </div>
             <div class="level-right">
@@ -29,6 +29,17 @@
             <p class="field-margin">
               Enter the name of the user you'd like to invite. If they are not on the Registry, you can choose to invite them to create an account.
             </p>
+            <b-field
+              class="field-margin"
+              label="Message"
+            >
+              <b-input
+                v-model.trim="message"
+                placeholder="Enter a message along with the invitation"
+                required
+                expanded
+              />
+            </b-field>
             <b-field grouped>
               <b-taginput
                 ref="taginput"
@@ -153,7 +164,7 @@
               <p class="control">
                 <b-button
                   :loading="isLoading.send"
-                  :disabled="selectedUsers.length < 1"
+                  :disabled="!message || selectedUsers.length < 1"
                   icon-left="mdil-redo-variant"
                   type="is-light"
                   @click="sendInvite"
@@ -422,17 +433,9 @@ export default {
       type: String,
       required: true
     },
-    typeId: {
-      type: String,
-      required: true
-    },
     active: {
       type: Boolean,
       required: true
-    },
-    members: {
-      type: Array,
-      default: () => []
     }
   },
   watch: {
@@ -464,6 +467,7 @@ export default {
       isSearching: false,
       users: [],
       selectedUsers: [],
+      message: "",
       emailInvitation: {
         first_name: "",
         last_name: "",
@@ -485,7 +489,7 @@ export default {
 
       try {
         // Fetch invitations
-        const invitations = await InviteManage.fetchInvitations(this.type, this.typeId, this.pagination)
+        const invitations = await InviteManage.fetchInvitations(this.type, undefined, this.pagination)
         this.invitations = invitations.results
         this.pagination.total = invitations.count
 
@@ -508,13 +512,9 @@ export default {
         if (keyword) {
           let users = await UserManage.queryUserByName(keyword, false)
 
-          // Remove members and already invitated users
+          // Remove already invitated users
           this.users = users.filter((user) => {
-            console.log(user)
-            const isMember = this.members.some(member => member.member && member.member.id === user.id)
-            const hasInvited = this.invitations.some(invitation => invitation.user && invitation.user.id === user.id)
-
-            return !isMember && !hasInvited
+            return !this.invitations.some(invitation => invitation.user && invitation.user.id === user.id)
           })
         } else {
           this.users = []
@@ -580,7 +580,7 @@ export default {
 
       // Save invites
       try {
-        const invitesSent = await InviteManage.addInvitations(this.selectedUsers, this.type, this.typeId)
+        const invitesSent = await InviteManage.addInvitations(this.selectedUsers, this.type)
 
         // Prepare message
         let message = `${invitesSent.length} invite${invitesSent.length > 1 ? "s" : ""} sent.`
