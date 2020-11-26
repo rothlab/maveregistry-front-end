@@ -65,8 +65,8 @@
                       <b-icon icon="mdil-message-text" />
                       <span>Message</span>
                     </p>
-                    <p>
-                      {{ invitation.message }}
+                    <p class="has-white-space-pre">
+                      {{ invitation.message.trim() }}
                     </p>
                   </div>
                   <!-- Team detail -->
