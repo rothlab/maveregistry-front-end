@@ -24,7 +24,10 @@
         </header>
 
         <div class="container">
-          <b-message type="is-warning">
+          <b-message
+            type="is-warning"
+            v-if="!optedOut"
+          >
             <div class="level">
               <div class="level-left">
                 Opt out from all email communications
