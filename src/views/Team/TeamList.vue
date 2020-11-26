@@ -421,6 +421,7 @@
     <!-- Invite modal -->
     <InviteModal
       type="team"
+      action="create"
       :active.sync="isInviteModalActive"
     />
   </div>

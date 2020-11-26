@@ -780,6 +780,7 @@
       <!-- Invite modal -->
       <InviteModal
         type="project"
+        action="create"
         :active.sync="isInviteModalActive"
       />
     </div>

@@ -12,7 +12,7 @@
           <header class="level is-mobile">
             <div class="level-left">
               <p class="has-text-primary is-capitalized is-size-5">
-                Invite People
+                Invite People to {{ action }} {{ type }}
               </p>
             </div>
             <div class="level-right">
@@ -168,8 +168,10 @@
             >
               <b-input
                 v-model.trim="message"
-                placeholder="Enter an optional message along with each invitation"
+                placeholder="Enter an optional message along with each invitation (max. 200 characters)"
                 expanded
+                type="textarea"
+                maxlength="200"
               />
             </b-field>
           </div>
@@ -244,7 +246,11 @@
                     <br>
                     <span v-if="invitation.message">
                       <b-icon icon="mdil-message-text" />
-                      <span>{{ invitation.message }}</span>
+                      <ShowMoreField
+                        :value="invitation.message"
+                        line-break
+                        foreground-colour="#FFFFFF"
+                      />
                     </span>
                     <span
                       v-else
@@ -258,6 +264,36 @@
               </div>
 
               <div class="media-right">
+                <div
+                  class="is-italic is-flex has-vcentered"
+                  style="margin-bottom: 0.25rem"
+                >
+                  <div
+                    v-if="!invitation.accepted_at"
+                    class="has-text-grey"
+                  >
+                    <small>Awaiting reponse</small>
+                    <b-icon icon="mdil-clock" />
+                  </div>
+                  <div
+                    v-else
+                    class="has-text-success"
+                  >
+                    <small>Accepted</small>
+                    <b-icon icon="mdil-check" />
+                  </div>
+
+                  <!-- Date -->
+                  <b-tooltip
+                    :label="`Invited on ${invitation.create_date.toLocaleString()}`"
+                    type="is-dark"
+                    position="is-left"
+                    class="has-text-grey"
+                  >
+                    <b-icon icon="mdil-calendar" />
+                  </b-tooltip>
+                </div>
+
                 <div class="has-text-right action-buttons">
                   <!-- View Profile -->
                   <b-tooltip
@@ -290,33 +326,6 @@
                       @click="deleteId = invitation.id; isConfirmDeleteModalActive = true"
                       :loading="isLoading.send"
                     />
-                  </b-tooltip>
-                </div>
-
-                <div class="is-italic is-flex has-vcentered">
-                  <div
-                    v-if="!invitation.accepted_at"
-                    class="has-text-grey"
-                  >
-                    <small>Awaiting reponse</small>
-                    <b-icon icon="mdil-clock" />
-                  </div>
-                  <div
-                    v-else
-                    class="has-text-success"
-                  >
-                    <small>Accepted</small>
-                    <b-icon icon="mdil-check" />
-                  </div>
-                  
-                  <!-- Date -->
-                  <b-tooltip
-                    :label="`Invited on ${invitation.create_date.toLocaleString()}`"
-                    type="is-dark"
-                    position="is-left"
-                    class="has-text-grey"
-                  >
-                    <b-icon icon="mdil-calendar" />
                   </b-tooltip>
                 </div>
               </div>
@@ -445,12 +454,14 @@ import { displayErrorToast } from "@/api/errorHandler.js"
 import PersonalInfoField from '@/components/Field/PersonalInfoField.vue'
 import { ValidationObserver } from 'vee-validate'
 import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
+import ShowMoreField from '@/components/Field/ShowMoreField.vue'
 
 export default {
   components: {
     PersonalInfoField,
     ValidationObserver,
-    ConfirmDangerModal
+    ConfirmDangerModal,
+    ShowMoreField
   },
   props: {
     type: {
@@ -460,6 +471,10 @@ export default {
     typeId: {
       type: String,
       default: undefined 
+    },
+    action: {
+      type: String,
+      required: true
     },
     active: {
       type: Boolean,
