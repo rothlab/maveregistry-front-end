@@ -302,7 +302,7 @@
                     v-if="!invitation.accepted_at"
                     class="has-text-grey"
                   >
-                    <small>Waiting reponse</small>
+                    <small>Awaiting reponse</small>
                     <b-icon icon="mdil-clock" />
                   </div>
                   <div
