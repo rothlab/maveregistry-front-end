@@ -129,7 +129,7 @@ export async function fetchOptOutStatus(email) {
 
 export async function optOutEmail(email, response = undefined) {
   // Fetch opt-out object
-  let optOut = await this.fetchOptOutStatus(email)
+  let optOut = await fetchOptOutStatus(email)
 
   if (optOut) {
     // If already opted out
