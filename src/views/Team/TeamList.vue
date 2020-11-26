@@ -227,8 +227,8 @@
             v-slot="props"
             cell-class="vertical-center"
           >
-            <div class="level is-mobile is-paddingless">
-              <div class="level-left">
+            <div class="level is-paddingless">
+              <div class="level-left allow-wrap">
                 <p>
                   <router-link
                     :to="{ path: `/team/${props.row.id}`}"
@@ -421,6 +421,7 @@
     <!-- Invite modal -->
     <InviteModal
       type="team"
+      action="create"
       :active.sync="isInviteModalActive"
     />
   </div>
@@ -591,4 +592,6 @@ export default {
 .team-project-height
   max-height: 12.5rem
   overflow-y: auto
+.allow-wrap
+  flex-shrink: unset
 </style>

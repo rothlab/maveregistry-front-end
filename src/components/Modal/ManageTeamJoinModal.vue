@@ -71,18 +71,20 @@
               </div>
             </div>
             <div class="media-right">
-              <div class="has-text-right">
+              <div class="has-text-right action-buttons has-vcentered">
                 <!-- View Profile -->
                 <b-tooltip
                   label="View Profile"
                   type="is-dark"
                 >
-                  <router-link
+                  <b-button
+                    tag="router-link"
+                    icon-right="mdil-eye mdil-18px"
+                    type="is-info"
+                    outlined
                     :to="{ name: 'User Profile View', params: { username: request.member.username } }"
                     target="_blank"
-                  >
-                    <b-icon icon="mdil-eye" />
-                  </router-link>
+                  />
                 </b-tooltip>
 
                 <!-- Approve -->
@@ -90,10 +92,13 @@
                   label="Approve"
                   type="is-dark"
                 >
-                  <a @click="approveRequest(request.id)"><b-icon
-                    icon="mdil-check"
+                  <b-button
+                    icon-right="mdil-check mdil-18px"
                     type="is-success"
-                  /></a>
+                    outlined
+                    @click="requestId = request.id; approveRequest()"
+                    :loading="isLoading.submit"
+                  />
                 </b-tooltip>
 
                 <!-- Remove -->
@@ -101,10 +106,13 @@
                   label="Remove"
                   type="is-dark"
                 >
-                  <a @click="rejectRequestId = request.id; isConfirmDeleteModalActive = true"><b-icon
-                    icon="mdil-delete"
+                  <b-button
+                    icon-right="mdil-delete mdil-18px"
                     type="is-danger"
-                  /></a>
+                    outlined
+                    @click="requestId = request.id; isConfirmDeleteModalActive = true"
+                    :loading="isLoading.submit"
+                  />
                 </b-tooltip>
               </div>
             </div>
@@ -173,11 +181,14 @@ export default {
   data () {
     return {
       isActive: false,
-      isLoading: false,
+      isLoading: {
+        list: false,
+        submit: false
+      },
       filteredRequests: [],
       keyword: "",
       isConfirmDeleteModalActive: false,
-      rejectRequestId: ""
+      requestId: ""
     }
   },
   methods: {
@@ -199,15 +210,28 @@ export default {
       return string.replace(keyword, '')
     },
     async rejectRequest() {
+      this.isLoading.submit = true
+
+      try {
+        await TeamManage.rejectJoinRequest(this.requestId)
+      } catch (error) {
+        await displayErrorToast(error)
+      } finally {
+        this.isLoading.submit = false
+      }
 
       this.$emit("change")
     },
-    async approveRequest(requestId) {
+    async approveRequest() {
+      this.isLoading.submit = true
+
       // Approve and refresh list
       try {
-        await TeamManage.acceptJoinRequest(requestId)
+        await TeamManage.acceptJoinRequest(this.requestId)
       } catch (error) {
         await displayErrorToast(error)
+      } finally {
+        this.isLoading.submit = false
       }
       
       this.$emit("change")

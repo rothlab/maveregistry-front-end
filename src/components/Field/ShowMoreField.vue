@@ -5,6 +5,7 @@
     <div
       style="margin-bottom: 0; position: relative"
       ref="description"
+      :class="{ 'has-white-space-pre': lineBreak}"
     >
       {{ value }}
       <resize-observer @notify="handleResize" />
@@ -12,6 +13,7 @@
     <p
       v-if="hasMore"
       class="is-size-7 has-text-centered show-more"
+      :style="{ 'background-image': 'linear-gradient(to bottom, transparent,' + foregroundColour + ', ' + foregroundColour + ')'}"
     >
       <a @click="expanded = !expanded">
         <b-icon :icon="expanded ? 'mdil-chevron-double-up' : 'mdil-chevron-double-down'" />
@@ -35,7 +37,6 @@
     width: 100%
     margin: 0
     padding: 1rem 0 0 0
-    background-image: linear-gradient(to bottom, transparent, $light, $light)
 </style>
 
 <script>
@@ -49,6 +50,14 @@ export default {
     value: {
       type: String,
       required: true
+    },
+    lineBreak: {
+      type: Boolean,
+      default: false
+    },
+    foregroundColour: {
+      type: String,
+      default: "#F5F5F5"
     }
   },
   data() {

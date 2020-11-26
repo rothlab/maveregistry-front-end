@@ -519,6 +519,7 @@
       <!-- Invite to join team modal -->
       <InviteModal
         type="team"
+        action="join"
         :type-id="teamId"
         :active.sync="isInviteModalActive"
         :members="members"

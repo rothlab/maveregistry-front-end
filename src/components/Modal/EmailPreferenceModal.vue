@@ -24,6 +24,24 @@
         </header>
 
         <div class="container">
+          <b-message type="is-warning">
+            <div class="level">
+              <div class="level-left">
+                Opt out from all email communications
+              </div>
+              <div class="level-right">
+                <b-button
+                  icon-left="mdil-logout"
+                  type="is-warning-light"
+                  tag="router-link"
+                  :to="{ name: 'Opt Out', params: {email: this.currentUser.email } }"
+                >
+                  Opt out
+                </b-button>
+              </div>
+            </div>
+          </b-message>
+
           <b-tabs
             position="is-centered"
             type="is-boxed"

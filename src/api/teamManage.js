@@ -335,18 +335,24 @@ export async function acceptJoinRequest(requestId) {
   if (!currentUser) throw new Error("Not logged in")
 
   // Fetch team member
-  const query = new Parse.Query(TeamMember)
-  query.equalTo("objectId", requestId)
-  query.include("target")
-  const member = await query.first()
-
-  // Check current user is team owner
-  // const team = member.get("target")
-  // if (team.get("creator").id !== currentUser.id) throw new Error("Access denied. You are not team owner.")
+  const member = await new TeamMember.create({ id: requestId })
 
   // Approve request
   member.set("approvedAt", new Date())
   await member.save()
+}
+
+export async function rejectJoinRequest(requestId) {
+    // Check current user
+    const currentUser = Parse.User.current()
+    if (!currentUser) throw new Error("Not logged in")
+
+    // Fetch team member
+    const member = await new TeamMember.create({ id: requestId })
+
+    // Delete team member
+    if (!member) throw new Error("Invalid request")
+    await member.destroy()
 }
 
 export async function leaveTeam(memberId) {
