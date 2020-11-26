@@ -243,9 +243,4 @@ export default {
 <style lang="sass" scoped>
 .manage-team-join-request
   padding: 2rem
-.action-buttons
-  height: 48px
-  .b-tooltip
-    &:not(:first-child)
-      margin-left: 0.5rem
 </style>

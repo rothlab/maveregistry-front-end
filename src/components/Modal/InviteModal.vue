@@ -258,16 +258,7 @@
               </div>
 
               <div class="media-right">
-                <div class="has-text-right">
-                  <!-- Date -->
-                  <b-tooltip
-                    :label="`Invited on ${invitation.create_date.toLocaleString()}`"
-                    type="is-dark"
-                    position="is-left"
-                  >
-                    <b-icon icon="mdil-calendar" />
-                  </b-tooltip>
-
+                <div class="has-text-right action-buttons">
                   <!-- View Profile -->
                   <b-tooltip
                     v-if="invitation.type === 'internal'"
@@ -275,12 +266,14 @@
                     type="is-dark"
                     position="is-left"
                   >
-                    <router-link
+                    <b-button
+                      tag="router-link"
+                      icon-right="mdil-eye mdil-18px"
+                      type="is-info"
+                      outlined
                       :to="{ name: 'User Profile View', params: { username: invitation.user.username } }"
                       target="_blank"
-                    >
-                      <b-icon icon="mdil-eye" />
-                    </router-link>
+                    />
                   </b-tooltip>
 
                   <!-- Remove -->
@@ -290,10 +283,13 @@
                     type="is-dark"
                     position="is-left"
                   >
-                    <a @click="deleteId = invitation.id; isConfirmDeleteModalActive = true"><b-icon
-                      icon="mdil-delete"
+                    <b-button
+                      icon-right="mdil-delete mdil-18px"
                       type="is-danger"
-                    /></a>
+                      outlined
+                      @click="deleteId = invitation.id; isConfirmDeleteModalActive = true"
+                      :loading="isLoading.send"
+                    />
                   </b-tooltip>
                 </div>
 
@@ -312,6 +308,16 @@
                     <small>Accepted</small>
                     <b-icon icon="mdil-check" />
                   </div>
+                  
+                  <!-- Date -->
+                  <b-tooltip
+                    :label="`Invited on ${invitation.create_date.toLocaleString()}`"
+                    type="is-dark"
+                    position="is-left"
+                    class="has-text-grey"
+                  >
+                    <b-icon icon="mdil-calendar" />
+                  </b-tooltip>
                 </div>
               </div>
             </div>
@@ -641,8 +647,16 @@ export default {
       }
     },
     async removeInvite() {
-      await InviteManage.removeInvite(this.deleteId)
-      await this.fetchInvites()
+      this.isLoading.send = true
+      
+      try {
+        await InviteManage.removeInvite(this.deleteId)
+        await this.fetchInvites()
+      } catch (error) {
+        await displayErrorToast(error)
+      } finally {
+        this.isLoading.send = false
+      }
     }
   }
 }
