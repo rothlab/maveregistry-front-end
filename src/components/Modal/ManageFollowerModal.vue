@@ -31,7 +31,7 @@
               type="search"
               icon="mdil-magnify"
               :placeholder="`Search ${classText}s`"
-              :loading="isLoading"
+              :loading="isLoading.page"
               @input="filterByName"
             />
           </div>
@@ -86,30 +86,34 @@
               </div>
             </div>
             <div class="media-right">
-              <div class="has-text-right">
+              <div class="has-text-right action-buttons v-centered">
                 <!-- View Profile -->
                 <b-tooltip
                   label="View Profile"
                   type="is-dark"
                 >
-                  <router-link
+                  <b-button
+                    tag="router-link"
+                    icon-right="mdil-eye mdil-18px"
+                    type="is-info"
+                    outlined
                     :to="{ name: 'User Profile View', params: { username: follower.by.username } }"
                     target="_blank"
-                  >
-                    <b-icon icon="mdil-eye" />
-                  </router-link>
+                  />
                 </b-tooltip>
 
                 <!-- Approve -->
                 <b-tooltip
                   label="Approve"
                   type="is-dark"
-                  v-if="isRequest"
                 >
-                  <a @click="approveFollower(follower.id, follower.can_edit)"><b-icon
-                    icon="mdil-check"
+                  <b-button
+                    icon-right="mdil-check mdil-18px"
                     type="is-success"
-                  /></a>
+                    outlined
+                    @click="approveFollower(follower.id, follower.can_edit)"
+                    :loading="isLoading.action"
+                  />
                 </b-tooltip>
 
                 <!-- Remove -->
@@ -117,16 +121,20 @@
                   label="Remove"
                   type="is-dark"
                 >
-                  <a @click="deleteId = follower.id; isConfirmDeleteModalActive = true"><b-icon
-                    icon="mdil-delete"
+                  <b-button
+                    icon-right="mdil-delete mdil-18px"
                     type="is-danger"
-                  /></a>
+                    outlined
+                    @click="deleteId = follower.id; isConfirmDeleteModalActive = true"
+                    :loading="isLoading.action"
+                  />
                 </b-tooltip>
               </div>
 
               <b-select
                 size="is-small"
                 icon="mdil-pencil"
+                expanded
                 v-model="follower.can_edit"
                 :loading="isSettingFollower === id"
                 :disabled="isSettingFollower === id"
@@ -219,7 +227,10 @@ export default {
   data () {
     return {
       isActive: false,
-      isLoading: false,
+      isLoading: {
+        page: false,
+        action: false
+      },
       isSettingFollower: -1,
       followers: {},
       filteredFollowers: {} ,
@@ -230,7 +241,7 @@ export default {
   },
   methods: {
     async fetchFollowers() {
-      this.isLoading = true
+      this.isLoading.page = true
 
       try {
         this.followers = await FollowManage.fetchFollows(this.target, this.type, this.isRequest)
@@ -238,7 +249,7 @@ export default {
       } catch (error) {
         await displayErrorToast(error)
       } finally {
-        this.isLoading = false
+        this.isLoading.page = false
       }
     },
     async filterByName(keyword) {
@@ -246,7 +257,7 @@ export default {
         this.filteredFollowers = this.followers
         this.keyword = ""
       } else {
-        this.isLoading = true
+        this.isLoading.page = true
 
         this.keyword = keyword.toLowerCase()
 
@@ -256,7 +267,7 @@ export default {
         } catch (error) {
           await displayErrorToast(error)
         } finally {
-          this.isLoading = false
+          this.isLoading.page = false
         }
       }
     },
@@ -265,11 +276,17 @@ export default {
       return string.replace(keyword, '')
     },
     async removeFollower() {
+      this.isLoading.action = true
+
       await FollowManage.unfollow(this.deleteId)
       await this.fetchFollowers()
       this.$emit("change")
+
+      this.isLoading.action = false
     },
     async approveFollower(id, canEdit = false) {
+      this.isLoading.action = true
+
       // Approve and refresh list
       try {
         await FollowManage.approve(id, canEdit)
@@ -284,6 +301,8 @@ export default {
         })
       } catch (error) {
         await displayErrorToast(error)
+      } finally {
+        this.isLoading.action = false
       }
     },
     async setEditRole(id, canEdit, selectId) {

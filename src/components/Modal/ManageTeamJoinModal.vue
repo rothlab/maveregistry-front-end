@@ -212,15 +212,10 @@ export default {
     async rejectRequest() {
       this.isLoading.submit = true
 
-      try {
-        await TeamManage.rejectJoinRequest(this.requestId)
-      } catch (error) {
-        await displayErrorToast(error)
-      } finally {
-        this.isLoading.submit = false
-      }
-
+      await TeamManage.rejectJoinRequest(this.requestId)
       this.$emit("change")
+
+      this.isLoading.submit = false
     },
     async approveRequest() {
       this.isLoading.submit = true

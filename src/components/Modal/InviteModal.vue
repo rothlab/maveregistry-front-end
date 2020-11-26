@@ -664,14 +664,10 @@ export default {
     async removeInvite() {
       this.isLoading.send = true
       
-      try {
-        await InviteManage.removeInvite(this.deleteId)
-        await this.fetchInvites()
-      } catch (error) {
-        await displayErrorToast(error)
-      } finally {
-        this.isLoading.send = false
-      }
+      await InviteManage.removeInvite(this.deleteId)
+      await this.fetchInvites()
+
+      this.isLoading.send = false
     }
   }
 }
