@@ -33,8 +33,8 @@
                 <b-button
                   icon-left="mdil-logout"
                   type="is-warning-light"
-                  tag="router-link"
-                  :to="{ name: 'Opt Out', params: {email: this.currentUser.email } }"
+                  :loading="isLoading.submit"
+                  @click="optIn"
                 >
                   Opt out
                 </b-button>
@@ -88,6 +88,35 @@
                     placeholder="Frequency"
                     expanded
                     v-model="join_team_request"
+                  >
+                    <option value="off">
+                      Off
+                    </option>
+                    <option value="immediately">
+                      Immediately
+                    </option>
+                    <option value="daily">
+                      Daily
+                    </option>
+                    <option value="weekly">
+                      Weekly
+                    </option>
+                  </b-select>
+                </div>
+              </div>
+
+              <div
+                class="columns is-mobile"
+              >
+                <div class="column">
+                  <span class="is-size-6 has-text-primary">Invite</span>
+                  <span class="is-size-7 help">Email me invitation requests.</span>
+                </div>
+                <div class="column is-4">
+                  <b-select
+                    placeholder="Frequency"
+                    expanded
+                    v-model="invite_request"
                   >
                     <option value="off">
                       Off
@@ -350,6 +379,7 @@ export default {
       optedOut: false,
       follow_request: "",
       join_team_request: "",
+      invite_request: "",
       target_update: "",
       project_update: "",
       team_update: "",
@@ -376,6 +406,7 @@ export default {
       if (preference) {
         this.follow_request = preference.follow_request
         this.join_team_request = preference.join_team_request
+        this.invite_request = preference.invite_request
         this.target_update = preference.target_update
         this.project_update = preference.project_update
         this.team_update = preference.team_update
@@ -391,6 +422,7 @@ export default {
           await UserManage.setEmailPreference(this.id, {
             follow_request: this.follow_request,
             join_team_request: this.join_team_request,
+            invite_request: this.invite_request,
             target_update: this.target_update,
             project_update: this.project_update,
             team_update: this.team_update,
