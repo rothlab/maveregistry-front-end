@@ -29,6 +29,7 @@
 
               <footer>
                 <vue-hcaptcha
+                  v-if="useCaptcha"
                   sitekey="57b34ff1-21ab-4eee-b0f1-a16071d64d34"
                   size="invisible"
                   ref="captcha"
@@ -67,6 +68,9 @@ export default {
   computed: {
     email() {
       return this.$route.params.email
+    },
+    useCaptcha() {
+      return !this.currentUser || this.currentUser.email !== this.email
     }
   },
   data() {
@@ -88,7 +92,7 @@ export default {
   methods: {
     executeCaptcha() {
       // If opt-in, no need to run captcha
-      if (this.optedOut) {
+      if (this.optedOut || !this.useCaptcha) {
         this.optOut()
       } else {
         this.$refs.captcha.execute()
