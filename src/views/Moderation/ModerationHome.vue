@@ -498,6 +498,8 @@ export default {
     }
   },
   mounted() {
+    if(this.hasDeepLink("#review-funders")) this.isFunderModalActive = true
+
     this.fetchUsers()
     this.fetchFunderRequest()
     this.fetchProjects()
