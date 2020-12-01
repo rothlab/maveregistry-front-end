@@ -57,13 +57,29 @@
             <!-- Filter -->
             <template slot="top-left">
               <!-- Filter by name -->
-              <b-field style="margin-left: 0.5em">
+              <b-field
+                style="margin-left: 0.5em"
+                grouped
+              >
                 <b-input
                   v-model="userFilter"
                   placeholder="Name"
                   type="search"
                   icon="mdil-magnify"
                 />
+                <p class="control">
+                  <b-button
+                    :type="funderRequests > 0 ? 'is-warning' : 'is-light'"
+                    icon-left="mdil-clipboard-text"
+                    :loading="isLoading.funder_request"
+                    @click="isFunderModalActive = true"
+                  >
+                    Manage Funders
+                    <span v-if="funderRequests > 0">
+                      ({{ funderRequests > 1 ? funderRequests + " new requests" : funderRequests + " new request" }})
+                    </span>
+                  </b-button>
+                </p>
               </b-field>
             </template>
 
@@ -424,19 +440,27 @@
           </b-table>
         </div>
       </div>
+
+      <ManageFunderModal
+        :active.sync="isFunderModalActive"
+        @change="fetchFunderRequest"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import Error from '@/components/Error.vue'
+import ManageFunderModal from '@/components/Modal/ManageFunderModal.vue'
 import * as ModerationHandler from "@/api/moderationHandler.js"
+import * as FunderManage from "@/api/funderManage.js"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 
 export default {
   title: "Moderation",
   components: {
-    Error
+    Error,
+    ManageFunderModal
   },
   watch: {
     async userFilter() {
@@ -451,6 +475,7 @@ export default {
       errorMessage: "",
       isLoading: {
         users: false,
+        funder_request: false,
         projects: false
       },
       userFilter: "",
@@ -466,13 +491,15 @@ export default {
         limit: 10,
         current: 1
       },
+      funderRequests: 0,
+      isFunderModalActive: false,
       projects: undefined,
-      projectFilter: "",
-      isConfirmDeleteUserModalActive: false
+      projectFilter: ""
     }
   },
   mounted() {
     this.fetchUsers()
+    this.fetchFunderRequest()
     this.fetchProjects()
   },
   methods: {
@@ -491,6 +518,17 @@ export default {
         this.errorMessage = await handleError(error)
       } finally {
         this.isLoading.users = false
+      }
+    },
+    async fetchFunderRequest() {
+      this.isLoading.funder_request = true
+
+      try {
+        this.funderRequests = await FunderManage.countFunderRequest()
+      } catch (error) {
+        this.errorMessage = await handleError(error)
+      } finally {
+        this.isLoading.funder_request = false
       }
     },
     async fetchProjects() {
