@@ -51,6 +51,9 @@ export const Notification = Parse.Object.extend("Notification", {
             id: targetBody.pointer.id
           }
           break
+        case "moderator_message":
+          ret.by = by
+          break
         case "funder_role":
           // If data is not available, fetch
           // This is because include is not implemented with LiveQuery

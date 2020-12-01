@@ -62,7 +62,7 @@
                 <figure class="column is-1">
                   <p
                     class="image is-24x24"
-                    v-if="notification.by"
+                    v-if="notification.by && typeof notification.by === 'object'"
                   >
                     <img
                       class="is-rounded"
@@ -75,7 +75,7 @@
                   >
                     <b-icon
                       type="is-white"
-                      icon="mdil-pencil"
+                      icon="mdil-message-alert"
                       custom-size="mdil-18px"
                       class="item-icon circle-icon has-background-grey"
                     />
@@ -85,7 +85,7 @@
                   <div class="content">
                     <p>
                       <span
-                        v-if="notification.by"
+                        v-if="notification.by && typeof notification.by === 'object'"
                         class="is-capitalized"
                       >
                         <router-link
@@ -94,6 +94,11 @@
                         >
                           <b>{{ notification.by.first_name }} {{ notification.by.last_name }}</b>
                         </router-link>
+                      </span>
+                      <span
+                        v-else-if="notification.by && typeof notification.by === 'string'"
+                      >
+                        {{ notification.by }}
                       </span>
                       <span> {{ notification.message }}</span>
                       <span
