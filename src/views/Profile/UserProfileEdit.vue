@@ -181,11 +181,10 @@
                 </ValidationProvider>
               </div>
 
-              <hr v-if="false">
+              <hr>
 
               <div
                 class="project-header"
-                v-if="false"
               >
                 <p class="is-size-4 has-text-weight-bold">
                   Funder Role
@@ -194,10 +193,9 @@
 
               <div
                 class="project-content"
-                v-if="false"
               >
                 <b-checkbox
-                  v-model="funder.hasRole"
+                  v-model="hasFunderRole"
                   class="field-margin"
                 >
                   I am representing a funding agency and would like to request for
@@ -212,7 +210,7 @@
 
                 <!-- Pending approval message -->
                 <b-message
-                  v-if="funder.hasRole && !funder.approved"
+                  v-if="hasFunderRole && !approvedFunder"
                   type="is-warning"
                   size="is-small"
                   class="activity-tip"
@@ -222,24 +220,37 @@
                     custom-class="mdil-18px"
                   />
                   <span class="font-14px">
-                    Your request needs to be reviewed and approved by moderators. 
+                    Your request {{ userInfo.funder.id ? "is being reviewed" : "needs to be reviewed and approved" }} by moderators. 
                   </span>
                 </b-message>
 
                 <!-- Approved message -->
                 <b-message
-                  v-else-if="funder.hasRole && funder.approved"
-                  type="is-success"
+                  v-else-if="hasFunderRole && approvedFunder"
+                  :type="isRoleBeingReviewed ? 'is-warning': 'is-success'"
                   size="is-small"
                   class="activity-tip"
                 >
-                  <b-icon
-                    icon="mdil-check"
-                    custom-class="mdil-18px"
-                  />
-                  <span class="font-14px">
-                    Your request was approved. <b>Changes to this section need to reviewed by moderators.</b>
-                  </span>
+                  <p
+                    class="font-14px"
+                    v-if="!isRoleBeingReviewed"
+                  >
+                    Your request was approved. <b>Changes to this section need to be reviewed by moderators.</b>
+                  </p>
+                  <p
+                    class="font-14px"
+                    v-else
+                  >
+                    Changes are being reviewed by moderators.
+                  </p>
+                  <div class="font-14px">
+                    Here is your approved funding agency association:
+                    <ul>
+                      <li>Funding Agency: {{ approvedFunder.funder_name }}</li>
+                      <li>Country of the Agency: {{ countries[approvedFunder.funder_country] }}</li>
+                      <li>Position: {{ approvedFunder.position }} </li>
+                    </ul>
+                  </div>
                 </b-message>
 
                 <!-- Funding Agency -->
@@ -247,7 +258,7 @@
                   rules="required"
                   name="Funding Agency"
                   v-slot="{ errors, valid }"
-                  v-if="funder.hasRole"
+                  v-if="hasFunderRole"
                 >
                   <b-field
                     :message="errors"
@@ -257,30 +268,62 @@
                   >
                     <b-input
                       type="text"
-                      v-model.trim="funder.agency"
+                      v-model.trim="userInfo.funder.funder_name"
                     />
                   </b-field>
                 </ValidationProvider>
 
-                <!-- Position -->
-                <ValidationProvider
-                  rules="required"
-                  name="Position"
-                  v-slot="{ errors, valid }"
-                  v-if="funder.hasRole"
+                <b-field
+                  grouped
+                  class="field-margin field-space-between"
+                  v-if="hasFunderRole"
                 >
-                  <b-field
-                    :message="errors"
-                    class="field-margin"
-                    :type="{ 'is-danger': errors[0], '': valid }"
-                    label="Position"
+                  <!-- Country -->
+                  <ValidationProvider
+                    rules="required"
+                    name="Country"
+                    v-slot="{ errors, valid }"
+                    class="name"
                   >
-                    <b-input
-                      type="text"
-                      v-model.trim="funder.position"
-                    />
-                  </b-field>
-                </ValidationProvider>
+                    <b-field
+                      :message="errors"
+                      :type="{ 'is-danger': errors[0], '': valid }"
+                      label="Country of the Agency"
+                    >
+                      <b-select
+                        placeholder="Select a country"
+                        expanded
+                        v-model="userInfo.funder.funder_country"
+                      >
+                        <option
+                          v-for="(name, id) in countries"
+                          :value="id"
+                          :key="id"
+                        >
+                          {{ name }}
+                        </option>
+                      </b-select>
+                    </b-field>
+                  </ValidationProvider>
+                  <!-- Position -->
+                  <ValidationProvider
+                    rules="required"
+                    name="Position"
+                    v-slot="{ errors, valid }"
+                    class="name"
+                  >
+                    <b-field
+                      :message="errors"
+                      :type="{ 'is-danger': errors[0], '': valid }"
+                      label="Position"
+                    >
+                      <b-input
+                        type="text"
+                        v-model.trim="userInfo.funder.position"
+                      />
+                    </b-field>
+                  </ValidationProvider>
+                </b-field>
               </div>
             </ValidationObserver>
           </div>
@@ -338,12 +381,16 @@
 </template>
 
 <script>
+import cloneDeep from "lodash/cloneDeep"
 import * as UserManage from "@/api/userManage.js"
 import * as FileManage from "@/api/fileManage.js"
+import * as FunderManage from "@/api/funderManage.js"
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import Error from "@/components/Error.vue"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import AvatarCropper from "vue-avatar-cropper"
+
+const countries = require("@/assets/script/countries.json")
 
 export default {
   title: "Edit User Profile",
@@ -355,9 +402,11 @@ export default {
   },
   computed: {
     isOwner() {
-      const username = this.$route.params.username
-      return this.hasLoggedIn && username && this.$store.getters.isOwner(username)
-    }
+      return this.hasLoggedIn && this.username && this.$store.getters.isOwner(this.username)
+    },
+    username() {
+      return this.$route.params.username
+    },
   },
   data () {
     return {
@@ -371,31 +420,26 @@ export default {
       errorMessage: "",
       isDisabled: false,
       hasInitLoad: false,
-      funder: {
-        hasRole: false,
-        approved: false,
-        agency: "",
-        position: ""
-      }
+      hasFunderRole: false,
+      isRoleBeingReviewed: false,
+      approvedFunder: undefined,
+      countries: countries
     }
   },
   watch: {
     async currentUser() {
-      const username = this.$route.params.username
       if (this.hasInitLoad && !this.isOwner) 
-        this.$router.push({ name: 'User Profile View', params: { username: username } })
+        this.$router.push({ name: 'User Profile View', params: { username: this.username } })
     }
   },
   async mounted () {
-    const username = this.$route.params.username
-
     // If not a valid action or not the owner, jump to view
     if (!this.isAction('edit') || !this.isOwner) {
-      this.$router.push({ name: 'User Profile View', params: { username: username } })
+      this.$router.push({ name: 'User Profile View', params: { username: this.username } })
       return
     }
 
-    this.userInfo = await this.fetchUserInfo(username)
+    this.userInfo = await this.fetchUserInfo()
     this.hasInitLoad = true
 
     if (this.userInfo) {
@@ -412,13 +456,36 @@ export default {
     )
   },
   methods: {
-    async fetchUserInfo(username) {
+    async fetchUserInfo() {
       this.isLoading.page = true
       
       // Get user info using username
       let res
       try {
-        res = await UserManage.fetchUserInfo(username)
+        res = await UserManage.fetchUserInfo(this.username)
+
+        // Handle funder entries
+        const funders = await FunderManage.fetchFunderInfo(this.username)
+        if (funders.length > 2) throw new Error("Invalid funder entries")
+        this.isRoleBeingReviewed = funders.length === 2
+
+        for (const funder of funders) {
+          this.hasFunderRole = true
+          if (funder.approved_at) {
+            this.approvedFunder = cloneDeep(funder)
+            if (!res.funder) res.funder = funder
+          } else {
+            res.funder = funder
+          }
+        }
+
+        if (!this.hasFunderRole) {
+          res.funder = {
+            funder_name: "",
+            funder_country: "",
+            position: ""
+          }
+        }
       } catch (error) {
         this.isLoading.page = false
         this.errorMessage = await handleError(error)
@@ -436,6 +503,15 @@ export default {
       // Update user
       try {
         await this.$store.dispatch('updateUserProfile', this.userInfo)
+
+        // Handle funder update
+        const funder = this.userInfo.funder
+        if (!this.hasFunderRole) {
+          // If funder is unset, remove funders related
+          if (funder.id || this.approvedFunder) await FunderManage.removeFunderStatus(this.username)
+        } else {
+          await FunderManage.setFunderMember(funder)
+        }
       } catch (e) {
         this.isLoading.save_edit = false
         await displayErrorToast(e)

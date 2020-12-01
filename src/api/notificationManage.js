@@ -51,6 +51,18 @@ export const Notification = Parse.Object.extend("Notification", {
             id: targetBody.pointer.id
           }
           break
+        case "funder_role":
+          // If data is not available, fetch
+          // This is because include is not implemented with LiveQuery
+          if (!by.isDataAvailable()) await by.fetch()
+
+          ret.by = {
+            first_name: by.get("first_name"),
+            last_name: by.get("last_name"),
+            username: by.get("username"),
+            profile_image: by.get("profile_image")
+          }
+          break
         default:
           break
       }

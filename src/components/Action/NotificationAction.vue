@@ -95,7 +95,7 @@
                           <b>{{ notification.by.first_name }} {{ notification.by.last_name }}</b>
                         </router-link>
                       </span>
-                      <span> {{ notification.message }} </span>
+                      <span> {{ notification.message }}</span>
                       <span
                         v-if="notification.target"
                         class="is-capitalized"
@@ -104,7 +104,7 @@
                           :to="{ path: `/${notification.target.type}/${notification.target.id}`}"
                           target="_blank"
                         >
-                          <b>{{ notification.target.type }}</b>
+                          <b> {{ notification.target.type }}</b>
                         </router-link>
                       </span>
                       <span>.</span>
