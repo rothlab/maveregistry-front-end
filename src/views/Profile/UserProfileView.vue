@@ -181,6 +181,38 @@
                   </router-link>
                 </span>
               </p>
+
+              <div
+                class="is-size-5"
+                v-if="userInfo.funder"
+              >
+                <p>
+                  <b>Funding Agency</b><br>
+                  <span class="is-capitalized is-flex has-vcentered">
+                    <span style="margin-right: 0.5rem">
+                      {{ userInfo.funder.position }}, {{ userInfo.funder.funder_name }}, {{ countries[userInfo.funder.funder_country] }}
+                    </span>
+                    <b-tag
+                      v-if="!userInfo.funder.approved_at"
+                      type="is-warning-light"
+                    >
+                      <b-icon icon="mdil-clock" />
+                      <span>Awaiting moderator approval</span>
+                    </b-tag>
+                    <b-tag
+                      type="is-success"
+                      style="margin: 0 0.5rem"
+                      v-else
+                    >
+                      <b-icon
+                        icon="mdil-check"
+                        style="padding-right: 0.25rem"
+                      />
+                      Approved
+                    </b-tag>
+                  </span>
+                </p>
+              </div>
             </div>
 
             <hr v-if="hasProject || hasTeam">
@@ -322,6 +354,9 @@ import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import Error from "@/components/Error.vue"
 import UserProfileAction from "@/components/Action/UserProfileAction.vue"
 import Twitter from 'vue-material-design-icons/Twitter.vue'
+import * as FunderManage from "@/api/funderManage.js"
+
+const countries = require("@/assets/script/countries.json")
 
 function initialState (){
   return {
@@ -338,7 +373,9 @@ function initialState (){
       resend_email: false
     },
     errorMessage: "",
+    isRoleBeingReviewed: false,
     hasInitLoad: false,
+    countries: countries
   }
 }
 
@@ -353,8 +390,11 @@ export default {
     isOwner() {
       return this.userInfo && this.userInfo.username && this.$store.getters.isOwner(this.userInfo.username)
     },
+    username() {
+      return this.$route.params.username
+    },
     hasAffiliation() {
-      return this.userInfo.team_aff
+      return this.userInfo.team_aff || this.userInfo.funder
     },
     hasProject() {
       return this.userInfo.projects && this.userInfo.projects.length > 0
@@ -380,24 +420,21 @@ export default {
       Object.assign(this.$data, initialState())
 
       // Fetch and store user information
-      const username = this.$route.params.username
-      this.userInfo = await this.fetchUserInfo(username)
+      this.userInfo = await this.fetchUserInfo(this.username)
       this.hasInitLoad = true
     },
     async currentUser() {
       if (!this.hasInitLoad) return
 
       // Fetch and store user information
-      const username = this.$route.params.username
-      this.userInfo = await this.fetchUserInfo(username)
+      this.userInfo = await this.fetchUserInfo(this.username)
     }
   },
   data () {
     return initialState()
   },
   async mounted () {
-    const username = this.$route.params.username
-    this.userInfo = await this.fetchUserInfo(username)
+    this.userInfo = await this.fetchUserInfo(this.username)
     this.hasInitLoad = true
   },
   methods: {
@@ -413,6 +450,19 @@ export default {
           // Fetch team
           const teamAff = await TeamManage.fetchTeamAffiliationsByUserId(res.id)
           if (teamAff && teamAff.length > 0) res.team_aff = teamAff
+
+          // Fetch funding agency
+          const funders = await FunderManage.fetchFunderInfo(this.username)
+          if (funders.length > 2) throw new Error("Invalid funder entries")
+          
+          for (const funder of funders) {
+            if (!funder.approved_at) {
+              this.isRoleBeingReviewed = true
+              res.funder = funder
+            } else if (!res.funder) {
+              res.funder = funder
+            }
+          }
 
           // Fetch projects
           res.projects = await ProjectManage.fetchProjectsByUserId(res.id)

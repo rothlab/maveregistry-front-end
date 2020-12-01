@@ -48,6 +48,7 @@
           <b-tabs
             position="is-centered"
             type="is-boxed"
+            :animated="false"
           >
             <b-tab-item label="Request">
               <div
