@@ -803,6 +803,7 @@ import TipAction from '@/components/Action/TipAction.vue'
 import FilterOutline from "vue-material-design-icons/FilterOutline.vue"
 import debounce from 'lodash/debounce'
 import pick from 'lodash/pick'
+import { displayErrorToast } from '../../api/errorHandler'
 
 const variables = require("@/assets/script/variables.json")
 
@@ -823,6 +824,11 @@ export default {
   watch: {
     async currentUser() {
       if (this.hasInitLoad) await this.fetchTargets()
+    },
+    isFunder(val) {
+      if (val) {
+        this.conditions = variables.conditions
+      }
     }
   },
   data () {
@@ -837,24 +843,7 @@ export default {
       types: variables.target_types,
       organisms: variables.target_organisms,
       progresses: variables.progress_type,
-      conditions: {
-        "creator": { 
-          name: "Projects you created", 
-          icon: "mdil-account",
-          icon_class: "has-background-success has-text-light"
-        },
-        "follower": {
-          name: "Targets and projects you follow",
-          icon: "mdil-bell",
-          icon_class: "has-background-info has-text-light"
-        },
-        "funding": {
-          name: "Projects with funding need",
-          icon: "mdil-currency-usd",
-          icon_class: "has-background-warning has-text-dark",
-          role: "funder"
-        },
-      },
+      conditions: variables.conditions,
       // Filter
       filter: {
         type: "",
@@ -904,16 +893,27 @@ export default {
       }
     }
 
+    // Handle deep links
+    if (this.hasDeepLink("#create")) this.handleNewTargetModal()
+    if (this.hasDeepLink("#with-funding-needs")) {
+      try {
+        this.isLoading.fetch_targets = true
+        // Waiting roles to refresh
+        await this.$store.dispatch("getRoles")
+        if (this.isFunder) this.filter.conditions.push("funding")
+      } catch (error) {
+        this.isLoading.fetch_targets = false
+        await displayErrorToast(error)
+      }
+    }
+
     // Hide display elements based on role
     if (!this.isFunder) {
       const conditionKeys = Object.keys(this.conditions).filter(e => !this.conditions[e].role || this.conditions[e].role !== 'funder')
       this.conditions = pick(this.conditions, conditionKeys)
     }
-    
-    await this.fetchTargets()
 
-    // Handle deep links
-    if (this.hasDeepLink("#create")) this.handleNewTargetModal()
+    await this.fetchTargets()
 
     this.hasInitLoad = true
   },
@@ -961,7 +961,6 @@ export default {
         this.pagination.count = targets.count
       } catch (error) {
         this.errorMessage = await handleError(error)
-        throw error
       } finally {
         this.isLoading.fetch_targets = false
       }
