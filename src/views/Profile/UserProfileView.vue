@@ -227,72 +227,85 @@
             </div>
 
             <div
-              class="project-content"
+              class="project-content project-container"
               v-if="hasProject || hasTeam"
             >
-              <p
-                class="is-size-5"
-                v-if="hasProject"
+              <b-tabs
+                v-model="activeTab"
+                :animated="false"
+                type="is-boxed"
+                multiline
               >
-                <b>Project{{ userInfo.projects.length > 1 ? "s" : "" }}</b> <br>
-                <span
-                  v-for="(project, id) in userInfo.projects"
-                  :key="id"
-                  class="is-block project-item"
-                >
-                  <router-link
-                    :to="{ name: 'Project View', params: { id: project.id } }"
-                    target="_blank"
-                  >
-                    <b-icon icon="mdil-link" />
-                    {{ project.target.name.toUpperCase() }} ({{ project.target.type }}),
-                    <i>{{ project.target.organism }}</i>
-                  </router-link><br>
-                  <span class="has-text-grey is-size-6">Features: {{ project.features.join(", ") }}</span>
-                </span>
-              </p>
+                <b-tab-item v-if="hasProject">
+                  <template #header>
+                    <span> Projects <b-tag rounded> {{ userInfo.projects.length }} </b-tag> </span>
+                  </template>
 
-              <p
-                class="is-size-5"
-                v-if="hasTeam"
-              >
-                <b>Team{{ userInfo.teams.length > 1 ? "s" : "" }}</b> <br>
-                <span
-                  v-for="(team, id) in userInfo.teams"
-                  :key="id"
-                  class="is-block project-item"
-                >
-                  <router-link
-                    :to="{ name: 'Team View', params: { id: team.id } }"
-                    target="_blank"
-                  >
-                    <b-icon icon="mdil-link" />
-                    <span class="is-capitalized">{{ team.first_name + " " + team.last_name }},</span>
-                    {{ team.affiliation }}
-                  </router-link><br>
-                </span>
-              </p>
+                  <p class="is-size-5">
+                    <span
+                      v-for="(project, id) in userInfo.projects"
+                      :key="id"
+                      class="is-block project-item"
+                    >
+                      <router-link
+                        :to="{ name: 'Project View', params: { id: project.id } }"
+                        target="_blank"
+                      >
+                        <b-icon icon="mdil-link" />
+                        {{ project.target.name.toUpperCase() }} ({{ project.target.type }}),
+                        <i>{{ project.target.organism }}</i>
+                      </router-link><br>
+                      <span class="has-text-grey is-size-6">Features: {{ project.features.join(", ") }}</span>
+                    </span>
+                  </p>
+                </b-tab-item>
 
-              <p
-                class="is-size-5"
-                v-if="hasNomination"
-              >
-                <b>Nomination{{ userInfo.nominations.length > 1 ? "s" : "" }}</b> <br>
-                <span
-                  v-for="(nomination, id) in userInfo.nominations"
-                  :key="id"
-                  class="is-block project-item"
-                >
-                  <router-link
-                    :to="{ name: 'Nominations', query: { id: nomination.id } }"
-                    target="_blank"
-                  >
-                    <b-icon icon="mdil-link" />
-                    {{ nomination.target.name.toUpperCase() }} ({{ nomination.target.type }}),
-                    <i>{{ nomination.target.organism }}</i><br>
-                  </router-link>
-                </span>
-              </p>
+                <b-tab-item v-if="hasTeam">
+                  <template #header>
+                    <span> Teams <b-tag rounded> {{ userInfo.teams.length }} </b-tag> </span>
+                  </template>
+
+                  <p class="is-size-5">
+                    <span
+                      v-for="(team, id) in userInfo.teams"
+                      :key="id"
+                      class="is-block project-item"
+                    >
+                      <router-link
+                        :to="{ name: 'Team View', params: { id: team.id } }"
+                        target="_blank"
+                      >
+                        <b-icon icon="mdil-link" />
+                        <span class="is-capitalized">{{ team.first_name + " " + team.last_name }},</span>
+                        {{ team.affiliation }}
+                      </router-link><br>
+                    </span>
+                  </p>
+                </b-tab-item>
+
+                <b-tab-item v-if="hasNomination">
+                  <template #header>
+                    <span> Nominations <b-tag rounded> {{ userInfo.nominations.length }} </b-tag> </span>
+                  </template>
+
+                  <p class="is-size-5">
+                    <span
+                      v-for="(nomination, id) in userInfo.nominations"
+                      :key="id"
+                      class="is-block project-item"
+                    >
+                      <router-link
+                        :to="{ name: 'Nominations', query: { id: nomination.id } }"
+                        target="_blank"
+                      >
+                        <b-icon icon="mdil-link" />
+                        {{ nomination.target.name.toUpperCase() }} ({{ nomination.target.type }}),
+                        <i>{{ nomination.target.organism }}</i><br>
+                      </router-link>
+                    </span>
+                  </p>
+                </b-tab-item>
+              </b-tabs>
             </div>
           </div>
         </div>
@@ -372,6 +385,7 @@ function initialState (){
     isDisabled: {
       resend_email: false
     },
+    activeTab: 0,
     errorMessage: "",
     isRoleBeingReviewed: false,
     hasInitLoad: false,
@@ -510,6 +524,12 @@ export default {
   }
 }
 </script>
+
+<style lang="sass">
+.project-container
+  ul
+    margin: 0 !important
+</style>
 
 <style lang="sass" scoped>
 @import "@/assets/style/variables.sass"

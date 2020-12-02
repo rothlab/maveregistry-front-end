@@ -136,11 +136,13 @@
               v-slot="props"
               cell-class="vertical-center"
             >
+              <a :href="`mailto:${props.row.email}`">
+                <b-icon icon="mdil-email" />
+              </a>
               <span class="is-capitalized">
                 {{ props.row.first_name }} {{ props.row.last_name }}
               </span>
             </b-table-column>
-
             <!-- Creation Date -->
             <b-table-column
               field="creation_date"

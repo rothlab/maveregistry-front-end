@@ -43,7 +43,10 @@
               </template>
 
               <!-- Search and pagination function -->
-              <div class="level is-mobile">
+              <div
+                class="level is-mobile"
+                v-if="requestPagination.count > 0"
+              >
                 <div class="level-left">
                   <b-input
                     v-model="requestKeyword"
@@ -56,11 +59,14 @@
 
                 <div class="level-right">
                   <b-pagination
-                    :total="requests.length"
+                    :total="requestPagination.count"
+                    :per-page="requestPagination.limit"
+                    :current.sync="requestPagination.current"
                     icon-pack="mdil"
                     icon-prev="chevron-left"
                     order="is-right"
                     simple
+                    @change="handleFetch()"
                   />
                 </div>
               </div>
@@ -159,7 +165,10 @@
               </template>
 
               <!-- Search and pagination function -->
-              <div class="level is-mobile">
+              <div
+                class="level is-mobile"
+                v-if="funderPagination.count > 0"
+              >
                 <div class="level-left">
                   <b-input
                     v-model="funderKeyword"
@@ -172,10 +181,13 @@
 
                 <div class="level-right">
                   <b-pagination
-                    :total="funders.length"
+                    :total="funderPagination.count"
+                    :per-page="funderPagination.limit"
+                    :current.sync="funderPagination.current"
                     icon-pack="mdil"
                     icon-prev="chevron-left"
                     order="is-right"
+                    @change="handleFetch()"
                     simple
                   />
                 </div>
@@ -298,7 +310,8 @@ export default {
       }
 
       if (val) {
-        await this.handleFetch(true)
+        // If no requests, switch to existing funders
+        this.activeTab = await this.handleFetch(true)
       }
     }
   },
@@ -311,12 +324,12 @@ export default {
       },
       funderPagination: {
         count: 0,
-        limit: 10,
+        limit: 5,
         current: 1
       },
       requestPagination: {
         count: 0,
-        limit: 10,
+        limit: 5,
         current: 1
       },
       activeTab: 0,
@@ -336,6 +349,9 @@ export default {
       try {
         if (all || this.activeTab === 0) await this.fetchFunderRequests()
         if (all || this.activeTab === 1) await this.fetchFunders()
+
+        if (this.requests.length < 1) return 1
+        return 0
       } catch (error) {
         await displayErrorToast(error)
       } finally {
