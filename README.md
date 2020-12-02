@@ -84,6 +84,6 @@ The Service uses [GitHub Actions](https://github.com/features/actions) to monito
 
 ## Contact me
 
-Please feel free to [contact me](kvn.kuang@mail.utoronto.ca) if you still have questions.
+Please feel free to [contact me](mailto:kvn.kuang@mail.utoronto.ca) if you still have questions.
 
 This manual was last updated on 2020-11-30.
