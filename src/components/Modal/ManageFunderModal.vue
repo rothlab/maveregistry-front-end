@@ -298,7 +298,8 @@ export default {
       }
 
       if (val) {
-        await this.handleFetch(true)
+        // If no requests, switch to existing funders
+        this.activeTab = await this.handleFetch(true)
       }
     }
   },
@@ -336,6 +337,9 @@ export default {
       try {
         if (all || this.activeTab === 0) await this.fetchFunderRequests()
         if (all || this.activeTab === 1) await this.fetchFunders()
+
+        if (this.requests.length < 1) return 1
+        return 0
       } catch (error) {
         await displayErrorToast(error)
       } finally {
