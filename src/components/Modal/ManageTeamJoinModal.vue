@@ -36,7 +36,9 @@
 
           <div class="level-right">
             <b-pagination
-              :total="filteredRequests.length"
+              :total="pagination.total"
+              :per-page="pagination.limit"
+              :current.sync="pagination.current"
               icon-pack="mdil"
               icon-prev="chevron-left"
               order="is-right"
@@ -48,7 +50,7 @@
         <div v-if="filteredRequests.length > 0">
           <div
             class="media"
-            v-for="(request, id) in filteredRequests"
+            v-for="(request, id) in filteredRequests.slice((pagination.current - 1) * pagination.limit, pagination.current * pagination.limit)"
             :key="id"
           >
             <figure class="media-left">
@@ -172,7 +174,9 @@ export default {
         this.isActive = val
       }
 
-      if (val) this.filteredRequests = this.requests
+      if (val) {
+        this.filterByName("")
+      }
     },
     requests() {
       this.filterByName(this.keyword)
@@ -185,6 +189,11 @@ export default {
         list: false,
         submit: false
       },
+      pagination: {
+        total: 0,
+        limit: 5,
+        current: 1
+      },
       filteredRequests: [],
       keyword: "",
       isConfirmDeleteModalActive: false,
@@ -193,17 +202,21 @@ export default {
   },
   methods: {
     async filterByName(keyword) {
-      if (keyword === "") {
-        this.keyword = ""
+      // reset pagination
+      this.pagination.current = 1
+
+      this.keyword = keyword.toLowerCase()
+      
+      if (keyword) {
         this.filteredRequests = this.requests
       } else {
-        keyword = keyword.toLowerCase()
-        this.keyword = keyword
         this.filteredRequests = this.requests.filter((request) => {
           const member = request.member
-          return member.first_name.startsWith(keyword) || member.last_name.startsWith(keyword)
+          return member.first_name.startsWith(this.keyword) || member.last_name.startsWith(this.keyword)
         })
       }
+
+      this.pagination.total = this.filteredRequests.length
     },
     trimKeyword(string, keyword) {
       if (keyword.length <= 0 || !string.startsWith(keyword)) return string.slice(0,1).toUpperCase() + string.slice(1)

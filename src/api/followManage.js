@@ -153,7 +153,7 @@ export async function setEditRole(id, canEdit) {
   }
 }
 
-export async function fetchFollows(target, type, request = false, limit = 10, skip = 0) {
+export async function fetchFollows(target, type, request = false, keyword = "", pagination = undefined) {
   const query = new Parse.Query(Follow)
   query.equalTo("type", type)
   query.equalTo("target", target)
@@ -162,9 +162,24 @@ export async function fetchFollows(target, type, request = false, limit = 10, sk
   } else {
     query.exists("approvedAt")
   }
-  query.limit(limit)
-  query.skip(skip)
-  query.withCount() // include total amount of targets in the DB
+
+  // If keyword set, filter by first and last name
+  if (keyword) {
+    const firstNameQuery = new Parse.Query(Parse.User)
+    const lastNameQuery = new Parse.Query(Parse.User)
+    firstNameQuery.startsWith("first_name", keyword)
+    lastNameQuery.startsWith("last_name", keyword)
+    const userQuery =  Parse.Query.or(firstNameQuery, lastNameQuery)
+    query.matchesQuery("by", userQuery)
+  }
+
+  // If pagination set
+  if (pagination) {
+    query.limit(pagination.limit)
+    query.skip((pagination.current - 1) * pagination.limit)
+  }
+
+  query.withCount()
   let follows = await query.find()
   follows.results = await Promise.all(follows.results.map(e => e.format()))
 

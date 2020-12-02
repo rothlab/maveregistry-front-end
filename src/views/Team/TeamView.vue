@@ -263,9 +263,24 @@
               class="project-header"
               v-if="hasProject"
             >
-              <p class="is-size-4 has-text-weight-bold">
-                Projects
-              </p>
+              <div class="level is-mobile">
+                <div class="level-left">
+                  <p class="is-size-4 has-text-weight-bold">
+                    Projects
+                  </p>
+                </div>
+                <div class="level-right">
+                  <b-pagination
+                    :total="pagination.total"
+                    :per-page="pagination.limit"
+                    :current.sync="pagination.current"
+                    icon-pack="mdil"
+                    icon-prev="chevron-left"
+                    order="is-right"
+                    simple
+                  />
+                </div>
+              </div>
             </div>
 
             <div
@@ -274,7 +289,7 @@
             >
               <p
                 class="is-size-5"
-                v-for="(project, id) in projects"
+                v-for="(project, id) in projects.slice((pagination.current - 1) * pagination.limit, pagination.current * pagination.limit)"
                 :key="id"
               >
                 <b class="is-capitalized">
@@ -600,6 +615,11 @@ export default {
       invitationMessage: "",
       collaborators: [],
       projects: [],
+      pagination: {
+        total: 0,
+        limit: 5,
+        current: 1
+      },
       updatedDate: new Date(),
       creator: {},
       errorMessage: "",
@@ -699,6 +719,7 @@ export default {
       // Format projects and collaborators
       if (team.projects) {
         this.projects = team.projects
+        this.pagination.total = this.projects.length
         const collaborators = team.projects.map(e => e.collaborators).filter(Boolean)
         if (collaborators.length > 0) this.collaborators = [].concat.apply([], collaborators)
       }

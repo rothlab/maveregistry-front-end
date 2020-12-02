@@ -3,7 +3,6 @@
     :active.sync="isActive"
     :can-cancel="['escape', 'outside']"
     :width="600"
-    @close="followers = {}"
     class="card-modal"
   >
     <div class="card">      
@@ -24,142 +23,152 @@
           </div>
         </header>
 
-        <!-- Search and pagination function -->
-        <div class="level is-mobile">
-          <div class="level-left">
-            <b-input
-              type="search"
-              icon="mdil-magnify"
-              :placeholder="`Search ${classText}s`"
-              :loading="isLoading.page"
-              @input="filterByName"
-            />
+        <div>
+          <b-loading
+            :is-full-page="false"
+            v-model="isLoading.page"
+          />
+
+          <!-- Search and pagination function -->
+          <div class="level is-mobile">
+            <div class="level-left">
+              <b-input
+                v-model="keyword"
+                type="search"
+                icon="mdil-magnify"
+                :placeholder="`Search ${classText}s`"
+                @input="fetchFollowers"
+              />
+            </div>
+
+            <div class="level-right">
+              <b-pagination
+                :total="pagination.total ? pagination.total : 0"
+                :per-page="pagination.limit"
+                :current.sync="pagination.current"
+                icon-pack="mdil"
+                icon-prev="chevron-left"
+                order="is-right"
+                simple
+                @change="fetchFollowers"
+              />
+            </div>
           </div>
 
-          <div class="level-right">
-            <b-pagination
-              :total="filteredFollowers.count ? filteredFollowers.count : 0"
-              icon-pack="mdil"
-              icon-prev="chevron-left"
-              order="is-right"
-              simple
-            />
-          </div>
-        </div>
-
-        <div v-if="filteredFollowers.count && filteredFollowers.count > 0">
-          <div
-            class="media"
-            v-for="(follower, id) in filteredFollowers.results"
-            :key="id"
-          >
-            <figure class="media-left">
-              <p class="image is-48x48">
-                <img
-                  class="is-rounded"
-                  :src="getProfileImageFromUser(follower.by)"
-                >
-              </p>
-            </figure>
-            <div class="media-content">
-              <div class="content">
-                <p>
-                  <!-- Add highlighting when a keyword is given -->
-                  <b><mark class="is-capitalized">{{ follower.by.first_name.startsWith(keyword) ? keyword : '' }}</mark>{{ trimKeyword(follower.by.first_name, keyword) }} </b>
-                  <b><mark class="is-capitalized">{{ follower.by.last_name.startsWith(keyword) ? keyword : '' }}</mark>{{ trimKeyword(follower.by.last_name, keyword) }} </b>
-                  <small>{{ follower.create_date.toLocaleString() }}</small><br>
-                  <b-icon icon="mdil-comment-text" />{{ follower.reason }}
-                  <span
-                    v-if="follower.can_edit"
-                    class="has-text-danger"
-                    style="font-size: 13px"
+          <div v-if="followers && followers.length > 0">
+            <div
+              class="media"
+              v-for="(follower, id) in followers"
+              :key="id"
+            >
+              <figure class="media-left">
+                <p class="image is-48x48">
+                  <img
+                    class="is-rounded"
+                    :src="getProfileImageFromUser(follower.by)"
                   >
-                    <br>
-                    <b-icon
-                      icon="mdil-alert"
-                      custom-size="mdil-18px"
-                    />
-                    <span v-if="isRequest">If approved, {{ capitalize(follower.by.first_name) }} will be able to edit this project.</span>
-                    <span v-else>{{ capitalize(follower.by.first_name) }} can edit this project.</span>
-                  </span>
                 </p>
+              </figure>
+              <div class="media-content">
+                <div class="content">
+                  <p>
+                    <!-- Add highlighting when a keyword is given -->
+                    <b><mark class="is-capitalized">{{ follower.by.first_name.startsWith(keyword) ? keyword : '' }}</mark>{{ trimKeyword(follower.by.first_name, keyword) }} </b>
+                    <b><mark class="is-capitalized">{{ follower.by.last_name.startsWith(keyword) ? keyword : '' }}</mark>{{ trimKeyword(follower.by.last_name, keyword) }} </b>
+                    <small>{{ follower.create_date.toLocaleString() }}</small><br>
+                    <b-icon icon="mdil-comment-text" />{{ follower.reason }}
+                    <span
+                      v-if="follower.can_edit"
+                      class="has-text-danger"
+                      style="font-size: 13px"
+                    >
+                      <br>
+                      <b-icon
+                        icon="mdil-alert"
+                        custom-size="mdil-18px"
+                      />
+                      <span v-if="isRequest">If approved, {{ capitalize(follower.by.first_name) }} will be able to edit this project.</span>
+                      <span v-else>{{ capitalize(follower.by.first_name) }} can edit this project.</span>
+                    </span>
+                  </p>
+                </div>
               </div>
-            </div>
-            <div class="media-right">
-              <div class="has-text-right action-buttons v-centered">
-                <!-- View Profile -->
-                <b-tooltip
-                  label="View Profile"
-                  type="is-dark"
-                >
-                  <b-button
-                    tag="router-link"
-                    icon-right="mdil-eye mdil-18px"
-                    type="is-info"
-                    outlined
-                    :to="{ name: 'User Profile View', params: { username: follower.by.username } }"
-                    target="_blank"
-                  />
-                </b-tooltip>
+              <div class="media-right">
+                <div class="has-text-right action-buttons v-centered">
+                  <!-- View Profile -->
+                  <b-tooltip
+                    label="View Profile"
+                    type="is-dark"
+                  >
+                    <b-button
+                      tag="router-link"
+                      icon-right="mdil-eye mdil-18px"
+                      type="is-info"
+                      outlined
+                      :to="{ name: 'User Profile View', params: { username: follower.by.username } }"
+                      target="_blank"
+                    />
+                  </b-tooltip>
 
-                <!-- Approve -->
-                <b-tooltip
-                  label="Approve"
-                  type="is-dark"
-                >
-                  <b-button
-                    icon-right="mdil-check mdil-18px"
-                    type="is-success"
-                    outlined
-                    @click="approveFollower(follower.id, follower.can_edit)"
-                    :loading="isLoading.action"
-                  />
-                </b-tooltip>
+                  <!-- Approve -->
+                  <b-tooltip
+                    label="Approve"
+                    type="is-dark"
+                  >
+                    <b-button
+                      icon-right="mdil-check mdil-18px"
+                      type="is-success"
+                      outlined
+                      @click="approveFollower(follower.id, follower.can_edit)"
+                      :loading="isLoading.action"
+                    />
+                  </b-tooltip>
 
-                <!-- Remove -->
-                <b-tooltip
-                  label="Remove"
-                  type="is-dark"
+                  <!-- Remove -->
+                  <b-tooltip
+                    label="Remove"
+                    type="is-dark"
+                  >
+                    <b-button
+                      icon-right="mdil-delete mdil-18px"
+                      type="is-danger"
+                      outlined
+                      @click="deleteId = follower.id; isConfirmDeleteModalActive = true"
+                      :loading="isLoading.action"
+                    />
+                  </b-tooltip>
+                </div>
+
+                <b-select
+                  size="is-small"
+                  icon="mdil-pencil"
+                  expanded
+                  v-model="follower.can_edit"
+                  :loading="isSettingFollower === id"
+                  :disabled="isSettingFollower === id"
+                  @input="setEditRole(follower.id, follower.can_edit, id)"
                 >
-                  <b-button
-                    icon-right="mdil-delete mdil-18px"
-                    type="is-danger"
-                    outlined
-                    @click="deleteId = follower.id; isConfirmDeleteModalActive = true"
-                    :loading="isLoading.action"
-                  />
-                </b-tooltip>
+                  <option :value="false">
+                    Viewer
+                  </option>
+                  <option :value="true">
+                    Editor
+                  </option>
+                </b-select>
               </div>
-
-              <b-select
-                size="is-small"
-                icon="mdil-pencil"
-                expanded
-                v-model="follower.can_edit"
-                :loading="isSettingFollower === id"
-                :disabled="isSettingFollower === id"
-                @input="setEditRole(follower.id, follower.can_edit, id)"
-              >
-                <option :value="false">
-                  Viewer
-                </option>
-                <option :value="true">
-                  Editor
-                </option>
-              </b-select>
             </div>
           </div>
-        </div>
 
-        <!-- Nothing found -->
-        <div
-          v-else
-          class="has-text-centered content"
-        >
-          <p class="has-text-grey">
-            <b-icon icon="mdil-information" />
-            No {{ classText }} found{{ keyword.length > 0 ? ` with first or last name starting with "${keyword}".` : '.' }}
-          </p>
+          <!-- Nothing found -->
+          <div
+            v-else
+            class="has-text-centered content"
+          >
+            <p class="has-text-grey">
+              <b-icon icon="mdil-information" />
+              No {{ classText }} found{{ keyword.length > 0 ? ` with first or last name starting with "${keyword}".` : '.' }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -214,7 +223,8 @@ export default {
 
       // Fetch followers if active
       if (val) {
-        this.filteredFollowers = {}
+        this.followers = []
+        this.keyword = ""
         this.fetchFollowers()
       }
     },
@@ -232,8 +242,12 @@ export default {
         action: false
       },
       isSettingFollower: -1,
-      followers: {},
-      filteredFollowers: {} ,
+      followers: [],
+      pagination: {
+        total: 0,
+        limit: 2,
+        current: 1
+      },
       keyword: "",
       isConfirmDeleteModalActive: false,
       deleteId: undefined
@@ -243,32 +257,17 @@ export default {
     async fetchFollowers() {
       this.isLoading.page = true
 
+      // If keyword set, reset pagination
+      if (this.keyword) this.pagination.current = 1
+
       try {
-        this.followers = await FollowManage.fetchFollows(this.target, this.type, this.isRequest)
-        this.filteredFollowers = this.followers
+        const followers = await FollowManage.fetchFollows(this.target, this.type, this.isRequest, this.keyword.toLowerCase(), this.pagination)
+        this.followers = followers.results
+        this.pagination.total = followers.count
       } catch (error) {
         await displayErrorToast(error)
       } finally {
         this.isLoading.page = false
-      }
-    },
-    async filterByName(keyword) {
-      if (keyword === "") {
-        this.filteredFollowers = this.followers
-        this.keyword = ""
-      } else {
-        this.isLoading.page = true
-
-        this.keyword = keyword.toLowerCase()
-
-        // Fetch followers
-        try {
-          this.filteredFollowers = await FollowManage.queryByName(this.target, this.type, this.keyword)
-        } catch (error) {
-          await displayErrorToast(error)
-        } finally {
-          this.isLoading.page = false
-        }
       }
     },
     trimKeyword(string, keyword) {
