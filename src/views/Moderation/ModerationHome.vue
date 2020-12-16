@@ -454,7 +454,7 @@
 <script>
 import Error from '@/components/Error.vue'
 import ManageFunderModal from '@/components/Modal/ManageFunderModal.vue'
-import * as ModerationHandler from "@/api/moderationHandler.js"
+import * as ModerationManage from "@/api/moderationManage.js"
 import * as FunderManage from "@/api/funderManage.js"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 
@@ -515,7 +515,7 @@ export default {
 
       try {
         // Load users
-        const response = await ModerationHandler.listUsers(this.userFilter, this.userPagination.limit, skip)
+        const response = await ModerationManage.listUsers(this.userFilter, this.userPagination.limit, skip)
         this.users = response.results
         this.userPagination.count = response.count
       } catch (error) {
@@ -543,7 +543,7 @@ export default {
 
       try {
         // Load projects
-        const response = await ModerationHandler.listProjects(this.projectFilter, this.projectPagination.limit, skip)
+        const response = await ModerationManage.listProjects(this.projectFilter, this.projectPagination.limit, skip)
         this.projects = response.results
         this.projectPagination.count = response.count
       } catch (error) {
@@ -554,7 +554,7 @@ export default {
     },
     async blockUnblockUser(user, state) {
       try {
-        await ModerationHandler.blockUnblockUser(user.id, state)
+        await ModerationManage.blockUnblockUser(user.id, state)
 
         // Confirmation
         this.$buefy.toast.open({
@@ -572,7 +572,7 @@ export default {
     },
     async grantModeratorRole(user, state) {
       try {
-        await ModerationHandler.grantModeratorRole(user.id, state)
+        await ModerationManage.grantModeratorRole(user.id, state)
 
         // Confirmation
         this.$buefy.toast.open({

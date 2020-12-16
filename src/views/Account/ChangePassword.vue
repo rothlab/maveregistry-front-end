@@ -101,7 +101,7 @@ export default {
     return {
       isActionLoading: false,
       password: "",
-      apiEndPoint: Parse.serverURL + '/apps/' + Parse.applicationId + '/request_password_reset'
+      apiEndPoint: Parse.serverURL + 'apps/' + Parse.applicationId + '/request_password_reset'
     }
   },
   mounted() {
