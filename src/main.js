@@ -5,8 +5,8 @@ import Buefy from 'buefy'
 
 // Import plugins
 import "@/assets/script/field_validation_rules.js"
-import * as Sentry from '@sentry/browser';
-import { Vue as VueIntegration } from '@sentry/integrations';
+import * as Sentry from '@sentry/vue'
+import { Integrations } from "@sentry/tracing"
 import VueAnimate from 'vue-animate-scroll'
 import VueScrollactive from 'vue-scrollactive'
 import VueScrollTo from 'vue-scrollto'
@@ -34,12 +34,18 @@ Vue.config.productionTip = false
 
 // Initialize Sentry
 Sentry.init({
+  Vue: Vue,
   dsn: process.env.NODE_ENV === "development" ? '' : 'https://937e133d79854ca7a2301bbaa9aa8a36@o239664.ingest.sentry.io/5266396',
-  integrations: [new VueIntegration({
-    Vue,
-    attachProps: true,
-    logErrors: true
-  })],
+  logErrors: true,
+  integrations: [
+    new Integrations.BrowserTracing({
+      tracingOrigins: ["localhost", "api.registry.varianteffect.org"],
+    }),
+  ],
+  tracingOptions: {
+    trackComponents: true,
+  },
+  tracesSampleRate: 1,
   release: 'mave-registry-frontend@' + process.env.VUE_APP_VERSION
 });
 // Report vuex states
