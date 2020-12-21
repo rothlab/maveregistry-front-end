@@ -369,7 +369,8 @@
             cell-class="is-capitalized vertical-center"
             v-slot="props"
           >
-            {{ props.row.type }}
+            <span v-if="props.row.type === 'Gene'">Gene</span>
+            <span v-else>Other</span>
           </b-table-column>
 
           <!-- Target species -->
@@ -387,7 +388,7 @@
             field="team"
             label="Team"
             v-slot="props"
-            width="12vw"
+            width="10vw"
             cell-class="vertical-center"
           >
             <div
@@ -424,8 +425,7 @@
             field="projects"
             label="Project"
             v-slot="props"
-            width="40vw"
-            cell-class="vertical-center"
+            width="35vw"
           >
             <div class="has-text-left">
               <!-- If not member, show this panel to indicate that nothing is available -->

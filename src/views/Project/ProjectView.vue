@@ -257,26 +257,38 @@
                 <router-link
                   :to="{ path: '/projects', query: { 
                     type: target.type,
-                    name: target.name,
-                    organism: target.organism}}"
+                    name: target.name}}"
                   target="_blank"
                 >
                   <span class="is-capitalized">
-                    {{ target.name.toUpperCase() }} ({{ target.type }}),
-                  </span>
-                  <span class="is-italic">
-                    {{ target.organism }}
+                    {{ target.name.toUpperCase() }} ({{ target.type }})
                   </span>
                 </router-link>
                 <br>
               </p>
               <p
                 class="is-size-5"
+                v-if="target"
+              >
+                <b>Organism</b> <br>
+                <b-icon icon="mdil-circle" />
+                <router-link
+                  :to="{ path: '/projects', query: { 
+                    organism: target.organism}}"
+                  target="_blank"
+                >
+                  <span class="is-italic">
+                    {{ target.organism }}
+                  </span>
+                </router-link>
+              </p>
+              <p
+                class="is-size-5"
                 v-if="features && features.length > 0"
               >
-                <b>Feature</b> <br>
+                <b>Feature{{ features.length > 1 ? 's' : '' }}</b> <br>
                 <b-icon icon="mdil-tag" />
-                {{ features.join(",") }}
+                {{ features.join(", ") }}
               </p>
               <p
                 class="is-size-5"
