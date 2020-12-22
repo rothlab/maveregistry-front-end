@@ -388,7 +388,6 @@
             field="team"
             label="Team"
             v-slot="props"
-            width="10vw"
             cell-class="vertical-center"
           >
             <div
@@ -425,7 +424,6 @@
             field="projects"
             label="Project"
             v-slot="props"
-            width="35vw"
           >
             <div class="has-text-left">
               <!-- If not member, show this panel to indicate that nothing is available -->

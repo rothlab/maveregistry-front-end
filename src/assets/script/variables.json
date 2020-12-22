@@ -11,7 +11,8 @@
     "C. elegans",
     "D. melanogaster",
     "D. rerio",
-    "M. musculus"
+    "M. musculus",
+    "Other"
   ],
   "genomic_features": [
     "5’ UTR",
