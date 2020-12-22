@@ -45,7 +45,7 @@ Sentry.init({
   tracingOptions: {
     trackComponents: true,
   },
-  tracesSampleRate: 1,
+  tracesSampleRate: 0.5,
   release: 'mave-registry-frontend@' + process.env.VUE_APP_VERSION
 });
 // Report vuex states
