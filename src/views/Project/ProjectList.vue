@@ -423,6 +423,7 @@
           <b-table-column
             field="projects"
             label="Project"
+            width="33vw"
             v-slot="props"
           >
             <div class="has-text-left">
