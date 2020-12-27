@@ -166,6 +166,7 @@ export const Project = Parse.Object.extend("Project", {
     const creator = this.get("creator")
     if (creator && creator.isDataAvailable()) {
       ret.creator = {
+        id: creator.id,
         username: creator.get("username"),
         first_name: creator.get("first_name"),
         last_name: creator.get("last_name"),

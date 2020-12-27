@@ -2,25 +2,20 @@
   <div>
     <!-- Transfer ownership -->
     <b-button
-      v-if="isOwner && !transfer"
-      type="is-light"
+      v-if="isOwner"
+      :type="hasAction ? 'is-warning' : 'is-light'"
       icon-left="mdil-repeat"
       @click="isTransferOwnershipModalActive = true"
       expanded
     >
-      Transfer Ownership
+      Change Ownership
+      <span v-if="hasAction">
+        <small>(Action Required)</small>
+      </span>
     </b-button>
+
     <b-button
-      v-else-if="isOwner && transfer"
-      type="is-warning"
-      icon-left="mdil-repeat-off"
-      @click="isCancelTransferOwnershipModalActive = true"
-      expanded
-    >
-      Cancel Ownership Transfer
-    </b-button>
-    <b-button
-      v-else-if="hasLoggedIn && !isOwner && transfer"
+      v-else-if="isMember && transfer"
       type="is-warning"
       icon-left="mdil-repeat"
       @click="isReviewTransferOwnershipModalActive = true"
@@ -31,27 +26,22 @@
 
     <!-- Transfer ownership modal -->
     <TransferOwnershipModal
-      v-if="isOwner && !transfer"
+      v-if="isOwner"
       :active.sync="isTransferOwnershipModalActive"
       :type="type"
       :target-id="targetId"
-      @transfer="(e) => transfer = e"
-    />
-
-    <!-- Cancel ownership transfer modal -->
-    <CancelTransferModal
-      v-if="isOwner && transfer"
-      :active.sync="isCancelTransferOwnershipModalActive"
       :transfer="transfer"
-      @transfer="transfer = undefined; isCancelTransferOwnershipModalActive = false"
+      :requests="requests"
+      @transfer="emitTransfer"
+      @refresh="fetchRecords"
     />
 
     <!-- Cancel ownership transfer modal -->
     <ReviewTransferModal
-      v-if="hasLoggedIn && !isOwner && transfer"
+      v-else-if="isMember && transfer"
       :active.sync="isReviewTransferOwnershipModalActive"
       :transfer="transfer"
-      @transfer="loadPage(); transfer = undefined; isReviewTransferOwnershipModalActive = false"
+      @transfer="loadPage(); transfer = undefined"
     />
   </div>
 </template>
@@ -59,13 +49,11 @@
 <script>
 import * as TransferManage from "@/api/transferManage.js"
 import TransferOwnershipModal from '@/components/Modal/TransferOwnershipModal.vue'
-import CancelTransferModal from '@/components/Modal/CancelTransferModal.vue'
 import ReviewTransferModal from '@/components/Modal/ReviewTransferModal.vue'
 
 export default {
   components: {
     TransferOwnershipModal,
-    CancelTransferModal,
     ReviewTransferModal
   },
   props: {
@@ -86,39 +74,53 @@ export default {
       required: true
     }
   },
-  watch: {
-    transfer(val) {
-      this.$emit("has-transfer", !!val)
+  computed: {
+    hasAction() {
+      return this.transfer || this.requests.length > 0
     }
   },
   data() {
     return {
       isTransferOwnershipModalActive: false,
-      isCancelTransferOwnershipModalActive: false,
       isReviewTransferOwnershipModalActive: false,
-      transfer: undefined
+      transfer: undefined,
+      requests: []
     }
   },
   async mounted() {
     if (this.hasLoggedIn) {
       // Fetch pending transfer
-      await this.fetchTransfer()
+      await this.fetchRecords()
 
       // Open review transfer modal
-      if (this.hasDeepLink("#review-transfer-request") && this.transfer)
+      if (this.transfer && this.hasDeepLink("#review-transfer-request"))
         this.isReviewTransferOwnershipModalActive = true
       
-      this.$emit("has-transfer", !!this.transfer)
+      if (this.hasDeepLink("#review-ownership-request"))
+        this.isTransferOwnershipModalActive = true
     }
   },
   methods: {
-    async fetchTransfer() {
+    async fetchRecords() {
+      // Init related variables
+      this.transfer = undefined
+      this.requests = []
+
       const target = {
         type: this.type,
         id: this.targetId
       }
 
-      this.transfer = await TransferManage.fetchTransfer("owner", target, this.isOwner)
+      const records = await TransferManage.fetchTransfer(undefined, target, this.isOwner)
+
+      // Get transfer and requests
+      records.map((record) => {
+        if (record.type === "owner") this.transfer = record
+        if (record.type === "request") this.requests.push(record)
+      })
+    },
+    emitTransfer() {
+      this.$emit("transfer")
     }
   }
 }
