@@ -352,7 +352,7 @@
 
             <div
               class="project-header"
-              v-if="hasActions"
+              v-if="isMember"
             >
               <p class="is-size-4 has-text-weight-bold">
                 Actions
@@ -361,26 +361,22 @@
 
             <div
               class="project-content action-buttons"
-              v-if="hasActions"
+              v-if="isMember"
             >
               <TransferAction
                 type="project"
                 :load-page="loadPage"
                 :is-owner="isOwner"
                 :target-id="projectId"
-                @has-transfer="(e) => hasTransfer = e"
+                @transfer="loadPage"
                 style="margin-bottom: 0.5rem"
               />
-              <b-button
-                v-if="isModerator && !isOwner"
-                icon-left="mdil-trophy"
-                type="is-light"
-                expanded
-                @click="isConfirmObtainOnwershipModalActive = true"
-                style="margin-bottom: 0.5rem"
-              >
-                Obtain Ownership
-              </b-button>
+              <ReuqestOwnershipAction
+                type="project"
+                :target-id="projectId"
+                :on-action="obtainProject"
+                :is-owner="isOwner"
+              />
               <b-button
                 v-if="isOwner"
                 icon-left="mdil-delete"
@@ -403,18 +399,6 @@
         type="project"
         @change="fetchFollowerAndRequestCount(projectId)"
       />
-
-      <!-- Obtain ownership modal -->
-      <ConfirmDangerModal
-        :active.sync="isConfirmObtainOnwershipModalActive"
-        type="project"
-        action="obtain"
-        :on-action="obtainProject"
-      >
-        <p style="margin: 1rem 0">
-          The current owner will not be notified.
-        </p>
-      </ConfirmDangerModal>
 
       <!-- Confirm Delete Modal -->
       <ConfirmDangerModal
@@ -445,11 +429,13 @@
 <script>
 import * as ProjectManage from "@/api/projectManage.js"
 import * as FollowManage from "@/api/followManage.js"
+import * as TransferManage from "@/api/transferManage.js"
 import { handleError } from "@/api/errorHandler.js"
 import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
 import TransferAction from '@/components/Action/TransferAction.vue'
+import ReuqestOwnershipAction from '@/components/Action/RequestOwnershipAction.vue'
 import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
 
 const variables = require("@/assets/script/variables.json")
@@ -461,6 +447,7 @@ export default {
     ManageFollowerModal,
     FollowButtonAction,
     TransferAction,
+    ReuqestOwnershipAction,
     ConfirmDangerModal,
   },
   data() {
@@ -471,7 +458,6 @@ export default {
       hasProject: false,
       isManageFollowerModalActive: false,
       isConfirmDeleteModalActive: false,
-      isConfirmObtainOnwershipModalActive: false,
       followStatus: undefined,
       isRequest: false,
       errorMessage: "",
@@ -487,7 +473,6 @@ export default {
       activities: [],
       followerCount: 0,
       requestCount: 0,
-      hasTransfer: true, // Default set to true so that the trasfer action can load
       hasInitLoad: false
     }
   },
@@ -500,9 +485,6 @@ export default {
     },
     hasActivity() {
       return this.activities.length > 0
-    },
-    hasActions() {
-      return this.hasLoggedIn && (!!this.hasTransfer || this.isOwner || this.isModerator)
     },
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
@@ -604,7 +586,17 @@ export default {
         return months[startDate.getMonth()] + " " + startDate.getFullYear() + " - " + months[endDate.getMonth()] + " " + endDate.getFullYear()
     },
     async obtainProject() {
-      await ProjectManage.obtainProject(this.projectId)
+      // If moderator, obtain project
+      if (this.isModerator) {
+        await ProjectManage.obtainProject(this.projectId)
+      } else {
+        const target = {
+          type: "project",
+          id: this.projectId
+        }
+        await TransferManage.requestOwnership(target, this.creator.id)
+      }
+
       await this.loadPage()
     },
     async deleteProject() {

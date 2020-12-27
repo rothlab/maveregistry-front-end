@@ -10,7 +10,7 @@
         <!-- Header -->
         <div class="level is-mobile">
           <div class="level-left">
-            <p class="is-size-5 has-text-primary is-capitalized">
+            <p class="is-size-5 has-text-danger is-capitalized">
               {{ `${action} ${type}` }}
             </p>
           </div>
@@ -38,7 +38,7 @@
             <div class="media-content">
               <div class="content">
                 <p>
-                  Are you sure you want to {{ action }} this {{ type }}? <br>
+                  Are you sure you want to {{ action }} the {{ type }}? <br>
                   <b v-if="isIrreversible">This action is not reversible.</b>
                 </p>
               </div>

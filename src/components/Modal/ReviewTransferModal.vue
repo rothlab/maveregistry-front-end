@@ -1,7 +1,7 @@
 <template>
   <b-modal
     :active.sync="isActive"
-    :width="600"
+    :width="500"
     class="card-modal"
   >
     <div class="card">
@@ -28,7 +28,7 @@
             <div class="media-left">
               <AlertCircleIcon
                 decorative
-                class="has-text-warning icon-48px"
+                class="has-text-primary icon-48px"
               />
             </div>
             <div class="media-content">
@@ -65,13 +65,19 @@
 
         <div class="buttons footer-actions">
           <b-button
-            @click="isActive = false"
+            :loading="isLoading"
+            type="is-danger"
+            outlined
+            @click="declineTransfer"
+            icon-left="mdil-cancel"
           >
-            Dismiss
+            Decline
           </b-button>
           <b-button
             :loading="isLoading"
-            type="is-warning"
+            outlined
+            type="is-success"
+            icon-left="mdil-check"
             @click="acceptTransfer"
           >
             Accept Transfer
@@ -125,11 +131,10 @@ export default {
       this.isLoading = true
 
       // Accept transfer
-      let transfer
       try {
-        transfer = await TransferManage.acceptTransfer(this.transfer.id)
+        await TransferManage.acceptTransfer(this.transfer.id)
       } catch (error) {
-        await displayErrorToast(error)
+        displayErrorToast(error)
         return
       } finally {
         this.isLoading = false
@@ -144,8 +149,33 @@ export default {
         type: "is-success"
       })
 
-      this.$emit("transfer", transfer)
+      this.$emit("transfer")
     },
+    async declineTransfer() {
+      // Loading
+      this.isLoading = true
+
+      // Decline transfer
+      try {
+        await TransferManage.cancelTransfer(this.transfer.id)
+      } catch (error) {
+        displayErrorToast(error)
+        return
+      } finally {
+        this.isLoading = false
+      }
+
+      // Handle UI changes
+      this.isActive = false
+      
+      // Show status update
+      this.$buefy.toast.open({
+        message: `Request declined`,
+        type: "is-success"
+      })
+
+      this.$emit("transfer")
+    }
   }
 }
 </script>

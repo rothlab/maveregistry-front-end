@@ -128,7 +128,7 @@ export default {
 
       // Unfollow
       try {
-        await TransferManage.cancelPendingTransfer(this.transfer.id)
+        await TransferManage.cancelTransfer(this.transfer.id)
       } catch (error) {
         await displayErrorToast(error)
         return

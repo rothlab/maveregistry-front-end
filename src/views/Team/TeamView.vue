@@ -439,7 +439,7 @@
         :on-action="obtainTeam"
       >
         <p style="margin: 1rem 0">
-          The current owner will not be notified.
+          As a moderator, you can obtain the ownership of this team record without notifying the current depositor.
         </p>
       </ConfirmDangerModal>
 

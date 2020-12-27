@@ -31,16 +31,17 @@ export const Transfer = Parse.Object.extend("Transfer", {
   }
 }, {
   create: async function (attrs) {
-    // Fetch recipient
+    // Fetch originate and recipient
     // No need to handle empty return because we have validations in the init function
     let query = new Parse.Query(Parse.User)
-    const recipient = await query.get(attrs.recipient_id)
+    if (typeof attrs.origin_id === "string") attrs.origin_id = await query.get(attrs.origin_id)
+    if (typeof attrs.recipient_id === "string") attrs.recipient_id = await query.get(attrs.recipient_id)
 
     // Check if any pending transfer exists
     // If exists, just return that transfer
     query = new Parse.Query(Transfer)
     query.equalTo("from", attrs.origin_id)
-    query.equalTo("to", recipient),
+    query.equalTo("to", attrs.recipient_id),
     query.equalTo("target_pointer", attrs.target_pointer)
     query.equalTo("target_type", attrs.target_type)
     query.equalTo("type", attrs.type)
@@ -50,7 +51,7 @@ export const Transfer = Parse.Object.extend("Transfer", {
 
     return new Transfer({
       from: attrs.origin_id,
-      to: recipient,
+      to: attrs.recipient_id,
       type: attrs.type,
       target_type: attrs.target_type,
       target_pointer: attrs.target_pointer
@@ -59,10 +60,10 @@ export const Transfer = Parse.Object.extend("Transfer", {
 })
 Parse.Object.registerSubclass('Transfer', Transfer)
 
-export async function transferOwnership(type, target, recipientId) {
+export async function transferOwnership(target, recipientId) {
   // Create a Transfer
   const transfer = await Transfer.create({
-    type: type,
+    type: "owner",
     target_type: target.type,
     target_pointer: target.id,
     origin_id: Parse.User.current(),
@@ -74,22 +75,36 @@ export async function transferOwnership(type, target, recipientId) {
   return transfer.format()
 }
 
-export async function fetchTransfer(type, target, isOwner = true) {
+export async function requestOwnership(target, ownerId) {
+  // Create a Transfer
+  const transfer = await Transfer.create({
+    type: "request",
+    target_type: target.type,
+    target_pointer: target.id,
+    origin_id: ownerId,
+    recipient_id: Parse.User.current(),
+  })
+
+  // If new object, save it first
+  if (transfer.isNew()) await transfer.save()
+  return transfer.format()
+}
+
+export async function fetchTransfer(type = undefined, target, isOwner = true) {
   // Fetch transfer
   const query = new Parse.Query(Transfer)
   query.equalTo(isOwner ? "from" : "to", Parse.User.current())
   query.equalTo("target_pointer", target.id)
   query.equalTo("target_type", target.type)
-  query.equalTo("type", type)
+  if (type) query.equalTo("type", type)
   query.doesNotExist("approvedAt") // Don't show approved transfer
   query.include(isOwner ? "to" : "from")
-  const transfer = await query.first()
+  const transfer = await query.find()
 
-  if (!transfer) return transfer
-  return transfer.format(isOwner)
+  return transfer.map(e => e.format(isOwner))
 }
 
-export async function cancelPendingTransfer(id) {
+export async function cancelTransfer(id) {
   // Fetch transfer
   const query = new Parse.Query(Transfer)
   query.equalTo("objectId", id)
