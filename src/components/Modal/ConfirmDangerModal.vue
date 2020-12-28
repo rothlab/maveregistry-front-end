@@ -142,7 +142,7 @@ export default {
       
       // Show status update
       this.$buefy.toast.open({
-        message: `${this.capitalize(this.type)} ${this.capitalize(this.action)}d`,
+        message: `${this.capitalize(this.type)} ${this.capitalize(this.getPastTense(this.action))}`,
         type: "is-success"
       })
 
