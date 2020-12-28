@@ -497,8 +497,18 @@ export default {
     }
   },
   watch: {
-    async currentUser() {
-      if (this.hasInitLoad) await this.fetchTeams()
+    async currentUser(newVal, oldVal) {
+      // Only fetch if user status has changed
+      // If logged in or logged out, refresh
+      if (!newVal && oldVal || newVal && !oldVal) {
+        if (this.hasInitLoad) await this.fetchTeams()
+      }
+
+      // If both logged in status, compare id
+      // and only refresh when user has changed
+      if (newVal && oldVal && newVal.id !== oldVal.id) {
+        if (this.hasInitLoad) await this.fetchTeams()
+      }
     }
   },
   async mounted() {

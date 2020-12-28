@@ -443,14 +443,19 @@
                 </div>
               </div>
 
-              <div v-if="props.row.projects.length < 1 && !hasLoggedIn">
-                <p>
-                  <b-icon
-                    icon="mdil-lock"
-                    class="team-icon"
-                  />
-                  Login for details
-                </p>
+              <div
+                v-if="props.row.projects.length < 1 && !hasLoggedIn"
+                class="card project-card has-background-light"
+              >
+                <div class="card-header">
+                  <p class="card-header-title">
+                    <b-icon
+                      icon="mdil-lock"
+                      style="margin-right: 0.25rem"
+                    />
+                    Login for details
+                  </p>
+                </div>
               </div>
               
               <b-collapse
@@ -821,8 +826,18 @@ export default {
     FilterOutline
   },
   watch: {
-    async currentUser() {
-      if (this.hasInitLoad) await this.fetchTargets()
+    async currentUser(newVal, oldVal) {
+      // Only fetch if user status has changed
+      // If logged in or logged out, refresh
+      if (!newVal && oldVal || newVal && !oldVal) {
+        if (this.hasInitLoad) await this.fetchTargets()
+      }
+
+      // If both logged in status, compare id
+      // and only refresh when user has changed
+      if (newVal && oldVal && newVal.id !== oldVal.id) {
+        if (this.hasInitLoad) await this.fetchTargets()
+      }
     },
     isFunder(val) {
       if (val) {

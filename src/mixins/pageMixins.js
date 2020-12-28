@@ -9,6 +9,20 @@ function getTitle (vm) {
   }
 }
 
+// language exceptions
+const exceptions = {
+	"are": "were",
+	"eat": "ate",
+	"go": "went",
+	"have": "had",
+	"inherit": "inherited",
+	"is": "was",
+	"run": "ran",
+	"sit": "sat",
+  "visit": "visited",
+  "cancel": "cancelled"
+}
+
 export default {
   created () {
     const title = getTitle(this)
@@ -25,6 +39,16 @@ export default {
     },
     hasDeepLink(action) {
       return this.$route.hash && this.$route.hash.split('?')[0] === action
+    },
+    getPastTense(verb) {
+      // Rules from here: https://gist.github.com/letsgetrandy/1e05a68ea74ba6736eb5
+      if (exceptions[verb]) return exceptions[verb]
+      if ((/e$/i).test(verb)) return verb + 'd'
+      if ((/[aeiou]c/i).test(verb)) return verb + 'ked'
+      if ((/el$/i).test(verb)) return verb + 'ed' // for american english only
+      if ((/[aeio][aeiou][dlmnprst]$/).test(verb)) return verb + 'ed'
+      if ((/[aeiou][bdglmnprst]$/i).test(verb)) return verb.replace(/(.+[aeiou])([bdglmnprst])/, '$1$2$2ed');
+      return verb + 'ed'
     }
   }
 }
