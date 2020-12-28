@@ -188,7 +188,7 @@
         <div class="level">
           <div class="level-left">
             <p>
-              Copyright © 2020 Mave Registry. Ver. {{ appVersion }}. <br>
+              © 2020-2021 Mave Registry. Ver. {{ appVersion }}. <br>
               Made with
               <b-icon
                 icon="mdil-heart"
