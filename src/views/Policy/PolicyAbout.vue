@@ -34,7 +34,7 @@
                 <a
                   href="#what-is"
                   class="scrollactive-item"
-                >What is Mave Registry?</a>
+                >What is MaveRegistry?</a>
               </li>
               <li>
                 <a
@@ -58,22 +58,22 @@
             id="what-is"
           >
             <p class="is-size-4">
-              What is Mave Registry?
+              What is MaveRegistry?
             </p>
             <p class="has-text-centered">
               <img
                 src="@/assets/image/logo.png"
-                alt="Mave Registry Logo"
+                alt="MaveRegistry Logo"
                 width="500"
               >
             </p>
             <p>
-              Mave Registry is a database for activities on studying targets with Multiplexed Assays of Variant Effect (MAVE).
+              MaveRegistry is a database for activities on studying targets with Multiplexed Assays of Variant Effect (MAVE).
             </p>
             <p>
-              Mave Registry is developed by 
+              MaveRegistry is developed by 
               <a
-                href="https://kevinkuang.net/"
+                href="https://github.com/kvnkuang"
                 target="_blank"
                 rel="noopener noreferrer"
               >Kevin Kuang</a>
@@ -95,7 +95,7 @@
               Contact Us
             </p>
             <p>
-              We would love to hear your thoughts and feedback so we can continue to improve Mave Registry.
+              We would love to hear your thoughts and feedback so we can continue to improve MaveRegistry.
             </p>
             <p>
               Please feel free to 
@@ -115,11 +115,11 @@
               Open Source Projects & Licenses
             </p>
             <p>
-              Mave Registry is built with an array of Open Source projects. Without technologies and supports from the Open Source community, 
-              it will be extremely difficult, if possible at all, to build Mave Registry.
+              MaveRegistry is built with an array of Open Source projects. Without technologies and supports from the Open Source community, 
+              it will be extremely difficult, if possible at all, to build MaveRegistry.
             </p>
             <p>
-              Specifically, Mave Registry benefits from the following major Open Source projects:
+              Specifically, MaveRegistry benefits from the following major Open Source projects:
             </p>
             <p>
               <ul>

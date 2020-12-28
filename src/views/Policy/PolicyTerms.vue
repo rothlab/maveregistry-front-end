@@ -117,11 +117,11 @@
             <p>
               1.1 These Terms and Conditions constitute a legally binding agreement made between you, whether personally or on behalf of an entity (<b>you</b>), 
               and Roth Laboratory, located at <b>160 College St, Rm 940, Toronto, Ontario M5S 3E1 Canada (we, us)</b>, concerning your access to and use of the 
-              <b>Mave Registry (https://registry.varianteffect.org)</b> website as well as any related applications (the <b>Site</b>).
+              <b>MaveRegistry (https://registry.varianteffect.org)</b> website as well as any related applications (the <b>Site</b>).
             </p>
             <p>
               The Site provides the following services: 
-              <b>MAVE Registry is a database for activities on studying targets with Multiplexed Assays of Variant Effect (MAVE). (Services).</b> 
+              <b>MaveRegistry is a database for activities on studying targets with Multiplexed Assays of Variant Effect (MAVE). (Services).</b> 
               You agree that by accessing the Site and/or Services, you have read, understood, and agree to be bound by all of these Terms and Conditions.  
             </p>
             <p>

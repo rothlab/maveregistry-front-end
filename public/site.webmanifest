@@ -1,6 +1,6 @@
 {
-    "name": "Mave Registry",
-    "short_name": "Mave Registry",
+    "name": "MaveRegistry",
+    "short_name": "MaveRegistry",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",

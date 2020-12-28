@@ -10,7 +10,7 @@ module.exports = {
     config
       .plugin('html')
       .tap(args => {
-        args[0].title = 'Mave Registry'
+        args[0].title = 'MaveRegistry'
         return args
       })
   },
