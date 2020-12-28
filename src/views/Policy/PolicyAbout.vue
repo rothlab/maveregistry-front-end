@@ -73,7 +73,7 @@
             <p>
               MaveRegistry is developed by 
               <a
-                href="https://kevinkuang.net/"
+                href="https://github.com/kvnkuang"
                 target="_blank"
                 rel="noopener noreferrer"
               >Kevin Kuang</a>
