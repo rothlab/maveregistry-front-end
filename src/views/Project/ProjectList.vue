@@ -443,14 +443,19 @@
                 </div>
               </div>
 
-              <div v-if="props.row.projects.length < 1 && !hasLoggedIn">
-                <p>
-                  <b-icon
-                    icon="mdil-lock"
-                    class="team-icon"
-                  />
-                  Login for details
-                </p>
+              <div
+                v-if="props.row.projects.length < 1 && !hasLoggedIn"
+                class="card project-card has-background-light"
+              >
+                <div class="card-header">
+                  <p class="card-header-title">
+                    <b-icon
+                      icon="mdil-lock"
+                      style="margin-right: 0.25rem"
+                    />
+                    Login for details
+                  </p>
+                </div>
               </div>
               
               <b-collapse
