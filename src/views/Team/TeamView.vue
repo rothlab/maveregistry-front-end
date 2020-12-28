@@ -379,7 +379,7 @@
 
             <div
               class="project-header"
-              v-if="hasActions"
+              v-if="isMember"
             >
               <p class="is-size-4 has-text-weight-bold">
                 Actions
@@ -388,26 +388,23 @@
 
             <div
               class="project-content action-buttons"
-              v-if="hasActions"
+              v-if="isMember"
             >
               <TransferAction
                 type="team"
                 :load-page="loadPage"
                 :is-owner="isOwner"
                 :target-id="teamId"
-                @has-transfer="(e) => hasTransfer = e"
+                @transfer="loadPage"
                 style="margin-bottom: 0.5rem"
               />
-              <b-button
-                v-if="isModerator && !isOwner"
-                icon-left="mdil-trophy"
-                type="is-light"
-                expanded
-                @click="isConfirmObtainOnwershipModalActive = true"
+              <ReuqestOwnershipAction
+                type="team"
+                :target-id="teamId"
+                :on-action="obtainTeam"
+                :is-owner="isOwner"
                 style="margin-bottom: 0.5rem"
-              >
-                Obtain Ownership
-              </b-button>
+              />
               <b-button
                 v-if="isOwner"
                 icon-left="mdil-delete"
@@ -430,18 +427,6 @@
         type="team"
         @change="fetchFollowerAndRequestCount(teamId)"
       />
-
-      <!-- Obtain ownership modal -->
-      <ConfirmDangerModal
-        :active.sync="isConfirmObtainOnwershipModalActive"
-        type="team"
-        action="obtain"
-        :on-action="obtainTeam"
-      >
-        <p style="margin: 1rem 0">
-          As a moderator, you can obtain the ownership of this team record without notifying the current depositor.
-        </p>
-      </ConfirmDangerModal>
 
       <!-- Confirm Delete Modal -->
       <ConfirmDangerModal
@@ -547,15 +532,18 @@
 import * as TeamManage from "@/api/teamManage.js"
 import * as FollowManage from "@/api/followManage.js"
 import * as InviteManage from "@/api/inviteManage.js"
+import * as TransferManage from "@/api/transferManage.js"
+import uniqBy from "lodash/uniqBy"
 import Error from '@/components/Error.vue'
 import ManageFollowerModal from '@/components/Modal/ManageFollowerModal.vue'
 import ManageTeamJoinModal from '@/components/Modal/ManageTeamJoinModal.vue'
+import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
 import ConfirmInfoModal from '@/components/Modal/ConfirmInfoModal.vue'
 import InviteModal from '@/components/Modal/InviteModal.vue'
 import { handleError } from '@/api/errorHandler.js'
 import FollowButtonAction from '@/components/Action/FollowButtonAction.vue'
 import TransferAction from '@/components/Action/TransferAction.vue'
-import ConfirmDangerModal from '@/components/Modal/ConfirmDangerModal.vue'
+import ReuqestOwnershipAction from '@/components/Action/RequestOwnershipAction.vue'
 
 export default {
   title: "View Team",
@@ -564,10 +552,11 @@ export default {
     ManageFollowerModal,
     InviteModal,
     ManageTeamJoinModal,
+    ConfirmDangerModal,
+    ConfirmInfoModal,
     FollowButtonAction,
     TransferAction,
-    ConfirmDangerModal,
-    ConfirmInfoModal
+    ReuqestOwnershipAction
   },
   computed: {
     teamId() {
@@ -575,9 +564,6 @@ export default {
     },
     hasProject() {
       return this.projects && this.projects.length > 0
-    },
-    hasActions() {
-      return !!this.hasTransfer || this.isOwner || this.isModerator
     },
     isOwner() {
       return this.creator && this.creator.username && this.$store.getters.isOwner(this.creator.username)
@@ -598,7 +584,6 @@ export default {
         page: false
       },
       isManageFollowerModalActive: false,
-      isConfirmObtainOnwershipModalActive: false,
       isConfirmDeleteModalActive: false,
       isJoinTeamModalActive: false,
       isLeaveTeamModalActive: false,
@@ -721,7 +706,7 @@ export default {
         this.projects = team.projects
         this.pagination.total = this.projects.length
         const collaborators = team.projects.map(e => e.collaborators).filter(Boolean)
-        if (collaborators.length > 0) this.collaborators = [].concat.apply([], collaborators)
+        if (collaborators.length > 0) this.collaborators = uniqBy([].concat.apply([], collaborators), "id")
       }
 
       // Format follow status
@@ -749,7 +734,17 @@ export default {
       return this.$route.hash === action
     },
     async obtainTeam() {
-      await TeamManage.obtainTeam(this.teamId)
+      // If moderator, obtain project
+      if (this.isModerator) {
+        await TeamManage.obtainTeam(this.teamId)
+      } else {
+        const target = {
+          type: "team",
+          id: this.teamId
+        }
+        await TransferManage.requestOwnership(target, this.creator.id)
+      }
+
       await this.loadPage()
     },
     async deleteTeam() {

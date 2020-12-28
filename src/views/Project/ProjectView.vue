@@ -376,6 +376,7 @@
                 :target-id="projectId"
                 :on-action="obtainProject"
                 :is-owner="isOwner"
+                style="margin-bottom: 0.5rem"
               />
               <b-button
                 v-if="isOwner"
