@@ -4,8 +4,8 @@ function getTitle (vm) {
   const { title } = vm.$options
   if (title) {
     return typeof title === 'function'
-      ? 'Mave Registry - ' + title.call(vm)
-      : 'Mave Registry - ' + title
+      ? 'MaveRegistry - ' + title.call(vm)
+      : 'MaveRegistry - ' + title
   }
 }
 

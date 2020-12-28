@@ -19,7 +19,7 @@
           >
             <img
               src="./assets/image/logo.png"
-              alt="Mave Registry Logo"
+              alt="MaveRegistry Logo"
             >
           </router-link>
         </b-navbar-item>
@@ -188,7 +188,7 @@
         <div class="level">
           <div class="level-left">
             <p>
-              © 2020-2021 Mave Registry. Ver. {{ appVersion }}. <br>
+              © 2020-2021 MaveRegistry. Ver. {{ appVersion }}. <br>
               Made with
               <b-icon
                 icon="mdil-heart"

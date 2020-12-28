@@ -20,7 +20,7 @@
             <img
               width="200"
               src="@/assets/image/logo.png"
-              alt="Mave Registry Logo"
+              alt="MaveRegistry Logo"
             >
           </div>
           <div class="level-right">

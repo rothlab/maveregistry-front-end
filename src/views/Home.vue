@@ -47,7 +47,7 @@
                     Tracked Here
                   </h1>
                   <p class="is-size-5">
-                    Mave Registry is a collaborative resource for sharing progress on Multiplexed Assays of Variant Effect (MAVE).
+                    MaveRegistry is a collaborative resource for sharing progress on Multiplexed Assays of Variant Effect (MAVE).
                   </p>
                 </div>
 
@@ -118,7 +118,7 @@
         <div class="container has-text-centered">
           <p class="section-header">
             How does 
-            <span class="has-text-primary">Mave Registry</span> work?
+            <span class="has-text-primary">MaveRegistry</span> work?
           </p>
 
           <div>
@@ -194,7 +194,7 @@
         <div class="container has-text-centered">
           <p class="section-header">
             What can
-            <span class="has-text-primary">Mave Registry</span>
+            <span class="has-text-primary">MaveRegistry</span>
             do
             <span class="has-text-success">for you</span>?
           </p>
