@@ -5,6 +5,7 @@ import { ToastProgrammatic as Toast } from 'buefy'
 const hasSentry = process.env.NODE_ENV !== "development"
 
 export async function handleError(err) {
+  if (!err.code) return err
   switch (err.code) {
     case Parse.Error.INVALID_SESSION_TOKEN:
       await Store.dispatch("logoutUser")
