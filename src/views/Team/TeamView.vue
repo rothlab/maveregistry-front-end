@@ -673,7 +673,7 @@ export default {
         // Fetch team follower and request count
         if (team && this.isOwner) await this.fetchFollowerAndRequestCount(team.id)
       } catch (error) {
-        this.errorMessage = await handleError(console.error())
+        this.errorMessage = await handleError(error)
       } finally {
         this.isLoading.page = false
       }
