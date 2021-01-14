@@ -211,7 +211,7 @@
                         class="font-14px"
                       >
                         <b-icon icon="mdil-link" />
-                        Links
+                        Publications or other links
                       </b-tag>
                   
                       <b-tag class="has-background-white-bis font-14px">
