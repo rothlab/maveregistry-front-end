@@ -356,10 +356,10 @@
           <b-table-column
             field="target_name"
             label="Target"
-            cell-class="is-uppercase vertical-center"
+            cell-class="is-uppercase vertical-center target-name"
             v-slot="props"
           >
-            {{ props.row.name }}
+            <span :title="props.row.name.toUpperCase()">{{ props.row.name }}</span>
           </b-table-column>
 
           <!-- Target type -->
@@ -423,7 +423,7 @@
           <b-table-column
             field="projects"
             label="Project"
-            width="33vw"
+            width="600px"
             v-slot="props"
           >
             <div class="has-text-left">
@@ -484,7 +484,7 @@
                     <span
                       class="is-size-7 has-text-info is-hidden-touch is-hidden-desktop-only"
                       style="margin-left: 0.5rem"
-                    >(Click to {{ innerProps.open ? 'collapse' : 'expand' }})</span>
+                    >({{ innerProps.open ? 'Collapse' : 'Expand' }})</span>
                   </p>
                   <p
                     v-else
@@ -498,7 +498,7 @@
                     <span
                       class="is-size-7 has-text-info is-hidden-touch is-hidden-desktop-only"
                       style="margin-left: 0.5rem"
-                    >(Click to {{ innerProps.open ? 'collapse' : 'expand' }})</span>
+                    >({{ innerProps.open ? 'Collapse' : 'Expand' }})</span>
                   </p>
                   <div class="card-header-icon">
                     <!-- Open for funding -->
@@ -727,6 +727,7 @@
                     target="_blank"
                     icon-right="mdil-magnify"
                     type="is-light"
+                    style="width: 44px"
                   />
                 </b-tooltip>
               </p>
@@ -1053,8 +1054,18 @@ export default {
         border-bottom-right-radius: 4px
         flex-grow: 1
         justify-content: flex-start
+
 .card-header-icon
   .b-tooltip
     &:not(:last-child), &:only-child
       margin-right: 0.25rem
+</style>
+
+<style lang="sass">
+@media screen and (min-width: 769px)
+  .target-name
+    max-width: 180px
+    overflow: hidden
+    white-space: nowrap
+    text-overflow: ellipsis
 </style>
