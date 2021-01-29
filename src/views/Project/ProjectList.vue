@@ -1062,9 +1062,10 @@ export default {
 </style>
 
 <style lang="sass">
-.target-name
-  max-width: 180px
-  overflow: hidden
-  white-space: nowrap
-  text-overflow: ellipsis
+@media screen and (min-width: 769px)
+  .target-name
+    max-width: 180px
+    overflow: hidden
+    white-space: nowrap
+    text-overflow: ellipsis
 </style>
