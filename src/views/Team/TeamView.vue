@@ -644,6 +644,9 @@ export default {
       try {
         const team = await this.fetchTeam()
 
+        // If no team, don't parse properties
+        if (!team) return
+
         // Format members
         if (team.members) {
           // For owner, separate join requests
