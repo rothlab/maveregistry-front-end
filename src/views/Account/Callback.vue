@@ -68,6 +68,7 @@ function getFullSize(url) {
   // Cover these two types of links:
   // 1) https://lh3.googleusercontent.com/a-/imageid-tUc=s96
   // 2) https://lh3.googleusercontent.com/imageid/imageid/imageid/imageid/s96-c/photo.jpg
+  if (!url) return url
   return url.replace(/(=.+|\/s96-c)/, "")
 }
 
