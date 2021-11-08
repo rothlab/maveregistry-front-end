@@ -35,7 +35,7 @@ Vue.config.productionTip = false
 // Initialize Sentry
 Sentry.init({
   Vue: Vue,
-  dsn: process.env.NODE_ENV === "development" ? '' : 'https://937e133d79854ca7a2301bbaa9aa8a36@o239664.ingest.sentry.io/5266396',
+  dsn: 'https://937e133d79854ca7a2301bbaa9aa8a36@o239664.ingest.sentry.io/5266396',
   logErrors: true,
   integrations: [
     new Integrations.BrowserTracing({
@@ -46,7 +46,9 @@ Sentry.init({
     trackComponents: true,
   },
   tracesSampleRate: 0.5,
-  release: 'mave-registry-frontend@' + process.env.VUE_APP_VERSION
+  release: 'mave-registry-frontend@' + process.env.VUE_APP_VERSION,
+  tunnel: process.env.VUE_APP_SENTRY_TUNNEL_URL,
+  environment: process.env.NODE_ENV
 });
 // Report vuex states
 Sentry.configureScope(scope => {
