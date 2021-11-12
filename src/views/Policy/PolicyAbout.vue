@@ -85,6 +85,18 @@
               >Roth Lab</a>
               at the Univeristy of Toronto.
             </p>
+            <p class="is-size-5">
+              Citation
+            </p>
+            <p>
+              Kuang, Da, <i>et al.</i> "MaveRegistry: a collaboration platform for multiplexed assays of variant effect." Bioinformatics (2021).
+              <a
+                href="https://academic.oup.com/bioinformatics/article/37/19/3382/6198101"
+                target="_blank"
+              >
+                (PubMed)
+              </a>
+            </p>
           </div>
 
           <div

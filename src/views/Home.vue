@@ -49,6 +49,18 @@
                   <p class="is-size-5">
                     MaveRegistry is a collaborative resource for sharing progress on Multiplexed Assays of Variant Effect (MAVE).
                   </p>
+                  <p class="is-size-6">
+                    <br>
+                    <i>
+                      Please cite: 
+                      <a
+                        href="https://academic.oup.com/bioinformatics/article/37/19/3382/6198101"
+                        target="_blank"
+                      >
+                        <u>Kuang et al. 2021</u>
+                      </a>
+                    </i>
+                  </p>
                 </div>
 
                 <!-- Action buttons -->
