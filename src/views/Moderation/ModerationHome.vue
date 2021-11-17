@@ -457,6 +457,7 @@ import ManageFunderModal from '@/components/Modal/ManageFunderModal.vue'
 import * as ModerationManage from "@/api/moderationManage.js"
 import * as FunderManage from "@/api/funderManage.js"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
+import debounce from 'lodash/debounce'
 
 export default {
   title: "Moderation",
@@ -465,8 +466,8 @@ export default {
     ManageFunderModal
   },
   watch: {
-    async userFilter() {
-      await this.fetchUsers()
+    userFilter() {
+      this.debouncedFetchUsers()
     },
     async projectFilter() {
       await this.fetchProjects()
@@ -507,6 +508,9 @@ export default {
     this.fetchProjects()
   },
   methods: {
+    debouncedFetchUsers: debounce(async function() {
+      return await this.fetchUsers()
+    }, 500),
     async fetchUsers() {
       this.isLoading.users = true
 
