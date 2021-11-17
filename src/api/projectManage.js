@@ -307,7 +307,7 @@ export async function fetchTargets(limit, skip, filter) {
   // Apply filter when available
   if (filter.type !== '') query.equalTo("type", filter.type)
   if (filter.organism !== '') query.equalTo("organism", filter.organism)
-  if (filter.name !== '') query.startsWith("name", filter.name.toLowerCase())
+  if (filter.name !== '') query.matches("name", filter.name.toLowerCase())
   if (filter.created_after) query.greaterThanOrEqualTo("createdAt", filter.created_after)
   if (filter.conditions.length > 0) {
     const projectQuery = new Parse.Query(Project)
