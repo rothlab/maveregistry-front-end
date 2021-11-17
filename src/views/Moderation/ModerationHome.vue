@@ -469,8 +469,8 @@ export default {
     userFilter() {
       this.debouncedFetchUsers()
     },
-    async projectFilter() {
-      await this.fetchProjects()
+    projectFilter() {
+      this.debouncedFetchProjects()
     }
   },
   data() {
@@ -510,6 +510,9 @@ export default {
   methods: {
     debouncedFetchUsers: debounce(async function() {
       return await this.fetchUsers()
+    }, 500),
+    debouncedFetchProjects: debounce(async function() {
+      return await this.fetchProjects()
     }, 500),
     async fetchUsers() {
       this.isLoading.users = true
