@@ -354,7 +354,6 @@ export default {
 
     // Load production third-party functionality
     if (process.env.NODE_ENV !== "development") {
-      this.initFeedbackButton() // Crisp Feedback button
       this.initSimpleAnalytics() // Simple Analytics
     }
   },
@@ -405,32 +404,6 @@ export default {
           }
         })
       }
-    },
-    initFeedbackButton() {
-      // Init parameters
-      window.$crisp = []
-      window.CRISP_WEBSITE_ID = "fcaf4708-d52f-439f-a74d-f6fb241d2958"
-
-      // Register a callback function to send basic information
-      if (this.hasLoggedIn && this.currentUser) {
-        window.$crisp = [
-          ["on", "chat:opened", () => {
-            const name = this.capitalize(this.currentUser.first_name) + " " + this.capitalize(this.currentUser.last_name)
-            window.$crisp.push(["set", "user:nickname", name])
-            window.$crisp.push(["set", "user:email", this.currentUser.email])
-            window.$crisp.push(["set", "user:avatar", [this.currentUser.profile_image]])
-          }]
-        ]
-      }
-      
-      (function() {
-        var d = document
-        var s = d.createElement("script")
-
-        s.src = "https://client.crisp.chat/l.js"
-        s.async = 1
-        d.getElementsByTagName("head")[0].appendChild(s)
-      })();
     },
     initSimpleAnalytics() {
       (function() {

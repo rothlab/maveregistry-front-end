@@ -441,10 +441,6 @@
                   <b>Website Performance Monitoring</b><br>
                   Sentry
                 </li>
-                <li>
-                  <b>Customer Support and Feedback Collection</b><br>
-                  Crisp
-                </li>
               </ul>
             </p>
           </div>
