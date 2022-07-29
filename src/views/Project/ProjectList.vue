@@ -1142,7 +1142,6 @@ export default {
           });
           formattedProjects.push(...projects)
         }
-        console.log(formattedProjects)
 
         // Trigger download csv
         // Code inspired by the vue-json-csv package
