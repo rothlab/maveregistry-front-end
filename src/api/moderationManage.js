@@ -1,7 +1,7 @@
 import { Parse } from "./parseConnect.js"
 
 // List users
-export async function listUsers(filter = "", limit = 10, skip = 0) {
+export async function listUsers(filter = "", limit = undefined, skip = 0) {
   return await Parse.Cloud.run("listUsers", { filter: filter, limit: limit, skip: skip })
 }
 

@@ -8,7 +8,7 @@
             <div class="level-left">
               <div class="content">
                 <p class="is-size-3 has-text-weight-medium">
-                  Moderate
+                  Moderation
                 </p>
               </div>
             </div>
@@ -67,7 +67,7 @@
                   type="search"
                   icon="mdil-magnify"
                 />
-                <p class="control">
+                <p class="control buttons">
                   <b-button
                     :type="funderRequests > 0 ? 'is-warning' : 'is-light'"
                     icon-left="mdil-clipboard-text"
@@ -78,6 +78,15 @@
                     <span v-if="funderRequests > 0">
                       ({{ funderRequests > 1 ? funderRequests + " new requests" : funderRequests + " new request" }})
                     </span>
+                  </b-button>
+                  <b-button
+                    type="is-light"
+                    icon-left="mdil-download"
+                    :loading="isLoading.users || isLoading.download_users"
+                    :disabled="userPagination.count < 1"
+                    @click="downloadUserInfo"
+                  >
+                    Download {{userFilter ? "Filtered" : ""}} User Info
                   </b-button>
                 </p>
               </b-field>
@@ -228,6 +237,19 @@
                 <b-icon icon="mdil-thumbs-up-down" />
                 {{ props.row.counts.nomination_vote }}
               </b-tooltip>
+            </b-table-column>
+
+            <!-- Notification -->
+            <b-table-column
+              field="email-notification"
+              label="Email Notification"
+              v-slot="props"
+              cell-class="vertical-center"
+            >
+              <span v-if="props.row.email_opt_out" class="has-text-danger">Opted out of all emails</span>
+              <span v-else>
+                Newsletter: {{ props.row.email_newsletter_frequency }}
+              </span>
             </b-table-column>
 
             <!-- Actions -->
@@ -458,6 +480,8 @@ import * as ModerationManage from "@/api/moderationManage.js"
 import * as FunderManage from "@/api/funderManage.js"
 import { handleError, displayErrorToast } from "@/api/errorHandler.js"
 import debounce from 'lodash/debounce'
+import { unparse } from "papaparse";
+import { saveAs } from "file-saver";
 
 export default {
   title: "Moderation",
@@ -478,6 +502,7 @@ export default {
       errorMessage: "",
       isLoading: {
         users: false,
+        download_users: false,
         funder_request: false,
         projects: false
       },
@@ -594,7 +619,46 @@ export default {
       } catch (error) {
         await displayErrorToast(error)
       }
-    }
+    },
+    async downloadUserInfo() {
+      this.isLoading.download_users = true
+
+      try {
+        // Load all users
+        let response = await ModerationManage.listUsers(this.userFilter)
+        response = response.results
+        
+        // Flatten user data and convert to CSV
+        let csv = response.map(user => {
+          return {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+            has_validated_email: user.email_validated,
+            email_opt_out: Boolean(user.email_opt_out),
+            email_newsletter_frequency: user.email_newsletter_frequency,
+            is_blocked: user.is_blocked,
+            is_moderator: Boolean(user.is_moderator),
+            num_projects_owned: user.counts.project_owner,
+            num_projects_followed: user.counts.project_follower,
+            num_team_owned: user.counts.team_owner,
+            num_team_followed: user.counts.team_follower,
+            num_nomination_owned: user.counts.nomination_owner,
+            num_nomination_voted: user.counts.nomination_vote,
+          }
+        })
+        csv = unparse(csv)
+        csv = "\ufeff" + csv; // Set UTF-8 encoding
+        let blob = new Blob([csv], {
+          type: "application/csvcharset=" + this.encoding
+        });
+        saveAs(blob, "user_info.csv");
+      } catch (error) {
+        this.errorMessage = await handleError(error)
+      } finally {
+        this.isLoading.download_users = false
+      }
+    },
   }
 }
 </script>

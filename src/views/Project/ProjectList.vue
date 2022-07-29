@@ -378,7 +378,7 @@
               :loading="isLoading.prepare_download"
               :disabled="isLoading.fetch_targets"
             >
-              Download All Projects
+              Download All {{hasProjectFilter ? "Filtered" : ""}} Projects
             </b-button>
           </template>
 
@@ -920,6 +920,12 @@ export default {
       }
     },
   },
+  computed: {
+    hasProjectFilter() {
+      return !!this.filter.type || !!this.filter.name || !!this.filter.organism
+        || !!this.filter.created_after || (!Array.isArray(this.filter.conditions) || this.filter.conditions.length > 0) || !!this.filter.progress
+    },
+  },
   data() {
     return {
       targets: [],
@@ -1142,7 +1148,6 @@ export default {
           });
           formattedProjects.push(...projects)
         }
-        console.log(formattedProjects)
 
         // Trigger download csv
         // Code inspired by the vue-json-csv package
