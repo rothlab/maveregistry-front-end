@@ -993,8 +993,15 @@ export default {
       }
     }
 
-    // Handle deep links
-    if (this.hasDeepLink("#create")) this.handleNewTargetModal();
+    // Hide display elements based on role
+    if (!this.isFunder) {
+      const conditionKeys = Object.keys(this.conditions).filter(
+        (e) => !this.conditions[e].role || this.conditions[e].role !== "funder"
+      );
+      this.conditions = pick(this.conditions, conditionKeys);
+    }
+
+    // Handle funding needs as a filter in the link
     if (this.hasDeepLink("#with-funding-needs")) {
       try {
         this.isLoading.fetch_targets = true;
@@ -1007,15 +1014,10 @@ export default {
       }
     }
 
-    // Hide display elements based on role
-    if (!this.isFunder) {
-      const conditionKeys = Object.keys(this.conditions).filter(
-        (e) => !this.conditions[e].role || this.conditions[e].role !== "funder"
-      );
-      this.conditions = pick(this.conditions, conditionKeys);
-    }
-
     await this.fetchTargets();
+
+    // Handle other deep links
+    if (this.hasDeepLink("#create")) this.handleNewTargetModal();
 
     this.hasInitLoad = true;
   },
@@ -1080,6 +1082,7 @@ export default {
     handleNewTargetModal(prefill = undefined) {
       // If not logged in, show the login panel instead
       if (!this.hasLoggedIn) {
+        console.log("show login")
         this.$emit("login");
         return;
       }
