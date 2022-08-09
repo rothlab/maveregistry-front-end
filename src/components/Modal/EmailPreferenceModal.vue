@@ -170,7 +170,7 @@
               <div class="columns is-mobile">
                 <div class="column">
                   <span class="is-size-6 has-text-primary">Project</span>
-                  <span class="is-size-7 help">Email me updates concering projects I follow.</span>
+                  <span class="is-size-7 help">Email me updates concerning projects I follow.</span>
                 </div>
                 <div class="column is-4">
                   <b-select
@@ -249,7 +249,59 @@
               </div>
             </b-tab-item>
 
-            <b-tab-item label="Communication">
+            <b-tab-item label="Other">
+              <div class="columns is-mobile">
+                <div class="column">
+                  <span class="is-size-6 has-text-primary">Reminder - Project Registration</span>
+                  <span class="is-size-7 help">Remind me to register projects with the Registry</span>
+                </div>
+                <div class="column is-4">
+                  <b-select
+                    placeholder="Frequency"
+                    expanded
+                    v-model="reminder_project_registration"
+                  >
+                    <option value="off">
+                      Off
+                    </option>
+                    <option value="monthly">
+                      Monthly
+                    </option>
+                    <option value="quarterly">
+                      Quarterly
+                    </option>
+                    <option value="yearly">
+                      Yearly
+                    </option>
+                  </b-select>
+                </div>
+              </div>
+              <div class="columns is-mobile">
+                <div class="column">
+                  <span class="is-size-6 has-text-primary">Reminder - Project Update</span>
+                  <span class="is-size-7 help">Remind me to update projects deposited in the Registry</span>
+                </div>
+                <div class="column is-4">
+                  <b-select
+                    placeholder="Frequency"
+                    expanded
+                    v-model="reminder_project_update"
+                  >
+                    <option value="off">
+                      Off
+                    </option>
+                    <option value="monthly">
+                      Monthly
+                    </option>
+                    <option value="quarterly">
+                      Quarterly
+                    </option>
+                    <option value="yearly">
+                      Yearly
+                    </option>
+                  </b-select>
+                </div>
+              </div>
               <div class="columns is-mobile">
                 <div class="column">
                   <span class="is-size-6 has-text-primary">Newsletters</span>
@@ -388,6 +440,8 @@ export default {
       project_update: "",
       team_update: "",
       status_update: "",
+      reminder_project_registration: "",
+      reminder_project_update: "",
       newsletter: ""
     }
   },
@@ -416,6 +470,8 @@ export default {
         this.team_update = preference.team_update
         this.status_update = preference.status_update
         this.newsletter = preference.newsletter
+        this.reminder_project_registration = preference.reminder_project_registration
+        this.reminder_project_update = preference.reminder_project_update
       }
     },
     async setPreference() {
@@ -431,7 +487,9 @@ export default {
             project_update: this.project_update,
             team_update: this.team_update,
             status_update: this.status_update,
-            newsletter: this.newsletter
+            newsletter: this.newsletter,
+            reminder_project_registration: this.reminder_project_registration,
+            reminder_project_update: this.reminder_project_update
           })
         } catch (error) {
           await displayErrorToast(error)

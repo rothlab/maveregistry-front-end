@@ -305,7 +305,9 @@ export async function getEmailPreference(id) {
     project_update: setting.get("email_project_update"),
     team_update: setting.get("email_team_update"),
     status_update: setting.get("email_status_update"),
-    newsletter: setting.get("email_newsletter")
+    newsletter: setting.get("email_newsletter"),
+    reminder_project_registration: setting.get("email_reminder_project_registration"),
+    reminder_project_update: setting.get("email_reminder_project_update")
   }
 }
 
@@ -324,6 +326,8 @@ export async function setEmailPreference(id, preference) {
   setting.set("email_team_update", preference.team_update)
   setting.set("email_status_update", preference.status_update)
   setting.set("email_newsletter", preference.newsletter)
+  setting.set("email_reminder_project_registration", preference.reminder_project_registration)
+  setting.set("email_reminder_project_update", preference.reminder_project_update)
   return await setting.save()
 }
 

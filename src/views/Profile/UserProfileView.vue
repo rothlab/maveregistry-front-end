@@ -238,7 +238,7 @@
               >
                 <b-tab-item v-if="hasProject">
                   <template #header>
-                    <span> Projects <b-tag rounded> {{ userInfo.projects.length }} </b-tag> </span>
+                    <span id="projects"> Projects <b-tag rounded> {{ userInfo.projects.length }} </b-tag> </span>
                   </template>
 
                   <p class="is-size-5">
@@ -255,7 +255,8 @@
                         {{ project.target.name.toUpperCase() }} ({{ project.target.type }}),
                         <i>{{ project.target.organism }}</i>
                       </router-link><br>
-                      <span class="has-text-grey is-size-6">Features: {{ project.features.join(", ") }}</span>
+                      <span class="has-text-grey is-size-6" v-if="project.features.length > 0">Features: {{ project.features.join(", ") }}<br></span>
+                      <span class="has-text-grey is-size-6">Last Update: {{ project.update_date.toLocaleString() }}</span>
                     </span>
                   </p>
                 </b-tab-item>
@@ -450,6 +451,10 @@ export default {
   async mounted () {
     this.userInfo = await this.fetchUserInfo(this.username)
     this.hasInitLoad = true
+  },
+  updated() {
+    // Check if should scroll to projects
+    if (this.hasDeepLink("#projects") & this.hasProject) this.$scrollTo('#projects')
   },
   methods: {
     async fetchUserInfo(username) {
