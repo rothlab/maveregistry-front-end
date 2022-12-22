@@ -16,6 +16,7 @@
   ],
   "genomic_features": [
     "5’ UTR",
+    "3’ UTR",
     "Attenuator",
     "Coding Sequence",
     "Enhancer",
@@ -45,6 +46,7 @@
     "Assay Development/Validation",
     "MAVE Data Collection",
     "MAVE Data Analysis",
+    "Project Paused or Ended",
     "Publication in Preparation",
     "Publication Available"
   ],
@@ -53,6 +55,7 @@
     "Assay Development/Validation": "mdil-flask",
     "MAVE Data Collection": "mdil-clipboard-plus",
     "MAVE Data Analysis": "mdil-chart-line",
+    "Project Paused or Ended": "mdil-pause",
     "Publication in Preparation": "mdil-pencil",
     "Publication Available": "mdil-book"
   },
@@ -93,6 +96,13 @@
         "If sequencing data is used, what platform (e.g. Illumina, PacBio) was used to generate them?",
         "What computational tools and/or pipelines do you use? You can add reference links below.",
         "If you are using in-house tools/pipelines, can you briefly describe it? You can add reference links below."
+      ]
+    },
+    "Project Paused or Ended": {
+      "description": "project is currently on pause or has ended",
+      "questions": [
+        "Why the project was put on pause or ended?",
+        "Will the project be reactivated? If so, when?"
       ]
     },
     "Publication in Preparation": {
